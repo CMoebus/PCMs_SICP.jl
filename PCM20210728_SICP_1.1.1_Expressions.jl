@@ -12,7 +12,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia-Pluto.jl-code by PCM *** 2022/08/17 ***
+###### Julia-Pluto.jl-code by PCM *** 2022/08/19 ***
 
 ====================================================================================
 "
@@ -193,7 +193,7 @@ md"
 
 ====================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus@uol.de**
+This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "
