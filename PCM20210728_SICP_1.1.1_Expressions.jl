@@ -1,6 +1,11 @@
 ### A Pluto.jl notebook ###
 # v0.19.11
 
+#> [frontmatter]
+#> title = "SICP.jl: 1.1.1 Expressions"
+#> date = "2022-08-20"
+#> description = "transpilation of SICP's chapter 1.1.1 into Pluto/Julia by PCM"
+
 using Markdown
 using InteractiveUtils
 
@@ -8,11 +13,11 @@ using InteractiveUtils
 md"
 ====================================================================================
 
-### SICP: [1.1.1 Expressions](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
+### SICP: [1.1.1 Expressions](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf)
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia-Pluto.jl-code by PCM *** 2022/08/17 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/20 ***
 
 ====================================================================================
 "
@@ -183,6 +188,8 @@ md"
 ---
 #### References
 
+- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
+- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf), last visit 2022/08/20
 - Bauer, F.L. & Wössner, H.; Algorithmic Language and Program Development, Heidelberg: Springer, 1981
 "
 
@@ -193,7 +200,7 @@ md"
 
 ====================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus@uol.de**
+This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "
@@ -207,8 +214,9 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.3"
+julia_version = "1.8.0"
 manifest_format = "2.0"
+project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 [deps]
 """
