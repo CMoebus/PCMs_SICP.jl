@@ -11,7 +11,7 @@ md"
 
  ###### file: PCM20210729\_SICP\_1.1.6\_Conditional\_Expressions\_and_Predicates.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/21 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/22 ***
 ===================================================================================
 "
 
@@ -197,6 +197,7 @@ geEq5(3, 5)
 # ╔═╡ 8208a2ee-8698-4a8c-81e2-3624abc4f7d3
 md"
 ###### n-ary Boolean operators with *strict* evaluation
+###### function application forms of *bitwise* '&' and '|'
 "
 
 # ╔═╡ c40f2fe6-c8ac-4ace-bb54-148506bdb7a1
@@ -270,16 +271,7 @@ or(false, false, false)
 md"
 ---
 #### 1.1.6.2 *idiomatic* Julia ...
-##### ... with infix operators
-"
-
-# ╔═╡ fe49318c-6fbb-46ae-b5a3-cfc0eb61ce7f
-md"
-###### chaining
-"
-
-# ╔═╡ 594739db-e694-475f-a55a-24b16fc1e75a
-md"
+##### ... with *infix* operators and *chaining* comparisons
 $$5 < 2 < 10 := (5 < 2) \land (2 < 10)$$
 "
 
@@ -402,8 +394,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═18ee8e44-abd2-4b6e-a66f-5be2dcda2978
 # ╠═6877d30c-7b37-4ec5-9fc7-d6b5fbe382bd
 # ╟─9326271a-ce21-4254-ab26-a42f87d18bc5
-# ╟─fe49318c-6fbb-46ae-b5a3-cfc0eb61ce7f
-# ╟─594739db-e694-475f-a55a-24b16fc1e75a
 # ╠═96004b6e-d0f7-4afa-8ee2-f61aa84af474
 # ╠═b00ca9fe-70fa-4d24-808f-581965d76df6
 # ╠═cedbf13f-be78-43d7-879a-63971f02c8f5
