@@ -11,4 +11,4 @@ In the last two years I became more acquainted with Julia partly because of Davi
 
 Now, learning Julia by transpiling the original SICP-Scheme scripts into Pluto/Julia seems to me the best practice in developing CS-skills in various basic domains.
 
-Claus Möbus (2022/08/21)
+Claus Möbus (2022/08/22)
