@@ -5,7 +5,7 @@ The seminal book "Structure and Interpretation of Computer Programs (SICP)" was 
 
 Later new lecturers took over the responsibility replacing Scheme by Python. One of the main reasons was the impression that todays developers need a 'glue' language combining libraries. Though the MIT-CS course switched over to Python, the website remained the same in content and url-location.
 
-This year (2022) MIT Press did not provide a follow-up edition like "SICP in Python" but an edition in Javascript (https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs,_JavaScript_Edition). This is a bit astonishing because the target audience of SICP-Scheme editions were CS and electrical engineers. These students don't use JS for their work.
+This year (2022) MIT Press did not provide a follow-up edition like "SICP in Python" but an edition in Javascript (https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs,_JavaScript_Edition). This is a bit astonishing because the target audience of the SICP-Scheme editions were CS and electrical engineers. These students don't use JS for their work.
 
 In the last two years I became more acquainted with Julia partly because of David Barber's (http://web4.cs.ucl.ac.uk/staff/D.Barber/pmwiki/pmwiki.php?n=Brml.HomePage) recommendation and party because some time later I came across the elegant probabilistic programming language TURING (https://github.com/TuringLang). Moreover two other probabilistic programming languages (...) are also based on Julia and its libraries. So I realized that Julia is the upcoming scientific programming language replacing Matlab, Python, and Scheme. In any case it is a more natural and more efficient successor of Scheme than JS. 
 
