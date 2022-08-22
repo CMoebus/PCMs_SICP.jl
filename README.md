@@ -1,7 +1,7 @@
 # PCMs_SICP.jl
 This is my personal reconstruction of SICP in Pluto/Julia. It is published here in the expectation that the Pluto/Julia community is willing to provide bug reports and code improvements because you never can be certain that you found the most efficient and elegant solution.
 
-The seminal book "Structure and Interpretation of Computer Programs (SICP)" was documenting the introductory CS course at the MIT for years (https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs). The book presented in both editions algorithms in the Scheme dialect MIT-Scheme. Later on the book's content was published as html-files in the public domain (https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-10.html). 
+The seminal book "Structure and Interpretation of Computer Programs (SICP)" was documenting the introductory CS course at the MIT for years (https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs). In both editions the book presented algorithms in the Scheme dialect MIT-Scheme. The book's content was published as html-files in the public domain (https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-10.html). 
 
 Later new lecturers took over the responsibility replacing Scheme by Python. One of the main reasons was the impression that todays developers need a 'glue' language combining libraries. Though the MIT-CS course switched over to Python, the website remained the same in content and url-location.
 
