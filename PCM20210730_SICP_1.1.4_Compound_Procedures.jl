@@ -7,11 +7,11 @@ using InteractiveUtils
 # ╔═╡ e4ea9712-f127-11eb-1ce4-e9286638b6cf
 md"
 ===================================================================================
- ### SICP: [1.1.4 Compound Procedures](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf)
+ ### SICP: [1.1.4 Compound Procedures](https://sarabander.github.io/sicp/html/1_002e1.xhtml#g_t1_002e1_002e4)
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/21 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
 ===================================================================================
 "
 
@@ -210,7 +210,7 @@ md"
 ---
 #### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf), last visit 2022/08/21
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/21
 - **Nazarathy, Y. & Klok, H.**, Statistics with Julia, Cham, Switzerland: Springer, 2021
 "
 

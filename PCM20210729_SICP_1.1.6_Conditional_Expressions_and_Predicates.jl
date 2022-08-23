@@ -7,11 +7,11 @@ using InteractiveUtils
 # ╔═╡ 4ba04c25-a29b-4bf0-be10-be3f20279f28
 md"
 ===================================================================================
- ### SICP: [1.1.6 Conditional Expressions and Predicates](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf)
+ ### SICP: [1.1.6 Conditional Expressions and Predicates](https://sarabander.github.io/sicp/html/1_002e1.xhtml#g_t1_002e1_002e6)
 
  ###### file: PCM20210729\_SICP\_1.1.6\_Conditional\_Expressions\_and_Predicates.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/22 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
 ===================================================================================
 "
 
@@ -296,6 +296,14 @@ $$5 < 2 < 10 := (5 < 2) \land (2 < 10)$$
 # ╔═╡ f7b6234a-1951-4111-9095-418e6a2a4d49
 (5 < 6 < 10) == ((5 < 6) && (6 < 10))
 
+# ╔═╡ 9a5d6d10-27d7-4cac-a950-6e5668955067
+md"
+---
+##### References
+
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23 
+"
+
 # ╔═╡ e89faf5f-04a8-44c3-a941-381d41782d40
 md"
 ---
@@ -401,6 +409,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═be1bb1e0-52f5-4158-9625-aa9f900b3d02
 # ╠═faeff098-044b-49bc-85a3-c0c655de80a6
 # ╠═f7b6234a-1951-4111-9095-418e6a2a4d49
+# ╟─9a5d6d10-27d7-4cac-a950-6e5668955067
 # ╟─e89faf5f-04a8-44c3-a941-381d41782d40
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

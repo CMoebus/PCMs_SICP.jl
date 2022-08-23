@@ -13,11 +13,11 @@ using InteractiveUtils
 md"
 ====================================================================================
 
-### SICP: [1.1.1 Expressions](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf)
+### SICP: [1.1.1 Expressions](https://sarabander.github.io/sicp/html/1_002e1.xhtml#g_t1_002e1_002e1)
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/20 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
 
 ====================================================================================
 "
@@ -189,7 +189,7 @@ md"
 #### References
 
 - Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
-- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf), last visit 2022/08/20
+- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
 - Bauer, F.L. & Wössner, H.; Algorithmic Language and Program Development, Heidelberg: Springer, 1981
 "
 

@@ -7,11 +7,11 @@ using InteractiveUtils
 # ╔═╡ 8bfaa820-fd16-11eb-1583-a75201c2e58a
 md"
 ======================================================================================
-### SICP: [1.1.7 Square Roots by Newton's_Method](https://cloudflare-ipfs.com/ipfs/QmQ3C4ooSCmBMuK7mKq4sqVAfGq9y5EJpWNGVTQzC1FRms?filename=sicp.pdf)
+### SICP: [1.1.7 Square Roots by Newton's_Method](https://sarabander.github.io/sicp/html/1_002e1.xhtml#g_t1_002e1_002e7)
 
 ###### file: PCM20210814\_SICP\_1.1.7\_Example\_Square\_Roots\_by\_Newton's\_Method.jl
 
-###### Julie/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/22 ***
+###### Julie/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
 ======================================================================================
 "
 
@@ -123,6 +123,13 @@ sqrt(1000)^2
 # ╔═╡ 2eeceb53-811b-4999-a09b-71897dec7fb6
 sqrt(1000.0)^2
 
+# ╔═╡ a6f3f9cd-7a52-4549-9e3a-02b3b1cbd127
+md"
+---
+##### References
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
+"
+
 # ╔═╡ 02374249-0f85-491a-8c9a-a1e384433b71
 md"
 ---
@@ -183,6 +190,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═e31d5876-7de3-4d13-a05a-ca8f7c0ab8fe
 # ╠═eb54070b-c564-45b2-979c-5074cec390bb
 # ╠═2eeceb53-811b-4999-a09b-71897dec7fb6
+# ╟─a6f3f9cd-7a52-4549-9e3a-02b3b1cbd127
 # ╟─02374249-0f85-491a-8c9a-a1e384433b71
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
