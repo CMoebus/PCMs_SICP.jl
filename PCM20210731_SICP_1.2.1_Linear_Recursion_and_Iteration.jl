@@ -74,7 +74,8 @@ factorial(7)
 
 # ╔═╡ 1c6a3681-c10f-4ffb-9e45-b5e1601ef8df
 md"
-###### *tailrecursive* (iterative) solution in *constant* space
+###### *tailrecursive* (iterative) solution in *constant* space $$\Theta(1)$$
+Θ(1) space requirement is only true, when the language (like Scheme) has *tail-call optimization* (tco). That means the stack is *not* growing when the function has tail-recursive calls. This is **not** true for Julia. You have to manually transform the code into *repititive* constructs like 'while' or 'for' to obtain Θ(1) space requirements.
 "
 
 # ╔═╡ 4a17ecb7-9460-48cb-855f-4a49a21bbc9d
