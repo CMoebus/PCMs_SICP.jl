@@ -9,9 +9,9 @@ md"
 ==================================================================================
 ### SICP: [1.2.2 Tree Recursion](https://sarabander.github.io/sicp/html/1_002e2.xhtml#g_t1_002e2_002e2)
 
-###### file: PCM20210801_SICP_1.2.2_Tree_Recursion.jl
+###### file: PCM20210801\_SICP\_1.2.2\_Tree\_Recursion.jl
 
-###### Julia/Pluto.jl-code by PCM *** 2022/08/23 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ==================================================================================
 "
 
@@ -27,11 +27,13 @@ md"
 
 # ╔═╡ 841f21aa-f09a-4fff-8128-49fe9890f4f7
 md" 
+---
 $$fib(n) := \cases{ 
 0 \;\;\;\;\; \text{ if } n = 0 \cr
 1 \;\;\;\;\; \text{ if } n = 1 \cr
 fib(n-1) + fib(n-2) \cr
 }$$
+---
 " 
 
 # ╔═╡ cb14ed53-f150-467c-b4df-9d4270c8896e
@@ -95,11 +97,14 @@ fib(8)
 
 # ╔═╡ 9d2d9e38-a34d-4df9-9b98-8bae8a251052
 md"
+---
 $$\psi := \frac{1-\sqrt{5}}{2}$$
 $$f : \mathbb N \rightarrow \mathbb N$$
 $$f : n \mapsto f_n$$
 $$f_n := \left(\frac{\psi^n}{\sqrt{5}}\right) \text{ for } n \ge 0$$
 more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number)
+
+---
 "
 
 # ╔═╡ 59f4bd16-f5fd-43a0-9130-733b318bb850
@@ -180,6 +185,7 @@ fib4(8)
 
 # ╔═╡ 81aa817d-683e-4d13-bad6-2a9a5cb1959a
 md"
+---
 ##### 1.2.2.1.2 idiomatic *imperative* Julia 
 ###### ... with *abstract* types 'Signed', 'AbstractFloat', *self-defined* abstract type 'FloatOrSigned', while' and parallel assignment
 "
@@ -372,6 +378,7 @@ my_count_change(100)
 
 # ╔═╡ 207dc946-a64a-4b2d-83e7-9fbec8aabacd
 md"
+---
 ##### 1.2.2.2.2 idiomatic *imperative* Julia
 
 ... this is missing and has to follow ...
@@ -388,10 +395,10 @@ md"
 # ╔═╡ 641439d6-9442-4e2a-9696-3153d1fd27f7
 md"
 ---
-###### end of ch. 1.2.2
+##### end of ch. 1.2.2
 ===================================================================================
 
-This is a **draft**. Comments, suggestions and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ===================================================================================
 "
@@ -463,7 +470,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═aca4a8a1-bc10-4abb-af38-941f3de29769
 # ╠═c0786dd7-c833-4218-9fc1-3c05ee85df0e
 # ╠═39f932a8-6d42-4c25-9f30-e19e0b262a6c
-# ╠═5c44c7be-fd22-4859-8a03-434eb6564942
+# ╟─5c44c7be-fd22-4859-8a03-434eb6564942
 # ╠═a863f97c-18b0-4e89-b2d8-e3e83eab9c0b
 # ╠═e333e3b5-66cf-4d59-b031-5e0676d4fbad
 # ╠═7fe95fc6-8704-432c-b101-55dcb0bd8777

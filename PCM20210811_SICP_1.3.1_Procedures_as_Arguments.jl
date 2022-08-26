@@ -13,7 +13,7 @@ md"
 ### SICP: [1.3.1 Procedures as Arguments](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1)
 ###### file: PCM20210811\_SICP\_1.3.1\_Procedures\_as\_Arguments.jl
 
-###### Julia/Pluto.jl-code by PCM *** 2022/08/25 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ===================================================================================
 "
 
@@ -24,9 +24,11 @@ md"
 
 # ╔═╡ e3414514-9956-416e-ad41-503795d32556
 md"""
+---
 $$cube: \mathbb N \rightarrow \mathbb N$$
 $$cube: x \mapsto cube(x)$$
 $$cube(x) := x^3$$
+---
 """
 
 # ╔═╡ f63fda47-0ee7-4fac-b90c-b4bd893daa7d
@@ -37,9 +39,11 @@ cube(3)
 
 # ╔═╡ 6414c834-cfe4-4208-a4b1-7fbf3ced47df
 md"
+---
 $$sumIntegers : \mathbb N \times \mathbb N \rightarrow \mathbb N$$
 $$(a, b) \mapsto sumIntegers(a, b)$$
 $$sumIntegers(a, b) := a + (a + 1) + (a + 2) + ... + b = \Sigma_{i=a}^{b}i$$
+---
 "
 
 # ╔═╡ df6d6fdc-20f1-4ead-8e3e-07340ddb521a
@@ -50,7 +54,9 @@ sumIntegers1(a, b) =
 
 # ╔═╡ 836a4034-3284-4768-a7f3-578b8d596d34
 md"""
+---
 $$sumIntegers(0, 0) := \Sigma_{i=a=0}^{b=5}i = 0 = 0$$
+---
 """
 
 # ╔═╡ 5e22d368-1433-4ea1-b094-0188cb755c89
@@ -58,7 +64,9 @@ sumIntegers1(0, 0)
 
 # ╔═╡ 51f97703-ccb3-4df1-abdd-c347a15b0385
 md"""
+---
 $$sumIntegers(0, 1) := \Sigma_{i=a=0}^{b=5}i = 0 + 1 = 1$$
+---
 """
 
 # ╔═╡ 91f80d01-3984-4c3c-8e4a-4087cf107730
@@ -66,7 +74,9 @@ sumIntegers1(0, 1)
 
 # ╔═╡ ef4d7404-247d-49fa-8109-0570c7d85d9d
 md"""
+---
 $$sumIntegers(0, 5) := \Sigma_{i=a=0}^{b=5}i = 0 + 1 + 2 + 3 + 4 + 5 = 15$$
+---
 """
 
 # ╔═╡ 9d85311b-458d-4e62-bcd7-b5120e49826a
@@ -74,7 +84,9 @@ sumIntegers1(0, 5)
 
 # ╔═╡ eea3a2ad-20ef-4c4d-ac4d-2e349cbf2bd6
 md"""
+---
 $$sumIntegers(0, 6) := \Sigma_{i=a=0}^{b=6}i = sumIntegers(0, 5) + 6 = 21$$
+---
 """
 
 # ╔═╡ 30191ce5-6908-4bd5-811d-f6dc5926dc1f
@@ -85,9 +97,11 @@ sumIntegers1(2, 7)
 
 # ╔═╡ 0f94752d-afc7-4c19-96b8-f0e40edd8f6f
 md"
+---
 $$sumCubes : \mathbb N \rightarrow \mathbb N$$
 $$(a, b) \mapsto sumCubes(a, b)$$
 $$sumCubes(a, b) := a + (a + 1^3) + (a + 2^3) + ... + b^3 = \Sigma_{i=a^3}^{b}i^3$$
+---
 "
 
 # ╔═╡ a92d3b32-fc1c-4bd9-ba16-d650ffc805eb
@@ -107,10 +121,13 @@ sumCubes1(1, 4)       #  36 + 4*4*4 = 36 + 64 = 100
 
 # ╔═╡ ac7668db-45f4-456c-a55b-b9106555fca4
 md"
+---
 $$\pi_{Sum}: \mathbb N \times \mathbb N \rightarrow \mathbb R$$
 $$\pi_{Sum}: (a, b) \mapsto \pi_{Sum}(a, b)$$
 $$\pi_{Sum}(a, b) := \Sigma_{i=a}^{b}\frac{1}{(4i+1)*(4i+3)} = \frac{1}{1*3}+\frac{1}{5*7}+\frac{1}{9*11}+... \approx \frac{\pi}{8}$$
 see [here](https://en.wikipedia.org/wiki/List_of_formulae_involving_%CF%80) the list of formulae  involving π.
+
+---
 "
 
 # ╔═╡ fb0e59f2-a9c5-44c3-9d41-7cb8c0347bfb
@@ -154,7 +171,9 @@ myError(*(8, piSum1(1, ^(10, 6))))   # StackOverflowError due to recursion !
 
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
+---
 $$\Sigma_{i=a}^b f(i) = f(a) + ... + f(b)$$
+---
 "
 
 # ╔═╡ da24559b-1937-4258-847d-e0f7b7a7c293
@@ -327,12 +346,14 @@ end
 
 # ╔═╡ 2a14bebd-8b53-442a-965f-983f040eeea3
 md"
-###### Integration by the Trapezoidal Method 
-###### see also [here](https://en.wikipedia.org/wiki/Trapezoidal_rule)
+###### Integration by the [Trapezoidal Method](https://en.wikipedia.org/wiki/Trapezoidal_rule) 
 
+---
 $\int_a^b f := \left[f\left(a+\frac{dx}{2}\right)+f\left(a+dx+\frac{dx}{2}\right)+f\left(a+2dx+\frac{dx}{2}\right)...\right]dx$
 
 $=\left[\sum_{i=0}^{b/dx}f\left(a + i \cdot dx + \frac{dx}{2}\right)\right]dx$
+
+---
 "
 
 # ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
@@ -343,7 +364,9 @@ end
 
 # ╔═╡ cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
 md"
+---
 $$\int_0^1 x^3 dx= \left[\frac{x^4}{4}\right]_0^1=\frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
+---
 "
 
 # ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
@@ -387,9 +410,12 @@ integral2(cube, 0.0, 1.0, 1.0E-4)
 
 # ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
 md"""
+---
 ###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
 
 $\int_0^1\left(6-6x^5\right)dx = \left[6x-6\frac{x^6}{6}\right]_0^1=(6-1)=5$
+
+---
 """
 
 # ╔═╡ 08e42781-ef22-483c-baa4-6bbf6e4b110a
@@ -1368,7 +1394,7 @@ version = "0.9.1+5"
 # ╟─2a14bebd-8b53-442a-965f-983f040eeea3
 # ╠═d0c513b0-e921-45b2-a12b-1ad41a1e902e
 # ╟─cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
-# ╟─02bf20ff-0e44-40bc-bd6a-1e55e2086571
+# ╠═02bf20ff-0e44-40bc-bd6a-1e55e2086571
 # ╠═bf281edd-d933-446b-8b54-903e52c4505b
 # ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
 # ╠═927400e1-d3a9-4acd-b061-a7fbe765f8d4

@@ -11,7 +11,7 @@ md"
 
  ###### file: PCM20210731\_SICP\_1.2.1\_Linear\_Recursion\_and\_Iteration
 
- ###### Julia/Pluto.jl-code by PCM *** 2022/08/23 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ===================================================================================
 "
 
@@ -22,13 +22,11 @@ md"
 
 # ╔═╡ b7a1a820-167e-4509-9132-16d1e373a599
 md"
+---
 $$fac(n):= 1 \cdot 2 \cdot 3 \; \cdot \; ... \; \cdot \; (n-1) \cdot n = n*(n-1)! = \prod_{i=1}^n i$$
-"
+*recursive* function 'factorial' parallel to the mathematical definition in *linear* space and time
 
-# ╔═╡ c7eeeaea-12ac-409d-927c-91dcee8c5494
-md"
-###### *recursive* function 'factorial' parallel to the mathematical definition in *linear* space and time
-
+---
 "
 
 # ╔═╡ 76c277f3-f31f-4f6b-aae1-94fbbda60be4
@@ -64,7 +62,7 @@ $$5040 = \cases{
 }$$
 
 
-**Fig. 1.2.1.1**: A linear recursive process for computing 7!
+**Fig. 1.2.1.1**: A linear recursive process for computing $$7!$$
 
 ---
 "
@@ -222,10 +220,10 @@ md"
 # ╔═╡ 75bb24f7-0a7c-4165-92c7-aa00d3e8721c
 md"
 ---
-#### end of ch. 1.2.1
+##### end of ch. 1.2.1
 ====================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "
@@ -250,7 +248,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─45de6af0-f228-11eb-3398-0ba586081633
 # ╟─71a5c80b-d0c1-4269-88f3-d75cbc4ecce5
 # ╟─b7a1a820-167e-4509-9132-16d1e373a599
-# ╟─c7eeeaea-12ac-409d-927c-91dcee8c5494
 # ╠═76c277f3-f31f-4f6b-aae1-94fbbda60be4
 # ╠═ab72cb48-9398-42e1-8ed7-8bc8db399ac5
 # ╠═362f76e2-6ba0-4564-90df-3c4258d88c83

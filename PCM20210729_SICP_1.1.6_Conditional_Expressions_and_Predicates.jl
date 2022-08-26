@@ -11,7 +11,7 @@ md"
 
  ###### file: PCM20210729\_SICP\_1.1.6\_Conditional\_Expressions\_and_Predicates.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ===================================================================================
 "
 
@@ -32,7 +32,8 @@ $$|x| = \cases{\;\;\; x \text{ if } x \gt 0 \cr \;\;\; 0  \text{ if } x = 0 \cr 
 
 # ╔═╡ 5a186b16-519a-49a0-95e7-4534b929d530
 md"
-###### SICP (Scheme/Lisp) conditional expression with *non-strict* evaluation
+---
+
 
 	(cond (<p_1>) <e_1>)
 
@@ -41,6 +42,10 @@ md"
 	       ...
    
           (<p_n>) <e_n>))
+
+**Fig. 1.1.6.1** SICP (Scheme/Lisp) conditional expression with *non-strict* evaluation
+
+---
 "
 
 # ╔═╡ 638667fc-0381-47a5-9288-e10b973e10b7
@@ -307,10 +312,10 @@ md"
 # ╔═╡ e89faf5f-04a8-44c3-a941-381d41782d40
 md"
 ---
-#### end of ch. 1.1.6
+##### end of ch. 1.1.6
 ===================================================================================
 
-This is a **draft**. Comments, suggestions, and corrections are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ===================================================================================
 "

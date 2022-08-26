@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210804\_SICP\_1.2.4\_Exponentiation
 
-###### Julia/Pluto.jl (1.8.0/19.11) code by PCM *** 2022/08/24 ***
+###### Julia/Pluto.jl (1.8.0/19.11) code by PCM *** 2022/08/26 ***
 =====================================================================================
 "
 
@@ -29,7 +29,9 @@ md"
 
 # ╔═╡ 36f9d06e-1cd7-456a-9f10-4cabded70658
 md"
+---
 $$b^n := \cases{1 \;\text{,\;\;\;\;\;\;\;\;\;\; if } n=0 \cr b \cdot b^{n-1} \;\text{,\; if } n>0}$$
+---
 "
 
 # ╔═╡ 93c2d234-6425-453c-98f2-991bfcd6a04e
@@ -79,7 +81,9 @@ md"
 
 # ╔═╡ d438b096-e9c9-4edf-b449-550e40b3c183
 md"
+---
 $$b^n := \cases{1\;\;\;\;\;\;\;\;\;\;\text{, if } n=0 \cr \left(b^\frac{n}{2}\right)^2 \;\;,\text{ if } n \text{ is even } \cr \cr b \cdot b^{n-1} \;,\text{ if } n \text{ is odd }}$$
+---
 "
 
 # ╔═╡ ed53f5d7-0a76-4126-9a47-a28531fc160b
@@ -147,6 +151,7 @@ end
 
 # ╔═╡ 9814f07a-ac2e-4ac1-9fb2-09634ff4411f
 md"
+---
 #### 1.2.4.2 idiomatic *imperative* Julia/Pluto.jl 
 ###### ... with *abstract* types 'AbstractFloat', 'Signed', *self-defined* type 'FloatOrSigned', repititive 'while' and update operators '-=' and '*='
 "
@@ -356,7 +361,7 @@ md"
 ##### end of ch. 1.2.4
 ==================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ==================================================================================
 "

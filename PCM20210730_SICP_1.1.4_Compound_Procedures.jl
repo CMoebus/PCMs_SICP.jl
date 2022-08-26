@@ -11,7 +11,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ===================================================================================
 "
 
@@ -25,7 +25,7 @@ md"
 ---
 $$square : \mathbb R \rightarrow \mathbb R$$
 $$square : x \mapsto square(x)$$
-$$square := x \mapsto x^2$$
+$$square(x) := x^2$$
 "
 
 # ╔═╡ b7025b0c-5010-47f7-9c73-789c9335987a
@@ -40,7 +40,9 @@ square(x) = *(x, x)           # 1st (default) untyped method of function 'square
 md"
 ---
 $$sumOfSquares : \mathbb R \times \mathbb R \rightarrow \mathbb R$$
-$$sumOfSquares := (x, y) \mapsto x^2 + y^2$$
+$$sumOfSquares: (x, y) \mapsto sumOfSquares(x, y)$$
+$$sumOfSquares(x, y) := x^2 + y^2$$
+---
 "
 
 # ╔═╡ 97d5f945-f0fe-4e2e-8bc3-6a562caf31eb
@@ -53,7 +55,9 @@ md"
 ---
 $$f : \mathbb R \times \mathbb R \rightarrow \mathbb R$$
 $$f : a \mapsto f(a)$$
-$$f := a \mapsto sumOfSquares(a+1, 2a) = a \mapsto (a+1)^2 + (2a)^2$$
+$$f(a) := sumOfSquares(a+1, 2a)$$
+---
+
 "
 
 # ╔═╡ 1cf1668b-220e-4813-af3b-fef0f938e29b
@@ -69,7 +73,8 @@ md"
 "
 
 # ╔═╡ 44b6cef9-6ea5-4540-aca3-61c2712e44fd
-md"  
+md" 
+---
                          Number
 				            |
 	  +---------------------+---------------------+
@@ -89,7 +94,9 @@ md"
 				        Int64  Int32  Int16
  
 
-**Fig. 1.1.4** Excerpt from *Julia's* type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11)
+**Fig. 1.1.4** modified excerpt from *Julia's* type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11)
+
+---
 "
 
 # ╔═╡ 3836b76c-5f05-487e-bcc1-e5261629c1fc
@@ -173,7 +180,7 @@ sumOfSquares(3, 4)
 f1(a) = sumOfSquares(+(a, 1), *(a, 2))
 
 # ╔═╡ 2b7d0b48-70de-40fd-bf43-660e70f2416e
-f1(5)
+f1(5) # 6^2 + 10^2 = 36 + 100 = 136
 
 # ╔═╡ 358250f0-94b7-48a8-acde-1c1f2734c967
 # alternative function definition of f1 with 'function'
@@ -209,7 +216,6 @@ f4(5.0)
 md"
 ---
 #### References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/21
 - **Nazarathy, Y. & Klok, H.**, Statistics with Julia, Cham, Switzerland: Springer, 2021
 "
@@ -217,10 +223,10 @@ md"
 # ╔═╡ 923f3c7d-9b17-4458-9ee3-8dd0e36f8452
 md" 
 ---
-#### end of ch. 1.1.4
+##### end of ch. 1.1.4
 ===================================================================================
 
-This is a **draft**. Comments, suggestions, and corrections are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the  [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ===================================================================================
 "

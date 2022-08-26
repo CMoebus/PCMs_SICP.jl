@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210818\_SICP\_1.3.2\_Constructing\_Procedures\_Using\_Lambda.jl 
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/25 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 =====================================================================================
 "
 
@@ -26,7 +26,9 @@ md"
 
 # ╔═╡ a8b9b6a8-63e8-4562-9f21-7fc4f0e8abab
 md"
-$$x \mapsto x + 4$$
+---
+$$\lambda: x \mapsto x + 4$$
+---
 "
 
 # ╔═╡ 7ba2d133-dcdb-46b9-8aee-63718c35ed77
@@ -43,7 +45,9 @@ x -> +(x, 4)                                # definition with '->'
 
 # ╔═╡ 5834d347-2256-4715-b0ad-3e6d9dd52ecf
 md"
-$$x \mapsto \frac{1}{x\cdot (x+2)}$$
+---
+$$\lambda: x \mapsto \frac{1}{x\cdot (x+2)}$$
+---
 "
 
 # ╔═╡ 932786e4-9df8-459b-97b8-13df46f4fd27
@@ -83,7 +87,9 @@ plot(x->x^3, 0, 1, size=(700, 300), xlim=(0.0, 1.1), ylim=(0.0, 1.2), line=:dark
 
 # ╔═╡ a592c99b-1870-42f8-8689-604688680f0a
 md"
+---
 $$\int_0^1 x^3 dx = \left[\frac{x^4}{4}\right]_0^1 = \frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
+---
 "
 
 # ╔═╡ 1181520d-5d35-42a7-994c-439d95b72e27
@@ -95,7 +101,9 @@ plot(x->-6x^5+6, 0, 1, size=(200,300), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:dar
 
 # ╔═╡ 00396507-be22-46a4-bf57-09010f90b723
 md"
+---
 $$\int_0^1 (6-6x^5)dx= \int_0^16dx -6\int_0^1x^5 dx=\left[6x - \frac{6x^6}{6}\right]_0^1=[6\cdot 1-1]-[6\cdot 0 - 0]=5$$
+---
 "
 
 # ╔═╡ a94cf299-a749-48d9-bbfa-de3a008176c9
@@ -122,11 +130,13 @@ f(1, 2)
 
 # ╔═╡ 8c0f6755-bce5-4cd2-87d4-34308e9a828f
 md"
+---
 $f(x, y)=x(1+xy)^2+y(1-y)+(1+xy)(1-y)$
 $\text{which is with the use of local variables \(a, b\) equivalent to }$
 $a=1+xy$
 $b=1-y$
 $f(x, y)=xa^2+yb+ab$
+---
 "
 
 # ╔═╡ c21c8705-a3ac-446e-a1ec-87e81d2afe97
@@ -214,6 +224,7 @@ f5(1, 2)
 
 # ╔═╡ 8ad1748f-45fc-4a08-9e52-bf854868f886
 md"
+---
 #### 1.3.2.2 idiomatic *imperative* Julia ...
 ###### ... with while, Function, *self-defined* FloatOrSigned
 "
@@ -253,7 +264,9 @@ plot(x->x^3, 0, 1, size=(700, 300), xlim=(0.0, 1.1), ylim=(0.0, 1.2), line=:dark
 
 # ╔═╡ aace3b58-55f7-40ec-9b82-7b149135cd9f
 md"
+---
 $$\int_0^1 x^3 dx = \left[\frac{x^4}{4}\right]_0^1 = \frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
+---
 "
 
 # ╔═╡ a9683cb8-8c26-422a-be7c-772d46acaa94
@@ -265,7 +278,9 @@ plot(x->-6x^5+6, 0, 1, size=(200,300), xlim=(0.0, 1.1), ylim=(0, 6.5), line= :da
 
 # ╔═╡ 7667a5b8-9fbb-472d-9681-f779c9d6e44f
 md"
+---
 $$\int_0^1 (6-6x^5)dx= \int_0^16dx -6\int_0^1x^5 dx=\left[6x - \frac{6x^6}{6}\right]_0^1=[6\cdot 1-1]-[6\cdot 0 - 0]=5$$
+---
 "
 
 # ╔═╡ 91049a2d-baf0-4e9c-98de-c1c0fa7fddcf
@@ -1156,7 +1171,7 @@ version = "0.9.1+5"
 # ╠═814d4077-c84c-459b-bc60-31e61bca774c
 # ╠═5077b76b-6fa5-45f5-9f18-75bbc505e3c8
 # ╠═801d9130-eb02-4206-8514-ae2cf0f7fd1e
-# ╟─19f9ce87-41d7-433a-9ea6-f402cf461fa6
+# ╠═19f9ce87-41d7-433a-9ea6-f402cf461fa6
 # ╟─a592c99b-1870-42f8-8689-604688680f0a
 # ╠═1181520d-5d35-42a7-994c-439d95b72e27
 # ╟─f4d0a5c5-8181-4c17-b316-5cdd092b879f
@@ -1181,7 +1196,7 @@ version = "0.9.1+5"
 # ╠═df9fb799-8a0b-4aa3-9d2e-c4cb4ffc7642
 # ╠═776a146d-970d-4278-b608-4907cbc751af
 # ╠═88b3c7e3-8633-4672-9177-079c7986f75a
-# ╠═8ad1748f-45fc-4a08-9e52-bf854868f886
+# ╟─8ad1748f-45fc-4a08-9e52-bf854868f886
 # ╠═086f84cb-66ce-4ea6-b033-75a6fbe87872
 # ╠═20b620c7-490c-432b-8b3a-41b0bc474c9b
 # ╠═648b442a-3106-45cd-b9e1-da82bb01efea

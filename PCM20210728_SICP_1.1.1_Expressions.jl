@@ -17,7 +17,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 
 ====================================================================================
 "
@@ -98,6 +98,8 @@ md"
 
 # ╔═╡ b48be123-30b4-4bbf-94f6-1c5dc5602a77
 md"
+---
+
                2         4     3         5    
                |         |     |         |
 			   +----+----+     +----+----+
@@ -119,7 +121,7 @@ md"
 				  
 
 ###### Fig. 1.1.1.1: Kantorovic tree
-		         
+---
 "
 
 # ╔═╡ 94c2b564-232c-4bc6-8c8f-d6d114d8b34c
@@ -187,20 +189,18 @@ div
 md"
 ---
 #### References
-
-- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
-- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
-- Bauer, F.L. & Wössner, H.; Algorithmic Language and Program Development, Heidelberg: Springer, 1981
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
+- **Bauer, F.L. & Wössner, H.**; Algorithmic Language and Program Development, Heidelberg: Springer, 1981
 "
 
 # ╔═╡ e831a5f5-fa0e-4214-a7b7-83a8fe9b989d
 md"
 ---
-#### end of ch. 1.1.1
+##### end of ch. 1.1.1
 
 ====================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "

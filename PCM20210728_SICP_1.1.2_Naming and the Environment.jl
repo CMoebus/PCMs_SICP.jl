@@ -12,7 +12,7 @@ md"
  
  ###### file: PCM20210728\_SICP\_1.1.2\_Naming and the Environment
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 
 ===============================================================================
 "
@@ -55,7 +55,9 @@ radius = 10
 # ╔═╡ 1dd2b96a-5aec-439c-b3e1-6bf41811ae9d
 md"
 ###### nested expressions in prefix form
-$$area := r^2\pi$$
+$$\mathbb{R}  \rightarrow \mathbb{R}$$
+$$area: r \mapsto area(r)$$ 
+$$area(r) := r^2\pi$$
 "
 
 # ╔═╡ 1a71832a-20ba-4807-8c54-a8ff45487a59
@@ -63,7 +65,9 @@ $$area := r^2\pi$$
 
 # ╔═╡ b462248d-f04f-43e4-b320-2277157d3dce
 md"
-$$circumference := 2\pi r$$
+$$\mathbb{R}  \rightarrow \mathbb{R}$$
+$$circumference: r \mapsto circumference(r)$$ 
+$$circumference(r) := 2\pi r$$
 "
 
 # ╔═╡ 676b0597-c81d-49bb-93a1-74ce4a1ebb65
@@ -111,19 +115,17 @@ md"
 ---
 ##### References
 
-- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
-
-- Abelson, H., Sussman, G.J. & Sussman, J., Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
 
 "
 
 # ╔═╡ b10318d0-4cc0-43bf-af57-72b030992d8f
 md"
 ---
-#### end of ch. 1.1.2
+##### end of ch. 1.1.2
 ===================================================================================
 
-###### This is a **draft**. Comments, suggestions, and corrections are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ===================================================================================
 "

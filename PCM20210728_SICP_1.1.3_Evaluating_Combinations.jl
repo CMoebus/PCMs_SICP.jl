@@ -12,7 +12,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.3\_Evaluating\_Combinations
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ****
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ****
  
 ===================================================================================
 "
@@ -31,6 +31,7 @@ md"
 
 # ╔═╡ a9586909-e952-4cdf-99a7-c79a388e5cd9
 md"
+---
                                       390
 			                           |        
 		                 +-------------+-----------------+
@@ -45,11 +46,14 @@ md"
                                        |   |   |                         
                                        *   4   6
 								 
-**Fig 1.1.a** Tree representation showing the value of each subcombination (modified SICP, 1966, Figure 1.1, p.10)
+**Fig 1.1.a** Tree of (sub-)expression values (modified SICP, 1966, Figure 1.1, p.10)
+
+---
 "
 
 # ╔═╡ 04603fd1-80b6-4486-bf22-ce6d521c3b4e
 md"
+---
                                  4           6
 								 |           |
 		                         +-----+-----+
@@ -64,7 +68,9 @@ md"
 						                   |  
 						                   *
 
-**Fig 1.1.b** (new figure) *Kantorovic tree* (Bauer & Wösnner, 1982, p.21)
+**Fig 1.1.b** (new) *Kantorovic tree* (Bauer & Wösnner, 1982, p.21)
+
+---
 "
 
 # ╔═╡ db698f35-cd91-469b-92ad-f6c86b55b16b
@@ -85,8 +91,6 @@ md"
 ---
 #### References
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996
-
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23
 
 - **Bauer, F.L. & Wössner, H.**; Algorithmic Language and Program Development; Heidelberg: Springer, 1982
@@ -95,10 +99,12 @@ md"
 # ╔═╡ c0e324a0-da15-424a-935f-e62b8ca990be
 md"
 ---
-#### end of ch. 1.1.3 
-===================================================================================
-###### This is a **draft**. Comments, suggestions, and corrections are welcome: **claus.moebus(@)uol.de**
-===================================================================================
+##### end of ch. 1.1.3 
+====================================================================================
+
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+
+====================================================================================
 "
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001

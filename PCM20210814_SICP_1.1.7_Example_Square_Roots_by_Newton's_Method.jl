@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210814\_SICP\_1.1.7\_Example\_Square\_Roots\_by\_Newton's\_Method.jl
 
-###### Julie/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/23 ***
+###### Julie/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
 ======================================================================================
 "
 
@@ -23,9 +23,12 @@ md"
 
 # ╔═╡ 02343a68-6e78-495a-ac9e-bda7fc49e6f9
 md"
+---
 ###### Specification of the *square-root* function
 
 $$\sqrt x := \cases{\mathbb R \rightarrow \mathbb R \cr x \mapsto \sqrt x \in \{y \;|\; (y \ge 0) \land (y^2 - x = 0) \}}$$
+
+---
 "
 
 # ╔═╡ b77cb3ba-74b0-4760-b0da-0a1672f9132d
@@ -68,6 +71,7 @@ sqrt(x) = sqrt_iter(1.0, x)
 
 # ╔═╡ 7539b320-5e91-4908-8377-8e8d41c25bd6
 md"
+---
 #### 1.1.7.2 *idiomatic* imperative Julia ,,,
 ###### ... with *infix* operators, *self-defined* abstract type declarations
 "
@@ -133,11 +137,11 @@ md"
 # ╔═╡ 02374249-0f85-491a-8c9a-a1e384433b71
 md"
 ---
-#### end of ch. 1.1.7
+##### end of ch. 1.1.7
 
 ===================================================================================
 
-This is a **draft**. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ===================================================================================
 
