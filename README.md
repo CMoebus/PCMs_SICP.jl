@@ -1,2 +1,2 @@
 # PCMs_SICP.jl
-my personal reconstruction of SICP in Julia
+Here we present transpilations of SICP-scripts into Julia and new versions exploiting idiographic JULIA constructs within a Pluto.jl-embedding. Pluto.jl offers reactive notebooks very suitable for educational purposes. We offer a learning environment for self-guided learning Julia by working through the examples offered by SICP. So SICP is expected to be the accompanying study-guide. All SICP-exercises can be reused for exploring Julia. In the end it is guaranteed that s|he is expert in Scheme as well as in Julia/Pluto.jl. Learners expecting a gamified learning environment (https://en.wikipedia.org/wiki/Gamification_of_learning) will be disappointed. This is a rather academic learning experience.
