@@ -8,4 +8,7 @@ In the end it is guaranteed that the learner has acquired several competencies. 
 
 Learners expecting a gamified learning environment (https://en.wikipedia.org/wiki/Gamification_of_learning) will be disappointed. This is a rather academic learning experience. 
 
-The time needed is not trivial. We estimate that a newbee to programming needs 12 months (2 semesters) of self-studying chapter 1-2 and further 12 months (2 semesters) for chapter 3-4.
+The time needed is not trivial. We estimate that a newbee to programming needs 12 months (2 semesters) of self-studying SICP-chapter 1-2 (incl. studying our Julia-scripts plus solving the SICP-exercises in Julia) and further 12 months (2 semesters) for chapter 3-4 (incl. studying our Julia-scripts plus solving the SICP-exercises in Julia).
+
+Ok, let's go !
+C.M.
