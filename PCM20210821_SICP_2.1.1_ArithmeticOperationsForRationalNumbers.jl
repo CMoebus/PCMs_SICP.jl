@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/28 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/29 ***
 ======================================================================================
 "
 
@@ -31,8 +31,9 @@ md"
 We represent rational numbers as *pairs* of numerator and denominators in four alternative ways:
 - the *first* is the *default* way, very *Scheme-like* by an *un*typed *named tuple* with two fields $$car$$ and $$cdr$$; the construction is deferred into the body of a constructor function $$cons$$. 
 - the *second* is the first *specialized* way by using Julia's *built-in* type $$Pair$$. The construction of pairs is deferred to the body of a constructor function $$cons2$$. The two fields can accessed by $$first$$ and $$second$$. They are hidden in the *Scheme*-like selector functions $$car2$$ and $$cdr2$$.
-- the *third* is the second *specialized* way by using Julia's *built-in* type $$Rational$$. The construction of pairs is deferred to the body of a *Scheme*-like constructor function $$cons$$. The two fields can accessed by the functions $$numerator$$ and $$denominator$$. They are hidden in the *Scheme*-like selector functions $$car3$$ and $$cdr3$$.
+- the *third* is the second *specialized* way by using Julia's *built-in* type $$Rational$$. The construction of pairs is deferred to the body of a *Scheme*-like constructor function $$cons3$$. The two fields can accessed by the functions $$numerator$$ and $$denominator$$. They are hidden in the *Scheme*-like selector functions $$car3$$ and $$cdr3$$.
 - the *fourth* is the most easy and third *specialized* way by using Julia's *built-in* type $$Rational$$ and its *built-in* operators $$+, -, *, /$$, and $$==$$. The construction of rationals is done by using Julia's *built-in* constructon operator $$//$$. The two fields can accessed by $$numerator$$ and $$denominator$$. 
+In this chapter we do *not* exploit Julia's *multiple dispatch*. So all functions have slightly different names depending on the number of the alternative. *Multiple dispatch* is valuable for subordinating alternative *functions* as *methods* under the umbrella of a reduced set of function objects. 
 "
 
 # ╔═╡ d4e48294-c66c-4fa3-9586-89fb825a4ee8
@@ -101,21 +102,22 @@ md"
 # ╔═╡ a27e5207-ffb7-4f91-ba46-2006be39fd81
 md"
 ---
-     ---------------------------------------------------------------------------
-     Operators       add_rat   sub_rat   mul_rat   div_rat   _equal_rat
-     --------------------------------------------------------------------------- 
-     Constructor /                           make_rat                   
+    ------------------------------------------------------------------------------
+      Domain                                                              level 3
+     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat
+    ------------------------------------------------------------------------------ 
+     Constructor /                           make_rat                     level 2  
 
      Selectors                         numer          denom  
-     ---------------------------------------------------------------------------
-     Constructor /                             cons            
+    ------------------------------------------------------------------------------
+     Constructor /                             cons                       level 1
 
      Selectors                           car            cdr
-     ---------------------------------------------------------------------------
-     Constructor /             consCell = (car = ... , cdr = ...)
+    ------------------------------------------------------------------------------
+     Constructor /             consCell = (car = ... , cdr = ...)         level 0
 
-     Selctors                      consCell.car    consCell.cdr
-     ---------------------------------------------------------------------------
+     Selectors                    consCell.car    consCell.cdr
+    ------------------------------------------------------------------------------
 
     Fig. 2.1.1.1: First Default Abstraction Hierarchy for Rational Number Algebra
 ---
@@ -380,19 +382,25 @@ definition of constructor $$cons$$ with constructor $$Pair(<par1>, <par2>)$$ and
 # ╔═╡ 28c75fb7-1c58-46d0-90bc-534791c4693b
 md"
 ---
-     ---------------------------------------------------------------------------
-                 add_rat   sub_rat   mul_rat   div_rat   _equal_rat
-     --------------------------------------------------------------------------- 
-                      make_rat         numer          denom
-     ---------------------------------------------------------------------------
-                        cons            car            cdr
-     ---------------------------------------------------------------------------
-     Constructor /         consCell = Pair(first: ... , second: ...)
 
-     Selectors                consCell.first     consCell.second
-     ---------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
+      Domain                                                              level 3
+     Operators      add_rat2  sub_rat2  mul_rat2  div_rat2   equal_rat2
+    ------------------------------------------------------------------------------ 
+     Constructor /                          make_rat2                     level 2  
 
-    Fig. 2.1.1.5: Second Abstraction Hierarchy for Rational Number Algebra
+     Selectors                        numer2         denom2  
+    ------------------------------------------------------------------------------
+     Constructor /                            cons2                       level 1
+
+     Selectors                         car2           cdr2
+    ------------------------------------------------------------------------------
+     Constructor /         consCell = Pair(first: ... , second: ...)      level 0
+
+     Selectors                 consCell.first     consCell.second
+    ------------------------------------------------------------------------------
+
+     Fig. 2.1.1.5: Second Abstraction Hierarchy for Rational Number Algebra
 ---
 "
 
@@ -572,17 +580,23 @@ definition of constructor $$cons$$ with constructor $$//$$ and fields $$numerato
 # ╔═╡ c47d0173-9fd4-4926-b426-42ff0f854c16
 md"
 ---
-     ---------------------------------------------------------------------------
-                   add_rat   sub_rat   mul_rat   div_rat   _equal_rat
-     --------------------------------------------------------------------------- 
-                         make_rat         numer          denom
-     ---------------------------------------------------------------------------
-                           cons            car            cdr
-     ---------------------------------------------------------------------------
-      Constructor /               consCell = car // cdr
 
-      Selectors           numerator(consCell)   denominator(consCell)
-     ---------------------------------------------------------------------------
+    ------------------------------------------------------------------------------
+      Domain                                                              level 3
+     Operators      add_rat3  sub_rat3  mul_rat3  div_rat3   equal_rat3
+    ------------------------------------------------------------------------------ 
+     Constructor /                          make_rat3                     level 2  
+
+     Selectors                        numer3         denom3  
+    ------------------------------------------------------------------------------
+     Constructor /                            cons3                       level 1
+
+     Selectors                         car3           cdr3
+    ------------------------------------------------------------------------------
+     Constructor /              consCell = car // cdr                     level 0
+
+     Selectors            numerator(consCell)   denominator(consCell)
+    ------------------------------------------------------------------------------
 
     Fig. 2.1.1.6: Third Abstraction Hierarchy for Rational Number Algebra
 ---
@@ -741,6 +755,31 @@ md"
 ---
 #### 2.1.1.4 idiomatic *typed* Julia ...
 ###### ... with type $$Rational$$
+"
+
+# ╔═╡ f1608855-54ca-464f-a48c-43046afa3dc0
+md"
+---
+
+    ------------------------------------------------------------------------------
+      Domain                                                              level 3
+     Operators           +         -        *        /        ==
+    ------------------------------------------------------------------------------ 
+     Constructor /                                                        level 2  
+
+     Selectors                       
+    ------------------------------------------------------------------------------
+     Constructor /                                                        level 1
+
+     Selectors                         
+    ------------------------------------------------------------------------------
+     Constructor /           consCell = numerator // denominator          level 0
+
+     Selectors                      numerator           denominator
+    ------------------------------------------------------------------------------
+
+    Fig. 2.1.1.7: Fourth Abstraction Hierarchy for Rational Number Algebra
+---
 "
 
 # ╔═╡ 6b36e481-d44c-468b-b020-ff7219eb6625
@@ -947,7 +986,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b25d2465-7452-43e8-b709-06009642076a
 # ╟─32927d21-4f21-41ff-b90c-21a9c15a7a26
 # ╟─5f1971c7-f3bb-4dbf-aa42-4218055e1fd0
-# ╠═c47d0173-9fd4-4926-b426-42ff0f854c16
+# ╟─c47d0173-9fd4-4926-b426-42ff0f854c16
 # ╠═47d605b7-ec32-4b72-a329-bf47e7273972
 # ╠═e6e6754c-d86e-449f-a82e-03e0ab2a91cb
 # ╠═c356aab4-4717-46a7-b041-aa14800a0253
@@ -976,6 +1015,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b64b8bc6-9746-4ac9-a0fe-dee60bc854ff
 # ╠═f38f0544-6113-4ed9-af22-d5d205078492
 # ╟─bcf4044f-f932-4a90-87bb-12963a67fc99
+# ╟─f1608855-54ca-464f-a48c-43046afa3dc0
 # ╟─6b36e481-d44c-468b-b020-ff7219eb6625
 # ╠═20014c17-f6b4-4e0d-a3e6-5ff3dc47dab4
 # ╠═522016b4-5f42-4cf9-acd7-67afd8116d90
