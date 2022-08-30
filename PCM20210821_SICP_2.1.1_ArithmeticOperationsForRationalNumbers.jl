@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/29 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/30 ***
 ======================================================================================
 "
 
@@ -103,20 +103,17 @@ md"
 md"
 ---
     ------------------------------------------------------------------------------
-      Domain                                                              level 3
-     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat
+      Abstract                                                            level 2
+     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat     Domain
     ------------------------------------------------------------------------------ 
-     Constructor /                           make_rat                     level 2  
-
+     Constructor /                           make_rat                     level 1  
      Selectors                         numer          denom  
     ------------------------------------------------------------------------------
-     Constructor /                             cons                       level 1
-
-     Selectors                           car            cdr
+     Constructor /                             cons                       level 0
+     Selectors                           car            cdr          Scheme-level
     ------------------------------------------------------------------------------
-     Constructor /             consCell = (car = ... , cdr = ...)         level 0
-
-     Selectors                    consCell.car    consCell.cdr
+     Constructor /             consCell = (car = ... , cdr = ...)        level -1
+     Selectors                    consCell.car    consCell.cdr        Julia-level
     ------------------------------------------------------------------------------
 
     Fig. 2.1.1.1: First Default Abstraction Hierarchy for Rational Number Algebra
@@ -384,20 +381,17 @@ md"
 ---
 
     ------------------------------------------------------------------------------
-      Domain                                                              level 3
-     Operators      add_rat2  sub_rat2  mul_rat2  div_rat2   equal_rat2
+      Abstract                                                            level 2
+     Operators      add_rat2  sub_rat2  mul_rat2  div_rat2   equal_rat2    Domain
     ------------------------------------------------------------------------------ 
-     Constructor /                          make_rat2                     level 2  
-
+     Constructor /                          make_rat2                     level 1  
      Selectors                        numer2         denom2  
     ------------------------------------------------------------------------------
-     Constructor /                            cons2                       level 1
-
-     Selectors                         car2           cdr2
+     Constructor /                            cons2                       level 0
+     Selectors                         car2           cdr2            Scheme-like
     ------------------------------------------------------------------------------
-     Constructor /         consCell = Pair(first: ... , second: ...)      level 0
-
-     Selectors                 consCell.first     consCell.second
+     Constructor /         consCell = Pair(first: ... , second: ...)     level -1
+     Selectors                 consCell.first     consCell.second           Julia
     ------------------------------------------------------------------------------
 
      Fig. 2.1.1.5: Second Abstraction Hierarchy for Rational Number Algebra
@@ -582,20 +576,17 @@ md"
 ---
 
     ------------------------------------------------------------------------------
-      Domain                                                              level 3
+      Abstract                                                            level 2
      Operators      add_rat3  sub_rat3  mul_rat3  div_rat3   equal_rat3
     ------------------------------------------------------------------------------ 
-     Constructor /                          make_rat3                     level 2  
-
+     Constructor /                          make_rat3                     level 1  
      Selectors                        numer3         denom3  
     ------------------------------------------------------------------------------
-     Constructor /                            cons3                       level 1
-
-     Selectors                         car3           cdr3
+     Constructor /                            cons3                       level 0
+     Selectors                         car3           cdr3            Scheme-like
     ------------------------------------------------------------------------------
-     Constructor /              consCell = car // cdr                     level 0
-
-     Selectors            numerator(consCell)   denominator(consCell)
+     Constructor /              consCell = car // cdr                    level -1
+     Selectors            numerator(consCell)   denominator(consCell)       Julia
     ------------------------------------------------------------------------------
 
     Fig. 2.1.1.6: Third Abstraction Hierarchy for Rational Number Algebra
@@ -762,20 +753,17 @@ md"
 ---
 
     ------------------------------------------------------------------------------
-      Domain                                                              level 3
-     Operators           +         -        *        /        ==
+      Abstract                                                              level 2
+     Operators           +         -        *        /        ==           Domain
     ------------------------------------------------------------------------------ 
-     Constructor /                                                        level 2  
-
+     Constructor /                                                        level 1  
      Selectors                       
     ------------------------------------------------------------------------------
-     Constructor /                                                        level 1
-
-     Selectors                         
+     Constructor /                                                        level 0
+     Selectors                                                        Scheme-like
     ------------------------------------------------------------------------------
-     Constructor /           consCell = numerator // denominator          level 0
-
-     Selectors                      numerator           denominator
+     Constructor /           consCell = //(numerator, denominator)       level -1
+     Selectors                    numerator           denominator           Julia
     ------------------------------------------------------------------------------
 
     Fig. 2.1.1.7: Fourth Abstraction Hierarchy for Rational Number Algebra
@@ -788,10 +776,13 @@ md"
 "
 
 # ╔═╡ 20014c17-f6b4-4e0d-a3e6-5ff3dc47dab4
-one_half4 = 1 // 2
+one_half4 = //(1, 2)            # prefix use of '//'
+
+# ╔═╡ 4691017a-0d04-4d94-a874-c78625a49c92
+one_half4 == 1 // 2             # prefix == infix
 
 # ╔═╡ 522016b4-5f42-4cf9-acd7-67afd8116d90
-one_third4 = 1 // 3
+one_third4 = //(1, 3)
 
 # ╔═╡ 4c25c782-decc-4d3b-bc01-31577218c6a7
 one_half4 + one_third4
@@ -806,13 +797,16 @@ one_half4 * one_third4
 one_half4 / one_third4
 
 # ╔═╡ d88f2af4-e182-4c90-ab88-694834485bb7
-1 // 3 == 2 // 6
+1 // 3 == 2 // 6 == //(2, 6)
 
 # ╔═╡ dc47a501-9c50-4e5d-bcea-d2fe9609a76c
-1 // 3 == 3 // 6
+1 // 3 == 3 // 6 == //(3, 6)
+
+# ╔═╡ 14c8d0af-5eb0-4d7c-b498-8b30e0724490
+one_third4 + one_third4
 
 # ╔═╡ 8bd0c86b-fe82-4221-9d4a-66cb192b5649
-one_third4 + one_third4
+one_third4 + one_third4 == //(2, 3) == 2//3
 
 # ╔═╡ 03a8961e-031e-4671-9bd5-c35c6c603c19
 120 // 90
@@ -1018,6 +1012,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─f1608855-54ca-464f-a48c-43046afa3dc0
 # ╟─6b36e481-d44c-468b-b020-ff7219eb6625
 # ╠═20014c17-f6b4-4e0d-a3e6-5ff3dc47dab4
+# ╠═4691017a-0d04-4d94-a874-c78625a49c92
 # ╠═522016b4-5f42-4cf9-acd7-67afd8116d90
 # ╠═4c25c782-decc-4d3b-bc01-31577218c6a7
 # ╠═da84aea9-d17e-4156-979d-8894066d3e38
@@ -1025,6 +1020,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═8cc968c6-5364-4430-9449-aeafd876d567
 # ╠═d88f2af4-e182-4c90-ab88-694834485bb7
 # ╠═dc47a501-9c50-4e5d-bcea-d2fe9609a76c
+# ╠═14c8d0af-5eb0-4d7c-b498-8b30e0724490
 # ╠═8bd0c86b-fe82-4221-9d4a-66cb192b5649
 # ╠═03a8961e-031e-4671-9bd5-c35c6c603c19
 # ╟─a73fdb19-6096-49fb-b4ef-07a4b27f3cd4
