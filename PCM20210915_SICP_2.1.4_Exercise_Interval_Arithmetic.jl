@@ -37,6 +37,27 @@ md"
 ##### 2.1.4.1.2 [Operations](https://en.wikipedia.org/wiki/Interval_arithmetic)
 "
 
+# ╔═╡ a1dda7be-f8f1-4c61-9cf5-f2520e8b8012
+md"
+---
+    -------------------------------------------------------------------------------
+     Abstract                                                              level 2
+     Operators     add_interval  sub_interval  mul_interval  div_interval   Domain
+    ------------------------------------------------------------------------------ 
+     Constructor /                      make_interval                      level 1  
+     Selectors              lower_bound            upperbound  
+    -------------------------------------------------------------------------------
+     Constructor /                              cons                       level 0
+     Selectors                            car            cdr          Scheme-level
+    -------------------------------------------------------------------------------
+     Constructor /              consCell = (car = ... , cdr = ...)        level -1
+     Selectors                     consCell.car    consCell.cdr        Julia-level
+    -------------------------------------------------------------------------------
+
+     Fig. 2.1.4.1: Abstraction Hierarchy for Implementing Interval Arithmetic
+---
+"
+
 # ╔═╡ c71a180d-e757-4067-8f46-13c457eb32e5
 md"
 ---
@@ -73,7 +94,7 @@ $$[x] / [y] \equiv [x_1, x_2] \times \frac{1}{[y_1,y_2]} = [x_1, x_2] \times \le
 # ╔═╡ fc9a0039-56a4-4543-b679-47a685b2900b
 md"
 ---
-##### 2.1.4.1.3 Constructor
+##### 2.1.4.1.3 Constructors $$make\_interval$$ and $$cons$$
 ###### make_interval:
 $$make\_interval: \mathbb R, \mathbb R \rightarrow [\mathbb R, \mathbb R]$$
 $$x, y \mapsto [x, y]$$
@@ -105,7 +126,7 @@ typeof(z)
 # ╔═╡ da7125bb-fce0-4758-898c-b15b22033d50
 md"
 ---
-##### 2.1.4.1.4 Selectors
+##### 2.1.4.1.4 Selectors $$lower\_bound, upper\_bound, car$$ and $$cdr$$
 $$car(cons(x, y)) \mapsto x$$
 $$cdr(cons(x, y)) \mapsto y$$
 "
@@ -283,6 +304,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─b60545c5-c9e7-465c-bdfb-43571296e8e4
 # ╟─b1a78493-b08b-4e47-bd6b-101bf40f3fac
 # ╟─140c8504-a3c1-4ebd-99ad-03a25a73cc3a
+# ╟─a1dda7be-f8f1-4c61-9cf5-f2520e8b8012
 # ╟─c71a180d-e757-4067-8f46-13c457eb32e5
 # ╠═d7e41439-209c-478a-99d4-c53416fd6053
 # ╟─512d2fa1-8997-4644-916f-32f7e75528b9
