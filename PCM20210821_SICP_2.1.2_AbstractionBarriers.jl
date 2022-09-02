@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.2\_AbstractionBarriers.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/30 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/02 ***
 ======================================================================================
 "
 
@@ -35,6 +35,73 @@ We represent rational numbers as *pairs* of numerator and denominators in four a
 - the *fourth* is the most easy and third *specialized* way by using Julia's *built-in* type $$Rational$$ and its *built-in* operators $$+, -, *, /$$, and $$==$$. The construction of rationals is done by using Julia's *built-in* constructon operator $$//$$. The two fields can accessed by $$numerator$$ and $$denominator.$$ 
 
 In this chapter we *do* exploit Julia's *multiple dispatch*. So all functions in domain *level* 2 ($$add\_rat$$, $$sub\_rat$$, $$mul\_rat$$, $$div\_rat$$, and $$equal\_rat$$ are *multiple dispatch*. This means that they are depending on their arguments' types different methods under the umbrella of the same function objects' name. *Multiple dispatch* is valuable for subordinating alternative *functions* as *methods* under the umbrella of a reduced set of function objects. The overall picture is displayed in Fig. 2.1.2.1
+"
+
+# ╔═╡ a27e5207-ffb7-4f91-ba46-2006be39fd81
+md"
+---
+    ------------------------------------------------------------------------------
+      Abstract                                                            level 2
+     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat     Domain
+     as Methods
+    ------------------------------------------------------------------------------ 
+     Constructor /                         make_rat1-3                    level 1  
+     Selectors                      numer1-3          denom1-3  
+     as Functions
+    ------------------------------------------------------------------------------
+     Constructor /                           cons1-3                      level 0
+     Selectors                        car1-3         cdr1-3           Scheme-like
+     as Functions
+    ------------------------------------------------------------------------------
+     Constructor /             consCell = (car = ... , cdr = ...)        level -1
+     Selectors                    consCell.car    consCell.cdr              Julia
+     as Functions          
+                          -------------------------------------------
+     Constructor /         consCell = Pair(first: ... , second: ...)     level -1
+     Selectors                 consCell.first     consCell.second           Julia
+     as Functions
+                          -------------------------------------------
+     Constructor /              consCell = car // cdr                    level -1
+     Selectors            numerator(consCell)   denominator(consCell)       Julia
+     as Functions
+    ------------------------------------------------------------------------------
+
+    Fig. 2.1.2.1: Abstraction Hierarchy for Implementing Rational Number Algebra
+---
+"
+
+# ╔═╡ d1ce04e2-d2df-4654-83be-1c037993ea2c
+md"
+Careful inspection of Fig. 2.1.2.1 reveals that it must be possible to compile the Scheme-like operators of level 0 out so that we can reduce the number of levels by 1. To this end functions of level 1 have to be grounded in functions of level -1 instead of functions in level -1.
+"
+
+# ╔═╡ e75728c0-7345-45ec-b3a6-cce07e5ed5d9
+md"
+---
+    ------------------------------------------------------------------------------
+      Abstract                                                            level 2
+     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat     Domain
+     as Methods
+    ------------------------------------------------------------------------------ 
+     Constructor /                         make_rat1-3                    level 1  
+     Selectors                      numer1-3          denom1-3  
+     as Functions
+    ------------------------------------------------------------------------------
+     Constructor /             consCell = (car = ... , cdr = ...)        level -1
+     Selectors                    consCell.car    consCell.cdr              Julia
+     as Functions          
+                          -------------------------------------------
+     Constructor /         consCell = Pair(first: ... , second: ...)     level -1
+     Selectors                 consCell.first     consCell.second           Julia
+     as Functions
+                          -------------------------------------------
+     Constructor /              consCell = car // cdr                    level -1
+     Selectors            numerator(consCell)   denominator(consCell)       Julia
+     as Functions
+    ------------------------------------------------------------------------------
+
+    Fig. 2.1.2.2: Reduced Abstraction Hierarchy for Rational Numbers
+---
 "
 
 # ╔═╡ d4e48294-c66c-4fa3-9586-89fb825a4ee8
@@ -97,98 +164,8 @@ $$(x=y) \equiv \left(\frac{n_x}{d_x} = \frac{n_y}{d_y}\right) \equiv (n_x d_y = 
 md"
 ---
 ##### 2.1.2.1.2 Pairs (... as *Named* Tuples)
-###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ are implemented here as Julia-*tuples* with *named* fields
+###### Scheme-like pair constructor $$cons1$$ and Selectors $$car1$$ and $$cdr1$$ are *no* longer *necessary*.
 "
-
-# ╔═╡ a27e5207-ffb7-4f91-ba46-2006be39fd81
-md"
----
-    ------------------------------------------------------------------------------
-      Abstract                                                            level 2
-     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat     Domain
-     as Methods
-    ------------------------------------------------------------------------------ 
-     Constructor /                         make_rat1-3                    level 1  
-     Selectors                      numer1-3          denom1-3  
-     as Functions
-    ------------------------------------------------------------------------------
-     Constructor /                           cons1-3                      level 0
-     Selectors                        car1-3         cdr1-3           Scheme-like
-     as Functions
-    ------------------------------------------------------------------------------
-     Constructor /             consCell = (car = ... , cdr = ...)        level -1
-     Selectors                    consCell.car    consCell.cdr              Julia
-     as Functions          
-                          -------------------------------------------
-     Constructor /         consCell = Pair(first: ... , second: ...)     level -1
-     Selectors                 consCell.first     consCell.second           Julia
-     as Functions
-                          -------------------------------------------
-     Constructor /              consCell = car // cdr                    level -1
-     Selectors            numerator(consCell)   denominator(consCell)       Julia
-     as Functions
-    ------------------------------------------------------------------------------
-
-    Fig. 2.1.2.1: Abstraction Hierarchy for Implementing Rational Number Algebra
----
-"
-
-# ╔═╡ 1c6a666d-c388-4ac9-b65f-dcebf9fc082f
-md"
-###### *1st* method (*default*, *un*typed) of function $$cons, car$$, and $$cdr$$
-definition of constructor $$cons$$ with named fields $$car$$ and $$cdr$$
-"
-
-# ╔═╡ 3b7faab0-b8e0-4bea-894f-16fd35e5727f
-cons1(car, cdr) = (car=car, cdr=cdr)::NamedTuple{(:car, :cdr)}
-
-# ╔═╡ 80fdcc6e-3435-4c3a-a73a-b4ecf54ecfb2
-car1(cons) = cons.car                # definition of selector 'car1'
-
-# ╔═╡ 1c695d3b-c88e-4227-8aa1-e88149a4f9f4
-cdr1(cons) = cons.cdr                # definition of selector 'cdr1'
-
-# ╔═╡ 3fba0329-19ac-485a-a56d-ee64ae0e3573
-consCell = cons1(1, 2)            # construction of 2-tuple consCell
-
-# ╔═╡ 44d3380a-b2ab-43e1-8f03-a14a9599fac0
-typeof(consCell)
-
-# ╔═╡ 44017d8b-476e-4e9c-abac-229e9a2e85d1
-car1(consCell)                    # selection of field 'car' of 2-tuple consCell
-
-# ╔═╡ 51732672-ee53-46e7-85bf-217f531867cc
-cdr1(consCell)                    # selection of field 'cdr' of 2-tuple consCell
-
-# ╔═╡ a1587038-c11d-4b4b-8436-b098b61f1077
-y = cons1(3, 4)               # construction of 2-tuple (= cons-cell) y
-
-# ╔═╡ 118b16a3-093f-4b39-823b-ac167da69615
-car1(y)
-
-# ╔═╡ fb4ecf01-1361-43c5-854d-8c83969a2e60
-cdr1(y)
-
-# ╔═╡ f0c42132-4b04-4b48-aa45-b45b4f585466
-x = cons1(1, 2)
-
-# ╔═╡ fa890890-cdc4-4fc1-acb6-d3f79109e5e8
-typeof(x)
-
-# ╔═╡ 132232a8-495f-4f2c-a08a-da4b898f606b
-z = cons1(x, y)               # construction of 2-tuple z
-
-# ╔═╡ 768b4543-6d34-4af7-9ee1-6120a33a169d
-car1(z)
-
-# ╔═╡ 8b990c96-d5e2-4e77-ae73-eae3bc399f9d
-cdr1(z)
-
-# ╔═╡ 4e7da88e-e73e-4d15-bd5f-b1eed925322d
-car1(car1(z))
-
-# ╔═╡ 9b7d9d52-77c6-4328-8018-3b1e40fb9558
-car1(cdr1(z))
 
 # ╔═╡ 7ce9706c-99ed-4dd8-bf14-19ad346cfbf4
 md"
@@ -208,7 +185,8 @@ md"
 "
 
 # ╔═╡ 7ff3b4a0-e00b-424f-8118-897019d0fc20
-make_rat1(n, d)::NamedTuple{(:car, :cdr)} = cons1(n, d)::NamedTuple{(:car, :cdr)}  
+make_rat1(n, d)::NamedTuple{(:car, :cdr)} = 
+	(car=car, cdr=cdr)::NamedTuple{(:car, :cdr)}  
 
 # ╔═╡ 810b1eca-eac7-49cb-a34f-8328ea432824
 md"
@@ -233,7 +211,8 @@ function make_rat1(n::Signed, d::Signed)::NamedTuple{(:car, :cdr)}
 	end  # function gcd2
 	#----------------------------------------=-----------------
 	let g = gcd2(n, d)
-		cons1(n ÷ g, d ÷ g)::NamedTuple{(:car, :cdr)}
+		# cons1(n ÷ g, d ÷ g)::NamedTuple{(:car, :cdr)}
+		(car=(n ÷ g), cdr=(d ÷ g))::NamedTuple{(:car, :cdr)}
 	end # let
 	#----------------------------------------=-----------------
 end # function make_rat
@@ -244,10 +223,14 @@ md"
 "
 
 # ╔═╡ 193ae321-0f26-44cc-a48f-1a1b9bc71af8
-numer1(x) = car1(x)            # definition of abstract selector 'numer'
+numer1(x) = 
+	# car1(x)            # definition of abstract selector 'numer'
+	x.car
 
 # ╔═╡ d5c0f2d2-7e6b-4fc5-b9a2-de927eb5c024
-denom1(x) = cdr1(x)            # definition of abstract selector 'denom'
+denom1(x) = 
+	# cdr1(x)            # definition of abstract selector 'denom'
+    x.cdr
 
 # ╔═╡ ca75c0f7-2e85-4436-8544-9b19aa0f57a8
 function add_rat(x::NamedTuple{(:car, :cdr)}, y::NamedTuple{(:car, :cdr)})
@@ -336,25 +319,8 @@ md"
 md"
 ---
 ##### 2.1.2.2.2 Pairs (... as Julia's $$Pair$$)
-###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ are implemented here as Julia's $$Pair$$
+###### Scheme-like pair constructor $$cons2$$ and Selectors $$car2$$ and $$cdr2$$ are *no* longer *necessary*.
 "
-
-# ╔═╡ d4c053d6-ba2c-4d88-beef-19873926df88
-md"
-###### *2nd* method (*specialized*, *typed*) of function $$cons, car$$, and $$cdr$$
-definition of constructor $$cons$$ with constructor $$Pair(<par1>, <par2>)$$ and fields $$first$$ and $$second$$. These selectors are deferred and hided into the *Scheme*-like selctors $$car, cdr$$.
-
-"
-
-# ╔═╡ 0ffbaeab-9ff4-484b-95df-3b6aab526e0d
-# idiomatic Julia-code by built-in types 'Signed' and constructor 'Pair'
-cons2(car::Signed, cdr::Signed)::Pair = Pair(car::Signed, cdr::Signed)::Pair
-
-# ╔═╡ 1fddd3ae-5da7-4a32-a53e-077b8f37509c
-car2(cons::Pair)::Signed = cons.first::Signed   # Pair-selector 'first'
-
-# ╔═╡ b52a93ce-d551-4c8d-bcdc-2a5d69facdcc
-cdr2(cons::Pair)::Signed = cons.second::Signed  # Pair-selector 'second'
 
 # ╔═╡ d84101ea-7172-4e1f-9929-1a23acd7a7c7
 md"
@@ -385,7 +351,8 @@ function make_rat2(n::Signed, d::Signed)::Pair
 	end # function gcd2
 	#----------------------------------------------------------
 	let g = gcd2(n, d)
-		cons2(n ÷ g, d ÷ g)::Pair
+		# cons2(n ÷ g, d ÷ g)::Pair
+		Pair((n ÷ g)::Signed, (d ÷ g)::Signed)::Pair
 	end # let
 end # function make_rat2
 
@@ -395,10 +362,14 @@ md"
 "
 
 # ╔═╡ 7f5b9164-07c2-4ae1-888d-f601fa9d286c
-numer2(x::Pair)::Signed = car2(x::Pair)::Signed
+numer2(x::Pair)::Signed = 
+	# car2(x::Pair)::Signed
+	x.first::Signed
 
 # ╔═╡ 3ca05b52-413f-46aa-9fd7-659227dccbd7
-denom2(x::Pair)::Signed = cdr2(x::Pair)::Signed
+denom2(x::Pair)::Signed = 
+	# cdr2(x::Pair)::Signed
+	x.second::Signed
 
 # ╔═╡ 76e3a4bc-fde2-4440-96c1-c492cc120db0
 function add_rat(x::Pair, y::Pair)::Pair
@@ -437,21 +408,6 @@ print_rat(x::Pair)::String = "$(numer2(x))/$(denom2(x))"
 md"
 ###### 2.1.1.2.4 Applications
 "
-
-# ╔═╡ 0e8fd444-fd9d-4455-8ca2-9d61f84e74d9
-a2 = cons2(2, 3)
-
-# ╔═╡ 32e3fc67-3872-4a28-bd6b-9cf06bc094ac
-car2(a2)
-
-# ╔═╡ e5fbf0c8-1123-4e4c-a5cd-3aeff74d8231
-cdr2(a2)
-
-# ╔═╡ cc5f1bf0-f1ae-44fa-94af-e06fedae12f0
-typeof(1.2)
-
-# ╔═╡ 4bed1729-8c79-4cf1-95e3-3285010a5622
-b2 = cons2(1.2, 3) # first argument is 'Float' but should be 'Signed'
 
 # ╔═╡ 4ee29c75-f689-4332-99b9-d7b0951d4487
 one_half2 = make_rat2(1, 2)
@@ -522,23 +478,8 @@ equal_rat(make_rat2(1, 3), make_rat2(3, 6))
 md"
 ---
 ##### 2.1.2.3.2 Pairs (... as Julia's $$Rational$$)
-###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ are implemente here as Julia's $$Rational$$
+###### Scheme-like pair constructor $$cons3$$ and Selectors $$car3$$ and $$cdr3$$ are *no* longer *necessary*
 "
-
-# ╔═╡ 5f1971c7-f3bb-4dbf-aa42-4218055e1fd0
-md"
-###### *3rd* method (*specialized*, *typed*) of function $$cons, car$$, and $$cdr$$
-definition of constructor $$cons$$ with constructor $$//$$ and fields $$numerator$$ and $$denominator$$
-"
-
-# ╔═╡ 47d605b7-ec32-4b72-a329-bf47e7273972
-cons3(car::Signed, cdr::Signed)::Rational = car // cdr
-
-# ╔═╡ e6e6754c-d86e-449f-a82e-03e0ab2a91cb
-car3(cons::Rational)::Signed = numerator(cons)::Signed
-
-# ╔═╡ c356aab4-4717-46a7-b041-aa14800a0253
-cdr3(cons::Rational)::Signed = denominator(cons)::Signed
 
 # ╔═╡ abf821d6-3f8a-404d-903d-0a4b49ed9d9b
 md"
@@ -573,15 +514,6 @@ denom3(x::Rational)::Signed = denominator(x::Rational)::Signed
 md"
 ##### 2.1.2.3.4 Applications
 "
-
-# ╔═╡ bb81d86d-63f6-4e9b-83ba-f10a6fc386b0
-cons3(1, 3)
-
-# ╔═╡ 96d4be2d-fab7-484e-8a1e-837df8e71574
-car3(cons3(1, 3))
-
-# ╔═╡ d07fe6c8-8577-4ece-94d9-c61d44bc502c
-cdr3(cons3(1, 3))
 
 # ╔═╡ 6d096e3e-3313-4889-aa5b-387e75912d5e
 print_rat(x::Rational)::String = "$(numer3(x))/$(denom3(x))"
@@ -694,21 +626,13 @@ md"
       Abstract                                                            level 2
      Operators           +         -        *        /        ==           Domain
      as methods
-    ------------------------------------------------------------------------------ 
-     Constructor /                                                        level 1  
-     Selectors                       
-     as Functions
-    ------------------------------------------------------------------------------
-     Constructor /                                                        level 0
-     Selectors                                                        Scheme-like
-     as Functions
     ------------------------------------------------------------------------------
      Constructor /           consCell = //(numerator, denominator)       level -1
      Selectors                    numerator           denominator           Julia
      as Functions
     ------------------------------------------------------------------------------
 
-    Fig. 2.1.2.2: Julia's Built-In Abstraction Hierarchy for Rational Number Algebra
+    Fig. 2.1.2.3: Julia's Built-In Abstraction Hierarchy for Rational Number Algebra
 ---
 "
 
@@ -810,6 +734,9 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─6011e641-b628-4642-8c55-549b05efbb89
 # ╟─2b87595b-9491-4ebe-acb9-1ab7d43c4678
 # ╟─55e8fb6e-4f94-46f2-97ff-42bfdcd37a48
+# ╟─a27e5207-ffb7-4f91-ba46-2006be39fd81
+# ╟─d1ce04e2-d2df-4654-83be-1c037993ea2c
+# ╟─e75728c0-7345-45ec-b3a6-cce07e5ed5d9
 # ╟─d4e48294-c66c-4fa3-9586-89fb825a4ee8
 # ╟─dc723ee4-97ce-41a3-88b0-49ccb31c289e
 # ╠═ca75c0f7-2e85-4436-8544-9b19aa0f57a8
@@ -822,25 +749,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─f74ced3c-487c-4428-bcfc-cc69e5416227
 # ╠═bc19acb5-0d08-4f7e-abce-c77fca0e8ac9
 # ╟─08ede030-fb83-4337-8c37-f346b1b7ebc0
-# ╟─a27e5207-ffb7-4f91-ba46-2006be39fd81
-# ╟─1c6a666d-c388-4ac9-b65f-dcebf9fc082f
-# ╠═3b7faab0-b8e0-4bea-894f-16fd35e5727f
-# ╠═80fdcc6e-3435-4c3a-a73a-b4ecf54ecfb2
-# ╠═1c695d3b-c88e-4227-8aa1-e88149a4f9f4
-# ╠═3fba0329-19ac-485a-a56d-ee64ae0e3573
-# ╠═44d3380a-b2ab-43e1-8f03-a14a9599fac0
-# ╠═44017d8b-476e-4e9c-abac-229e9a2e85d1
-# ╠═51732672-ee53-46e7-85bf-217f531867cc
-# ╠═a1587038-c11d-4b4b-8436-b098b61f1077
-# ╠═118b16a3-093f-4b39-823b-ac167da69615
-# ╠═fb4ecf01-1361-43c5-854d-8c83969a2e60
-# ╠═f0c42132-4b04-4b48-aa45-b45b4f585466
-# ╠═fa890890-cdc4-4fc1-acb6-d3f79109e5e8
-# ╠═132232a8-495f-4f2c-a08a-da4b898f606b
-# ╠═768b4543-6d34-4af7-9ee1-6120a33a169d
-# ╠═8b990c96-d5e2-4e77-ae73-eae3bc399f9d
-# ╠═4e7da88e-e73e-4d15-bd5f-b1eed925322d
-# ╠═9b7d9d52-77c6-4328-8018-3b1e40fb9558
 # ╟─7ce9706c-99ed-4dd8-bf14-19ad346cfbf4
 # ╟─8b2fb52c-7519-410f-a872-610cdb911b72
 # ╟─680c5ec0-6cf2-4b0c-a005-751ef8a7e568
@@ -882,10 +790,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═555e6212-22bd-4d0e-b221-edfe32f043f5
 # ╠═afe55885-aba6-4cbc-af2c-23d15bbbf6f5
 # ╟─cc592f32-8785-4735-badd-de3903c20f05
-# ╟─d4c053d6-ba2c-4d88-beef-19873926df88
-# ╠═0ffbaeab-9ff4-484b-95df-3b6aab526e0d
-# ╠═1fddd3ae-5da7-4a32-a53e-077b8f37509c
-# ╠═b52a93ce-d551-4c8d-bcdc-2a5d69facdcc
 # ╟─d84101ea-7172-4e1f-9929-1a23acd7a7c7
 # ╟─b4c9a74b-5a49-452e-bbf0-44826cd92e46
 # ╠═3498e844-931f-4d46-a9aa-b9a2d3b892e7
@@ -895,11 +799,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─bbccaeb3-48cf-4f65-9aa2-d0de9940e311
 # ╠═1248e659-dcdb-442c-859c-3289d5561c6f
 # ╟─edd94612-1772-4c7a-b8d5-cf5b4a540487
-# ╠═0e8fd444-fd9d-4455-8ca2-9d61f84e74d9
-# ╠═32e3fc67-3872-4a28-bd6b-9cf06bc094ac
-# ╠═e5fbf0c8-1123-4e4c-a5cd-3aeff74d8231
-# ╠═cc5f1bf0-f1ae-44fa-94af-e06fedae12f0
-# ╠═4bed1729-8c79-4cf1-95e3-3285010a5622
 # ╠═4ee29c75-f689-4332-99b9-d7b0951d4487
 # ╠═451f4fcd-3cb6-400b-b7eb-b80cb6a5a712
 # ╠═86b40359-a87d-477e-9615-6b4803fe4fd7
@@ -921,10 +820,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═f7bd0981-1534-4c80-9697-e019f29c4a3c
 # ╠═b25d2465-7452-43e8-b709-06009642076a
 # ╟─32927d21-4f21-41ff-b90c-21a9c15a7a26
-# ╟─5f1971c7-f3bb-4dbf-aa42-4218055e1fd0
-# ╠═47d605b7-ec32-4b72-a329-bf47e7273972
-# ╠═e6e6754c-d86e-449f-a82e-03e0ab2a91cb
-# ╠═c356aab4-4717-46a7-b041-aa14800a0253
 # ╟─abf821d6-3f8a-404d-903d-0a4b49ed9d9b
 # ╟─ce97fbfe-0a85-43c6-980f-18da5e795a98
 # ╠═6858b169-b9dc-4a23-8dd3-8951033bd311
@@ -932,9 +827,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═0a935144-2c44-480b-9c6e-53408b972e89
 # ╠═7c2af484-eea8-4c8c-8891-4aa4923298ae
 # ╟─846b7522-8088-49b4-8848-9f0031e1004e
-# ╠═bb81d86d-63f6-4e9b-83ba-f10a6fc386b0
-# ╠═96d4be2d-fab7-484e-8a1e-837df8e71574
-# ╠═d07fe6c8-8577-4ece-94d9-c61d44bc502c
 # ╠═6d096e3e-3313-4889-aa5b-387e75912d5e
 # ╠═9672253e-c0be-4da5-9c1b-6882ce5f65c3
 # ╠═ed140d1c-110e-4fcb-ba43-807b59ac30ef
