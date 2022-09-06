@@ -14,12 +14,9 @@ md"
 
 ###### file: PCM20210830\_SICP\_2.2.3\_SequencesAsConventionalInterfaces.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/05 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/06 ***
 =====================================================================================
 "
-
-# ╔═╡ e4becd0b-9929-4dde-a112-14597c0cfb77
-
 
 # ╔═╡ 438e40ec-ac14-4541-9086-c051bcf97372
 md"
@@ -44,7 +41,7 @@ end
 
 # ╔═╡ 04d6ca0c-f67d-4cea-9166-20d98115f350
 md"
-###### 1st (default) *untyped* method of function $$cons$$
+###### 1st (default) *untyped* method of Scheme-like *constructor* function $$cons$$
 "
 
 # ╔═╡ d1bb66f0-18f0-4caf-b44c-7a8f27304859
@@ -53,7 +50,7 @@ cons(car, cdr) = Cons(car, cdr)
 
 # ╔═╡ fc576d60-5ada-4348-a753-b86a81793d01
 md"
-###### 1st (default) *untyped* method of selector function $$car$$
+###### 1st (default) *untyped* method of Scheme-like *selector* function $$car$$
 "
 
 # ╔═╡ 1ba55e5f-35ad-4fe4-8b76-dee560fe49e8
@@ -63,7 +60,7 @@ car(cons) = cons.car
 
 # ╔═╡ 8aba03d0-b7af-4c5e-b990-f660b0384bc7
 md"
-###### 1st (default) *untyped* method of selector function $$cdr$$
+###### 1st (default) *untyped* method of Scheme-like *selector* function $$cdr$$
 "
 
 # ╔═╡ 044fe2ab-a4f5-40fd-b61e-58f3904ed4ff
@@ -74,25 +71,27 @@ cdr(cons) = cons.cdr
 # ╔═╡ 224586f3-1fbb-41c3-bdc9-51229913a699
 md"
 ---
-                                            
-                                          /\
-                                        /    \
-                                      /\       \
-                                    /    \       \
-                                  /        \       \
-                                /            \       \
-                              /                \       \
-                            /\                   \       \
-                          /    \                   \       \
-                        /     /  \                   \       \
-                      /     /\     \                   \       \    
-                    /     /    \     \                   \       \
-                  /     /  \     \     \                   \       \
-                /     /     /\     \     \                  /\       \
-              /     /     /    \     \     \               /   \       \
-            /     /      /\       \     \     \           /\     \       \
-          /     /      /    \       \     \     \        /   \     \       \
-         1     2      3      4     :nil    5   :nil     6      7   :nil    :nil
+                                          tree1
+                                            /\
+                                          /    \
+                                        /\       \
+                                      /    \       \
+                                    /        \       \
+                                  /            \       \
+                                /                \       \
+                              /\                   \       \
+                            /    \                   \       \
+                          /       /\                   \       \
+                        /       /    \                   \       \
+                      /       /\       \                   \       \    
+                    /       /    \       \                   \       \
+                  /       /\       \       \                   \       \
+                /       /    \       \       \                   \       \
+              /       /       /\       \       \                  /\       \
+            /       /       /    \       \       \              /    \       \
+          /       /       /\       \       \       \          /\       \       \
+        /       /       /    \       \       \       \      /    \       \       \
+      1       2       3       4     :nil      5     :nil   6      7     :nil    :nil
 
 Fig. 2.2.3.1 Binary-tree representation of [1, [2, [3, 4], 5], [6, 7]]
 
@@ -102,15 +101,16 @@ Fig. 2.2.3.1 Binary-tree representation of [1, [2, [3, 4], 5], [6, 7]]
 # ╔═╡ 9f0808b5-1130-4603-9f8b-7359560f5672
 md"
 ---
-                                          |
-                                          |
-       1    +-----------------+-----------+------------------+------------+
-            |                 |                              |            |
-       2    |     +-----------+-----------+-----+      +-----+-----+      |
-            |     |           |           |     |      |     |     |      |
-       3    |     |     +-----+-----+     |     |      |     |     |      |
-            |     |     |     |     |     |     |      |     |     |      |
-       4    1     2     3     4   :nil    5   :nil     6     7   :nil   :nil
+                                          tree1
+                                            |
+                                            |
+       1      +-----------------+-----------+------------------+------------+
+              |                 |                              |            |
+       2      |     +-----------+-----------+-----+      +-----+-----+      |
+              |     |           |           |     |      |     |     |      |
+       3      |     |     +-----+-----+     |     |      |     |     |      |
+              |     |     |     |     |     |     |      |     |     |      |
+       4      1     2     3     4   :nil    5   :nil     6     7   :nil   :nil
 
 Fig. 2.2.3.2 Tree-representation of [1, [2, [3, 4], 5], [6, 7]]
 
@@ -132,8 +132,55 @@ md"
 
 # ╔═╡ 8ecd4de0-f81f-4aee-aed9-c85312138bc1
 md"
-###### 1st (default) *untyped* method of function $$enumerate\_interval$$ ...
-###### .... *but* with keyword parameter $$initial=:nil$$
+###### 1st (default) *untyped* method of Scheme-like function $$enumerate\_interval$$ ...
+###### .... *but* with *keyword* parameter $$initial=:nil$$
+"
+
+# ╔═╡ c5992151-e61d-4672-939b-931090fc4275
+md"
+---
+                                  tree2
+                                   / \
+                                 /\    \               
+                               /    \    \               
+                             /\       \    \              
+                           /   /\       \    \                 
+                         /   /    \       \    \              
+                       /   /        \       \    \  
+                     /   / \          \       \    \
+                   /   /   / \          \       \    \            
+                 /   /   /     \          \       \    \       
+               /   /   /\        \          \       \    \      
+             /   /   /    \        \          \       \    \    
+            1   2   3      4      :nil       :nil      5   :nil   
+
+Fig. 2.2.3.3 Binary-tree representation of [1, [2, [3, 4]], 5]
+
+---
+"
+
+# ╔═╡ 054cd582-16ec-4c27-8504-192a437e254e
+md"
+---
+                                    tree2
+                                      |
+                                      |
+            1    +--------------------+--------------+-----+
+                 |                    |              |     |      
+            2    |     +-----------+--+--------+     |     |
+                 |     |           |           |     |     |  
+            3    |     |     +-----+-----+     |     |     |   
+                 |     |     |     |     |     |     |     |    
+            4    1     2     3     4   :nil  :nil    5   :nil     
+
+Fig. 2.2.3.4 Tree-representation of [1, [2, [3, 4]], 5]
+
+---
+"
+
+# ╔═╡ 130a22a0-bbfd-4d69-bd99-194d71906f75
+md"
+###### function $$enumerate\_tree$$ is defined further below because we use a $$Union$$-type
 "
 
 # ╔═╡ ee509ed5-31b9-4657-858c-1dd6e6749c96
@@ -153,7 +200,17 @@ md"
 
 # ╔═╡ 804a253f-28c4-4eb7-8bc9-ac00c3d80f6d
 md"
-##### ... my solution in Julia
+
+Given a positive integer $$n$$, find all ordered pairs of distinct positive integers $$i$$ and $$j$$, where 
+
+$$1 \le i \lt j \le n,$$
+
+such that $$i + j$$ is prime. (SICP, 1996, p.122)
+
+$$\{(i, j)| 1 \le i \lt j \le n; i,j \in \mathbb{N}, (i + j)\in \mathbb{P}\}$$
+
+##### 
+... the solution in Julia for $$n=6$$ is first *unfiltered* then *prime-filtered*:
 "
 
 # ╔═╡ 525716f9-cb91-4bf3-92ff-1a5734aeb87b
@@ -210,16 +267,16 @@ function cons(list1::Array, list2::Array)::Array
 end
 
 # ╔═╡ 450f2841-faae-486c-900d-3b830da5b2bd
-function enumerate_interval(low, high; initial=:nil) # keword parameter !
-	if >(low, high)
+function enumerate_interval(low, high; initial = :nil) # keword parameter 'initial'
+	if >(low, high)              #   ^----------------- semicolon
 		initial
 	else
-		cons(low, enumerate_interval(+(low,1), high; initial)) # keyword argument !
-	end
-end
+		cons(low, enumerate_interval(+(low, 1), high; initial)) # keyword argument !
+	end # if                                    #   ^----------------- semicolon
+end # function enumerate_interval
 
 # ╔═╡ ceee3d88-7d76-482e-8eb0-6bb7bbb75b7a
-enumerate_interval(2, 7)      # no keyword argument; must be pretty-printed with 'pp'
+enumerate_interval(2, 7)     # no keyword argument; should be pretty-printed with 'pp'
 
 # ╔═╡ 06f50446-19fe-4826-be42-d9507f2d552a
 enumerate_interval(2, 7, initial=[]) # with keyword argument 'initial=[]' !
@@ -244,12 +301,12 @@ cdr(x::Array)::Array = x[2:end]
 
 # ╔═╡ 069ee324-eceb-4f42-ae20-aac2e4478b2b
 function sumOddSquares(tree)
-	#----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
 				null = isempty     # Julia Base.isempty(collection) -> Bool
 	isnumber(x::Any) = typeof(x) <: Number
 	       square(x) = *(x, x)
 	             odd = isodd       # Julia Base.isodd(x::Number) -> Bool
-	#----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
 	if null(tree)
 		0
 	elseif isnumber(tree)
@@ -270,24 +327,24 @@ function filter2(predicate, sequence)
 		cons(car(sequence), filter2(predicate, cdr(sequence)))
 	else
 		filter2(predicate, cdr(sequence))
-	end
-end
+	end # if
+end # function filter2
 
 # ╔═╡ bb4388e8-91f0-41f6-ae17-ae50c512c6e3
 filter2
 
 # ╔═╡ e2bb2ed2-de48-4e53-b566-1e9b6f6c3aa1
 function accumulate(op, initial, sequence)
-	#---------------------------------------------------
-	isnull = isempty  # Julia's Base.isempty - Function
-	#---------------------------------------------------
+	#-------------------------------------------------------------
+	isnull = isempty  # Julia's Base.isempty - function 'isempty'
+	#-------------------------------------------------------------
 	if isnull(sequence)
 		initial
 	else
 		op(car(sequence), 
 			accumulate(op, initial, cdr(sequence)))
-	end
-end
+	end # if
+end # function accumulate
 
 # ╔═╡ e91a0596-8401-4e34-b1ab-17d6eae08801
 function productOfSquaresOfOddElements(sequence)
@@ -329,24 +386,24 @@ md"
 list(xs::Any...)::Array = [xs::Any...]::Array
 
 # ╔═╡ 00e8e8e8-592e-4206-80c9-7308d5d6e151
-l1 = list(1, list(2, list(3, 4), 5), list(6, 7))
+tree1 = list(1, list(2, list(3, 4), 5), list(6, 7))
 
 # ╔═╡ dfe2820c-be99-4bda-a48b-64c250938404
-sumOddSquares(l1)          # correct if sumOddSquares(l1) == 84
+sumOddSquares(tree1)          # correct if sumOddSquares(l1) == 84
 
 # ╔═╡ 340e3dad-8b91-471e-84ed-8e4ac555ef49
 map(square, list(1, 2, 3, 4, 5))          # Julia's Base.map — Function
 
 # ╔═╡ 20697309-9d88-4d3f-a153-849f229cf47a
-map(list(1, 2, 3, 4, 5)) do n             # Julia's Base.map — Function
+map(list(1, 2, 3, 4, 5)) do n             # Julia's Base.map — Function with 'do'
  	square(n)
 end # map
 
 # ╔═╡ 1ee151db-1b91-4400-8474-9d689cb73664
-filter2(isodd, list(1, 2, 3, 4, 5))
+filter2(isodd, list(1, 2, 3, 4, 5))   # Julia's Base.filter - function 'isodd'
 
 # ╔═╡ a9366254-3a82-4252-8c47-9b51b9dd504d
-filter(isodd, list(1, 2, 3, 4, 5))    # Julia's Base.filter - Function
+filter(iseven, list(1, 2, 3, 4, 5))   # Julia's Base.filter - function 'iseven'
 
 # ╔═╡ 7bfc28ac-b41e-4c34-88dc-e74cd363922f
 accumulate(+, 0, list(1, 2, 3, 4, 5))
@@ -364,20 +421,28 @@ accumulate(cons, [], list(1, 2, 3, 4, 5))            # initial is '[]'
 # ╔═╡ 6b73e23d-f041-443f-9db6-8e08804542e4
 sum(accumulate(cons, [], list(1, 2, 3, 4, 5)))
 
+# ╔═╡ 19d77c84-8b9b-4c0e-95ff-33667cc461b1
+tree2 = list(1, list(2, list(3, 4)), 5)
+
+# ╔═╡ 85e2f791-7498-413c-8216-f9ef5c2abd44
+tree2                         # tree2 *not* modified !
+
 # ╔═╡ 07720d55-52a0-409a-9f56-d0525e25f129
 productOfSquaresOfOddElements(list(1, 2, 3, 4, 5))
 
 # ╔═╡ 43279a01-aded-4f22-a5d4-97057e850dda
-map(i -> map(j -> list(i, j), enumerate_interval(1, i-1, initial=[])), enumerate_interval(1, 5, initial=[]))
+let n = 6
+	map(j -> map(i -> list(i, j), enumerate_interval(1, j-1, initial=[])), 	enumerate_interval(1, n, initial=[]))
+end # let
 
 # ╔═╡ 69b40bb5-fa2c-4af3-9e43-7d7419f73042
 nestedList = 
 	let n = 6 
-		map(j -> map(i -> i > j ? 
+		map(j -> map(i -> i < j ? 
 			list(i, j) :
 			:nothing,
-			enumerate_interval(2, n, initial=[])), 
-				enumerate_interval(1, n-1, initial=[]))
+			enumerate_interval(1, j-1, initial=[])), 
+				enumerate_interval(1, n, initial=[]))
 	end # let
 
 # ╔═╡ d5551946-391c-479c-bb26-0f3cbd0d46aa
@@ -393,35 +458,37 @@ primeTable =
 	sort(
 		map(pair->
 			let prime = (pair[1]+pair[2])
-				(pair[1], pair[2], prime)
+				(pair[1], pair[2], '|' , prime)
 			end, # let
 		primeList))
 
 # ╔═╡ 46aafc6d-96ec-4574-a294-8dc3fa9475fe
-["i   |", map(tuple->tuple[1], primeTable),
- "  j |", map(tuple->tuple[2], primeTable),
+["j   |", map(tuple->tuple[1], primeTable),
+ "  i |", map(tuple->tuple[2], primeTable),
  "i+j |", map(tuple->tuple[3], primeTable)]
 
 # ╔═╡ f2a779f5-d408-467b-9713-c58fe4db6913
-accumulate(append!, [], 
-	map(i -> map(j -> list(i, j), 
-			enumerate_interval(1, i-1, initial = [])), 
-		enumerate_interval(1, n, initial = [])))
+let n = 5
+	accumulate(append!, [], 
+		map(j -> map(i -> list(i, j), 
+			enumerate_interval(1, j-1, initial = [])), 
+			enumerate_interval(1, n, initial = [])))
+end # let
 
 # ╔═╡ 19fa3b90-7cae-48dc-95e4-0fa63d4e0339
 function makePairSum(pair)
 	#-----------------------------------
 	cadr(x) = car(cdr(x))
 	#-----------------------------------
-	list(car(pair), cadr(pair), +(car(pair), cadr(pair)))
+	list(car(pair), cadr(pair), '|', +(car(pair), cadr(pair)))
 end
 
 # ╔═╡ 977a9138-6530-4eaa-8b5f-df45c43864db
 function primeSumPairs(n)
 	map(makePairSum, 
 		filter(primeSum, 
-			flatmap(i -> map(j -> list(i, j), 
-					enumerate_interval(1, i-1, initial = [])), 
+			flatmap(j -> map(i -> list(i, j), 
+					enumerate_interval(1, j-1, initial = [])), 
 				enumerate_interval(1, n, initial = []))))
 end
 
@@ -501,14 +568,14 @@ function even_fibs(n)
 	even = iseven
 	#-------------------------------------------
 	function next(k)
-		if k > n
+		if >(k, n)
 			[]
 		else
 			let f = fib6(k)
 				if even(f)
-					cons(f, next(k + 1))
+					cons(f, next( +(k, 1)))
 				else
-					next(k + 1)
+					next( +(k, 1))
 				end # if
 			end # let
 		end # if
@@ -734,8 +801,11 @@ function enumerate_tree(tree::AtomOrArray)
 		list(tree)
 	else
 		append!(enumerate_tree(car(tree)), enumerate_tree(cdr(tree)))
-	end
-end 
+	end # if
+end # function enumerate_tree
+
+# ╔═╡ f5a765fe-e03f-4bea-9d26-e4faf548cf8a
+enumerate_tree(tree2)
 
 # ╔═╡ 1f7ce44a-9720-404f-847c-c36601874396
 function sumOddSquares2(tree)
@@ -743,16 +813,16 @@ function sumOddSquares2(tree)
 end
 
 # ╔═╡ d7a64fd1-7c9d-43af-bd89-58492a633f12
-sumOddSquares2(l1)
+sumOddSquares2(tree1)
 
-# ╔═╡ 19d77c84-8b9b-4c0e-95ff-33667cc461b1
-l2 = list(1, list(2, list(3, 4), 5))
+# ╔═╡ 06ee405c-1a4d-46ea-a198-7ee15184c2a8
+sumOddSquares2(tree2)
 
-# ╔═╡ f5a765fe-e03f-4bea-9d26-e4faf548cf8a
-enumerate_tree(l2)
+# ╔═╡ b2b81a77-78e2-43a4-ba1a-0cc182035faf
+enumerate_tree(tree1)
 
-# ╔═╡ 85e2f791-7498-413c-8216-f9ef5c2abd44
-l2                         # l2 *not* modified !
+# ╔═╡ fb2c97b5-3eec-467a-ba90-0518ef5c8ba1
+enumerate_tree(tree2)
 
 # ╔═╡ 7aae8e88-8d5b-4df1-94de-ace9635f6058
 md"
@@ -798,6 +868,12 @@ function enumerate_interval4(low, high; initial=:nil)
 	intvl
 end
 
+# ╔═╡ 89b98a66-0378-47e6-8eb6-77f23406b96b
+enumerate_interval4(2, 7)                     # without keyword argument 'initial'
+
+# ╔═╡ a94203ea-b828-457a-a58e-3362a0307f2e
+enumerate_interval4(2, 7, initial=[])         # with keyword argument 'initial=[]'
+
 # ╔═╡ 94efad05-8481-4cd6-a9cb-829671c29c4d
 md"
 ###### 5th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ...
@@ -814,26 +890,21 @@ function enumerate_interval5(low, high; initial=:nil)
 	intvl
 end
 
-# ╔═╡ 00093ee9-27d2-4204-a22d-272f64606d51
-Base.iterate(intvl::IntervalUp, state=intvl.low) = intvl.low <= state <= intvl.high ? (state, state+1) : nothing
-
-# ╔═╡ 4683bb5b-03c9-4f44-90d0-a1b7df238d15
-Base.iterate(intvl::IntervalDown, state=intvl.high) = intvl.low <= state <= intvl.high ? (state, state-1) : nothing
-
-# ╔═╡ 89b98a66-0378-47e6-8eb6-77f23406b96b
-enumerate_interval4(2, 7)                     # without keyword argument 'initial'
-
 # ╔═╡ 15df85fb-03e5-4f71-a9eb-ea227579c288
 enumerate_interval5(2, 7)                     # without keyword argument 'initial'
 
 # ╔═╡ 8dddc5b9-1837-4d90-b99e-67eb047cf834
 pp(enumerate_interval5(2, 7))                 # pretty print
 
-# ╔═╡ a94203ea-b828-457a-a58e-3362a0307f2e
-enumerate_interval4(2, 7, initial=[])         # with keyword argument 'initial=[]'
-
 # ╔═╡ e27244e4-3002-47c1-ac01-6065017a5c9d
 enumerate_interval5(2, 7, initial=[])         # with keyword argument 'initial=[]'
+
+# ╔═╡ 00093ee9-27d2-4204-a22d-272f64606d51
+Base.iterate(intvl::IntervalUp, state=intvl.low) = 
+	intvl.low <= state <= intvl.high ? (state, state+1) : nothing
+
+# ╔═╡ 4683bb5b-03c9-4f44-90d0-a1b7df238d15
+Base.iterate(intvl::IntervalDown, state=intvl.high) = intvl.low <= state <= intvl.high ? (state, state-1) : nothing
 
 # ╔═╡ a49378fc-331a-47c4-9caa-0a18145fe994
 md"
@@ -874,7 +945,6 @@ version = "0.5.0"
 
 # ╔═╡ Cell order:
 # ╟─ba6ee9c0-0999-11ec-3197-6b273cb47913
-# ╠═e4becd0b-9929-4dde-a112-14597c0cfb77
 # ╟─438e40ec-ac14-4541-9086-c051bcf97372
 # ╟─aefb9021-5b2c-4b53-8bd6-e14cf4a887b0
 # ╟─94ec5754-ef71-44fb-90e8-a76a54107a27
@@ -904,17 +974,24 @@ version = "0.5.0"
 # ╠═7bfc28ac-b41e-4c34-88dc-e74cd363922f
 # ╠═3a205677-c028-4e3d-bd22-e8fd6afcfc4c
 # ╠═1b862b47-7789-44d9-9005-ce7b77bec837
-# ╠═956b9ccd-6d8c-4afc-b26c-3f477e8b07fe
 # ╠═8edb760b-e4ab-4354-8b2c-b53aa15d0a7f
 # ╠═dcdb3dbc-5415-4c21-8431-da7bba9553ef
+# ╠═956b9ccd-6d8c-4afc-b26c-3f477e8b07fe
 # ╠═6b73e23d-f041-443f-9db6-8e08804542e4
 # ╟─8ecd4de0-f81f-4aee-aed9-c85312138bc1
 # ╠═450f2841-faae-486c-900d-3b830da5b2bd
 # ╠═ceee3d88-7d76-482e-8eb0-6bb7bbb75b7a
 # ╠═773d8b55-0e59-4272-aea1-a5b5eee4966a
 # ╠═06f50446-19fe-4826-be42-d9507f2d552a
+# ╟─c5992151-e61d-4672-939b-931090fc4275
+# ╟─054cd582-16ec-4c27-8504-192a437e254e
+# ╠═19d77c84-8b9b-4c0e-95ff-33667cc461b1
+# ╟─130a22a0-bbfd-4d69-bd99-194d71906f75
+# ╠═f5a765fe-e03f-4bea-9d26-e4faf548cf8a
+# ╠═85e2f791-7498-413c-8216-f9ef5c2abd44
 # ╠═1f7ce44a-9720-404f-847c-c36601874396
 # ╠═d7a64fd1-7c9d-43af-bd89-58492a633f12
+# ╠═06ee405c-1a4d-46ea-a198-7ee15184c2a8
 # ╠═bb4388e8-91f0-41f6-ae17-ae50c512c6e3
 # ╠═262fecaf-08ed-48bb-88b3-7891fbb188bf
 # ╠═84669c73-9668-43e4-9201-0b82ec95d9d2
@@ -1004,25 +1081,24 @@ version = "0.5.0"
 # ╠═08bdfd0b-be0b-44bc-ba71-adbe8c23f742
 # ╟─6b04606d-b595-4baa-9a82-f85d3ace78b1
 # ╠═5e0adaac-e483-4b9f-a365-6dd843fa1bd7
-# ╠═19d77c84-8b9b-4c0e-95ff-33667cc461b1
-# ╠═f5a765fe-e03f-4bea-9d26-e4faf548cf8a
-# ╠═85e2f791-7498-413c-8216-f9ef5c2abd44
-# ╠═7aae8e88-8d5b-4df1-94de-ace9635f6058
+# ╠═b2b81a77-78e2-43a4-ba1a-0cc182035faf
+# ╠═fb2c97b5-3eec-467a-ba90-0518ef5c8ba1
+# ╟─7aae8e88-8d5b-4df1-94de-ace9635f6058
 # ╟─f8ef8cf1-009e-4b0e-8295-8a914900ef0b
 # ╟─a592fea5-962e-41ca-add5-324480224693
 # ╠═6860b10e-f415-45f6-8a96-412fdaebbecf
 # ╠═6a48b863-5a8e-42e7-bdc6-956295294b35
 # ╟─b7e645ca-a545-455e-b9ef-944da3ebf0b8
 # ╠═1b592487-ad22-4f14-b374-87743b8ec134
+# ╠═89b98a66-0378-47e6-8eb6-77f23406b96b
+# ╠═a94203ea-b828-457a-a58e-3362a0307f2e
 # ╟─94efad05-8481-4cd6-a9cb-829671c29c4d
 # ╠═de2196da-70b9-4c45-9732-ad5b8e7e4a1e
-# ╠═00093ee9-27d2-4204-a22d-272f64606d51
-# ╠═4683bb5b-03c9-4f44-90d0-a1b7df238d15
-# ╠═89b98a66-0378-47e6-8eb6-77f23406b96b
 # ╠═15df85fb-03e5-4f71-a9eb-ea227579c288
 # ╠═8dddc5b9-1837-4d90-b99e-67eb047cf834
-# ╠═a94203ea-b828-457a-a58e-3362a0307f2e
 # ╠═e27244e4-3002-47c1-ac01-6065017a5c9d
+# ╠═00093ee9-27d2-4204-a22d-272f64606d51
+# ╠═4683bb5b-03c9-4f44-90d0-a1b7df238d15
 # ╟─a49378fc-331a-47c4-9caa-0a18145fe994
 # ╟─e902aa9c-6eac-4d38-80e7-ee252cc30b53
 # ╟─00000000-0000-0000-0000-000000000001
