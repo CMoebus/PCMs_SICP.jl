@@ -835,44 +835,30 @@ md"
 ##### Sequence Operations
 "
 
-# ╔═╡ a592fea5-962e-41ca-add5-324480224693
-md"
-###### Declaration of [Composite Types](https://docs.julialang.org/en/v1/manual/types/#Composite-Types) $$IntervalUp$$ and $$IntervalDown$$
-"
-
-# ╔═╡ 6860b10e-f415-45f6-8a96-412fdaebbecf
-struct IntervalUp
-	low::Signed
-	high::Signed
-end
-
-# ╔═╡ 6a48b863-5a8e-42e7-bdc6-956295294b35
-struct IntervalDown
-	high::Signed
-	low::Signed
-end
-
 # ╔═╡ b7e645ca-a545-455e-b9ef-944da3ebf0b8
 md"
 ###### 4th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ...
 ... with keyword parameter $$initial=:nil$$
-... and iterate $$IntervalUp(low, high)$$
 "
 
 # ╔═╡ 1b592487-ad22-4f14-b374-87743b8ec134
 function enumerate_interval4(low, high; initial=:nil)
-	intvl = initial
-	for item in IntervalUp(low, high)
-		intvl = cons(item, intvl)
-	end
-	intvl
+	let intvl = initial
+		for item in high: -1 : low
+			intvl = cons(item, intvl)
+		end # for
+		intvl
+	end # let
 end
 
 # ╔═╡ 89b98a66-0378-47e6-8eb6-77f23406b96b
 enumerate_interval4(2, 7)                     # without keyword argument 'initial'
 
+# ╔═╡ 575e5f9c-7a21-4250-9b2e-bbb42bd1ed4c
+pp(enumerate_interval4(2, 7))
+
 # ╔═╡ a94203ea-b828-457a-a58e-3362a0307f2e
-enumerate_interval4(2, 7, initial=[])         # with keyword argument 'initial=[]'
+enumerate_interval4(2, 7; initial=[])         # with keyword argument 'initial=[]'
 
 # ╔═╡ 94efad05-8481-4cd6-a9cb-829671c29c4d
 md"
@@ -883,11 +869,12 @@ md"
 
 # ╔═╡ de2196da-70b9-4c45-9732-ad5b8e7e4a1e
 function enumerate_interval5(low, high; initial=:nil)
-	intvl = initial
-	for item in IntervalDown(high, low)
-		intvl = cons(item, intvl)
-	end
-	intvl
+	let intvl = initial
+		for item in low : +1 : high
+			intvl = cons(item, intvl)
+		end # for
+		intvl
+	end # let
 end
 
 # ╔═╡ 15df85fb-03e5-4f71-a9eb-ea227579c288
@@ -898,13 +885,6 @@ pp(enumerate_interval5(2, 7))                 # pretty print
 
 # ╔═╡ e27244e4-3002-47c1-ac01-6065017a5c9d
 enumerate_interval5(2, 7, initial=[])         # with keyword argument 'initial=[]'
-
-# ╔═╡ 00093ee9-27d2-4204-a22d-272f64606d51
-Base.iterate(intvl::IntervalUp, state=intvl.low) = 
-	intvl.low <= state <= intvl.high ? (state, state+1) : nothing
-
-# ╔═╡ 4683bb5b-03c9-4f44-90d0-a1b7df238d15
-Base.iterate(intvl::IntervalDown, state=intvl.high) = intvl.low <= state <= intvl.high ? (state, state-1) : nothing
 
 # ╔═╡ a49378fc-331a-47c4-9caa-0a18145fe994
 md"
@@ -1085,20 +1065,16 @@ version = "0.5.0"
 # ╠═fb2c97b5-3eec-467a-ba90-0518ef5c8ba1
 # ╟─7aae8e88-8d5b-4df1-94de-ace9635f6058
 # ╟─f8ef8cf1-009e-4b0e-8295-8a914900ef0b
-# ╟─a592fea5-962e-41ca-add5-324480224693
-# ╠═6860b10e-f415-45f6-8a96-412fdaebbecf
-# ╠═6a48b863-5a8e-42e7-bdc6-956295294b35
 # ╟─b7e645ca-a545-455e-b9ef-944da3ebf0b8
 # ╠═1b592487-ad22-4f14-b374-87743b8ec134
 # ╠═89b98a66-0378-47e6-8eb6-77f23406b96b
+# ╠═575e5f9c-7a21-4250-9b2e-bbb42bd1ed4c
 # ╠═a94203ea-b828-457a-a58e-3362a0307f2e
 # ╟─94efad05-8481-4cd6-a9cb-829671c29c4d
 # ╠═de2196da-70b9-4c45-9732-ad5b8e7e4a1e
 # ╠═15df85fb-03e5-4f71-a9eb-ea227579c288
 # ╠═8dddc5b9-1837-4d90-b99e-67eb047cf834
 # ╠═e27244e4-3002-47c1-ac01-6065017a5c9d
-# ╠═00093ee9-27d2-4204-a22d-272f64606d51
-# ╠═4683bb5b-03c9-4f44-90d0-a1b7df238d15
 # ╟─a49378fc-331a-47c4-9caa-0a18145fe994
 # ╟─e902aa9c-6eac-4d38-80e7-ee252cc30b53
 # ╟─00000000-0000-0000-0000-000000000001
