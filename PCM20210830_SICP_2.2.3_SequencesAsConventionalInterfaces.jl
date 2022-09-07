@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210830\_SICP\_2.2.3\_SequencesAsConventionalInterfaces.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/06 ***
+###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/07 ***
 =====================================================================================
 "
 
@@ -55,7 +55,7 @@ md"
 
 # ╔═╡ 1ba55e5f-35ad-4fe4-8b76-dee560fe49e8
 # 1st method for car
-car(cons) = cons.car
+car(cons::Cons) = cons.car
 #     ^-------^------------------------- parameter
 
 # ╔═╡ 8aba03d0-b7af-4c5e-b990-f660b0384bc7
@@ -65,7 +65,7 @@ md"
 
 # ╔═╡ 044fe2ab-a4f5-40fd-b61e-58f3904ed4ff
 # 1st method for cdr
-cdr(cons) = cons.cdr
+cdr(cons::Cons) = cons.cdr
 #     ^-------^------------------------- parameter
 
 # ╔═╡ 224586f3-1fbb-41c3-bdc9-51229913a699
@@ -388,8 +388,17 @@ list(xs::Any...)::Array = [xs::Any...]::Array
 # ╔═╡ 00e8e8e8-592e-4206-80c9-7308d5d6e151
 tree1 = list(1, list(2, list(3, 4), 5), list(6, 7))
 
+# ╔═╡ 8824f5f4-4f29-48d7-8d07-a5a767c47ac4
+typeof(tree1) <: Vector <: Array
+
+# ╔═╡ 2bba24d2-79ee-4923-a6b5-e0e9a4d410d9
+car(tree1)
+
+# ╔═╡ d63ca7af-a13e-4625-bbf5-6024c6a14247
+cdr(tree1)
+
 # ╔═╡ dfe2820c-be99-4bda-a48b-64c250938404
-sumOddSquares(tree1)          # correct if sumOddSquares(l1) == 84
+sumOddSquares(tree1)          # correct if sumOddSquares(tree1) == 84
 
 # ╔═╡ 340e3dad-8b91-471e-84ed-8e4ac555ef49
 map(square, list(1, 2, 3, 4, 5))          # Julia's Base.map — Function
@@ -838,15 +847,19 @@ md"
 # ╔═╡ b7e645ca-a545-455e-b9ef-944da3ebf0b8
 md"
 ###### 4th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ...
-... with keyword parameter $$initial=:nil$$
+... with keyword parameter $$initial=:nil$$ and use of $$iterate$$
 "
 
 # ╔═╡ 1b592487-ad22-4f14-b374-87743b8ec134
 function enumerate_interval4(low, high; initial=:nil)
 	let intvl = initial
-		for item in high: -1 : low
+		iter  = (high: -1 : low)
+		next = iterate(iter)
+		while next !== nothing
+			(item, state) = next
 			intvl = cons(item, intvl)
-		end # for
+			next = iterate(iter, state)
+		end # while
 		intvl
 	end # let
 end
@@ -870,9 +883,13 @@ md"
 # ╔═╡ de2196da-70b9-4c45-9732-ad5b8e7e4a1e
 function enumerate_interval5(low, high; initial=:nil)
 	let intvl = initial
-		for item in low : +1 : high
+		iter  = (low: +1 : high)
+		next = iterate(iter)
+		while next !== nothing
+			(item, state) = next
 			intvl = cons(item, intvl)
-		end # for
+			next = iterate(iter, state)
+		end # while
 		intvl
 	end # let
 end
@@ -939,6 +956,9 @@ version = "0.5.0"
 # ╟─224586f3-1fbb-41c3-bdc9-51229913a699
 # ╟─9f0808b5-1130-4603-9f8b-7359560f5672
 # ╠═00e8e8e8-592e-4206-80c9-7308d5d6e151
+# ╠═8824f5f4-4f29-48d7-8d07-a5a767c47ac4
+# ╠═2bba24d2-79ee-4923-a6b5-e0e9a4d410d9
+# ╠═d63ca7af-a13e-4625-bbf5-6024c6a14247
 # ╠═dfe2820c-be99-4bda-a48b-64c250938404
 # ╠═cae46dcc-0a3b-4dab-8139-b57c7946a155
 # ╠═a3dc4444-f515-4e06-8985-959d9c0f72ae
