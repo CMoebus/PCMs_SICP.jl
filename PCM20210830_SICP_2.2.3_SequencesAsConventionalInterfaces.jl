@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210830\_SICP\_2.2.3\_SequencesAsConventionalInterfaces.jl
 
-###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/09/07 ***
+###### Julia/Pluto.jl-code (1.8.1/19.11) by PCM *** 2022/09/11 ***
 =====================================================================================
 "
 
@@ -68,30 +68,37 @@ md"
 cdr(cons::Cons) = cons.cdr
 #     ^-------^------------------------- parameter
 
+# ╔═╡ ede3a48f-71c0-4ddc-8f98-0590b817ef17
+md"
+###### $$sumOddSquares$$ as conventional *tree recursion* (like $$count\_leaves$$ in 2.2.2)
+"
+
 # ╔═╡ 224586f3-1fbb-41c3-bdc9-51229913a699
 md"
 ---
                                           tree1
-                                            /\
+                           car(tree1) --->  /\  <--- cdr(tree1)
                                           /    \
-                                        /\       \
-                                      /    \       \
-                                    /        \       \
-                                  /            \       \
-                                /                \       \
-                              /\                   \       \
-                            /    \                   \       \
-                          /       /\                   \       \
-                        /       /    \                   \       \
-                      /       /\       \                   \       \    
-                    /       /    \       \                   \       \
-                  /       /\       \       \                   \       \
-                /       /    \       \       \                   \       \
-              /       /       /\       \       \                  /\       \
-            /       /       /    \       \       \              /    \       \
-          /       /       /\       \       \       \          /\       \       \
-        /       /       /    \       \       \       \      /    \       \       \
-      1       2       3       4     :nil      5     :nil   6      7     :nil    :nil
+                                        /       /\
+                                      /       /    \
+                                    /       /        \
+                                  /       /            \
+                                /       /                \
+                              /       /                    \
+                            /       /                        \
+                          /       /\                           \
+                        /       /    \                           \
+                      /       /       /\                           \    
+                    /       /       /    \                           \
+                  /       /       /        \                          /\
+                /       /       /            \                      /    \
+              /       /       /\               \                  /\       \
+            /       /       /    \               \              /    \       \
+          /       /       /       /\              /\          /       /\       \
+        /       /       /       /    \          /    \      /       /    \       \
+      1       2       3        4    :nil       5    :nil   6      7     :nil    :nil
+
+                               ^--- car(cdr(car(cdr(car(cdr(tree1))))))
 
 Fig. 2.2.3.1 Binary-tree representation of [1, [2, [3, 4], 5], [6, 7]]
 
@@ -101,20 +108,27 @@ Fig. 2.2.3.1 Binary-tree representation of [1, [2, [3, 4], 5], [6, 7]]
 # ╔═╡ 9f0808b5-1130-4603-9f8b-7359560f5672
 md"
 ---
-                                          tree1
-                                            |
-                                            |
-       1      +-----------------+-----------+------------------+------------+
-              |                 |                              |            |
-       2      |     +-----------+-----------+-----+      +-----+-----+      |
-              |     |           |           |     |      |     |     |      |
+            tree1
+              |
+              | cdr                                                    
+       1      +-----+------------------------------------+------------------+
+          car |     |                                    |                  |
+       2      |     +-----------------------+-----+      +-----+-----+      |
+              |     |     |                 |     |      |     |     |      |
        3      |     |     +-----+-----+     |     |      |     |     |      |
               |     |     |     |     |     |     |      |     |     |      |
        4      1     2     3     4   :nil    5   :nil     6     7   :nil   :nil
 
+                                ^--- car(cdr(car(cdr(car(cdr(tree1))))))
+
 Fig. 2.2.3.2 Tree-representation of [1, [2, [3, 4], 5], [6, 7]]
 
 ---
+"
+
+# ╔═╡ 405e17a8-b601-4668-8fc0-cd5a2e99e81e
+md"
+###### $$even\_fibs$$ as conventional *recursion*
 "
 
 # ╔═╡ 2d45ac6d-fc78-48b6-a1c1-3bf8923c857e
@@ -125,9 +139,16 @@ md"
 # ╔═╡ 9f64b774-8333-48d0-9a60-aede670db6ff
 square(x) = *(x, x)
 
+# ╔═╡ 93c3d676-aa0f-40b3-8c57-fd28ca5acf0c
+md"
+###### 1st (default) *untyped* method of Scheme-like function $$filter2$$
+Julia's Base.filter is *different* (see below)
+"
+
 # ╔═╡ 602ecf93-2e61-44bc-ab45-06477fdff6f6
 md"
-###### 1st (default) *untyped* method of function $$accumulate$$
+###### 1st (default) *untyped* method of Scheme-like function $$accumulate2$$
+Julia's Base.accumulate is *different* (see below)
 "
 
 # ╔═╡ 8ecd4de0-f81f-4aee-aed9-c85312138bc1
@@ -139,22 +160,25 @@ md"
 # ╔═╡ c5992151-e61d-4672-939b-931090fc4275
 md"
 ---
-                                  tree2
-                                   / \
-                                 /\    \               
-                               /    \    \               
-                             /\       \    \              
-                           /   /\       \    \                 
-                         /   /    \       \    \              
-                       /   /        \       \    \  
-                     /   / \          \       \    \
-                   /   /   / \          \       \    \            
-                 /   /   /     \          \       \    \       
-               /   /   /\        \          \       \    \      
-             /   /   /    \        \          \       \    \    
-            1   2   3      4      :nil       :nil      5   :nil   
+                                    tree2
+                      car(tree2) --->  /\  <--- cdr(tree2) 
+                                     /    \
+                                   /       /\
+                                 /       /    \                                     
+                               /       /        \                     
+                             /       /\           \                            
+                           /       /    \           \                         
+                         /       /       /\           \                      
+                       /       /       /    \           \                   
+                     /       /       /\       \           \                
+                   /       /       /    \       \           \           
+                 /       /       /       /\       \          /\         
+               /       /       /       /    \       \      /    \
+              1       2       3       4    :nil    :nil   5    :nil 
 
-Fig. 2.2.3.3 Binary-tree representation of [1, [2, [3, 4]], 5]
+                                      ^--- car(cdr(car(cdr(car(cdr(tree2))))))
+
+Fig. 2.2.3.1 Binary-tree representation of [1, [2, [3, 4]], 5]
 
 ---
 "
@@ -162,35 +186,69 @@ Fig. 2.2.3.3 Binary-tree representation of [1, [2, [3, 4]], 5]
 # ╔═╡ 054cd582-16ec-4c27-8504-192a437e254e
 md"
 ---
-                                    tree2
-                                      |
-                                      |
-            1    +--------------------+--------------+-----+
-                 |                    |              |     |      
-            2    |     +-----------+--+--------+     |     |
-                 |     |           |           |     |     |  
-            3    |     |     +-----+-----+     |     |     |   
-                 |     |     |     |     |     |     |     |    
-            4    1     2     3     4   :nil  :nil    5   :nil     
+                        tree2
+                          |
+                          | cdr
+                   1      +-----+-----------------------------+-----+
+                      car |     |                             |     |
+                   2      |     +-----------------------+     |     |
+                          |     |     |                 |     |     |     
+                   3      |     |     +-----+-----+     |     |     |  
+                          |     |     |     |     |     |     |     |     
+                   4      1     2     3     4   :nil  :nil   5    :nil    
 
-Fig. 2.2.3.4 Tree-representation of [1, [2, [3, 4]], 5]
+                                            ^--- car(cdr(car(cdr(car(cdr(tree2))))))
+
+Fig. 2.2.3.2 Tree-representation of [1, [2, [3, 4]], 5]
 
 ---
 "
 
 # ╔═╡ 130a22a0-bbfd-4d69-bd99-194d71906f75
 md"
-###### function $$enumerate\_tree$$ is defined further below because we use a $$Union$$-type
+###### function $$enumerate\_tree$$ is defined further below because we use an $$Union$$-type
+"
+
+# ╔═╡ 131bbb1f-25c1-4bd2-af72-4177ebda209e
+md"
+---
+          +---------+        +---------+         +--------+         +---------+
+          | enumer- |        |         |         |        | squared | accu-   | sum-
+     tree |  ate:   | leaves | filter: |  odd    |  map:  |   odd   | mulate: | odd-
+    ----->+         +------->+         +-------->+        +-------->+         +-->
+          | leaves  |        |  odd?   | leaves  | square | leaves  | +, 0    | sqrd
+          +---------+        +---------+         +--------+         +---------+ leaves
+
+Fig. 2.2.3.3 Signal-flow plan for 'sum-odd-squares'
+
+---
+"
+
+# ╔═╡ c7615112-8c03-43fb-ad3a-e979f6ae951f
+md"
+---
+
+          +----------+        +--------+        +---------+         +---------+
+          | enumer-  |        |        |        |         |         | accu-   | list
+     tree |  ate:    |        |  map:  |  fibs  | filter: |  even   | mulate: | of
+    ----->+          +------->+        +------->+         +-------->+         +-->
+          | integers |        |  fib   |        |  even?  |  fibs   | cons,() | even
+          +----------+        +--------+        +---------+         +---------+ fibs
+
+Fig. 2.2.3.2 Signal-flow plan for 'even-fibs'
+
+---
 "
 
 # ╔═╡ ee509ed5-31b9-4657-858c-1dd6e6749c96
 records =
- [  [:joe,   :carpenter,  40000],
-	[:jim,   :butcher,    45000],
-	[:buddy, :programmer, 50000],
-	[:susi,  :programmer, 52000],           # <== highest programmer's salary
-	[:joanne,:psychogist, 35000],
-	[:fred,  :physician,  60000]]
+ [  [:joe,   :carpenter,    40000],
+	[:jim,   :butcher,      45000],
+	[:buddy, :software_dev, 50000],
+	[:susi,  :software_dev, 52000],           # <== highest software_dev's salary
+	[:joanne,:psychologist, 35000],
+	[:fred,  :physician,    60000],
+    [:syrah, :lawyer,       80000]]
 	
 
 # ╔═╡ 56837c07-91a6-452b-8c3a-854bbe6a8423
@@ -221,13 +279,10 @@ md"
 # ╔═╡ bfaec430-7fc3-4c0f-bf45-0eb87f60dbe3
 n = 5
 
-# ╔═╡ 23aa8af2-f38c-44ce-8009-93d46e3b9a7a
-isprime(3)
-
 # ╔═╡ 0d153832-c688-4a2a-b7b9-3caceffbd9e3
 md"
 ---
-##### 2.2.3.2 Idiomatic *imperative* or *typed* Julia
+#### 2.2.3.2 Idiomatic *imperative* or *typed* Julia
 "
 
 # ╔═╡ 4f873aed-cd34-4309-b3dd-5574d3f41e49
@@ -302,22 +357,23 @@ cdr(x::Array)::Array = x[2:end]
 # ╔═╡ 069ee324-eceb-4f42-ae20-aac2e4478b2b
 function sumOddSquares(tree)
 	#-----------------------------------------------------------------------
-				null = isempty     # Julia Base.isempty(collection) -> Bool
+				null = isempty         # Julia Base.isempty(collection) -> Bool
 	isnumber(x::Any) = typeof(x) <: Number
+	          isleaf = isnumber
 	       square(x) = *(x, x)
-	             odd = isodd       # Julia Base.isodd(x::Number) -> Bool
+	             odd = isodd           # Julia Base.isodd(x::Number) -> Bool
 	#-----------------------------------------------------------------------
-	if null(tree)
+	if null(tree)                      # is tree empty ?
 		0
-	elseif isnumber(tree)
-		odd(tree) ? square(tree) : 0
+	elseif isnumber(tree)              # is leaf ?   
+		odd(tree) ? square(tree) : 0   # if is leaf odd ?  then square
 	else
-		+(sumOddSquares(car(tree)), sumOddSquares(cdr(tree)))
+		+(sumOddSquares(car(tree)), sumOddSquares(cdr(tree))) # tree recursion
 	end
 end
 
 # ╔═╡ ea228836-2583-4b0e-9f7a-c2d50f9f8230
-function filter2(predicate, sequence)
+function filter2(predicate, sequence)     # Base.filter is Julia builtin function
 	#---------------------------------------------------------
 	null = isempty
 	#---------------------------------------------------------
@@ -334,7 +390,8 @@ end # function filter2
 filter2
 
 # ╔═╡ e2bb2ed2-de48-4e53-b566-1e9b6f6c3aa1
-function accumulate(op, initial, sequence)
+# 'accumulate' is Julia's accumulate(op, A; dims::Integer, [init])
+function accumulate2(op, initial, sequence) 
 	#-------------------------------------------------------------
 	isnull = isempty  # Julia's Base.isempty - function 'isempty'
 	#-------------------------------------------------------------
@@ -342,30 +399,30 @@ function accumulate(op, initial, sequence)
 		initial
 	else
 		op(car(sequence), 
-			accumulate(op, initial, cdr(sequence)))
+			accumulate2(op, initial, cdr(sequence)))
 	end # if
 end # function accumulate
 
 # ╔═╡ e91a0596-8401-4e34-b1ab-17d6eae08801
 function productOfSquaresOfOddElements(sequence)
-	accumulate(*, 1, map(square, filter(isodd, sequence)))
+	accumulate2(*, 1, map(square, filter2(isodd, sequence)))
 end
 
 # ╔═╡ 927365af-503e-4005-951b-28c4fbbee92e
-function salaryOfHighestPaidProgrammer(records)
+function salaryOfHighestPaidSoftwareDev(records)
 	#-------------------------------------------------
-	isProgrammer(record) = record[2] == :programmer
-	salary(record)       = record[3]
+	isSoftwareDev(record) = record[2] == :software_dev
+	salary(record)        = record[3]
 	#-------------------------------------------------
-	accumulate(max, 0, map(salary, filter(isProgrammer, records)))
+	accumulate2(max, 0, map(salary, filter2(isSoftwareDev, records)))
 end
 
 # ╔═╡ f495ea83-a03a-45ec-9e0a-971388120632
-salaryOfHighestPaidProgrammer(records)           # o.k. if its 52000
+salaryOfHighestPaidSoftwareDev(records)           # o.k. if its 52000
 
 # ╔═╡ b4d1e9eb-1367-4dda-935c-8d24712dcd96
 function flatmap(proc, seq)
-	accumulate(append!, [], map(proc, seq))
+	accumulate2(append!, [], map(proc, seq))
 end
 
 # ╔═╡ b94fb940-4cfa-4496-aff6-bdd0014a1c5d
@@ -378,7 +435,7 @@ end
 
 # ╔═╡ bd062bda-db6f-4511-b03d-1b156eedb09a
 md"
-###### 1st (default) method of constructor function $$list$$ with *untyped* input and constructing arrays
+###### 1st (default) method of constructor function $$list$$ with *un*typed input and *typed* output generating arrays
 "
 
 # ╔═╡ 87996ca9-84c8-46e9-ba71-89baafc2db28
@@ -397,6 +454,12 @@ car(tree1)
 # ╔═╡ d63ca7af-a13e-4625-bbf5-6024c6a14247
 cdr(tree1)
 
+# ╔═╡ 4c640fed-d04b-4e57-9548-98ce7bac9f34
+car(cdr(car(cdr(car(cdr(tree1))))))
+
+# ╔═╡ e5889629-d634-4814-996f-9e59222ce1fe
+car(cdr(car(cdr(car(cdr(tree1)))))) == 4
+
 # ╔═╡ dfe2820c-be99-4bda-a48b-64c250938404
 sumOddSquares(tree1)          # correct if sumOddSquares(tree1) == 84
 
@@ -409,29 +472,35 @@ map(list(1, 2, 3, 4, 5)) do n             # Julia's Base.map — Function with '
 end # map
 
 # ╔═╡ 1ee151db-1b91-4400-8474-9d689cb73664
-filter2(isodd, list(1, 2, 3, 4, 5))   # Julia's Base.filter - function 'isodd'
+filter2(isodd, list(1, 2, 3, 4, 5))    # Julia's filter function is Base.filter 
 
 # ╔═╡ a9366254-3a82-4252-8c47-9b51b9dd504d
-filter(iseven, list(1, 2, 3, 4, 5))   # Julia's Base.filter - function 'iseven'
+filter2(iseven, list(1, 2, 3, 4, 5))   # Julia's filter function is Base.filter 
 
 # ╔═╡ 7bfc28ac-b41e-4c34-88dc-e74cd363922f
-accumulate(+, 0, list(1, 2, 3, 4, 5))
+accumulate2(+, 0, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 3a205677-c028-4e3d-bd22-e8fd6afcfc4c
-accumulate(*, 1, list(1, 2, 3, 4, 5))
+accumulate2(*, 1, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 1b862b47-7789-44d9-9005-ce7b77bec837
 # initial is ':nil'; result should be pretty printed !
-accumulate(cons, :nil, list(1, 2, 3, 4, 5))  
+accumulate2(cons, :nil, list(1, 2, 3, 4, 5))  
 
 # ╔═╡ 956b9ccd-6d8c-4afc-b26c-3f477e8b07fe
-accumulate(cons, [], list(1, 2, 3, 4, 5))            # initial is '[]'
+accumulate2(cons, [], list(1, 2, 3, 4, 5))            # initial is '[]'
 
 # ╔═╡ 6b73e23d-f041-443f-9db6-8e08804542e4
-sum(accumulate(cons, [], list(1, 2, 3, 4, 5)))
+sum(accumulate2(cons, [], list(1, 2, 3, 4, 5)))       # Julia's sum
 
 # ╔═╡ 19d77c84-8b9b-4c0e-95ff-33667cc461b1
 tree2 = list(1, list(2, list(3, 4)), 5)
+
+# ╔═╡ b31bd8a2-ef27-4fc8-9790-3ddbdd540667
+car(cdr(car(cdr(car(cdr(tree2))))))
+
+# ╔═╡ f493c8c9-4399-475f-9d8a-9aa2b5aa38ea
+car(cdr(car(cdr(car(cdr(tree2)))))) == 4
 
 # ╔═╡ 85e2f791-7498-413c-8216-f9ef5c2abd44
 tree2                         # tree2 *not* modified !
@@ -440,27 +509,20 @@ tree2                         # tree2 *not* modified !
 productOfSquaresOfOddElements(list(1, 2, 3, 4, 5))
 
 # ╔═╡ 43279a01-aded-4f22-a5d4-97057e850dda
-let n = 6
-	map(j -> map(i -> list(i, j), enumerate_interval(1, j-1, initial=[])), 	enumerate_interval(1, n, initial=[]))
-end # let
-
-# ╔═╡ 69b40bb5-fa2c-4af3-9e43-7d7419f73042
-nestedList = 
-	let n = 6 
-		map(j -> map(i -> i < j ? 
-			list(i, j) :
-			:nothing,
-			enumerate_interval(1, j-1, initial=[])), 
-				enumerate_interval(1, n, initial=[]))
+nestedListOfOrderedPairs =
+	let n = 6
+		map(j -> map(i -> list(i, j), 
+					enumerate_interval(1, j-1, initial=[])), 	# i
+			enumerate_interval(1, n, initial=[]))               # j
 	end # let
 
 # ╔═╡ d5551946-391c-479c-bb26-0f3cbd0d46aa
 reducedFilteredList = 
-	reduce(vcat, map(shortList -> filter(item -> typeof(item) <:Array, shortList), nestedList))
+	reduce(vcat, map(shortList -> filter2(item -> typeof(item) <:Array, shortList), 					nestedListOfOrderedPairs))
 
 # ╔═╡ ed86ac5c-b2db-4ffe-862c-72e590b6ef65
 primeList = 
-		filter(pair -> isprime(pair[1]+pair[2]), reducedFilteredList)
+		filter2(pair -> isprime(pair[1]+pair[2]), reducedFilteredList)
 
 # ╔═╡ 657cb8a0-892f-4e37-83da-8785b20f848e
 primeTable =
@@ -478,10 +540,10 @@ primeTable =
 
 # ╔═╡ f2a779f5-d408-467b-9713-c58fe4db6913
 let n = 5
-	accumulate(append!, [], 
+	accumulate2(append!, [], 
 		map(j -> map(i -> list(i, j), 
-			enumerate_interval(1, j-1, initial = [])), 
-			enumerate_interval(1, n, initial = [])))
+					enumerate_interval(1, j-1, initial = [])), # i
+			enumerate_interval(1, n, initial = [])))           # j
 end # let
 
 # ╔═╡ 19fa3b90-7cae-48dc-95e4-0fa63d4e0339
@@ -495,7 +557,7 @@ end
 # ╔═╡ 977a9138-6530-4eaa-8b5f-df45c43864db
 function primeSumPairs(n)
 	map(makePairSum, 
-		filter(primeSum, 
+		filter2(primeSum, 
 			flatmap(j -> map(i -> list(i, j), 
 					enumerate_interval(1, j-1, initial = [])), 
 				enumerate_interval(1, n, initial = []))))
@@ -508,7 +570,7 @@ primeSumPairs(6)
 function permutations(s)
 	#-----------------------------------------------------------
 	null = isempty
-	remove(item, sequence) = filter(x -> !(x == item), sequence)
+	remove(item, sequence) = filter2(x -> !(x == item), sequence)
 	#-----------------------------------------------------------
 	if null(s)
 		list([])
@@ -535,7 +597,7 @@ length(permutations([1, 2, 3, 4]))        # n! = 4! = 4*3*2*1 = 24
 function permutations2(s)
 	#-----------------------------------------------------------
 	null = isempty
-	remove(item, sequence) = filter(x -> !(x == item), sequence)
+	remove(item, sequence) = filter2(x -> !(x == item), sequence)
 	#-----------------------------------------------------------
 	if null(s)
 		list([])
@@ -572,13 +634,13 @@ function fib6(n)
 end
 
 # ╔═╡ cae46dcc-0a3b-4dab-8139-b57c7946a155
-function even_fibs(n)
+function even_fibs(n; nil = [])
 	#-------------------------------------------
 	even = iseven
 	#-------------------------------------------
 	function next(k)
 		if >(k, n)
-			[]
+			nil
 		else
 			let f = fib6(k)
 				if even(f)
@@ -591,15 +653,18 @@ function even_fibs(n)
 	end # function next(.)
 	#-------------------------------------------
 	next(0)
-end
+end # function even_fibs
 
 # ╔═╡ a3dc4444-f515-4e06-8985-959d9c0f72ae
 even_fibs(10)
 
+# ╔═╡ 7fd4b1d0-793e-4988-b32f-51b3f06b80b5
+even_fibs(10; nil=:nil)
+
 # ╔═╡ 262fecaf-08ed-48bb-88b3-7891fbb188bf
  # keyword argument 'initial=[]' is *necessary* to generate an array within 'map'
 function even_fibs2(n)
-	accumulate(cons, [], filter(iseven, map(fib6, enumerate_interval(0, n, initial=[]))))          
+	accumulate2(cons, [], filter2(iseven, map(fib6, enumerate_interval(0, n, initial=[]))))          
 end
 
 # ╔═╡ 84669c73-9668-43e4-9201-0b82ec95d9d2
@@ -640,11 +705,14 @@ function pp(consList::Cons)::Array
 	pp_iter([], consList)
 end
 
+# ╔═╡ e435940c-d785-4c97-aba3-d26abc42e977
+pp(even_fibs(10; nil=:nil))
+
 # ╔═╡ 8edb760b-e4ab-4354-8b2c-b53aa15d0a7f
-pp(accumulate(cons, :nil, list(1, 2, 3, 4, 5)))      # pretty-printed as array !
+pp(accumulate2(cons, :nil, list(1, 2, 3, 4, 5)))      # pretty-printed as array !
 
 # ╔═╡ dcdb3dbc-5415-4c21-8431-da7bba9553ef
-sum(pp(accumulate(cons, :nil, list(1, 2, 3, 4, 5)))) # Julia's Base.sum - Function
+sum(pp(accumulate2(cons, :nil, list(1, 2, 3, 4, 5)))) # Julia's Base.sum - Function
 
 # ╔═╡ 773d8b55-0e59-4272-aea1-a5b5eee4966a
 pp(enumerate_interval(2, 7))         # pretty-printed as array
@@ -660,59 +728,66 @@ md"
 ##### Declaration of $$Union$$-Type $$FloatOrSigned$$
 "
 
+# ╔═╡ 94e37ee5-3158-446d-8422-db00d92910ba
+subtypes(AbstractFloat)
+
 # ╔═╡ 65f4abb9-e159-4188-9e37-def73f9fb160
 FloatOrSigned = Union{AbstractFloat, Signed}
 
 # ╔═╡ da5ddbad-2fb9-419d-9a09-1f3bb8fb6331
 md"
-###### 1st (specialized) *typed variant* of function $$accumulate$$ based on $$reduce$$
+###### 1st (specialized) *typed variant* of function $$accumulate$$ based on Julia's $$reduce:$$
+$$reduce := reduce(op, itr; [init])$$
 "
 
 # ╔═╡ 06047667-04c2-4ebe-922c-632521cbd084
-#= idiomatic Julia-code by substuting 'accumulate' by Julia's 'reduce' and keyword parameter 'init=...' =#
-function accumulate2(op::Function, initial::FloatOrSigned, sequence::Vector{<:FloatOrSigned})::FloatOrSigned
+#= idiomatic Julia-code by substuting 2nd typed method of function 'accumulate2' by Julia's 'reduce' and keyword parameter 'init=...' =#
+function accumulate3(op::Function, initial::FloatOrSigned, 	sequence::Vector{<:FloatOrSigned})::FloatOrSigned
 		reduce(op, sequence; init=initial)
 end
 
 # ╔═╡ 34843a75-2a2c-4e2d-a8c9-ca2dea293914
-accumulate2(+, 0, list(1, 2, 3, 4, 5))
+accumulate3(+, 0, list(1, 2, 3, 4, 5))
 
 # ╔═╡ fb7dd33e-4d99-4997-81bf-3eb8f36a866f
-accumulate2(*, 1, list(1, 2, 3, 4, 5))
+accumulate3(*, 1, list(1, 2, 3, 4, 5))
 
 # ╔═╡ e1aa0ec9-bf27-4268-b60c-42847affc432
 md"
-###### 1st (specialized) *typed variant* of function $$accumulate$$ based on $$foldl$$
+###### 1st (specialized) *typed variant* of function $$accumulate$$ based on Julia's $$foldl:$$
+$$foldl := foldl(op, itr; [init])$$
+
 "
 
 # ╔═╡ c8c19b7b-ee0e-434a-874e-cb4485b7e80b
 # idiomatic Julia-code by substuting 'accumulate' by Julia's 'foldl' and keyword parameter 'init=...'
-function accumulate3(op::Function, initial::FloatOrSigned, sequence::Vector{<:FloatOrSigned})::FloatOrSigned
+function accumulate4(op::Function, initial::FloatOrSigned, sequence::Vector{<:FloatOrSigned})::FloatOrSigned
 	foldl(op, sequence; init=initial)
 end
 
 # ╔═╡ 9f7b140d-7f04-4988-9706-cf7141b9ee9b
-accumulate3(+, 0, list(1, 2, 3, 4, 5))
+accumulate4(+, 0, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 1320fd17-bb69-415a-8ced-a7d300a9b179
-accumulate3(*, 1, list(1, 2, 3, 4, 5))
+accumulate4(*, 1, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 38362da7-c423-4060-a5ca-4822294c8a49
 md"
-###### 1st (specialized) *typed variant* of function $$accumulate$$ based on $$foldr$$
+###### 1st (specialized) *typed variant* of function $$accumulate$$ based on Julia's $$foldr:$$
+$$foldr := foldr(op, itr; [init])$$
 "
 
 # ╔═╡ b430b97f-8ba6-4a0c-a663-4ff3f28d5698
-# idiomatic Julia-code by substuting 'accumulate' by Julian 'foldr' and keyword parameter 'init=...'
-function accumulate4(op::Function, initial::FloatOrSigned, sequence::Vector{<:FloatOrSigned})::FloatOrSigned
+# idiomatic Julia-code by substituting 'accumulate' by Julian 'foldr' and keyword parameter 'init=...'
+function accumulate5(op::Function, initial::FloatOrSigned, sequence::Vector{<:FloatOrSigned})::FloatOrSigned
 	foldr(op, sequence; init=initial)
 end
 
 # ╔═╡ c7a7dfb4-f052-4fa5-ab3b-efc78319f0bd
-accumulate4(+, 0, list(1, 2, 3, 4, 5))
+accumulate5(+, 0, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 9b5fc090-e7d5-4783-8c69-e630f203ab04
-accumulate4(*, 1, list(1, 2, 3, 4, 5))
+accumulate5(*, 1, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 77d8dde4-8b75-49f0-9585-14961937b9e0
 md"
@@ -724,21 +799,22 @@ FloatOrSignedOrError = Union{AbstractFloat, Signed, String}
 
 # ╔═╡ e47d1e7d-9671-4972-a98d-35cbdbbd29c7
 md"
-###### 1st (specialized) *typed variant* of function $$accumulate$$ based on $$sum$$
+###### 1st (specialized) *typed variant* of function $$accumulate$$ based on Julia's $$sum:$$
+$$sum := sum(f, itr; [init])$$
 "
 
 # ╔═╡ dd6f57bb-fea6-4538-b29c-2cafc5e3b9e5
-function accumulate5(op::Function, 
+function accumulate6(op::Function, 
 	initial::FloatOrSigned, 
 	sequence::Vector{<:FloatOrSigned})::FloatOrSignedOrError
 	(op == +) ? sum(sequence) : "error: op not +"
 end
 
 # ╔═╡ 499bda9e-01f3-4db4-adbd-7f7f529fbfbe
-accumulate5(+, 0, list(1, 2, 3, 4, 5))
+accumulate6(+, 0, list(1, 2, 3, 4, 5))
 
 # ╔═╡ 96b34aed-7c89-48f6-96c2-229c0d2f43bd
-accumulate5(*, 1, list(1, 2, 3, 4, 5))  # expects '+' as argument for parameter 'op'
+accumulate6(*, 1, list(1, 2, 3, 4, 5))  # expects '+' as argument for parameter 'op'
 
 # ╔═╡ d5a40063-9b03-46e2-8607-3081d524b17a
 md"
@@ -750,9 +826,8 @@ ConsOrArray = Union{Cons, Array}
 
 # ╔═╡ 68c176c8-0892-42ed-bed1-5d8f7a02b33d
 md"
-###### 2nd (specialized) *typed* method of function $$enumerate\_interval$$ ...
-###### .... *but* with keyword parameter $$initial=:nil$$ ...
-###### ... and with Julia's right-associative function $$Base.foldr$$
+###### 2nd (specialized) *typed* method of function $$enumerate\_interval$$ with Julia's $$foldr:$$
+$$foldr := foldr(op, itr; [init])$$
 "
 
 # ╔═╡ 69ad7e44-b690-44d3-8b70-0dec997e4a26
@@ -764,7 +839,7 @@ end
 # ╔═╡ 1340206a-e4b9-4445-8e12-e14d0d2e81a0
  # keyword argument 'initial=[]' is *necessary* to generate an array within 'map'
 function listFibSquares(n)
-	accumulate(cons, [], map(square, map(fib6, enumerate_interval2(0, n, initial=[]))))
+	accumulate2(cons, [], map(square, map(fib6, enumerate_interval2(0, n, initial=[]))))
 end
 
 # ╔═╡ f3c7318e-eeb0-4716-b7ab-aceab779e9d6
@@ -818,7 +893,7 @@ enumerate_tree(tree2)
 
 # ╔═╡ 1f7ce44a-9720-404f-847c-c36601874396
 function sumOddSquares2(tree)
-	accumulate(+, 0, map(square, filter(isodd, enumerate_tree(tree))))
+	accumulate2(+, 0, map(square, filter2(isodd, enumerate_tree(tree))))
 end
 
 # ╔═╡ d7a64fd1-7c9d-43af-bd89-58492a633f12
@@ -836,7 +911,7 @@ enumerate_tree(tree2)
 # ╔═╡ 7aae8e88-8d5b-4df1-94de-ace9635f6058
 md"
 ---
-##### 2.2.3.3 Idiomatic Julia *Interfaces* with $$iterate$$
+##### 2.2.3.3 Idiomatic Julia *Interfaces* with $$filter$$, $$accumulate$$, $$iterate$$
 "
 
 # ╔═╡ f8ef8cf1-009e-4b0e-8295-8a914900ef0b
@@ -844,10 +919,49 @@ md"
 ##### Sequence Operations
 "
 
+# ╔═╡ 250bcc9f-1f6d-4265-b1ad-3a2784b7cc8a
+filter(isodd, list(1, 2, 3, 4, 5))     # Julia's filter function is Base.filter
+
+# ╔═╡ 0828af1f-f07e-4f39-b572-dd99fa8386ce
+filter(iseven, list(1, 2, 3, 4, 5))    # Julia's filter function is Base.filter
+
+# ╔═╡ c1692293-64d7-4686-b05b-acaf2c783757
+md"
+###### Julia's $$accumulate:$$
+$$accumulate := accumulate(op, A; dims::Integer, [init])$$
+"
+
+# ╔═╡ 1051d718-8a92-4db7-80ca-6d128b442a63
+# Julia's accumulate(op, A; dims::Integer, [init])
+accumulate(+, list(1, 2, 3, 4, 5), init=0)  
+
+# ╔═╡ 0f951595-bca4-40eb-b43c-1f8a89ddf560
+last(accumulate(+, list(1, 2, 3, 4, 5), init=0))
+
+# ╔═╡ 22ef4c14-bc21-44f2-be29-c57c9bad01c3
+last(accumulate(+, list(1, 2, 3, 4, 5), init=0)) == sum(list(1, 2, 3, 4, 5))
+
+# ╔═╡ da2d81cd-8247-4882-8d00-7d1d07130cb3
+accumulate(*, list(1, 2, 3, 4, 5), init=1)
+
+# ╔═╡ 1089ba05-c3e1-4328-90c3-f07c83696df7
+last(accumulate(*, list(1, 2, 3, 4, 5), init=1))
+
+# ╔═╡ 01e8598d-b761-4904-8871-764359fd7738
+last(accumulate(*, list(1, 2, 3, 4, 5), init=1)) == prod(list(1, 2, 3, 4, 5))
+
+# ╔═╡ 5086fdfa-df90-486b-8679-633b9da22808
+accumulate(cons, list(1, 2, 3, 4, 5), init=:nil)  
+
+# ╔═╡ 1fc937a4-60ac-4d82-8d9f-94677071d552
+last(accumulate(cons, list(1, 2, 3, 4, 5), init=:nil)) # this is *not* (1, 2, 3, 4, 5)
+
 # ╔═╡ b7e645ca-a545-455e-b9ef-944da3ebf0b8
 md"
-###### 4th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ...
-... with keyword parameter $$initial=:nil$$ and use of $$iterate$$
+###### 4th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ... using of Julia's $$iterate:$$ with $$iter  = (high: -1 : low)$$
+
+$$iterate := iterate(iter [, state]) -> Union\{Nothing, Tuple\{Any, Any\}\}$$
+
 "
 
 # ╔═╡ 1b592487-ad22-4f14-b374-87743b8ec134
@@ -875,9 +989,10 @@ enumerate_interval4(2, 7; initial=[])         # with keyword argument 'initial=[
 
 # ╔═╡ 94efad05-8481-4cd6-a9cb-829671c29c4d
 md"
-###### 5th (specialized) *partial typed* variant of function $$enumerate\_interval$$ ...
-... with keyword parameter $$initial=:nil$$
-... and iterate $$IntervalDown(high, low)$$
+###### 5th (specialized) *partial typed* variant of function $$enumerate\_interval$$
+using iterate $$IntervalDown(high, low)$$ with $$iter  = (low: +1 : high)$$
+
+$$iterate := iterate(iter [, state]) -> Union\{Nothing, Tuple\{Any, Any\}\}$$
 "
 
 # ╔═╡ de2196da-70b9-4c45-9732-ad5b8e7e4a1e
@@ -952,6 +1067,7 @@ version = "0.5.0"
 # ╠═1ba55e5f-35ad-4fe4-8b76-dee560fe49e8
 # ╟─8aba03d0-b7af-4c5e-b990-f660b0384bc7
 # ╠═044fe2ab-a4f5-40fd-b61e-58f3904ed4ff
+# ╟─ede3a48f-71c0-4ddc-8f98-0590b817ef17
 # ╠═069ee324-eceb-4f42-ae20-aac2e4478b2b
 # ╟─224586f3-1fbb-41c3-bdc9-51229913a699
 # ╟─9f0808b5-1130-4603-9f8b-7359560f5672
@@ -959,13 +1075,19 @@ version = "0.5.0"
 # ╠═8824f5f4-4f29-48d7-8d07-a5a767c47ac4
 # ╠═2bba24d2-79ee-4923-a6b5-e0e9a4d410d9
 # ╠═d63ca7af-a13e-4625-bbf5-6024c6a14247
+# ╠═4c640fed-d04b-4e57-9548-98ce7bac9f34
+# ╠═e5889629-d634-4814-996f-9e59222ce1fe
 # ╠═dfe2820c-be99-4bda-a48b-64c250938404
+# ╟─405e17a8-b601-4668-8fc0-cd5a2e99e81e
 # ╠═cae46dcc-0a3b-4dab-8139-b57c7946a155
 # ╠═a3dc4444-f515-4e06-8985-959d9c0f72ae
+# ╠═7fd4b1d0-793e-4988-b32f-51b3f06b80b5
+# ╠═e435940c-d785-4c97-aba3-d26abc42e977
 # ╟─2d45ac6d-fc78-48b6-a1c1-3bf8923c857e
 # ╠═9f64b774-8333-48d0-9a60-aede670db6ff
 # ╠═340e3dad-8b91-471e-84ed-8e4ac555ef49
 # ╠═20697309-9d88-4d3f-a153-849f229cf47a
+# ╟─93c3d676-aa0f-40b3-8c57-fd28ca5acf0c
 # ╠═ea228836-2583-4b0e-9f7a-c2d50f9f8230
 # ╠═1ee151db-1b91-4400-8474-9d689cb73664
 # ╠═a9366254-3a82-4252-8c47-9b51b9dd504d
@@ -986,13 +1108,17 @@ version = "0.5.0"
 # ╟─c5992151-e61d-4672-939b-931090fc4275
 # ╟─054cd582-16ec-4c27-8504-192a437e254e
 # ╠═19d77c84-8b9b-4c0e-95ff-33667cc461b1
+# ╠═b31bd8a2-ef27-4fc8-9790-3ddbdd540667
+# ╠═f493c8c9-4399-475f-9d8a-9aa2b5aa38ea
 # ╟─130a22a0-bbfd-4d69-bd99-194d71906f75
 # ╠═f5a765fe-e03f-4bea-9d26-e4faf548cf8a
 # ╠═85e2f791-7498-413c-8216-f9ef5c2abd44
+# ╟─131bbb1f-25c1-4bd2-af72-4177ebda209e
 # ╠═1f7ce44a-9720-404f-847c-c36601874396
 # ╠═d7a64fd1-7c9d-43af-bd89-58492a633f12
 # ╠═06ee405c-1a4d-46ea-a198-7ee15184c2a8
 # ╠═bb4388e8-91f0-41f6-ae17-ae50c512c6e3
+# ╟─c7615112-8c03-43fb-ad3a-e979f6ae951f
 # ╠═262fecaf-08ed-48bb-88b3-7891fbb188bf
 # ╠═84669c73-9668-43e4-9201-0b82ec95d9d2
 # ╠═1340206a-e4b9-4445-8e12-e14d0d2e81a0
@@ -1005,7 +1131,6 @@ version = "0.5.0"
 # ╟─56837c07-91a6-452b-8c3a-854bbe6a8423
 # ╟─804a253f-28c4-4eb7-8bc9-ac00c3d80f6d
 # ╠═43279a01-aded-4f22-a5d4-97057e850dda
-# ╠═69b40bb5-fa2c-4af3-9e43-7d7419f73042
 # ╠═3d033066-0bee-48e9-a4d0-be0e0afdfe68
 # ╠═d5551946-391c-479c-bb26-0f3cbd0d46aa
 # ╠═ed86ac5c-b2db-4ffe-862c-72e590b6ef65
@@ -1015,7 +1140,6 @@ version = "0.5.0"
 # ╠═bfaec430-7fc3-4c0f-bf45-0eb87f60dbe3
 # ╠═f2a779f5-d408-467b-9713-c58fe4db6913
 # ╠═b4d1e9eb-1367-4dda-935c-8d24712dcd96
-# ╠═23aa8af2-f38c-44ce-8009-93d46e3b9a7a
 # ╠═b94fb940-4cfa-4496-aff6-bdd0014a1c5d
 # ╠═19fa3b90-7cae-48dc-95e4-0fa63d4e0339
 # ╠═977a9138-6530-4eaa-8b5f-df45c43864db
@@ -1049,6 +1173,7 @@ version = "0.5.0"
 # ╠═dd5aff36-30ff-41c7-8cad-838f92a86ea8
 # ╟─f3392214-43c1-4086-bf3a-2dabd678a900
 # ╟─03dd4154-4bf1-4059-9511-a78e030a2d9d
+# ╠═94e37ee5-3158-446d-8422-db00d92910ba
 # ╠═65f4abb9-e159-4188-9e37-def73f9fb160
 # ╟─da5ddbad-2fb9-419d-9a09-1f3bb8fb6331
 # ╠═06047667-04c2-4ebe-922c-632521cbd084
@@ -1085,6 +1210,17 @@ version = "0.5.0"
 # ╠═fb2c97b5-3eec-467a-ba90-0518ef5c8ba1
 # ╟─7aae8e88-8d5b-4df1-94de-ace9635f6058
 # ╟─f8ef8cf1-009e-4b0e-8295-8a914900ef0b
+# ╠═250bcc9f-1f6d-4265-b1ad-3a2784b7cc8a
+# ╠═0828af1f-f07e-4f39-b572-dd99fa8386ce
+# ╟─c1692293-64d7-4686-b05b-acaf2c783757
+# ╠═1051d718-8a92-4db7-80ca-6d128b442a63
+# ╠═0f951595-bca4-40eb-b43c-1f8a89ddf560
+# ╠═22ef4c14-bc21-44f2-be29-c57c9bad01c3
+# ╠═da2d81cd-8247-4882-8d00-7d1d07130cb3
+# ╠═1089ba05-c3e1-4328-90c3-f07c83696df7
+# ╠═01e8598d-b761-4904-8871-764359fd7738
+# ╠═5086fdfa-df90-486b-8679-633b9da22808
+# ╠═1fc937a4-60ac-4d82-8d9f-94677071d552
 # ╟─b7e645ca-a545-455e-b9ef-944da3ebf0b8
 # ╠═1b592487-ad22-4f14-b374-87743b8ec134
 # ╠═89b98a66-0378-47e6-8eb6-77f23406b96b
