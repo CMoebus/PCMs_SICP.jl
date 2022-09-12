@@ -7,10 +7,11 @@ using InteractiveUtils
 # ╔═╡ 353d3930-0a7c-11ec-22fb-2ba2ded89523
 md"
 ======================================================================================
+#### [SICP\_2.3.1\_Quotation.jl](https://sarabander.github.io/sicp/html/2_002e3.xhtml#g_t2_002e3_002e1)
 
 ###### file: PCM20210831\_SICP\_2.3.1\_Quotation.jl
 
-###### Julia/Pluto.jl-code (1.8.1/19.11) by PCM *** 2022/09/11 ***
+###### Julia/Pluto.jl-code (1.8.1/19.11) by PCM *** 2022/09/12 ***
 ======================================================================================
 "
 
@@ -86,6 +87,15 @@ md"
 function list(xs...)
 	push!([], xs...)
 end
+
+# ╔═╡ 67a71799-3e40-48ef-bd29-a8bba877ed7a
+list(:a, :b, :c, :d)
+
+# ╔═╡ 04caf83a-9df8-41e2-835d-1bbfc7e6698d
+list(23, 45, 17)
+
+# ╔═╡ 0a507b0a-b377-4215-b5ff-cd377162357d
+list(list(:Norah, 12), list(:Molly, 9), list(:Anna, 7), list(:Lauren, 6), list(:Charlotte, 4))
 
 # ╔═╡ 6741b890-392a-48f3-b970-b2a289862875
 list(a, b)
@@ -260,6 +270,9 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═3b7b8373-2a1d-400c-a67c-b6ad69d5a4f1
 # ╠═c0f13087-edc7-433b-b715-e408386e11f2
 # ╟─35d094a8-a129-4d0b-b4eb-bd714f6e71c6
+# ╠═67a71799-3e40-48ef-bd29-a8bba877ed7a
+# ╠═04caf83a-9df8-41e2-835d-1bbfc7e6698d
+# ╠═0a507b0a-b377-4215-b5ff-cd377162357d
 # ╠═f4dd7244-0618-457d-90c6-3f5479d1f35b
 # ╠═6c5718e3-aaae-47f9-a98d-33e7c9f56d30
 # ╟─d3c5964f-b96f-482d-a4a8-f587d3244192
