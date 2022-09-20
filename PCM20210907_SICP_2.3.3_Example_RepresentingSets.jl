@@ -11,8 +11,13 @@ md"
 
 ##### file: PCM20210907\_SICP\_2.3.3\_Example\_RepresentingSets.jl
 
-###### code: Julia/Pluto.jl-code (1.8.1/19.11) by PCM *** 2022/09/18 ***
+###### code: Julia/Pluto.jl-code (1.8.1/19.11) by PCM *** 2022/09/20 ***
 ======================================================================================
+"
+
+# ╔═╡ 90866eff-5dae-4471-8a7f-22bfea0f32b5
+md"
+##### 2.3.3.1 Scheme-like Julia
 "
 
 # ╔═╡ 31640d3d-f26d-4c35-a970-2a11ba4619bc
@@ -57,6 +62,7 @@ cdr(x::Vector) = x[2:end]
 
 # ╔═╡ de9ee526-57f8-4285-b9fc-386a30e35178
 md"
+---
 ##### Sets as *un*ordered lists
 "
 
@@ -117,6 +123,7 @@ intersection_set1(mySet1, mySet2)
 
 # ╔═╡ 1d165e97-c545-46f6-9582-5709aa60899b
 md"
+---
 ##### Sets as ordered lists
 "
 
@@ -172,6 +179,7 @@ intersection_set2(mySet3, mySet4)
 
 # ╔═╡ 2f1bcd82-5d21-4029-8d3a-6ce95a1637e7
 md"
+---
 ##### Sets as Binary Trees
 "
 
@@ -221,6 +229,7 @@ Trees are built with the *constructor* function $$adjoin\_set3$$ starting from t
 
 # ╔═╡ 6376f9c2-d385-4908-be15-4e6a81f7cd07
 md"
+---
 ###### basic Scheme-like selectors $cadr, caddr, cadddr$
 "
 
@@ -376,7 +385,8 @@ is_element_of_set3(6, mySet5)
 
 # ╔═╡ 6f7707ed-7825-4570-8e96-b403190402d6
 md"
-###### Sets and information retrieval
+---
+##### Sets and information retrieval
 "
 
 # ╔═╡ e8e5f771-efeb-471d-836d-54d8165dd00d
@@ -395,29 +405,105 @@ end # function lookup
 
 # ╔═╡ f075025b-55cc-41e8-a9ed-d215bb4af07d
 database = 
-[	[:Abelson_Sussman_Sussman, 1985, "Structure and Interpretation of Computer Programs, 1/e"],
-	[:ASS, 1996, "SICP, 2/e"],
-	[:Allen, 1978, "Anatomy of Lisp"],
-	[:Backus, 1978, "Can programming be liberated from the von Neumann style?"],
-	[:Church, 1941, "The Calculi of Lambda-Conversion"],
-	[:Friedman_Felleisen, 1987, "The Little Lisper"],
-	[:Russell_Norvig, 2021, "Artificial Intelligence: A Modern Approach, 4/e"],
-	[:Winston, 1992, "Artificial Intelligence"]];
+[	["Abelson,Sussman&Sussman", 1985, "Structure and Interpretation of Computer Programs, 1/e"],
+	["ASS", 1996, "SICP, 2/e"],
+	["Allen", 1978, "Anatomy of Lisp"],
+	["Backus", 1978, "Can programming be liberated from the von Neumann style?"],
+	["Church", 1941, "The Calculi of Lambda-Conversion"],
+	["Friedman&Felleisen", 1987, "The Little Lisper"],
+	["Russell&Norvig", 2021, "Artificial Intelligence: A Modern Approach, 4/e"],
+	["Winston", 1992, "Artificial Intelligence"]];
 
 # ╔═╡ 32b3dda6-0b28-4eff-958d-39ddda3d2184
 database
 
+# ╔═╡ 7cff9a66-94e7-4c2a-8c94-4058999b48c6
+database[5]
+
+# ╔═╡ 40afcc74-5a18-48f8-9627-939eec59ef65
+database[5][1]
+
+# ╔═╡ 52476761-16c3-4ec0-9396-3258aa2aa574
+database[5][2]
+
+# ╔═╡ 634f1a3d-80e2-46a3-8c70-cbb1e0f8422b
+database[5][3]
+
 # ╔═╡ 96a063bc-04e4-44a5-b827-d19cfc652e51
-lookup(:Russell_Norvig, database)
+lookup("Russell&Norvig", database)
 
 # ╔═╡ 6d73ae3f-fcbf-47b0-9384-0eaa896e68c7
-lookup(:ASS, database)
+lookup("ASS", database)
+
+# ╔═╡ c9fd0ecd-86e0-4fd0-95fd-6a0b8ff0371f
+md"
+---
+##### 2.3.3.2 idiographic Julia
+"
+
+# ╔═╡ df980bac-44e9-4893-956a-3fd30ce02acd
+mySet1
+
+# ╔═╡ 4da50963-2117-449b-b377-6c4cbacbe778
+mySet2
+
+# ╔═╡ c360d756-f060-4d5e-848c-32740d30e8ad
+intersect(mySet1, mySet2)
+
+# ╔═╡ bc823da7-3b6a-40ee-b2e6-0b590e96c090
+∩(mySet1, mySet2)
+
+# ╔═╡ aabf82c3-906d-489a-bf67-576293fa261f
+union(mySet1, mySet2)
+
+# ╔═╡ a41c8598-850f-46b8-9c07-cf77a803f989
+∪(mySet1, mySet2)
+
+# ╔═╡ d5b6372f-7c48-4074-ad3e-407442a47273
+setdiff(mySet1, mySet2)
+
+# ╔═╡ 31f34dfa-ba4e-443c-a032-68eb667afc86
+setdiff(mySet2, mySet1)
+
+# ╔═╡ 8c2a5585-2d23-4c71-8ea1-c5db7e55b942
+myDict = Dict([
+	(database[5][1], (database[5][2], database[5][3])),
+	(database[4][1], (database[4][2], database[4][3])),
+	(database[6][1], (database[6][2], database[6][3])),
+	(database[3][1], (database[3][2], database[3][3])),
+	(database[7][1], (database[7][2], database[7][3])),
+	(database[2][1], (database[2][2], database[2][3])),
+	(database[8][1], (database[8][2], database[8][3])),
+	(database[1][1], (database[1][2], database[1][3]))
+])
+
+# ╔═╡ f40b9c56-f308-4d89-baa3-465e7e3fa919
+keys(myDict)
+
+# ╔═╡ f507116f-caf2-4d93-8287-9193bfbf3d3d
+values(myDict)
+
+# ╔═╡ 8934372c-2940-4685-b180-547632289315
+haskey(myDict, "Church")
+
+# ╔═╡ 4ce40ff7-42fa-4e46-889d-a57bebe50f95
+haskey(myDict, "ASS")
+
+# ╔═╡ dea9a374-a00f-4e22-8e84-fb7b0e4ef53f
+get(myDict, "ASS", "no entry found")
+
+# ╔═╡ 09fdf039-29e0-4e60-a3ef-16d3814c4184
+get(myDict, "Church", "no entry found")
+
+# ╔═╡ f166c71d-0cb5-4f74-b274-717c0319b4c6
+get(myDict, "Kiczales,DesRivieres&Bobrow", "no entry found")
 
 # ╔═╡ cc03266f-6f2d-4743-857b-59e0509e189e
 md"
 ---
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/09/16
+- **Kiczales, G., Des Rivieres, J. & Bobrow, D.G.**; The Art of the Metaobject Protocol; MIT Press, 1991
 "
 
 # ╔═╡ aec1fed8-74ff-475f-bf26-b88bc788bfc4
@@ -447,6 +533,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 # ╔═╡ Cell order:
 # ╟─287e9560-0fe3-11ec-2a3e-bf6c9c52f872
+# ╟─90866eff-5dae-4471-8a7f-22bfea0f32b5
 # ╠═31640d3d-f26d-4c35-a970-2a11ba4619bc
 # ╠═e09b1809-ac89-42e7-88dd-fc8250e43316
 # ╠═115717d7-97a2-4de7-9009-cf3065511586
@@ -527,8 +614,29 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═515dc6e4-c222-4fc3-b852-62b1235d39ae
 # ╠═f075025b-55cc-41e8-a9ed-d215bb4af07d
 # ╠═32b3dda6-0b28-4eff-958d-39ddda3d2184
+# ╠═7cff9a66-94e7-4c2a-8c94-4058999b48c6
+# ╠═40afcc74-5a18-48f8-9627-939eec59ef65
+# ╠═52476761-16c3-4ec0-9396-3258aa2aa574
+# ╠═634f1a3d-80e2-46a3-8c70-cbb1e0f8422b
 # ╠═96a063bc-04e4-44a5-b827-d19cfc652e51
 # ╠═6d73ae3f-fcbf-47b0-9384-0eaa896e68c7
+# ╟─c9fd0ecd-86e0-4fd0-95fd-6a0b8ff0371f
+# ╠═df980bac-44e9-4893-956a-3fd30ce02acd
+# ╠═4da50963-2117-449b-b377-6c4cbacbe778
+# ╠═c360d756-f060-4d5e-848c-32740d30e8ad
+# ╠═bc823da7-3b6a-40ee-b2e6-0b590e96c090
+# ╠═aabf82c3-906d-489a-bf67-576293fa261f
+# ╠═a41c8598-850f-46b8-9c07-cf77a803f989
+# ╠═d5b6372f-7c48-4074-ad3e-407442a47273
+# ╠═31f34dfa-ba4e-443c-a032-68eb667afc86
+# ╠═8c2a5585-2d23-4c71-8ea1-c5db7e55b942
+# ╠═f40b9c56-f308-4d89-baa3-465e7e3fa919
+# ╠═f507116f-caf2-4d93-8287-9193bfbf3d3d
+# ╠═8934372c-2940-4685-b180-547632289315
+# ╠═4ce40ff7-42fa-4e46-889d-a57bebe50f95
+# ╠═dea9a374-a00f-4e22-8e84-fb7b0e4ef53f
+# ╠═09fdf039-29e0-4e60-a3ef-16d3814c4184
+# ╠═f166c71d-0cb5-4f74-b274-717c0319b4c6
 # ╟─cc03266f-6f2d-4743-857b-59e0509e189e
 # ╟─aec1fed8-74ff-475f-bf26-b88bc788bfc4
 # ╟─00000000-0000-0000-0000-000000000001
