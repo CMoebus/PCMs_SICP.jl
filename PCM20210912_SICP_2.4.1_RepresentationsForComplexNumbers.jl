@@ -20,7 +20,7 @@ md"
 # ╔═╡ 9142ce4d-01f9-4ea9-a94c-9d857ebdabe0
 md"
 ###### Definition of a [complex number](https://en.wikipedia.org/wiki/Complex_number) $$z$$ :
-$$z:=x+y\,i = r\cdot cos\,\phi + r\cdot i\, sin\,\phi = r(cos\,\phi + i\, sin\,\phi) = re^{\phi i}$$
+$$z:=x+y\,i = r\cdot cos\,\phi + r\cdot i\, sin\,\phi = r(cos\,\phi + i\, sin\,\phi) = re^{i \phi}$$
 
 where :
 
@@ -36,7 +36,7 @@ The last expression uses Euler's formula for complex analysis.
 md"
 ###### [Euler's formula](https://en.wikipedia.org/wiki/Euler%27s_formula) for complex analysis is:
 
-$$e^{\phi i} = cos\,\phi + i \,sin\,\phi,$$
+$$e^{i \phi} = cos\,\phi + i \,sin\,\phi,$$
 
 Several different [proofs](https://en.wikipedia.org/wiki/Euler%27s_formula#Proofs) are known. One of the first was using the *power series expansion* of all terms in the formula.
 
@@ -47,18 +47,18 @@ md"
 ###### [Euler's identity](https://en.wikipedia.org/wiki/Euler%27s_identity) :
 If we substitute $$\phi := \pi$$ in [Euler's formula](https://en.wikipedia.org/wiki/Euler%27s_formula):
 
-$$e^{\phi i} = cos\,\phi + i\, sin\,\phi$$
+$$e^{i \phi} = cos\,\phi + i\, sin\,\phi$$
 
 we fix $$\phi$$ by $$\pi= \frac{2\pi r}{2r}=\frac{circumference}{diameter}$$ then the result is called *Euler's identity* :
 ###### 
 
-$$e^{\pi i} = cos\,\pi + i \, sin\,\pi = -1 + 0\,i = -1$$
+$$e^{i \pi} = cos\,\pi + i \, sin\,\pi = -1 + 0\,i = -1$$
 
 and rearranging terms
 
-$$e^{\pi i} = -1$$
+$$e^{i \pi} = -1$$
 
-$$e^{\pi i} + 1 = 0.$$
+$$e^{i \pi} + 1 = 0.$$
 
 This is known as *'our jewel' and 'the most remarkable formula in mathematics'* [(https://en.wikipedia.org/wiki/Mathematical_beauty)](https://en.wikipedia.org/wiki/Mathematical_beauty) because it connects several fundamental concepts in **one** formula.
 
@@ -125,7 +125,7 @@ end
 
 # ╔═╡ 61502c97-46c9-43d0-a48b-f0d40a985ffd
 md"
-$$z = r e^{\phi i}$$
+$$z = r e^{i \phi}$$
 "
 
 # ╔═╡ f76e31ee-3c12-4ced-8252-1afd6ce6a763
@@ -141,11 +141,11 @@ begin
 	plot!([Complex(0, -1.2), Complex(0, 1.4)], line = (:dash, :line, 0.5, 1, :black))
 	plot!([0*exp(ϕ*im), r*exp(ϕ*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z = r*exp(ϕ i) = 2 + 1i
 	plot!([0*exp(ϕ*im), 1*exp(ϕ*im)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)  # point on unit square
-	annotate!([(2.7,  1.0,  ("z := r*exp(ϕ*i)", 13, :bottom, :red))])
-	annotate!([(2.5,  0.8,  ("= 2 + 1i", 13, :bottom, :red))])
-	annotate!([(1.65, 0.4,  ("z := exp(ϕ*i)", 13, :bottom, :blue))])
-	annotate!([(1.65, 0.2,  ("   = 0.894 + 0.447i", 13, :bottom, :blue))])
-	annotate!([(1.65,-0.03, ("   (= 2/√5 + 1/√5i)", 13, :bottom, :blue))])
+	annotate!([(2.7,  1.0,  ("z:=r*exp(iϕ)", 13, :bottom, :red))])
+	annotate!([(2.5,  0.8,  (" =2+1i", 13, :bottom, :red))])
+	annotate!([(1.65, 0.4,  ("z:=exp(iϕ)", 13, :bottom, :blue))])
+	annotate!([(1.65, 0.2,  ("   =0.894+0.447i", 13, :bottom, :blue))])
+	annotate!([(1.65,-0.03, ("   (=2/√5+1/√5i)", 13, :bottom, :blue))])
 	annotate!([(0.5,  0.03, ("ϕ", 13, :bottom, :black))])
 	annotate!([(0.5, -0.15, ("ϕ=arctan(Im(z)/Re(z))", 9, :bottom, :black))])
 end
@@ -171,7 +171,7 @@ begin
 	plot!([Complex(-1.2, 0), Complex(2.5, 0)], line = (:dash, :line, 0.5, 1, :black))
 	plot!([Complex(0, -1.2), Complex(0, 1.4)], line = (:dash, :line, 0.5, 1, :black))
 	plot!([0*exp(π*im), r2*exp(π*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z2 = r2*exp(π i) = re(z2) + im(z2)
-	annotate!([(-0.5, 0.2,  ("z2 := r2*exp(ϕ2*i)", 13, :bottom, :red))])
+	annotate!([(-0.5, 0.2,  ("z2 := r2*exp(iϕ2)", 13, :bottom, :red))])
 	annotate!([(-0.5, 0.0,  ("= 1.0 + 0i", 13, :bottom, :red))])
 	annotate!([(-0.5,-0.15, ("ϕ2=arctan(Im(z2)/Re(z2))=0", 9, :bottom, :black))])
 end
@@ -296,9 +296,9 @@ begin
 	plot!([Complex(0, 0), Complex(4, 3)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false)  
 	plot!([Complex(2, 2), Complex(4, 3)] , arrow=:head, line = (:dash, :line, 1.0, 1, :blue))
 	plot!([Complex(2, 1), Complex(4, 3)] , arrow=:head, line = (:dash, :line, 1.0, 1, :green))
-	annotate!([(3.0,  0.8,  ("z1 = 2+1i", 13, :bottom, :blue))])
-	annotate!([(0.8,  1.8,  ("z2 = 2+2i", 13, :bottom, :green))])	
-	annotate!([(4.0,  3.0,  ("z3 = z1+z2 = 4+3i", 13, :bottom, :red))])
+	annotate!([(2.8,  0.8,  ("z1=2+1i", 13, :bottom, :blue))])
+	annotate!([(1.0,  1.8,  ("z2=2+2i", 13, :bottom, :green))])	
+	annotate!([(4.0,  3.0,  ("z3=z1+z2=4+3i", 13, :bottom, :red))])
 	
 end
 
@@ -323,17 +323,22 @@ $$=(x_1*x_2 - y_1*y_2) + (x_1*y_2 + x_2*y_1)i$$
 begin
 	ϕblue  = atan(1/2)
 	ϕgreen = atan(2/2)
-	ϕred   = ϕblue + ϕgreen 
-	plot(Plots.partialcircle(0.0, ϕred, nrOfPoints, radius), line = (:dash, :line, 2, 1, :red), xlim=(-1.5, 5), ylim=(-1.5, 7), aspect_ratio=:equal, title="Multiplication of complex numbers as vectors in 2D")
+	ϕred   = ϕblue + ϕgreen
+	redArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕred, nrOfPoints, 3.5*radius)]
+	greenArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕgreen, nrOfPoints, 2.5*radius)]
+	blueArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕblue, nrOfPoints, 1.5*radius)]
+	plot(redArc, line = (:dash, :line, 2, 1, :red), xlim=(-1.5, 5), ylim=(-1.5, 7), aspect_ratio=:equal, title="Multiplication of complex numbers as vectors in 2D")
+	plot!(greenArc, line = (:dash, :line, 2, 1, :green))
+	plot!(blueArc, line = (:dash, :line, 2, 1, :blue))
 	plot!([Complex(-1.2, 0), Complex(5, 0)], line = (:dash, :line, 0.5, 1, :black))
 	plot!([Complex(0, -1.2), Complex(0, 6)], line = (:dash, :line, 0.5, 1, :black))
 	plot!([0*exp(ϕ*im), r*exp(ϕ*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z = r*exp(ϕ i) = 2 + 1i
 	plot!([Complex(0, 0), Complex(2, 1)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)
 	plot!([Complex(0, 0), Complex(2, 2)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :green), legend=:false)  
 	plot!([Complex(0, 0), Complex(2, 6)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false)  	
-	annotate!([(3.5,  0.7,  ("z1 = 2+1i", 13, :bottom, :blue))])
-	annotate!([(3.5,  1.7,  ("z2 = 2+2i", 13, :bottom, :green))])	
-	annotate!([(2.3,  6.1,  ("z3 = z1*z2 = 2+6i", 13, :bottom, :red))])
+	annotate!([(3.2,  0.7,  ("z1=2+1i", 12, :bottom, :blue))])
+	annotate!([(3.2,  1.7,  ("z2=2+2i", 12, :bottom, :green))])	
+	annotate!([(2.3,  6.1,  ("z3=z1*z2=|z1|*|z2|+(ϕ1+ϕ2)i", 12, :bottom, :red))])
 end
 
 # ╔═╡ 9d750d83-4142-4be6-add2-a869e2299f89
