@@ -12,9 +12,14 @@ md"
 =====================================================================================
 #### [SICP\_2.4.1\_RepresentationsForComplexNumbers.jl](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e1)
 ##### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-##### code: Julia/Pluto.jl (1.8.2/19.12) by PCM *** 2022/10/09 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.12) by PCM *** 2022/10/10 ***
 
 =====================================================================================
+"
+
+# ╔═╡ 7c72b93a-e502-417c-a4ad-99b8be18cebf
+md"
+Fig. 2.4.1.1 Complex numbers as points (or vectors) in 2D (similar to Fig. 2.20 in SICP)
 "
 
 # ╔═╡ 9142ce4d-01f9-4ea9-a94c-9d857ebdabe0
@@ -150,6 +155,11 @@ begin
 	annotate!([(0.5, -0.15, ("ϕ=arctan(Im(z)/Re(z))", 9, :bottom, :black))])
 end
 
+# ╔═╡ 3c3837d3-4b55-4720-917e-1bdc8397c8cb
+md"
+Fig. 2.4.1.2 Complex numbers as points (or vectors) in 2D using *Euler's formula*
+"
+
 # ╔═╡ 76af9279-2013-491c-b55b-6adcbe2f4fc0
 π
 
@@ -175,6 +185,11 @@ begin
 	annotate!([(-0.5, 0.0,  ("= 1.0 + 0i", 13, :bottom, :red))])
 	annotate!([(-0.5,-0.15, ("ϕ2=arctan(Im(z2)/Re(z2))=0", 9, :bottom, :black))])
 end
+
+# ╔═╡ a3c59817-1bf8-4114-b347-92bdd0400a25
+md"
+Fig. 2.4.1.3 Complex number as point (or vector) in 2D using *Euler's identity*
+"
 
 # ╔═╡ 2713a735-3542-45d6-9ed3-a3aa1863902c
 md"
@@ -302,6 +317,11 @@ begin
 	
 end
 
+# ╔═╡ ad751aeb-441d-45c4-b3ba-31b338b3c625
+md"
+Fig. 2.4.1.4 Complex addition as points (or vectors) in 2D
+"
+
 # ╔═╡ 879967a3-bc78-417a-8cc0-aaf53343d3e2
 md"
 ###### [Subtraction](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
@@ -336,10 +356,18 @@ begin
 	plot!([Complex(0, 0), Complex(2, 1)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)
 	plot!([Complex(0, 0), Complex(2, 2)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :green), legend=:false)  
 	plot!([Complex(0, 0), Complex(2, 6)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false)  	
+	annotate!([(0.85,-0.05, ("ϕ1", 10, :bottom, :blue))])
+	annotate!([(1.3,  0.7,  ("ϕ2", 10, :bottom, :green))])
+	annotate!([(1.3,  1.6,  ("ϕ3", 10, :bottom, :red))])
 	annotate!([(3.2,  0.7,  ("z1=2+1i", 12, :bottom, :blue))])
 	annotate!([(3.2,  1.7,  ("z2=2+2i", 12, :bottom, :green))])	
 	annotate!([(2.3,  6.1,  ("z3=z1*z2=|z1|*|z2|+(ϕ1+ϕ2)i", 12, :bottom, :red))])
 end
+
+# ╔═╡ 4ba35a7e-d038-4bd5-b627-039eb0abf460
+md"
+Fig. 2.4.1.5 Complex multiplication as points (or vectors) in 2D
+"
 
 # ╔═╡ 9d750d83-4142-4be6-add2-a869e2299f89
 md"
@@ -1573,6 +1601,7 @@ version = "1.4.1+0"
 # ╟─ddedeb70-3b21-11ed-1278-37ba3d55e512
 # ╠═4082b01a-1149-43ae-9a6b-6531c985d157
 # ╟─73b6b69d-bbe1-438d-a397-d4e848aedfc5
+# ╟─7c72b93a-e502-417c-a4ad-99b8be18cebf
 # ╟─9142ce4d-01f9-4ea9-a94c-9d857ebdabe0
 # ╟─e895bc63-c837-4512-baac-a9a48cae50cb
 # ╟─386610be-98ca-4ee0-8f24-038eb06c44f7
@@ -1590,12 +1619,14 @@ version = "1.4.1+0"
 # ╠═f76e31ee-3c12-4ced-8252-1afd6ce6a763
 # ╠═51bf7e65-2a4e-440d-871d-f0bb61c695f9
 # ╟─f760db0f-8dbb-4130-bf54-bdf556d785c9
+# ╟─3c3837d3-4b55-4720-917e-1bdc8397c8cb
 # ╠═76af9279-2013-491c-b55b-6adcbe2f4fc0
 # ╠═db2ea1ef-d2ba-41c2-a293-79ed6a82c2d7
 # ╠═0eba8065-ce12-43d3-9852-ef03abf10712
 # ╠═d6030208-4cef-45ec-93e9-c0ec996d41e9
 # ╠═ae3cddc7-c324-4454-988b-b4b6bc9f5900
 # ╟─97b83b76-ac88-4be6-b387-4b29861cffb5
+# ╟─a3c59817-1bf8-4114-b347-92bdd0400a25
 # ╟─2713a735-3542-45d6-9ed3-a3aa1863902c
 # ╟─cede8129-9358-4dc4-a32e-6390af700376
 # ╟─1c736e19-1dde-496c-9d8f-991384d8d803
@@ -1611,11 +1642,13 @@ version = "1.4.1+0"
 # ╟─1977b1f7-03ee-4c91-a01a-c26a75e85fa2
 # ╟─f594966f-2e7c-42ab-81d0-b5360f19bf6f
 # ╟─a39e810d-6adc-4343-aaeb-a2c34db92104
+# ╟─ad751aeb-441d-45c4-b3ba-31b338b3c625
 # ╠═0f5eae24-727c-4ef9-8e38-18ee64d97229
 # ╟─879967a3-bc78-417a-8cc0-aaf53343d3e2
 # ╠═8f80e51f-b813-4846-967c-1e101511aaef
 # ╟─e05f131b-5c68-4974-b0cb-ec6d46871fd5
 # ╟─c44c7aaa-60c4-4f51-a85d-f94c300272bb
+# ╟─4ba35a7e-d038-4bd5-b627-039eb0abf460
 # ╠═a779ca0b-dbad-4fc2-be75-4b7f45d31636
 # ╟─9d750d83-4142-4be6-add2-a869e2299f89
 # ╟─cb398a68-cef5-4398-ae9d-65a7e380f2a2
