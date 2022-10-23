@@ -4,265 +4,183 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 4082b01a-1149-43ae-9a6b-6531c985d157
+# ╔═╡ 90aa1e17-89f8-4884-9a3b-e58acf87bc7a
 using Plots
 
-# ╔═╡ ddedeb70-3b21-11ed-1278-37ba3d55e512
+# ╔═╡ e39aed1d-58a3-40e6-8a73-27204b742f42
 md"
 =====================================================================================
-#### [SICP\_2.4.1\_RepresentationsForComplexNumbers.jl](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e1)
-##### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.12) by PCM *** 2022/10/10 ***
+#### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
+###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
+###### code: Julia/Pluto.jl (1.8.2/0.19.12) by PCM *** 2022/10/23 ***
 
 =====================================================================================
-"
-
-# ╔═╡ 7c72b93a-e502-417c-a4ad-99b8be18cebf
-md"
-Fig. 2.4.1.1 Complex numbers as points (or vectors) in 2D (similar to Fig. 2.20 in SICP)
-"
-
-# ╔═╡ 9142ce4d-01f9-4ea9-a94c-9d857ebdabe0
-md"
-###### Definition of a [complex number](https://en.wikipedia.org/wiki/Complex_number) $$z$$ :
-$$z:=x+y\,i = r\cdot cos\,\phi + r\cdot i\, sin\,\phi = r(cos\,\phi + i\, sin\,\phi) = re^{i \phi}$$
-
-where :
-
-$$x = Re(z) = r\cdot cos \,\phi$$
-$$y = Im(z) = r\cdot sin \,\phi$$
-$$\phi = \arctan(y/x)$$
-$$r = \sqrt{(x^2 + y^2)}.$$
-
-The last expression uses Euler's formula for complex analysis.
-"
-
-# ╔═╡ e895bc63-c837-4512-baac-a9a48cae50cb
-md"
-###### [Euler's formula](https://en.wikipedia.org/wiki/Euler%27s_formula) for complex analysis is:
-
-$$e^{i \phi} = cos\,\phi + i \,sin\,\phi,$$
-
-Several different [proofs](https://en.wikipedia.org/wiki/Euler%27s_formula#Proofs) are known. One of the first was using the *power series expansion* of all terms in the formula.
 
 "
 
-# ╔═╡ 386610be-98ca-4ee0-8f24-038eb06c44f7
+# ╔═╡ d87312c3-36cc-4d5d-9d3f-fd9da02bdadb
 md"
-###### [Euler's identity](https://en.wikipedia.org/wiki/Euler%27s_identity) :
-If we substitute $$\phi := \pi$$ in [Euler's formula](https://en.wikipedia.org/wiki/Euler%27s_formula):
+#### 2.4.1.1 Definition of complex numbers
+"
 
-$$e^{i \phi} = cos\,\phi + i\, sin\,\phi$$
+# ╔═╡ b4ce58d8-c130-4c4f-904d-deccef8940cf
 
-we fix $$\phi$$ by $$\pi= \frac{2\pi r}{2r}=\frac{circumference}{diameter}$$ then the result is called *Euler's identity* :
-###### 
+let
+	title = "Representation of z = Re(z) + Im(z) = x + yi in C"
+	xlim  = (-0.5, 2.5); ylim = (-0.5, 1.2)
+	z = 2 + 1im
+	ϕ = atan(imag(z)/real(z))
+	radius = 0.8
+	circleArray = Plots.partialcircle(0, ϕ, 30, radius)
+	plot([(0, 0), (2, 1)], line=:arrow, linecolor=:red, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false)
+	plot!([(2, 0), (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(0, 0), (2, 0)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(0, 1), (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(0, 0), (0, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!(circleArray, linestyle=:dot, linecolor=:red, linewidth=1)
+	annotate!(2.3, 1.05, "z = x + yi", :red)
+	annotate!(2.3, 0.5, "Im(z)=y")
+	annotate!(1.0,-0.1, "Re(z)=x")
+	annotate!(1.2, 0.2, "ϕ=arctan(y/x)", :red)
+	annotate!(0.8, 0.6, "|z|=ρ=r", :red)
+end # let
 
-$$e^{i \pi} = cos\,\pi + i \, sin\,\pi = -1 + 0\,i = -1$$
+# ╔═╡ 576d32a1-4aa4-414d-84a5-99a1f5bc3208
+md"
+Fig. 2.4.1.1 Complex numbers as points (or vectors) in $$\mathbb C$$ (cf. Fig. 2.20 in SICP)
+
+---
+"
+
+# ╔═╡ 24a94004-d2f6-40f2-9596-0d2467fe8f4b
+md"
+
+$$z = x + yi = r \cdot cos \, \phi + r \cdot i\, sin \, \phi = r \cdot (cos \, \phi + i\, sin \, \phi) = r \cdot e^{i \, \phi}$$
+
+where:
+
+$$x  = Re(z) = r \cdot cos \, \phi$$
+$$yi = Im(z) = r \cdot i\, sin \, \phi$$
+$$ϕ  = arctan(Im(z)/Re(z)) = arctan(y/x)$$
+$$ρ  = r = |z| = \sqrt{x^2+y^2}$$
+"
+
+# ╔═╡ c2bfc649-b5b1-4e75-83f4-76d2aa57bc5b
+md"
+---
+##### [Euler's formula](https://en.wikipedia.org/wiki/Euler%27s_formula) for complex analysis
+The expression
+
+$$e^{i \, \phi} = (cos \, \phi + i\, sin \, \phi)$$
+
+is known as *Euler's formula*. Several different [proofs](https://en.wikipedia.org/wiki/Euler%27s_formula#Proofs) are known. One of the first was using the *power series expansion* of all terms in the formula.
+"
+
+# ╔═╡ eb2b46af-1eda-4b19-988d-ab8b2f7c3525
+md"
+##### [Euler's identity](https://en.wikipedia.org/wiki/Euler%27s_identity)
+
+If we substitute $$\phi = \pi = \frac{2\pi}{2r} = \frac{circumference}{diameter}$$ *of circle* in Euler's formula:
+
+$$e^{i \, \phi} = (cos \, \phi + i\, sin \, \phi)$$
+
+the result is called *Euler's identity* :
+
+$$e^{i \, \pi} = (cos \, \pi + i\, sin \, \pi) = -1 + 0i = -1$$
 
 and rearranging terms
 
-$$e^{i \pi} = -1$$
+$$e^{i \, \pi} + 1 = 0.$$
 
-$$e^{i \pi} + 1 = 0.$$
-
-This is known as *'our jewel' and 'the most remarkable formula in mathematics'* [(https://en.wikipedia.org/wiki/Mathematical_beauty)](https://en.wikipedia.org/wiki/Mathematical_beauty) because it connects several fundamental concepts in **one** formula.
+This is known as '*our jewel*' and '*the most remarkable formula in mathematics*' [https://en.wikipedia.org/wiki/Mathematical_beauty](https://en.wikipedia.org/wiki/Mathematical_beauty) because it connects several fundamental concepts in *one* formula.
 
 "
 
-# ╔═╡ cf5fa4f0-8e0a-46c5-9b0e-f88f766831f5
+# ╔═╡ 46638e2b-704f-43df-9b61-a387762f78c9
+let
+	title = "Representation by Euler's formula in C"
+	xlim  = (-1.5, 3.5); ylim = (-1.5, 1.5)
+	ϕ = atan(1/2)
+	radius = 1.0
+	r = sqrt(2^2 + 1^2)
+	z = r*exp(im*ϕ)
+	circleArray = Plots.partialcircle(0, 2π, 240, radius)
+	plot([(0, 0), (real(z), imag(z))], line=:arrow, linecolor=:red, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false)
+	plot!([(0, 0),   (real(z)/r, imag(z)/r)], line=:arrow, linecolor=:blue, linewidth=4)
+	plot!([(2, 0),   (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([(0, 0),   (2, 0)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([(0, 1),   (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(0, 0),   (0, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
+	annotate!(2.7, 1.05, "z = r⋅exp(iϕ)", :red)
+	annotate!(1.3, 0.4, "exp(iϕ)", :blue)
+	annotate!(2.1, 0.5, "y")
+	annotate!(1.2,-0.1, "x")
+	annotate!(0.6, 0.15, "ϕ", :blue)
+	annotate!(1.1, 0.7, "|z|", :red)
+end # let
+
+# ╔═╡ 724ba211-8069-43b8-99b1-55d755ed3c68
 md"
-###### Examples
-$$z = x + yi$$
+Fig. 2.4.1.2 Complex numbers as *points* (or *vectors*) in $$\mathbb C$$ using *Euler's formula*
+
+---
 "
 
-# ╔═╡ 10ae79f4-0ec6-4a8a-8422-a4db6a2b3de0
-z = 2 + 1im
+# ╔═╡ afd5a931-b8ad-46f8-b0f2-894d59d53959
+let
+	title = "Representation of Euler's identity in C"
+	xlim  = (-2.5, 3.5); ylim = (-1.5, 1.5)
+	ϕ = π
+	radius = 1.0
+	r = 1
+	z = r*exp(im*π)
+	circleArray = Plots.partialcircle(0, 2π, 240, radius)
+	plot([(0, 0), (real(z), imag(z))], line=:arrow, linecolor=:red, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
+	annotate!(-1.0, 0.15, "z = exp(iπ)", :red)
+	annotate!(-1.0,-0.15, "= -1+0i", :red)
+end # let
 
-# ╔═╡ 0e560e33-cce5-40c0-baef-74d64379d677
+# ╔═╡ e791db57-a399-47fe-ac45-f4a61c493473
 md"
-$$x = Re(z)$$
+Fig. 2.4.1.3 Complex number as *point* (or *vector*) in $$\mathbb C$$ using *Euler's identity*
 "
 
-# ╔═╡ db2fcb36-27af-4a02-8255-ef823aaa1306
-x = real(z)
-
-# ╔═╡ 33128853-39be-4e75-a92e-f5281fa72fdb
-md"
-$$y = Im(z)$$
-"
-
-# ╔═╡ 830bf616-89bc-484c-b3b1-3a3729e3966b
-y = imag(z)
-
-# ╔═╡ d2449192-fafe-4023-8b97-30f7b946827c
-md"
-$$r = \sqrt{Re(z)^2+Im(z)^2}$$
-"
-
-# ╔═╡ 5a2711ec-8154-4505-88c9-80b68f60179f
-r = sqrt(2^2+1^1)
-
-# ╔═╡ eba524fb-4b5f-497e-9b97-7c82b04849e6
-md"
-$$\phi = arctan(Im(z)/Re(z))$$
-"
-
-# ╔═╡ b26ca7e1-15e8-43d9-b607-2d74c306f2d0
-ϕ = atan(imag(z)/real(z))
-
-# ╔═╡ 73b6b69d-bbe1-438d-a397-d4e848aedfc5
-begin
-	plot([Complex(0, 0), Complex(2,1)], title="2D-Representation of z := Re(z)+Im(z) = x + yi", xlims=(-0.5, 2.3), ylims=(-0.3, 1.3), aspect_ratio=:equal, arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=false)
-	plot!([Complex(0, 0), Complex(2, 0)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, 0), Complex(0, 1)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([complex(0, 1), Complex(2, 1)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(2, 0), Complex(2, 1)], line = (:dash, :line, 0.5, 1, :black))
-	annotate!([( 2.05, 1.05, ("z := 2 + 1i", 13, :bottom, :black))])
-	annotate!([( 1.0,  0.5,  ("r", 13, :bottom, :black))])
-	annotate!([( 0.5,  0.05, ("ϕ", 13, :bottom, :black))])
-	annotate!([(-0.1,  0.5,  ("y", 13, :bottom, :black))])
-	annotate!([( 1.0, -0.13, ("x", 13, :bottom, :black))])
-	nrOfPoints = 30
-	radius = 0.75                  # deliberately chosen to describe the arc of ϕ
-	# ϕ = atan(y/x)                # ϕ is defined below as ϕ = arctan(Im(z)/Re(z))
-	plot!(Plots.partialcircle(0.0, ϕ, nrOfPoints, radius), line = (:dash, :line, 0.5, 1, :black))
-end
-
-# ╔═╡ 61502c97-46c9-43d0-a48b-f0d40a985ffd
-md"
-$$z = r e^{i \phi}$$
-"
-
-# ╔═╡ f76e31ee-3c12-4ced-8252-1afd6ce6a763
-r*exp(ϕ*im)             # (red) point on circle with radius r <> 1
-
-# ╔═╡ 51bf7e65-2a4e-440d-871d-f0bb61c695f9
-exp(ϕ*im)               # (blue) point on unit circle with radius r = 1
-
-# ╔═╡ f760db0f-8dbb-4130-bf54-bdf556d785c9
-begin
-	plot([exp(phi*im) for phi in 0:0.01:2π], xlim=(-1.5, 3), ylim=(-1.5, 1.5), aspect_ratio=:equal, title="Complex number representation by Euler's formula")
-	plot!([Complex(-1.2, 0), Complex(2.5, 0)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, -1.2), Complex(0, 1.4)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([0*exp(ϕ*im), r*exp(ϕ*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z = r*exp(ϕ i) = 2 + 1i
-	plot!([0*exp(ϕ*im), 1*exp(ϕ*im)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)  # point on unit square
-	annotate!([(2.7,  1.0,  ("z:=r*exp(iϕ)", 13, :bottom, :red))])
-	annotate!([(2.5,  0.8,  (" =2+1i", 13, :bottom, :red))])
-	annotate!([(1.65, 0.4,  ("z:=exp(iϕ)", 13, :bottom, :blue))])
-	annotate!([(1.65, 0.2,  ("   =0.894+0.447i", 13, :bottom, :blue))])
-	annotate!([(1.65,-0.03, ("   (=2/√5+1/√5i)", 13, :bottom, :blue))])
-	annotate!([(0.5,  0.03, ("ϕ", 13, :bottom, :black))])
-	annotate!([(0.5, -0.15, ("ϕ=arctan(Im(z)/Re(z))", 9, :bottom, :black))])
-end
-
-# ╔═╡ 3c3837d3-4b55-4720-917e-1bdc8397c8cb
-md"
-Fig. 2.4.1.2 Complex numbers as points (or vectors) in 2D using *Euler's formula*
-"
-
-# ╔═╡ 76af9279-2013-491c-b55b-6adcbe2f4fc0
-π
-
-# ╔═╡ db2ea1ef-d2ba-41c2-a293-79ed6a82c2d7
-π*im
-
-# ╔═╡ 0eba8065-ce12-43d3-9852-ef03abf10712
-z2 = exp(π*im)
-
-# ╔═╡ d6030208-4cef-45ec-93e9-c0ec996d41e9
-r2 = sqrt(real(z2)^2 + imag(z2)^2)
-
-# ╔═╡ ae3cddc7-c324-4454-988b-b4b6bc9f5900
-ϕ2 = atan(imag(z2)/real(z2))
-
-# ╔═╡ 97b83b76-ac88-4be6-b387-4b29861cffb5
-begin
-	plot([exp(phi*im) for phi in 0:0.01:2π], xlim=(-1.5, 1.5), ylim=(-1.5, 1.5), aspect_ratio=:equal, title="Complex number representation by Euler's identity")
-	plot!([Complex(-1.2, 0), Complex(2.5, 0)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, -1.2), Complex(0, 1.4)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([0*exp(π*im), r2*exp(π*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z2 = r2*exp(π i) = re(z2) + im(z2)
-	annotate!([(-0.5, 0.2,  ("z2 := r2*exp(iϕ2)", 13, :bottom, :red))])
-	annotate!([(-0.5, 0.0,  ("= 1.0 + 0i", 13, :bottom, :red))])
-	annotate!([(-0.5,-0.15, ("ϕ2=arctan(Im(z2)/Re(z2))=0", 9, :bottom, :black))])
-end
-
-# ╔═╡ a3c59817-1bf8-4114-b347-92bdd0400a25
-md"
-Fig. 2.4.1.3 Complex number as point (or vector) in 2D using *Euler's identity*
-"
-
-# ╔═╡ 2713a735-3542-45d6-9ed3-a3aa1863902c
+# ╔═╡ 262fb6be-d103-4407-b30b-ff5293ce2bea
 md"
 ---
-##### 2.4.1.1 *Scheme-like* Julia
+#### 2.4.1.2 Scheme-like Julia
 "
 
-# ╔═╡ cede8129-9358-4dc4-a32e-6390af700376
-md"$$
-\begin{array}{|c|c|}
-\hline
-layer     & \text{Operations or Functions} \\
-\hline
-top       & \text{Representation-independent Operations} \\
-domain    & \begin{array}{c} 
-          & \hline                              \\
-          & addComplex                          \\ 
-          & subComplex                          \\
-          & mulComplex                          \\
-          & divComplex                          \\   
-          & \end{array}                         \\
-          & \hline                              \\
-middle    & \text{Representation-dependent Constructors} \\
-interface & \begin{array}{cc} 
-          & \text{Rectangular} & \text{Polar}    \\
-          & \hline                               \\
-          & makeZFromRealImag  &                 \\ 
-          &                    & makeZFromMagAng \\
-          & \hline                              \\
-          & \end{array}                         \\
-          & \text{Representation-dependent Selectors} \\
-          & \begin{array}{cc} 
-          & \text{Rectangular} & \text{Polar}   \\
-          & \hline                              \\
-          & realPartOfZ        &                \\ 
-          & imagPartOfZ        &                \\
-          &                    & magnitudeOfZ   \\
-          &                    & angleOfZ       \\
-          & \hline                              \\
-          & \end{array}                         \\
-\hline
-ground   & cons \\
-(Scheme) & car  \\
-         & cdr  \\
-\hline
-basement & \\
-(Julia)  & \\
-\hline
-\end{array}$$
-"
 
-# ╔═╡ 1c736e19-1dde-496c-9d8f-991384d8d803
+# ╔═╡ 4dc1459c-070f-4970-9e67-c9facdc15cef
 md"
-###### methods of *constructor* $$cons$$
+---
+###### Methods of Scheme-like *constructor* $$cons$$
 "
 
-# ╔═╡ 92e2404e-5606-41d9-a46c-61b76f6737b3
+# ╔═╡ 82578c79-a6f3-4374-8ee2-aa8a585f4b4a
 struct Cons
 	car
 	cdr
 end
 
-# ╔═╡ 7d42ab0f-b4e4-4cf3-81d7-652990d049b0
+# ╔═╡ 8a06336c-044c-4091-b7ae-f4ea60b97afa
 cons(car::Any, cdr::Any)::Cons = Cons(car, cdr)::Cons  
 
-# ╔═╡ bdfa88e0-e190-4e4f-bf0e-1ba1f2f895ea
+# ╔═╡ ed5d2b26-d30a-4d13-8eef-6e1175699f57
 function cons(car::Any, list2::Vector)::Vector
 	conslist = list2
 	pushfirst!(conslist, car)
 	conslist
 end
 
-# ╔═╡ f29a5d9e-66af-4f3d-b9f6-ad91f0ea735a
+# ╔═╡ f1181c0f-0127-4761-a471-757f71dddb97
 function cons(list1::Vector, list2::Vector)::Vector
 	conslist = push!([], list1)
 	for xi in list2
@@ -271,397 +189,555 @@ function cons(list1::Vector, list2::Vector)::Vector
 	conslist
 end
 
-# ╔═╡ b6f35feb-67b9-42be-b172-e1a41682fd6f
+# ╔═╡ 2e5ccb79-6d54-4b84-9a78-633ed533c1dc
 md"
-###### methods of *selectors* $$car, cdr$$
+###### Methods of Scheme-like *selectors* $$car, cdr$$
 "
 
-# ╔═╡ 03c9e321-0a5f-452e-a83c-09edd321df46
+# ╔═╡ 43b5159b-40b1-41fb-8547-a889b8e9e729
 car(cell::Cons) = cell.car
 
-# ╔═╡ a0724486-e498-4fe6-a383-88c100e9bdbd
+# ╔═╡ 5a5a7926-7733-40cd-8ab9-583a15e534ba
 car(x::Vector) = x[1]
 
-# ╔═╡ 33e437c6-125c-443c-b697-3e9b29f34dd1
+# ╔═╡ 04532459-8d67-4ea2-9b32-f010e3100932
 cdr(cell::Cons)::Any = cell.cdr
 
-# ╔═╡ 880c3d95-67df-4ac0-a9b0-0339d2d2d461
-cdr(x::Vector) = x[2:end]
-
-# ╔═╡ 1977b1f7-03ee-4c91-a01a-c26a75e85fa2
+# ╔═╡ 6d2eea9e-fd56-43c6-95a7-3d565dd0836a
 md"
----
-##### Operations on complex numbers based on *rectangular* form
+$$\begin{array}{|c|c|}                     
+\hline                                                         \\
+layer         & \text{Operations or Functions}                 \\
+              &                                                \\
+\hline                                                         \\
+top           & \text{representation independent}              \\
+              &                                                \\
+(domain)      & addComplex                                     \\
+              & subComplex                                     \\
+              & mulComplex                                     \\
+              & divComplex                                     \\
+\hline                                                         \\
+middle        & \text{representation dependent}                \\
+(interface)   & \begin{array}{cc}                              \\
+              & realPartFromRectZ     & realPartFromPolarZ     \\      
+              & imagPartFromRectZ     & imagPartFromPolarZ     \\
+              & magnitudeFromRectZ    & magnitudeFromPolarZ    \\
+              & angleFromRectZ        & angleFromPolarZ        \\
+              & makeZRectFromRealImag & makeZPolarFromRealImag \\
+              & makeZRectFromMagAng   & makeZPolarFromMagAng   \\
+              & \end{array}                                    \\
+\hline                                                         \\
+ground        & cons                                           \\
+(Scheme-like) & car                                            \\            
+              & cdr                                            \\
+              &                                                \\
+\hline                                                                              
+\end{array}$$                                       
 "
 
-# ╔═╡ f594966f-2e7c-42ab-81d0-b5360f19bf6f
+# ╔═╡ 1e2aa2f3-81a8-4252-be4f-aa575918a67b
+md"
+Fig. 2.4.1.4 *Data abstraction barriers* in the complex number system (cf. to SICP, Fig. 2.19)
+
+---
+"
+
+# ╔═╡ c02043ce-730e-42e1-ae7d-96963bdb4a75
+md"
+---
+###### *Rectangular* representation (Ben's)
+"
+
+# ╔═╡ ace9faf1-33cf-4086-b6aa-9b1fad9ddd82
+realPartFromRectZ(z) = car(z)
+
+# ╔═╡ 0bb28e73-6374-4b59-8070-d6964a53c20c
+imagPartFromRectZ(z) = cdr(z)
+
+# ╔═╡ 6f3732d7-f9e6-4c6b-8a18-47e128337531
+magnitudeFromRectZ(z) = sqrt(realPartFromRectZ(z)^2 + imagPartFromRectZ(z)^2)
+
+# ╔═╡ 4775c4b5-c6e0-45da-8a1c-33070e5348ed
+angleFromRectZ(z) = atan(imagPartFromRectZ(z)/realPartFromRectZ(z))
+
+# ╔═╡ 9c4e42b6-a630-4263-95b0-40c072763410
+makeZRectFromRealImag(x, y) = cons(x, y)
+
+# ╔═╡ fe8c3cae-b495-4670-983f-fcef9d72e98f
+makeZRectFromMagAng(r, a) = cons(r * cos(a), r * sin(a))
+
+# ╔═╡ 420220d7-586f-4f26-b107-e68677d10b5b
+md"
+---
+###### *Polar* representation (Alyss's)
+"
+
+# ╔═╡ e48844ca-fa46-4c8f-9bb8-f2d33ad7fdad
+magnitudeFromPolarZ(z) = car(z)
+
+# ╔═╡ 42b1742d-da96-4ea7-b5a8-288ea45d035c
+angleFromPolarZ(z) = cdr(z)
+
+# ╔═╡ fd0dcca8-dd8a-416d-91d2-469f81dba264
+realPartFromPolarZ(z) = magnitudeFromPolarZ(z) * cos(angleFromPolarZ(z))
+
+# ╔═╡ 55535d43-7c35-4ac1-9bf8-22881647651d
+imagPartFromPolarZ(z) = magnitudeFromPolarZ(z) * sin(angleFromPolarZ(z))
+
+# ╔═╡ 60dead94-fe17-412a-8574-e7ba010090ca
+makeZPolarFromealImag(x, y) = cons(sqrt(x^2+y^2), atan(y/x))
+
+# ╔═╡ 93dc4413-e5f8-4df8-9798-f1189962e4e7
+makeZPolarFromMagAng(r, a) = cons(r, a)
+
+# ╔═╡ 74fd815e-34fa-4f89-aa06-d19ed3ca382f
+md"
+---
+###### Domain operators (representation *in*dependent)
+"
+
+# ╔═╡ 27d313ff-84f8-44bb-ae90-9e71fed9d106
 md"
 ###### [Addition](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
-$$addComplex: \mathbb{C} \times \mathbb{C} \rightarrow \mathbb{C}$$
-$$(z_1, z_2):= ((x_1+x_1i),(x_2+y_2i)) \mapsto ((x_1+x_2),(y_1+y_2)i)$$
+
+$$addComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$addComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1+x_2),(y_1+y_2)i)$$
 "
 
-# ╔═╡ a39e810d-6adc-4343-aaeb-a2c34db92104
-begin
-	plot([exp(phi*im) for phi in 0:0.01:2π], xlim=(-1.5, 6), ylim=(-1.5, 4), aspect_ratio=:equal, title="Addition of complex numbers as vectors in 2D")
-	plot!([Complex(-1.2, 0), Complex(5, 0)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, -1.2), Complex(0, 3)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, 0), Complex(2, 1)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)
-	plot!([Complex(0, 0), Complex(2, 2)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :green), legend=:false) 
-	plot!([Complex(0, 0), Complex(4, 3)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false)  
-	plot!([Complex(2, 2), Complex(4, 3)] , arrow=:head, line = (:dash, :line, 1.0, 1, :blue))
-	plot!([Complex(2, 1), Complex(4, 3)] , arrow=:head, line = (:dash, :line, 1.0, 1, :green))
-	annotate!([(2.8,  0.8,  ("z1=2+1i", 13, :bottom, :blue))])
-	annotate!([(1.0,  1.8,  ("z2=2+2i", 13, :bottom, :green))])	
-	annotate!([(4.0,  3.0,  ("z3=z1+z2=4+3i", 13, :bottom, :red))])
-	
-end
-
-# ╔═╡ ad751aeb-441d-45c4-b3ba-31b338b3c625
-md"
-Fig. 2.4.1.4 Complex addition as points (or vectors) in 2D
-"
-
-# ╔═╡ 879967a3-bc78-417a-8cc0-aaf53343d3e2
-md"
-###### [Subtraction](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
-$$SubComplex: \mathbb{C} \times \mathbb{C} \rightarrow \mathbb{C}$$
-$$(z_1, z_2):=((x_1+y_1i),(x_2+y_2i)) \mapsto ((x_1-x_2),(y_1-y_2)i)$$
-"
-
-# ╔═╡ e05f131b-5c68-4974-b0cb-ec6d46871fd5
-md"
-###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
-$$MulRectComplexZ: \mathbb{C} \times \mathbb{C} \rightarrow \mathbb{C}$$
-$$(z_1, z_2):=((x_1+y_1i),(x_2+y_2i)) \mapsto (x_1+y_1i)*(x_2+y_2i)$$
-$$=x_1*x_2 + x_1*y_2i + y_1i*x_2 + y_1i*y_2i$$
-$$=(x_1*x_2 - y_1*y_2) + (x_1*y_2i + y_1i*x_2)$$
-$$=(x_1*x_2 - y_1*y_2) + (x_1*y_2 + x_2*y_1)i$$
-"
-
-# ╔═╡ c44c7aaa-60c4-4f51-a85d-f94c300272bb
-begin
-	ϕblue  = atan(1/2)
-	ϕgreen = atan(2/2)
-	ϕred   = ϕblue + ϕgreen
-	redArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕred, nrOfPoints, 3.5*radius)]
-	greenArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕgreen, nrOfPoints, 2.5*radius)]
-	blueArc = [(x, y) for (x, y) in Plots.partialcircle(0.0, ϕblue, nrOfPoints, 1.5*radius)]
-	plot(redArc, line = (:dash, :line, 2, 1, :red), xlim=(-1.5, 5), ylim=(-1.5, 7), aspect_ratio=:equal, title="Multiplication of complex numbers as vectors in 2D")
-	plot!(greenArc, line = (:dash, :line, 2, 1, :green))
-	plot!(blueArc, line = (:dash, :line, 2, 1, :blue))
-	plot!([Complex(-1.2, 0), Complex(5, 0)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([Complex(0, -1.2), Complex(0, 6)], line = (:dash, :line, 0.5, 1, :black))
-	plot!([0*exp(ϕ*im), r*exp(ϕ*im)], arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false) # point z = r*exp(ϕ i) = 2 + 1i
-	plot!([Complex(0, 0), Complex(2, 1)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :blue), legend=:false)
-	plot!([Complex(0, 0), Complex(2, 2)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :green), legend=:false)  
-	plot!([Complex(0, 0), Complex(2, 6)] , arrow=:head, line = (:solid, :arrow, 0.8, 3, :red), legend=:false)  	
-	annotate!([(0.85,-0.05, ("ϕ1", 10, :bottom, :blue))])
-	annotate!([(1.3,  0.7,  ("ϕ2", 10, :bottom, :green))])
-	annotate!([(1.3,  1.6,  ("ϕ3", 10, :bottom, :red))])
-	annotate!([(3.2,  0.7,  ("z1=2+1i", 12, :bottom, :blue))])
-	annotate!([(3.2,  1.7,  ("z2=2+2i", 12, :bottom, :green))])	
-	annotate!([(2.3,  6.1,  ("z3=z1*z2=|z1|*|z2|+(ϕ1+ϕ2)i", 12, :bottom, :red))])
-end
-
-# ╔═╡ 4ba35a7e-d038-4bd5-b627-039eb0abf460
-md"
-Fig. 2.4.1.5 Complex multiplication as points (or vectors) in 2D
-"
-
-# ╔═╡ 9d750d83-4142-4be6-add2-a869e2299f89
-md"
----
-##### Operations on complex numbers based on *polar* form
-"
-
-# ╔═╡ cb398a68-cef5-4398-ae9d-65a7e380f2a2
-md"
-###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
-$$mulComplex: \mathbb{C} \times \mathbb{C} \rightarrow \mathbb{C}$$
-$$(z_1, z_2):=((\rho(z_1)+\theta(z_1)),(\rho(z_2)+\theta(z_2)))  \mapsto ((\rho(z_1)*\rho(z_2)),(\theta(z_1)+\theta(z_2))$$
-"
-
-# ╔═╡ ce2e5a5b-38fc-4be6-bf5f-435ac2d90ec4
-md"
-###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
-$$divComplex: \mathbb{C} \times \mathbb{C} \rightarrow \mathbb{C}$$
-$$(z_1, z_2):=((\rho(z_1)+\theta(z_1)),(\rho(z_2)+\theta(z_2)))  \mapsto ((\rho(z_1) / \rho(z_2)),(\theta(z_1)-\theta(z_2))$$
-"
-
-# ╔═╡ 184c048f-4b67-4b90-af2c-f520becb393f
-
-md"
----
-###### Constructors of complex numbers in *rectangular* form
-$$makeZFromRealImag: \mathbb R \times \mathbb R \rightarrow \mathbb C$$
-
-$$(Re(z), Im(z)) \mapsto z \in \mathbb C$$
-
-"
-
-# ╔═╡ 39cf6016-62e6-4c2b-9e3b-a51491bf5922
-makeZFromRealImag = cons
-
-# ╔═╡ f44475f7-c036-46fc-8c21-94b383ee90cb
-md"
----
-###### Selector $$realPartOfZ$$ of complex numbers in *rectangular* form
-$$realPartOfZ: \mathbb C \rightarrow \mathbb R$$
-
-$$z \mapsto Re(z)$$
-
-"
-
-# ╔═╡ 919cbd2a-4e66-43bb-9ff3-70e4b9694011
-realPartOfZ = car
-
-# ╔═╡ a676d3d6-8b01-4938-a72e-770e040e2d47
-md"
----
-###### Selector $$imagPartOfZ$$ of complex numbers in *rectangular* form
-$$imagPartOfZ: \mathbb C \rightarrow \mathbb R$$
-
-$$z \mapsto Im(z)$$
-
-"
-
-# ╔═╡ a2993ced-5bd1-42c8-8642-3cd9bb32ed2c
-imagPartOfZ = cdr
-
-# ╔═╡ 0f5eae24-727c-4ef9-8e38-18ee64d97229
-function addComplex(z1, z2) 
-	makeZFromRealImag(
-		realPartOfZ(z1) + realPartOfZ(z2), 
-		imagPartOfZ(z1) + imagPartOfZ(z2))
+# ╔═╡ 43a53b2a-0a0d-41a5-8e7c-b3106d999272
+function addComplex(z1, z2)
+	makeZRectFromRealImag(
+		realPartFromRectZ(z1) + realPartFromRectZ(z2),
+		imagPartFromRectZ(z1) + imagPartFromRectZ(z2))
 end # function addComplex
 
-# ╔═╡ 8f80e51f-b813-4846-967c-1e101511aaef
+# ╔═╡ 37766cb9-6453-47a5-b127-a87fb100f868
+let
+	z1 = makeZRectFromRealImag(2, 1)
+	r1 = magnitudeFromRectZ(z1)
+	z2 = makeZRectFromRealImag(realPartFromRectZ(z1)/r1, -2*imagPartFromRectZ(z1)/r1)
+	z3 = addComplex(z1, z2)
+end # let
+
+# ╔═╡ c635a131-54c0-4530-9735-07fc558240fb
+md"
+###### [Subtraction](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
+
+$$subComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$subComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1-x_2),(y_1-y_2)i)$$
+"
+
+# ╔═╡ 6c151933-886d-4774-a380-1ba185a1070d
 function subComplex(z1, z2)
-	makeZFromRealImag(
-		realPartOfZ(z1) - realPartOfZ(z2), 
-		imagPartOfZ(z1) - imagPartOfZ(z2))
+	makeZRectFromRealImag(
+		realPartFromRectZ(z1) - realPartFromRectZ(z2),
+		imagPartFromRectZ(z1) - imagPartFromRectZ(z2))
 end # function subComplex
 
-# ╔═╡ a779ca0b-dbad-4fc2-be75-4b7f45d31636
-function mulRectComplex(z1, z2)
-	makeZFromRealImag(
-		realPartOfZ(z1) * realPartOfZ(z2) - imagPartOfZ(z1) * imagPartOfZ(z2), 
-		realPartOfZ(z1) * imagPartOfZ(z2) + realPartOfZ(z2) * imagPartOfZ(z1))
-end # function mulRectComplex
+# ╔═╡ e3cb6006-4bf0-497c-8420-55637737a981
+let
+	z1 = makeZRectFromRealImag(2, 1)
+	r1 = magnitudeFromRectZ(z1)
+	z2 = makeZRectFromRealImag(realPartFromRectZ(z1)/r1, -2*imagPartFromRectZ(z1)/r1)
+	z3 = subComplex(z1, z2)
+end # let
 
-# ╔═╡ 11a5bf4b-b5ac-4ac0-9f09-87594b9d0c6d
+# ╔═╡ 46f29c21-f7c6-416f-8915-a957abf74186
+let
+	title = "Complex multiplication as vector operation in C"
+	xlim  = (-1.5, 8.5); ylim = (-1.5, 3.0)
+	z1 = 2 - 1im
+	ϕ1 = atan(imag(z1)/real(z1))
+	r1 = abs(z1)
+	z2 = 2 + 2im	
+	r2 = abs(z2)
+	ϕ2 = atan(imag(z2)/real(z2))
+	z3 = z1 * z2
+	r3 = r1 * r2
+	ϕ3 = ϕ1 + ϕ2
+	circleArray  = Plots.partialcircle(0, 2π, 240, 1)
+	circleArray1 = Plots.partialcircle(0, ϕ1, 30, r1)	
+	circleArray2 = Plots.partialcircle(0, ϕ2, 30, r2)	
+	circleArray3 = Plots.partialcircle(0, ϕ3, 30, r3)	
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
+	plot!([(0, 0),  (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
+	plot!([(0,-1.3), (0, 2.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([(-1.3, 0),(6.5, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!(circleArray,  linestyle=:dot, linecolor=:blue,  linewidth=1)
+	plot!(circleArray1, linestyle=:dot, linecolor=:green, linewidth=1)
+	plot!(circleArray2, linestyle=:dot, linecolor=:blue,  linewidth=1)
+	plot!(circleArray3, linestyle=:dot, linecolor=:red,   linewidth=1)
+	annotate!(2.3, -1.0, "z1", :green)
+	annotate!(1.0, -0.8, "|z1|", :green)
+	annotate!(2.3,  2.1, "z2", :blue)
+	annotate!(1.0,  1.5, "|z2|", :blue)
+	annotate!(7.0,  2.1, "z3=z1*z2", :red)
+	annotate!(4.0,  2.15, "|z1|*|z2|", :red)
+	annotate!(4.0,  1.7, "=|z3|", :red)
+	annotate!(1.8, -0.4, "ϕ1", :green)
+	annotate!(2.2,  1.2, "ϕ2", :blue)
+	annotate!(5.1,  0.8, "ϕ1+ϕ2=ϕ3", :red)
+end # let
+
+# ╔═╡ a064adda-624f-4dd6-9521-1dcfb2840189
 md"
----
-###### Constructors of complex numbers in *polar* form
-$$makeZFromMagAng: \mathbb R \times \mathbb R \rightarrow \mathbb C$$
+###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) 
+###### in *rectangular* coordinates
 
-$$(\rho(z), \theta(z)) \mapsto z \in \mathbb C$$
+$$subComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$subComplex: (z_1, z_2) := ((x_1+y_1i), (x_2+y_2i) \mapsto (x_1x_2 + x_1y_2i + y_1ix_2 + y_1i\cdot y_2i)$$
+$$=(x_1x_2 + x_1y_2i + y_1ix_2 - y_1y_2)=(x_1x_2 - y_1y_2)+(x_1y_2 + y_1x_2)i$$
 
+###### in *polar* coordinates
+
+$$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \mapsto (\rho(z_1) \cdot \rho(z_2), \phi(z_1) + \phi(z_2))$$
 "
 
-# ╔═╡ c8d24446-9cd4-4339-9187-ed7e540a3557
-makeZFromMagAng(r, a) = cons(r * cos(a), r * sin(a))
 
-# ╔═╡ 5c72a1ab-8c0b-474e-8046-cce9041ac5dd
-md"
----
-###### Selector $$magnitudeOfZ$$ of complex numbers in *polar* form
-$$magnitudetOfZ: \mathbb C \rightarrow \mathbb R$$
 
-$$z \mapsto \rho(z)$$
-
-"
-
-# ╔═╡ 686de811-e42c-4c16-b609-11863c5747bb
-magnitudeOfZ(z) = √(realPartOfZ(z)^2 + imagPartOfZ(z)^2)
-
-# ╔═╡ 20d54d11-dacd-49a5-a99d-634a813efaf5
-md"
----
-###### Selector $$angleOfZ$$ of complex numbers in *polar* form
-$$angleOfZ: \mathbb C \rightarrow \mathbb R$$
-
-$$z \mapsto \theta(z)$$
-
-"
-
-# ╔═╡ 542f980c-9e82-4066-9dfc-a6827da9bc1b
-angleOfZ(z) = atan(imagPartOfZ(z), realPartOfZ(z))
-
-# ╔═╡ b9dc12c1-6e1b-4d1a-8629-f937e9174e61
+# ╔═╡ f179ef07-e391-4894-a5f2-6cef7659e592
 function mulComplex(z1, z2)
-	makeZFromMagAng(
-		magnitudeOfZ(z1) * magnitudeOfZ(z2), 
-		angleOfZ(z1) + angleOfZ(z2))
+	makeZRectFromMagAng(
+		magnitudeFromRectZ(z1) * magnitudeFromRectZ(z2),
+		angleFromRectZ(z1) + angleFromRectZ(z2))
 end # function mulComplex
 
-# ╔═╡ d4d1ae65-9b38-4600-a33c-a3668f822c77
+# ╔═╡ 25151974-8b0b-4e33-ac6c-927e695789d0
+let
+	z1 = makeZRectFromRealImag(2, -1)
+	z2 = makeZRectFromRealImag(2,  2)
+	z3 = mulComplex(z1, z2)
+end # let
+
+# ╔═╡ 72e9c6eb-6404-4fc8-bafa-996d335734fe
+let
+	title = "Complex division as vector operation in C"
+	xlim  = (-2.5, 4.5); ylim = (-2.5, 3.0)
+	z1 = 3 - 1im
+	ϕ1 = atan(imag(z1)/real(z1))
+	r1 = abs(z1)
+	z2 = 1.0 + 2im	
+	r2 = abs(z2)
+	ϕ2 = atan(imag(z2)/real(z2))
+	z3 = z1 / z2
+	r3 = r1 / r2
+	ϕ3 = ϕ1 - ϕ2
+	circleArray  = Plots.partialcircle(0, 2π, 240, 1)
+	circleArray1 = Plots.partialcircle(0, ϕ1, 30, r1)	
+	circleArray2 = Plots.partialcircle(0, ϕ2, 30, r2)	
+	circleArray3 = Plots.partialcircle(0, ϕ3, 30, r3)	
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
+	plot!([(0, 0),  (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
+	plot!([(0,-1.3), (0, 2.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([(-2.0, 0),(6.5, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!(circleArray,  linestyle=:dot, linecolor=:blue,  linewidth=1)
+	plot!(circleArray1, linestyle=:dot, linecolor=:green, linewidth=1)
+	plot!(circleArray2, linestyle=:dot, linecolor=:blue,  linewidth=1)
+	plot!(circleArray3, linestyle=:dot, linecolor=:red,   linewidth=1)
+	annotate!(3.2, -1.0, "z1", :green)
+	annotate!(1.9, -0.4, "|z1|", :green)
+	annotate!(1.0,  2.2, "z2", :blue)
+	annotate!(0.4,  1.5, "|z2|", :blue)
+	annotate!(-.4, -1.6, "z1/z2=z3", :red)
+	annotate!(-1.0, -.7, "|z1|/|z2|=|z3|", :red)
+	annotate!(2.9, -0.4, "ϕ1", :green)
+	annotate!(1.7,  1.0, "ϕ2", :blue)
+	annotate!(1.7, -1.2, "ϕ3=ϕ1-ϕ2", :red)
+end # let
+
+# ╔═╡ f799d74f-5629-4171-86f1-d1ef772a617b
+md"
+###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
+###### in *polar* coordinates
+
+$$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \mapsto (\rho(z_1) / \rho(z_2), \phi(z_1) - \phi(z_2))$$
+"
+
+# ╔═╡ 0c54eddf-4cd1-4428-9d01-77742cc46796
 function divComplex(z1, z2)
-	makeZFromMagAng(
-		magnitudeOfZ(z1) / magnitudeOfZ(z2), 
-		angleOfZ(z1) - angleOfZ(z2))
+	makeZRectFromMagAng(
+		magnitudeFromRectZ(z1) / magnitudeFromRectZ(z2),
+		angleFromRectZ(z1) - angleFromRectZ(z2))
 end # function divComplex
 
-# ╔═╡ 94dbc794-5913-4cca-b4f8-796e7287ad45
+# ╔═╡ e86b123d-5658-4caa-9826-f400beda75ef
+let
+	z1 = makeZRectFromRealImag(3, -1)
+	z2 = makeZRectFromRealImag(1,  2)
+	z3 = divComplex(z1, z2)
+end # let
+
+# ╔═╡ 78c508b3-40e1-45fd-80b3-70174ea7b5b3
 md"
 ---
-##### Test calculations of complex numbers in *rectangular* form
+#### 2.3.1.3 idiographic Julia
 "
 
-# ╔═╡ ce04c2f4-a5f5-4b91-b4ce-af23fbc1c1d8
+# ╔═╡ 8d659f59-ba30-4960-a755-866b08f270a0
 md"
-###### *construction* of complex numbers in *rectangular* form
+##### Example
 "
 
-# ╔═╡ 460dfdbd-b713-4e6d-843c-d1e1ae1e63a8
-zTwoPlusThreeI = makeZFromRealImag(2, 3)
-
-# ╔═╡ 4d2e2768-0ba1-462d-815b-cd169015aa5c
-realPartOfZ(zTwoPlusThreeI)
-
-# ╔═╡ b32981b9-e7c9-467d-b22e-43ecaa5ce3c6
-imagPartOfZ(zTwoPlusThreeI)
-
-# ╔═╡ d68b3f96-a19e-4098-a233-35f3192fb726
-zTwoMinusThreeI = makeZFromRealImag(2, -3)
-
-# ╔═╡ 646c41c8-2d9f-4057-ad4b-6d8695bb1aa2
-zTwoPlusOneI = makeZFromRealImag(2, 1)
-
-# ╔═╡ 0716e984-eeee-4714-86c4-dfc8b5313c30
-zThreePlusOneI = makeZFromRealImag(3, 1)
-
-# ╔═╡ 794915a9-2d08-4e36-8e0f-f44682d2d1dc
+# ╔═╡ 795ca456-6ca6-4d11-b2fc-8a9014a653ad
 md"
-###### [*Addition*](https://www.hackmath.net/en/calculator/complex-number) based on *rectangular* coordinates
-$$addComplex: (z_1,z_2) \mapsto (2 + 3i) + (2 − 3i) = 4 + 0i = 4$$
+###### Definition of $$z$$
 "
 
-# ╔═╡ b79d7d75-5dc5-4591-a26e-dc91c17be92e
-addComplex(zTwoPlusThreeI, zTwoMinusThreeI)
-
-# ╔═╡ e3fdcf8c-e210-4a4f-a4c8-b0a2e2315a6d
-realPartOfZ(addComplex(zTwoPlusThreeI, zTwoMinusThreeI))
-
-# ╔═╡ 38cb4d6d-f209-4650-82c2-1b33b0e829e1
-imagPartOfZ(addComplex(zTwoPlusThreeI, zTwoMinusThreeI))
-
-# ╔═╡ 8c2cf831-4b01-4ec8-a06c-7f050cb917df
+# ╔═╡ ed0dd90d-253b-45ab-a6c1-3bc25c5aeac9
 md"
-###### [*Subtraction*](https://www.hackmath.net/en/calculator/complex-number) based on *rectangular* coordinates
-$$subComplex: (z_1,z_2) \mapsto (2 + 3i) - (2 − 3i) = 0 + 6i$$
+$$z = x + yi = 2 + 1i$$
 "
 
-# ╔═╡ 1ae2d086-2170-4c33-a3f3-38fd5d330dd6
-subComplex(zTwoPlusThreeI, zTwoMinusThreeI)
+# ╔═╡ 2c6136a7-aaea-4f34-8cf0-e6c59051c669
+z = 2 + 1im
 
-# ╔═╡ c0cc5ec5-e576-4300-804d-fb5f8a0770be
-realPartOfZ(subComplex(zTwoPlusThreeI, zTwoMinusThreeI))
+# ╔═╡ b818345b-d79b-41a4-8b6c-1e88248a2089
+let
+	title = "Complex addition as vector addition in C"
+	xlim  = (-1.5, 4.5); ylim = (-1.5, 1.5)
+	ϕ = atan(1/2)
+	radius = 1.0
+	r = sqrt(2^2 + 1^2)
+	z1 = r*exp(im*ϕ)
+	z2 = real(z)/r + -2*imag(z)/r*im
+	z3 = z1 + z2
+	circleArray = Plots.partialcircle(0, 2π, 240, radius)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot!([(0, 0),   (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
+	plot!([(0, 0),   (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
+	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([z1, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([z2, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
+	annotate!(2.2, 1.05, "z1", :green)
+	annotate!(1.0,-1.0,  "z2", :blue)
+	annotate!(3.6, 0.12, "z3=z1+z2", :red)
+end # let
 
-# ╔═╡ 46d3b162-7339-42df-86d7-0ee5d6ba9ebf
-imagPartOfZ(subComplex(zTwoPlusThreeI, zTwoMinusThreeI))
+# ╔═╡ d1666436-a476-4ef1-a0e9-b9ad44300a09
+let
+	title = "Complex subtraction as vector subtraction in C"
+	xlim  = (-1.5, 4.5); ylim = (-1.5, 2.5)
+	ϕ = atan(1/2)
+	radius = 1.0
+	r = sqrt(2^2 + 1^2)
+	z1 = r*exp(im*ϕ)
+	z2 = real(z)/r + -2*imag(z)/r*im
+	z3 = z1 - z2
+	circleArray = Plots.partialcircle(0, 2π, 240, radius)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
+	plot!([(0, 0),  (-real(z2), -imag(z2))], line=:arrow, linecolor=:lightblue, linewidth=4)
+	plot!([(0, 0),   (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
+	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([z1, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
+	plot!([-z2, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
+	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
+	annotate!(2.2, 1.05, "z1")
+	annotate!(1.0,-1.0,  "z2")
+	annotate!(-1.0, 1.1,  "-z2")
+	annotate!(2.0, 2.0, "z3=z1-z2=z3+(-z2)")
+end # let
 
-# ╔═╡ 01fe1b54-5090-4faa-a711-c86ef9d159f4
+# ╔═╡ 69628aaf-2678-45ea-a142-64dd22b8b378
 md"
-###### [*Multiplication*](https://www.hackmath.net/en/calculator/complex-number) based on *rectangular* coordinates
-$$mulRectComplexZ: (z_1,z_2) \mapsto (2 + 1i) * (3 + 1i) = (6 - 1) + (2 + 3)= 5+5i$$
+$$x = Re(z) = 2$$
 "
 
-# ╔═╡ 8e43aa6c-ba87-4e99-ac78-7a4f09207ef2
-mulRectComplex(zTwoPlusOneI, zThreePlusOneI)
+# ╔═╡ 6c6004db-cbca-4a03-800d-15593556baff
+x = real(z)
 
-# ╔═╡ 5e28243b-3813-471b-83ee-924d289f7000
+# ╔═╡ 97ada40a-2491-4351-a061-88f6393d6ebe
 md"
----
-##### Test calculations of complex numbers in *polar* form
+$$y = Im(z) = 1$$
 "
 
-# ╔═╡ 0299a002-aeaf-4f79-95fb-829ca15d1915
+# ╔═╡ 74e65c0f-470d-4a7f-ac67-174f6489b8fb
+y = imag(z)
+
+# ╔═╡ 28d542a3-6a16-4c65-a0a1-02e5d8b48439
 md"
-###### [*Multiplication*](https://www.hackmath.net/en/calculator/complex-number) based on *polar* coordinates
-$$mulComplex: (z_1,z_2) \mapsto ((\rho(z_1)*\rho(z_2)),(\theta(z_1)+\theta(z_2))=13$$
+$$|z| = r = \rho = \sqrt{Re(z)^2+Im(z)^2} = \sqrt{2^2+1^2}=\sqrt{5}$$
 "
 
-# ╔═╡ 082bf239-666f-42ad-8170-31ebcd25ecde
-mulComplex(zTwoPlusThreeI, zTwoMinusThreeI)
+# ╔═╡ 35ccdb87-274f-40e3-a40e-28e441d85655
+r = abs(z)
 
-# ╔═╡ d50fb13a-f424-42c2-b501-97a986bf182e
+# ╔═╡ 84f33549-7f10-451b-843f-a877a4d6c6b7
 md"
-[multiplication in polar form](https://upload.wikimedia.org/wikipedia/commons/9/91/Complex_multi.svg)
+$$\overline{z} = Re(z) - Im(z)$$
 "
 
-# ╔═╡ 0db89983-49d2-41e2-9b94-a171f6b0d8ca
-mulComplex(zTwoPlusOneI, zThreePlusOneI)
+# ╔═╡ eafa2a8d-b1f4-4775-97d4-9d8f028a5324
+zConj = conj(z)
 
-# ╔═╡ 2be9faee-f977-4278-9b10-4321abf6cb26
+# ╔═╡ 79e50aad-169b-4f7f-99d9-22d612616c06
 md"
-###### [*Division*](https://www.hackmath.net/en/calculator/complex-number) based on *polar* coordinates
-$$divComplex: (z_1,z_2) \mapsto ((\rho(z_1)/ \rho(z_2)),(\theta(z_1)-\theta(z_2))= -0.3846154+0.9230769i$$
+*Magnitude* or *norm* of complex vector $$z$$ is :
+
+$$r = \rho = |z| = <z, z>^{1/2}$$ 
+$$<z, z> = z^T \overline{z} = (Re(z) + Im(z)) \cdot (Re(z) - Im(z)) = x^2 + y^2$$ 
 "
 
-# ╔═╡ 3ea58403-8feb-4897-9759-90ed548d6419
-divComplex(zTwoPlusThreeI, zTwoMinusThreeI)
+# ╔═╡ 3e9f674f-eb16-4f07-9a0f-65fbd4c93e54
+zzConj = z * zConj
 
-# ╔═╡ 1d7edfae-9400-4911-b364-372da3b2ad25
+# ╔═╡ 90455237-27dc-4a4e-bbd5-c6d9931c60be
+sqrt(real(z * zConj))
+
+# ╔═╡ c03a9225-e65e-4a5f-aa44-50220d4376fa
+abs(z) == sqrt(2^2 + 1^2) == sqrt(5) == sqrt(real(z * zConj))
+
+# ╔═╡ d1b38ce9-a820-4344-9aa5-41b627f8eeb3
 md"
----
-##### 2.4.1.2 *idiographic* Julia
+$$\angle{z} = \phi = arctan(Im(z)/Re(z)) = arctan(1/2)$$
 "
 
-# ╔═╡ d2344a32-eb70-4b67-b245-2d699531c5ad
-2 + 3im
+# ╔═╡ 21df5a65-3128-42b5-9f00-09dd686ced91
+ϕ = angle(z)
 
-# ╔═╡ eb6dfeab-eb5e-42e5-80f7-f9b25d5baf57
-2 -3im
+# ╔═╡ 1fd749ff-a089-4e07-8598-80e95b964842
+angle(z) == atan(imag(z)/real(z)) == atan(1/2)
 
-# ╔═╡ b8f4babf-4226-4517-91cf-4c26d8d14659
-complex(2, 3) + complex(2, -3)
+# ╔═╡ e6a8e690-ea92-4657-a69e-a8d58b63b661
+md"
+###### Euler's formula
+$$r \cdot e^{i\cdot \phi}$$
+"
 
-# ╔═╡ 50d8b88b-7623-42c1-b2d0-a54c0a7cb06a
-complex(2, 3) - complex(2, -3)
+# ╔═╡ a5e1439e-571d-4705-895d-8ca72cd0c82c
+r*exp(im*ϕ)             # (red) point on circle with radius r <> 1
 
-# ╔═╡ 4b049265-c15c-4db9-8a18-44016a218685
-complex(2, 3) * complex(2, -3)
+# ╔═╡ 34250530-f803-44db-8f84-9828acf99d77
+md"
+$$e^{i\cdot \phi}$$
+"
 
-# ╔═╡ ebd82750-b684-47e5-bcd5-5891af7ed437
-complex(2, 3) / complex(2, -3)
+# ╔═╡ c7500900-5f03-4187-b496-d680d943454d
+exp(im*ϕ)               # (blue) point on circle with radius r == 1
 
-# ╔═╡ 6c8d4360-5ab7-4437-be89-e9c7f033280c
+# ╔═╡ b28ec3ec-3a21-4ac5-a934-1573f00f5ebf
+md"
+$$e^{i\cdot \phi} == e^{\phi \cdot i}$$
+"
+
+# ╔═╡ ae49dcc4-4648-41a4-9bed-ef200bb66588
+exp(im*ϕ) == exp(ϕ*im)  # '*' should be placed between variable name and 'im' 
+
+# ╔═╡ 0fb878b7-1e8d-4190-a0d7-96f9bceeb606
 md"
 ###### Euler's identity
 "
 
-# ╔═╡ 62d5fe1c-0c46-4ba8-b54a-2751c2774169
+# ╔═╡ 8cc23ffa-6134-4e73-88da-5fefb6ff69b8
+π
+
+# ╔═╡ 5b432ada-6370-4ff0-ad6c-2879cbb351f6
+π*im
+
+# ╔═╡ e1cf1510-9c18-43fe-ba9e-e90e2cfc6c08
 exp(π*im)
 
-# ╔═╡ ea0cfb3e-2996-4dad-a28e-b3b70d5bc8ae
-real(exp(π*im))
+# ╔═╡ 35ab6cc8-651a-4f40-89a0-deef8670cb15
+abs(exp(π*im) - (-1 + 0im)) < 10.0E-10
 
-# ╔═╡ f438cbb7-c3e3-4aaf-aa13-c106f0fb8c04
-imag(exp(π*im))
+# ╔═╡ 75c52cf4-9308-42a4-a26d-2c878fbc42d3
+abs(exp(π*im) + 1 - 0im) < 10.0E-10
 
-# ╔═╡ 3e6a4672-edf0-421e-a2c7-14eb99a85097
+# ╔═╡ a5464136-3ac2-4225-b838-ec070e24b7b1
+md"
+###### Addition in $$\mathbb C$$
+"
+
+# ╔═╡ 21e54832-cc62-4662-94f6-7ed5399ef609
+let
+	z1 = Complex(2, 1)
+	r1 = abs(z1)
+	z2 = Complex(real(z1)/r1, -2*imag(z1)/r1)
+	z3 = z1 + z2
+end # let
+
+# ╔═╡ 611e4d99-9efd-41b2-8b9c-39c76c4e7255
+md"
+###### Subtraction in $$\mathbb C$$
+"
+
+# ╔═╡ 8ef6ff4c-d780-4909-93f3-9fb88f89aefb
+let
+	z1 = Complex(2, 1)
+	r1 = abs(z1)
+	z2 = Complex(real(z1)/r1, -2*imag(z1)/r1)
+	z3 = z1 - z2
+end # let
+
+# ╔═╡ 13fba1b1-ff87-41fe-bf30-b11ae89c072c
+md"
+###### Multiplication in $$\mathbb C$$
+"
+
+# ╔═╡ 21b3eb3f-023d-465e-937c-712272b5ec56
+let
+	z1 = Complex(2, -1)
+	r1 = abs(z1)
+	z2 = Complex(2, 2)
+	z3 = z1 * z2
+end # let
+
+# ╔═╡ 63181711-0741-40ce-9ac7-0f8053b77254
+md"
+###### Division in $$\mathbb C$$
+"
+
+# ╔═╡ 6c3a4af2-841c-4318-a4ff-9d3118bb26fd
+let
+	z1 = Complex(3, -1)
+	r1 = abs(z1)
+	z2 = Complex(1, 2)
+	z3 = z1 / z2
+end # let
+
+# ╔═╡ c898ef69-ff89-4846-88ed-c39245c62256
+md"
+---
+"
+
+# ╔═╡ b0270d5f-d6b0-4a05-80f7-0b8d86ecdf84
 md"
 ---
 ##### References
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/09/23
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, https://sarabander.github.io/sicp/, last visit 2022/09/23
+
 - **Feynman, R.P.**; The Feynman Lectures on Physics. Vol. I. Addison-Wesley, 1977.
-- **Wikipedia**, Euler's formula, [https://en.wikipedia.org/wiki/Euler%27s_formula](https://en.wikipedia.org/wiki/Euler%27s_formula), last visit 2022/10/09
-- **Wikipedia**, Euler's identity, [https://en.wikipedia.org/wiki/Euler%27s_identity](https://en.wikipedia.org/wiki/Euler%27s_identity), last visit 2022/10/06
+
+- **Wikipedia**, Euler's formula, https://en.wikipedia.org/wiki/Euler%27s_formula, last visit 2022/10/09
+
+- **Wikipedia**, Euler's identity, https://en.wikipedia.org/wiki/Euler%27s_identity, last visit 2022/10/06
 "
 
-# ╔═╡ 3b0945de-e1bb-4435-a07e-c647619e6c2f
+
+# ╔═╡ b9e5ea98-ce2d-4594-965e-e8003a5d86ef
 md"
 ---
-###### end of ch 2.3.4
+##### end of ch 2.3.4
+"
 
-This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+
+
+# ╔═╡ 0f6da3d6-bcc7-49d8-a347-c7c68b2526e9
+md"
+---
+This is a **draft** under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ---
-
 "
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -669,7 +745,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
-Plots = "~1.35.0"
+Plots = "~1.35.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -678,7 +754,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "60543e7475eaa67606fb48601d68705cb460b645"
+project_hash = "0534ab805c6602c4a71fb94d38bee348c94d5259"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -751,9 +827,9 @@ version = "0.12.8"
 
 [[deps.Compat]]
 deps = ["Dates", "LinearAlgebra", "UUIDs"]
-git-tree-sha1 = "5856d3031cdb1f3b2b6340dfdc66b6d9a149a374"
+git-tree-sha1 = "3ca828fe1b75fa84b021a7860bd039eaea84d2f2"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.2.0"
+version = "4.3.0"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -766,9 +842,9 @@ uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.6.2"
 
 [[deps.DataAPI]]
-git-tree-sha1 = "1106fa7e1256b402a86a8e7b15c00c85036fef49"
+git-tree-sha1 = "46d2680e618f8abd007bce0c3026cb0c4a8f2032"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
-version = "1.11.0"
+version = "1.12.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -854,9 +930,9 @@ version = "3.3.8+0"
 
 [[deps.GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Preferences", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
-git-tree-sha1 = "859e9cfa91d21ed87e8ea9f2998c94df1de12045"
+git-tree-sha1 = "00a9d4abadc05b9476e937a5557fcce476b9e547"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.69.2"
+version = "0.69.5"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
@@ -889,9 +965,9 @@ version = "1.0.2"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "Dates", "IniFile", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
-git-tree-sha1 = "4abede886fcba15cd5fd041fef776b230d004cee"
+git-tree-sha1 = "e8c58d5f03b9d9eb9ed7067a2f34c7c371ab130b"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "1.4.0"
+version = "1.4.1"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg"]
@@ -1063,9 +1139,9 @@ version = "0.4.9"
 
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
-git-tree-sha1 = "3d3e902b31198a27340d0bf00d6ac452866021cf"
+git-tree-sha1 = "42324d08725e200c23d4dfb549e0d5d89dede2d2"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.9"
+version = "0.5.10"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -1128,9 +1204,9 @@ version = "0.8.1+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
-git-tree-sha1 = "02be9f845cb58c2d6029a6d5f67f4e0af3237814"
+git-tree-sha1 = "ebe81469e9d7b471d7ddb611d9e147ea16de0add"
 uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
-version = "1.1.3"
+version = "1.2.1"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1162,9 +1238,9 @@ version = "10.40.0+0"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "3d5bf43e3e8b412656404ed9466f1dcbf7c50269"
+git-tree-sha1 = "6c01a9b494f6d2a9fc180a08b182fcb06f0958a0"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.4.0"
+version = "2.4.2"
 
 [[deps.Pipe]]
 git-tree-sha1 = "6842804e7867b115ca9de748a0cf6b364523c16d"
@@ -1184,9 +1260,9 @@ version = "1.8.0"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Statistics"]
-git-tree-sha1 = "8162b2f8547bc23876edd0c5181b27702ae58dce"
+git-tree-sha1 = "1f03a2d339f42dca4a4da149c7e15e9b896ad899"
 uuid = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
-version = "3.0.0"
+version = "3.1.0"
 
 [[deps.PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "Printf", "Random", "Reexport", "SnoopPrecompile", "Statistics"]
@@ -1196,9 +1272,9 @@ version = "1.3.1"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SnoopPrecompile", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "Unzip"]
-git-tree-sha1 = "f60a3090028cdf16b33a62f97eaedf67a6509824"
+git-tree-sha1 = "524d9ff1b2f4473fef59678c06f9f77160a204b1"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.35.0"
+version = "1.35.3"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -1231,10 +1307,10 @@ uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 version = "1.3.0"
 
 [[deps.RecipesPipeline]]
-deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
-git-tree-sha1 = "017f217e647cf20b0081b9be938b78c3443356a0"
+deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase", "SnoopPrecompile"]
+git-tree-sha1 = "9b1c0c8e9188950e66fc28f40bfe0f8aac311fe0"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
-version = "0.6.6"
+version = "0.6.7"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1598,112 +1674,104 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─ddedeb70-3b21-11ed-1278-37ba3d55e512
-# ╠═4082b01a-1149-43ae-9a6b-6531c985d157
-# ╟─73b6b69d-bbe1-438d-a397-d4e848aedfc5
-# ╟─7c72b93a-e502-417c-a4ad-99b8be18cebf
-# ╟─9142ce4d-01f9-4ea9-a94c-9d857ebdabe0
-# ╟─e895bc63-c837-4512-baac-a9a48cae50cb
-# ╟─386610be-98ca-4ee0-8f24-038eb06c44f7
-# ╟─cf5fa4f0-8e0a-46c5-9b0e-f88f766831f5
-# ╠═10ae79f4-0ec6-4a8a-8422-a4db6a2b3de0
-# ╟─0e560e33-cce5-40c0-baef-74d64379d677
-# ╠═db2fcb36-27af-4a02-8255-ef823aaa1306
-# ╟─33128853-39be-4e75-a92e-f5281fa72fdb
-# ╠═830bf616-89bc-484c-b3b1-3a3729e3966b
-# ╟─d2449192-fafe-4023-8b97-30f7b946827c
-# ╠═5a2711ec-8154-4505-88c9-80b68f60179f
-# ╟─eba524fb-4b5f-497e-9b97-7c82b04849e6
-# ╠═b26ca7e1-15e8-43d9-b607-2d74c306f2d0
-# ╟─61502c97-46c9-43d0-a48b-f0d40a985ffd
-# ╠═f76e31ee-3c12-4ced-8252-1afd6ce6a763
-# ╠═51bf7e65-2a4e-440d-871d-f0bb61c695f9
-# ╟─f760db0f-8dbb-4130-bf54-bdf556d785c9
-# ╟─3c3837d3-4b55-4720-917e-1bdc8397c8cb
-# ╠═76af9279-2013-491c-b55b-6adcbe2f4fc0
-# ╠═db2ea1ef-d2ba-41c2-a293-79ed6a82c2d7
-# ╠═0eba8065-ce12-43d3-9852-ef03abf10712
-# ╠═d6030208-4cef-45ec-93e9-c0ec996d41e9
-# ╠═ae3cddc7-c324-4454-988b-b4b6bc9f5900
-# ╟─97b83b76-ac88-4be6-b387-4b29861cffb5
-# ╟─a3c59817-1bf8-4114-b347-92bdd0400a25
-# ╟─2713a735-3542-45d6-9ed3-a3aa1863902c
-# ╟─cede8129-9358-4dc4-a32e-6390af700376
-# ╟─1c736e19-1dde-496c-9d8f-991384d8d803
-# ╠═92e2404e-5606-41d9-a46c-61b76f6737b3
-# ╠═7d42ab0f-b4e4-4cf3-81d7-652990d049b0
-# ╠═bdfa88e0-e190-4e4f-bf0e-1ba1f2f895ea
-# ╠═f29a5d9e-66af-4f3d-b9f6-ad91f0ea735a
-# ╟─b6f35feb-67b9-42be-b172-e1a41682fd6f
-# ╠═03c9e321-0a5f-452e-a83c-09edd321df46
-# ╠═a0724486-e498-4fe6-a383-88c100e9bdbd
-# ╠═33e437c6-125c-443c-b697-3e9b29f34dd1
-# ╠═880c3d95-67df-4ac0-a9b0-0339d2d2d461
-# ╟─1977b1f7-03ee-4c91-a01a-c26a75e85fa2
-# ╟─f594966f-2e7c-42ab-81d0-b5360f19bf6f
-# ╟─a39e810d-6adc-4343-aaeb-a2c34db92104
-# ╟─ad751aeb-441d-45c4-b3ba-31b338b3c625
-# ╠═0f5eae24-727c-4ef9-8e38-18ee64d97229
-# ╟─879967a3-bc78-417a-8cc0-aaf53343d3e2
-# ╠═8f80e51f-b813-4846-967c-1e101511aaef
-# ╟─e05f131b-5c68-4974-b0cb-ec6d46871fd5
-# ╟─c44c7aaa-60c4-4f51-a85d-f94c300272bb
-# ╟─4ba35a7e-d038-4bd5-b627-039eb0abf460
-# ╠═a779ca0b-dbad-4fc2-be75-4b7f45d31636
-# ╟─9d750d83-4142-4be6-add2-a869e2299f89
-# ╟─cb398a68-cef5-4398-ae9d-65a7e380f2a2
-# ╠═b9dc12c1-6e1b-4d1a-8629-f937e9174e61
-# ╟─ce2e5a5b-38fc-4be6-bf5f-435ac2d90ec4
-# ╠═d4d1ae65-9b38-4600-a33c-a3668f822c77
-# ╟─184c048f-4b67-4b90-af2c-f520becb393f
-# ╠═39cf6016-62e6-4c2b-9e3b-a51491bf5922
-# ╟─f44475f7-c036-46fc-8c21-94b383ee90cb
-# ╠═919cbd2a-4e66-43bb-9ff3-70e4b9694011
-# ╟─a676d3d6-8b01-4938-a72e-770e040e2d47
-# ╠═a2993ced-5bd1-42c8-8642-3cd9bb32ed2c
-# ╟─11a5bf4b-b5ac-4ac0-9f09-87594b9d0c6d
-# ╠═c8d24446-9cd4-4339-9187-ed7e540a3557
-# ╟─5c72a1ab-8c0b-474e-8046-cce9041ac5dd
-# ╠═686de811-e42c-4c16-b609-11863c5747bb
-# ╟─20d54d11-dacd-49a5-a99d-634a813efaf5
-# ╠═542f980c-9e82-4066-9dfc-a6827da9bc1b
-# ╟─94dbc794-5913-4cca-b4f8-796e7287ad45
-# ╟─ce04c2f4-a5f5-4b91-b4ce-af23fbc1c1d8
-# ╠═460dfdbd-b713-4e6d-843c-d1e1ae1e63a8
-# ╠═4d2e2768-0ba1-462d-815b-cd169015aa5c
-# ╠═b32981b9-e7c9-467d-b22e-43ecaa5ce3c6
-# ╠═d68b3f96-a19e-4098-a233-35f3192fb726
-# ╠═646c41c8-2d9f-4057-ad4b-6d8695bb1aa2
-# ╠═0716e984-eeee-4714-86c4-dfc8b5313c30
-# ╟─794915a9-2d08-4e36-8e0f-f44682d2d1dc
-# ╠═b79d7d75-5dc5-4591-a26e-dc91c17be92e
-# ╠═e3fdcf8c-e210-4a4f-a4c8-b0a2e2315a6d
-# ╠═38cb4d6d-f209-4650-82c2-1b33b0e829e1
-# ╟─8c2cf831-4b01-4ec8-a06c-7f050cb917df
-# ╠═1ae2d086-2170-4c33-a3f3-38fd5d330dd6
-# ╠═c0cc5ec5-e576-4300-804d-fb5f8a0770be
-# ╠═46d3b162-7339-42df-86d7-0ee5d6ba9ebf
-# ╟─01fe1b54-5090-4faa-a711-c86ef9d159f4
-# ╠═8e43aa6c-ba87-4e99-ac78-7a4f09207ef2
-# ╟─5e28243b-3813-471b-83ee-924d289f7000
-# ╟─0299a002-aeaf-4f79-95fb-829ca15d1915
-# ╠═082bf239-666f-42ad-8170-31ebcd25ecde
-# ╟─d50fb13a-f424-42c2-b501-97a986bf182e
-# ╠═0db89983-49d2-41e2-9b94-a171f6b0d8ca
-# ╟─2be9faee-f977-4278-9b10-4321abf6cb26
-# ╠═3ea58403-8feb-4897-9759-90ed548d6419
-# ╟─1d7edfae-9400-4911-b364-372da3b2ad25
-# ╠═d2344a32-eb70-4b67-b245-2d699531c5ad
-# ╠═eb6dfeab-eb5e-42e5-80f7-f9b25d5baf57
-# ╠═b8f4babf-4226-4517-91cf-4c26d8d14659
-# ╠═50d8b88b-7623-42c1-b2d0-a54c0a7cb06a
-# ╠═4b049265-c15c-4db9-8a18-44016a218685
-# ╠═ebd82750-b684-47e5-bcd5-5891af7ed437
-# ╟─6c8d4360-5ab7-4437-be89-e9c7f033280c
-# ╠═62d5fe1c-0c46-4ba8-b54a-2751c2774169
-# ╠═ea0cfb3e-2996-4dad-a28e-b3b70d5bc8ae
-# ╠═f438cbb7-c3e3-4aaf-aa13-c106f0fb8c04
-# ╟─3e6a4672-edf0-421e-a2c7-14eb99a85097
-# ╟─3b0945de-e1bb-4435-a07e-c647619e6c2f
+# ╟─e39aed1d-58a3-40e6-8a73-27204b742f42
+# ╟─d87312c3-36cc-4d5d-9d3f-fd9da02bdadb
+# ╠═90aa1e17-89f8-4884-9a3b-e58acf87bc7a
+# ╟─b4ce58d8-c130-4c4f-904d-deccef8940cf
+# ╟─576d32a1-4aa4-414d-84a5-99a1f5bc3208
+# ╟─24a94004-d2f6-40f2-9596-0d2467fe8f4b
+# ╟─c2bfc649-b5b1-4e75-83f4-76d2aa57bc5b
+# ╟─eb2b46af-1eda-4b19-988d-ab8b2f7c3525
+# ╟─46638e2b-704f-43df-9b61-a387762f78c9
+# ╟─724ba211-8069-43b8-99b1-55d755ed3c68
+# ╟─afd5a931-b8ad-46f8-b0f2-894d59d53959
+# ╟─e791db57-a399-47fe-ac45-f4a61c493473
+# ╟─262fb6be-d103-4407-b30b-ff5293ce2bea
+# ╟─4dc1459c-070f-4970-9e67-c9facdc15cef
+# ╠═82578c79-a6f3-4374-8ee2-aa8a585f4b4a
+# ╠═8a06336c-044c-4091-b7ae-f4ea60b97afa
+# ╠═ed5d2b26-d30a-4d13-8eef-6e1175699f57
+# ╠═f1181c0f-0127-4761-a471-757f71dddb97
+# ╟─2e5ccb79-6d54-4b84-9a78-633ed533c1dc
+# ╠═43b5159b-40b1-41fb-8547-a889b8e9e729
+# ╠═5a5a7926-7733-40cd-8ab9-583a15e534ba
+# ╠═04532459-8d67-4ea2-9b32-f010e3100932
+# ╟─6d2eea9e-fd56-43c6-95a7-3d565dd0836a
+# ╟─1e2aa2f3-81a8-4252-be4f-aa575918a67b
+# ╟─c02043ce-730e-42e1-ae7d-96963bdb4a75
+# ╠═ace9faf1-33cf-4086-b6aa-9b1fad9ddd82
+# ╠═0bb28e73-6374-4b59-8070-d6964a53c20c
+# ╠═6f3732d7-f9e6-4c6b-8a18-47e128337531
+# ╠═4775c4b5-c6e0-45da-8a1c-33070e5348ed
+# ╠═9c4e42b6-a630-4263-95b0-40c072763410
+# ╠═fe8c3cae-b495-4670-983f-fcef9d72e98f
+# ╟─420220d7-586f-4f26-b107-e68677d10b5b
+# ╠═e48844ca-fa46-4c8f-9bb8-f2d33ad7fdad
+# ╠═42b1742d-da96-4ea7-b5a8-288ea45d035c
+# ╠═fd0dcca8-dd8a-416d-91d2-469f81dba264
+# ╠═55535d43-7c35-4ac1-9bf8-22881647651d
+# ╠═60dead94-fe17-412a-8574-e7ba010090ca
+# ╠═93dc4413-e5f8-4df8-9798-f1189962e4e7
+# ╟─74fd815e-34fa-4f89-aa06-d19ed3ca382f
+# ╟─b818345b-d79b-41a4-8b6c-1e88248a2089
+# ╟─27d313ff-84f8-44bb-ae90-9e71fed9d106
+# ╠═43a53b2a-0a0d-41a5-8e7c-b3106d999272
+# ╠═37766cb9-6453-47a5-b127-a87fb100f868
+# ╟─d1666436-a476-4ef1-a0e9-b9ad44300a09
+# ╟─c635a131-54c0-4530-9735-07fc558240fb
+# ╠═6c151933-886d-4774-a380-1ba185a1070d
+# ╠═e3cb6006-4bf0-497c-8420-55637737a981
+# ╟─46f29c21-f7c6-416f-8915-a957abf74186
+# ╟─a064adda-624f-4dd6-9521-1dcfb2840189
+# ╠═f179ef07-e391-4894-a5f2-6cef7659e592
+# ╠═25151974-8b0b-4e33-ac6c-927e695789d0
+# ╟─72e9c6eb-6404-4fc8-bafa-996d335734fe
+# ╟─f799d74f-5629-4171-86f1-d1ef772a617b
+# ╠═0c54eddf-4cd1-4428-9d01-77742cc46796
+# ╠═e86b123d-5658-4caa-9826-f400beda75ef
+# ╟─78c508b3-40e1-45fd-80b3-70174ea7b5b3
+# ╟─8d659f59-ba30-4960-a755-866b08f270a0
+# ╟─795ca456-6ca6-4d11-b2fc-8a9014a653ad
+# ╟─ed0dd90d-253b-45ab-a6c1-3bc25c5aeac9
+# ╠═2c6136a7-aaea-4f34-8cf0-e6c59051c669
+# ╟─69628aaf-2678-45ea-a142-64dd22b8b378
+# ╠═6c6004db-cbca-4a03-800d-15593556baff
+# ╟─97ada40a-2491-4351-a061-88f6393d6ebe
+# ╠═74e65c0f-470d-4a7f-ac67-174f6489b8fb
+# ╟─28d542a3-6a16-4c65-a0a1-02e5d8b48439
+# ╠═35ccdb87-274f-40e3-a40e-28e441d85655
+# ╟─84f33549-7f10-451b-843f-a877a4d6c6b7
+# ╠═eafa2a8d-b1f4-4775-97d4-9d8f028a5324
+# ╟─79e50aad-169b-4f7f-99d9-22d612616c06
+# ╠═3e9f674f-eb16-4f07-9a0f-65fbd4c93e54
+# ╠═90455237-27dc-4a4e-bbd5-c6d9931c60be
+# ╠═c03a9225-e65e-4a5f-aa44-50220d4376fa
+# ╟─d1b38ce9-a820-4344-9aa5-41b627f8eeb3
+# ╠═21df5a65-3128-42b5-9f00-09dd686ced91
+# ╠═1fd749ff-a089-4e07-8598-80e95b964842
+# ╟─e6a8e690-ea92-4657-a69e-a8d58b63b661
+# ╠═a5e1439e-571d-4705-895d-8ca72cd0c82c
+# ╟─34250530-f803-44db-8f84-9828acf99d77
+# ╠═c7500900-5f03-4187-b496-d680d943454d
+# ╟─b28ec3ec-3a21-4ac5-a934-1573f00f5ebf
+# ╠═ae49dcc4-4648-41a4-9bed-ef200bb66588
+# ╟─0fb878b7-1e8d-4190-a0d7-96f9bceeb606
+# ╠═8cc23ffa-6134-4e73-88da-5fefb6ff69b8
+# ╠═5b432ada-6370-4ff0-ad6c-2879cbb351f6
+# ╠═e1cf1510-9c18-43fe-ba9e-e90e2cfc6c08
+# ╠═35ab6cc8-651a-4f40-89a0-deef8670cb15
+# ╠═75c52cf4-9308-42a4-a26d-2c878fbc42d3
+# ╟─a5464136-3ac2-4225-b838-ec070e24b7b1
+# ╠═21e54832-cc62-4662-94f6-7ed5399ef609
+# ╟─611e4d99-9efd-41b2-8b9c-39c76c4e7255
+# ╠═8ef6ff4c-d780-4909-93f3-9fb88f89aefb
+# ╟─13fba1b1-ff87-41fe-bf30-b11ae89c072c
+# ╠═21b3eb3f-023d-465e-937c-712272b5ec56
+# ╟─63181711-0741-40ce-9ac7-0f8053b77254
+# ╠═6c3a4af2-841c-4318-a4ff-9d3118bb26fd
+# ╟─c898ef69-ff89-4846-88ed-c39245c62256
+# ╟─b0270d5f-d6b0-4a05-80f7-0b8d86ecdf84
+# ╟─b9e5ea98-ce2d-4594-965e-e8003a5d86ef
+# ╟─0f6da3d6-bcc7-49d8-a347-c7c68b2526e9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
