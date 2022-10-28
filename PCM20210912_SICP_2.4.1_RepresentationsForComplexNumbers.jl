@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.12) by PCM *** 2022/10/23 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/10/27 ***
 
 =====================================================================================
 
@@ -38,11 +38,11 @@ let
 	plot!([(0, 1), (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!([(0, 0), (0, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:red, linewidth=1)
-	annotate!(2.3, 1.05, "z = x + yi", :red)
-	annotate!(2.3, 0.5, "Im(z)=y")
-	annotate!(1.0,-0.1, "Re(z)=x")
-	annotate!(1.2, 0.2, "ϕ=arctan(y/x)", :red)
-	annotate!(0.8, 0.6, "|z|=ρ=r", :red)
+	annotate!(2.3,  1.04, ("z = x + yi", 12, :red))
+	annotate!(2.25, 0.5,  ("y=Im(z)", 12))
+	annotate!(1.0, -0.1,  ("x=Re(z)", 12))
+	annotate!(1.15, 0.2,  ("ϕ=arctan(y/x)", 12, :red))
+	annotate!(0.85, 0.6,  ("|z|=ρ=r", :red, 12))
 end # let
 
 # ╔═╡ 576d32a1-4aa4-414d-84a5-99a1f5bc3208
@@ -114,12 +114,12 @@ let
 	plot!([(0, 1),   (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!([(0, 0),   (0, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
-	annotate!(2.7, 1.05, "z = r⋅exp(iϕ)", :red)
-	annotate!(1.3, 0.4, "exp(iϕ)", :blue)
-	annotate!(2.1, 0.5, "y")
-	annotate!(1.2,-0.1, "x")
-	annotate!(0.6, 0.15, "ϕ", :blue)
-	annotate!(1.1, 0.7, "|z|", :red)
+	annotate!(2.6, 1.05, ("z = r⋅exp(iϕ)", 12, :red))
+	annotate!(1.3, 0.4, ("exp(iϕ)", 12, :blue))
+	annotate!(2.14, 0.5, ("y", 12))
+	annotate!(1.2,-0.1, ("x", 12))
+	annotate!(0.6, 0.15, ("ϕ", 12, :blue))
+	annotate!(1.2, 0.8, ("|z|", 12, :red))
 end # let
 
 # ╔═╡ 724ba211-8069-43b8-99b1-55d755ed3c68
@@ -142,8 +142,8 @@ let
 	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
 	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
-	annotate!(-1.0, 0.15, "z = exp(iπ)", :red)
-	annotate!(-1.0,-0.15, "= -1+0i", :red)
+	annotate!(-1.0, 0.15, ("z = exp(iπ)", 12, :red))
+	annotate!(-1.0,-0.15, ("= -1+0i", 12, :red))
 end # let
 
 # ╔═╡ e791db57-a399-47fe-ac45-f4a61c493473
@@ -157,6 +157,45 @@ md"
 #### 2.4.1.2 Scheme-like Julia
 "
 
+
+# ╔═╡ 6d2eea9e-fd56-43c6-95a7-3d565dd0836a
+md"
+$$\begin{array}{|c|c|}                     
+\hline                                                         \\
+layer         & \text{Operations or Functions}                 \\
+              &                                                \\
+\hline                                                         \\
+top           & \text{representation independent}              \\
+              &                                                \\
+(domain)      & addComplex                                     \\
+              & subComplex                                     \\
+              & mulComplex                                     \\
+              & divComplex                                     \\
+\hline                                                         \\
+middle        & \text{representation dependent}                \\
+(interface)   & \begin{array}{cc}                              \\
+              & realPartOfZRect       & realPartOfZPolar       \\      
+              & imagPartOfZRect       & imagPartOfZPolar       \\
+              & magnitudeOfZRect      & magnitudeOfZPolar      \\
+              & angleFromOfZRect      & angleOfZPolar          \\
+              & makeZRectFromRealImag & makeZPolarFromRealImag \\
+              & makeZRectFromMagAng   & makeZPolarFromMagAng   \\
+              & \end{array}                                    \\
+\hline                                                         \\
+ground        & cons                                           \\
+(Scheme-like) & car                                            \\            
+              & cdr                                            \\
+              &                                                \\
+\hline                                                                              
+\end{array}$$                                       
+"
+
+# ╔═╡ 1e2aa2f3-81a8-4252-be4f-aa575918a67b
+md"
+Fig. 2.4.1.4 *Data abstraction barriers* in the complex number system (cf. to SICP, Fig. 2.19)
+
+---
+"
 
 # ╔═╡ 4dc1459c-070f-4970-9e67-c9facdc15cef
 md"
@@ -203,62 +242,39 @@ car(x::Vector) = x[1]
 # ╔═╡ 04532459-8d67-4ea2-9b32-f010e3100932
 cdr(cell::Cons)::Any = cell.cdr
 
-# ╔═╡ 6d2eea9e-fd56-43c6-95a7-3d565dd0836a
-md"
-$$\begin{array}{|c|c|}                     
-\hline                                                         \\
-layer         & \text{Operations or Functions}                 \\
-              &                                                \\
-\hline                                                         \\
-top           & \text{representation independent}              \\
-              &                                                \\
-(domain)      & addComplex                                     \\
-              & subComplex                                     \\
-              & mulComplex                                     \\
-              & divComplex                                     \\
-\hline                                                         \\
-middle        & \text{representation dependent}                \\
-(interface)   & \begin{array}{cc}                              \\
-              & realPartFromRectZ     & realPartFromPolarZ     \\      
-              & imagPartFromRectZ     & imagPartFromPolarZ     \\
-              & magnitudeFromRectZ    & magnitudeFromPolarZ    \\
-              & angleFromRectZ        & angleFromPolarZ        \\
-              & makeZRectFromRealImag & makeZPolarFromRealImag \\
-              & makeZRectFromMagAng   & makeZPolarFromMagAng   \\
-              & \end{array}                                    \\
-\hline                                                         \\
-ground        & cons                                           \\
-(Scheme-like) & car                                            \\            
-              & cdr                                            \\
-              &                                                \\
-\hline                                                                              
-\end{array}$$                                       
-"
-
-# ╔═╡ 1e2aa2f3-81a8-4252-be4f-aa575918a67b
-md"
-Fig. 2.4.1.4 *Data abstraction barriers* in the complex number system (cf. to SICP, Fig. 2.19)
-
----
-"
+# ╔═╡ 7cde6bad-2ff7-4fec-bed6-b5d00adfb0ba
+cdr(x::Vector) = x[2:end]
 
 # ╔═╡ c02043ce-730e-42e1-ae7d-96963bdb4a75
 md"
 ---
-###### *Rectangular* representation (Ben's)
+##### *Rectangular*-dependent functions 
+(Ben's representation)
+"
+
+# ╔═╡ ad27ac18-e0f8-4b63-942d-e5a24efbd168
+md"
+###### Selectors
+$$realPartOfZRect, imagPartOfZRect$$
+$$magnitudeOfZRect, angleOfZRect$$
+
+###### Constructors
+$$makeZRectFromRealImag, makeZRectFromMagAng$$
+
+---
 "
 
 # ╔═╡ ace9faf1-33cf-4086-b6aa-9b1fad9ddd82
-realPartFromRectZ(z) = car(z)
+realPartOfZRect(z) = car(z)
 
 # ╔═╡ 0bb28e73-6374-4b59-8070-d6964a53c20c
-imagPartFromRectZ(z) = cdr(z)
+imagPartOfZRect(z) = cdr(z)
 
 # ╔═╡ 6f3732d7-f9e6-4c6b-8a18-47e128337531
-magnitudeFromRectZ(z) = sqrt(realPartFromRectZ(z)^2 + imagPartFromRectZ(z)^2)
+magnitudeOfZRect(z) = sqrt(realPartOfZRect(z)^2 + imagPartOfZRect(z)^2)
 
 # ╔═╡ 4775c4b5-c6e0-45da-8a1c-33070e5348ed
-angleFromRectZ(z) = atan(imagPartFromRectZ(z)/realPartFromRectZ(z))
+angleOfZRect(z) = atan(imagPartOfZRect(z)/realPartOfZRect(z))
 
 # ╔═╡ 9c4e42b6-a630-4263-95b0-40c072763410
 makeZRectFromRealImag(x, y) = cons(x, y)
@@ -269,23 +285,33 @@ makeZRectFromMagAng(r, a) = cons(r * cos(a), r * sin(a))
 # ╔═╡ 420220d7-586f-4f26-b107-e68677d10b5b
 md"
 ---
-###### *Polar* representation (Alyss's)
+##### *Polar*-dependent functions
+(Alyssa's representation) 
+
+###### Selectors
+$$realPartOfZPolar, imagPartOfZPolar$$
+$$magnitudeOfZPolar, anglePartOfZPolar$$
+
+###### Constructors
+$$makeZPolarFromRealImag, makeZPolarFromMagAng$$
+
+---
 "
 
 # ╔═╡ e48844ca-fa46-4c8f-9bb8-f2d33ad7fdad
-magnitudeFromPolarZ(z) = car(z)
+magnitudeOfZPolar(z) = car(z)
 
 # ╔═╡ 42b1742d-da96-4ea7-b5a8-288ea45d035c
-angleFromPolarZ(z) = cdr(z)
+angleOfZPolar(z) = cdr(z)
 
 # ╔═╡ fd0dcca8-dd8a-416d-91d2-469f81dba264
-realPartFromPolarZ(z) = magnitudeFromPolarZ(z) * cos(angleFromPolarZ(z))
+realPartOfZPolar(z) = magnitudeOfZPolar(z) * cos(angleOfZPolar(z))
 
 # ╔═╡ 55535d43-7c35-4ac1-9bf8-22881647651d
-imagPartFromPolarZ(z) = magnitudeFromPolarZ(z) * sin(angleFromPolarZ(z))
+imagPartOfZPolar(z) = magnitudeOfZPolar(z) * sin(angleOfZPolar(z))
 
 # ╔═╡ 60dead94-fe17-412a-8574-e7ba010090ca
-makeZPolarFromealImag(x, y) = cons(sqrt(x^2+y^2), atan(y/x))
+makeZPolarFromRealImag(x, y) = cons(sqrt(x^2+y^2), atan(y/x))
 
 # ╔═╡ 93dc4413-e5f8-4df8-9798-f1189962e4e7
 makeZPolarFromMagAng(r, a) = cons(r, a)
@@ -293,12 +319,26 @@ makeZPolarFromMagAng(r, a) = cons(r, a)
 # ╔═╡ 74fd815e-34fa-4f89-aa06-d19ed3ca382f
 md"
 ---
-###### Domain operators (representation *in*dependent)
+##### Domain (representation *in*dependent) operations
+$$addComplex, subComplex, mulComplex divComplex$$
+"
+
+# ╔═╡ 64035b6c-2596-4977-bafb-96b2a0a0d90b
+md"
+---
+###### Complex addition
+"
+
+# ╔═╡ ff97e2e0-d581-470d-bdfb-92c4822e7970
+md"
+Fig. 1.4.1.5 Complex addition as vector addition in $$\mathbb C$$
+
+---
 "
 
 # ╔═╡ 27d313ff-84f8-44bb-ae90-9e71fed9d106
 md"
-###### [Addition](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
+###### [Addition](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 
 $$addComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
 $$addComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1+x_2),(y_1+y_2)i)$$
@@ -307,21 +347,34 @@ $$addComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1+x_2),(y_1+y_2)i)$
 # ╔═╡ 43a53b2a-0a0d-41a5-8e7c-b3106d999272
 function addComplex(z1, z2)
 	makeZRectFromRealImag(
-		realPartFromRectZ(z1) + realPartFromRectZ(z2),
-		imagPartFromRectZ(z1) + imagPartFromRectZ(z2))
+		realPartOfZRect(z1) + realPartOfZRect(z2),
+		imagPartOfZRect(z1) + imagPartOfZRect(z2))
 end # function addComplex
 
 # ╔═╡ 37766cb9-6453-47a5-b127-a87fb100f868
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	r1 = magnitudeFromRectZ(z1)
-	z2 = makeZRectFromRealImag(realPartFromRectZ(z1)/r1, -2*imagPartFromRectZ(z1)/r1)
+	r1 = magnitudeOfZRect(z1)
+	z2 = makeZRectFromRealImag(realPartOfZRect(z1)/r1, -2*imagPartOfZRect(z1)/r1)
 	z3 = addComplex(z1, z2)
 end # let
 
+# ╔═╡ f4ee47dc-6059-4980-86a5-15b122b56751
+md"
+---
+###### Complex subtraction
+"
+
+# ╔═╡ 4db3fda8-63e9-48ab-ba9d-431f2ac7e061
+md"
+Fig. 1.4.1.6 Complex subtraction as vector subtraction in $$\mathbb C$$
+
+---
+"
+
 # ╔═╡ c635a131-54c0-4530-9735-07fc558240fb
 md"
-###### [Subtraction](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
+###### [Subtraction](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 
 $$subComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
 $$subComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1-x_2),(y_1-y_2)i)$$
@@ -330,21 +383,26 @@ $$subComplex: (z_1, z_2)=((x_1+y_1i), (x_2+y_2i) \mapsto ((x_1-x_2),(y_1-y_2)i)$
 # ╔═╡ 6c151933-886d-4774-a380-1ba185a1070d
 function subComplex(z1, z2)
 	makeZRectFromRealImag(
-		realPartFromRectZ(z1) - realPartFromRectZ(z2),
-		imagPartFromRectZ(z1) - imagPartFromRectZ(z2))
+		realPartOfZRect(z1) - realPartOfZRect(z2),
+		imagPartOfZRect(z1) - imagPartOfZRect(z2))
 end # function subComplex
 
 # ╔═╡ e3cb6006-4bf0-497c-8420-55637737a981
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	r1 = magnitudeFromRectZ(z1)
-	z2 = makeZRectFromRealImag(realPartFromRectZ(z1)/r1, -2*imagPartFromRectZ(z1)/r1)
+	r1 = magnitudeOfZRect(z1)
+	z2 = makeZRectFromRealImag(realPartOfZRect(z1)/r1, -2*imagPartOfZRect(z1)/r1)
 	z3 = subComplex(z1, z2)
 end # let
 
+# ╔═╡ ceed4c01-d4ca-47a7-add3-b14c775d95d8
+md"
+---
+###### Complex multiplication
+"
+
 # ╔═╡ 46f29c21-f7c6-416f-8915-a957abf74186
 let
-	title = "Complex multiplication as vector operation in C"
 	xlim  = (-1.5, 8.5); ylim = (-1.5, 3.0)
 	z1 = 2 - 1im
 	ϕ1 = atan(imag(z1)/real(z1))
@@ -359,7 +417,7 @@ let
 	circleArray1 = Plots.partialcircle(0, ϕ1, 30, r1)	
 	circleArray2 = Plots.partialcircle(0, ϕ2, 30, r2)	
 	circleArray3 = Plots.partialcircle(0, ϕ3, 30, r3)	
-	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
 	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
 	plot!([(0, 0),  (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
 	plot!([(0,-1.3), (0, 2.5)], linestyle=:dash, linecolor=:black, linewidth=1)
@@ -368,21 +426,28 @@ let
 	plot!(circleArray1, linestyle=:dot, linecolor=:green, linewidth=1)
 	plot!(circleArray2, linestyle=:dot, linecolor=:blue,  linewidth=1)
 	plot!(circleArray3, linestyle=:dot, linecolor=:red,   linewidth=1)
-	annotate!(2.3, -1.0, "z1", :green)
-	annotate!(1.0, -0.8, "|z1|", :green)
-	annotate!(2.3,  2.1, "z2", :blue)
-	annotate!(1.0,  1.5, "|z2|", :blue)
-	annotate!(7.0,  2.1, "z3=z1*z2", :red)
-	annotate!(4.0,  2.15, "|z1|*|z2|", :red)
-	annotate!(4.0,  1.7, "=|z3|", :red)
-	annotate!(1.8, -0.4, "ϕ1", :green)
-	annotate!(2.2,  1.2, "ϕ2", :blue)
-	annotate!(5.1,  0.8, "ϕ1+ϕ2=ϕ3", :red)
+	annotate!(2.3, -1.0, ("z1", 12, :green))
+	annotate!(1.0, -0.8, ("|z1|", 12, :green))
+	annotate!(2.3,  2.1, ("z2", 12, :blue))
+	annotate!(1.0,  1.5, ("|z2|", 12, :blue))
+	annotate!(7.0,  2.1, ("z3=z1*z2", 12, :red))
+	annotate!(4.0,  2.15,("|z1|*|z2|", 12, :red))
+	annotate!(4.0,  1.7, ("=|z3|", 12, :red))
+	annotate!(1.9, -0.4, ("ϕ1", 12, :green) )
+	annotate!(2.2,  1.2, ("ϕ2", 12, :blue))
+	annotate!(5.2,  0.8, ("ϕ1+ϕ2=ϕ3", 12, :red))
 end # let
+
+# ╔═╡ 36cf2a48-6f57-4a78-a55d-cab8199eba97
+md"
+Fig. 1.4.1.5 Complex multiplication as vector operation in $$\mathbb C$$
+
+---
+"
 
 # ╔═╡ a064adda-624f-4dd6-9521-1dcfb2840189
 md"
-###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) 
+###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 ###### in *rectangular* coordinates
 
 $$subComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
@@ -400,8 +465,8 @@ $$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \ma
 # ╔═╡ f179ef07-e391-4894-a5f2-6cef7659e592
 function mulComplex(z1, z2)
 	makeZRectFromMagAng(
-		magnitudeFromRectZ(z1) * magnitudeFromRectZ(z2),
-		angleFromRectZ(z1) + angleFromRectZ(z2))
+		magnitudeOfZRect(z1) * magnitudeOfZRect(z2),
+		angleOfZRect(z1) + angleOfZRect(z2))
 end # function mulComplex
 
 # ╔═╡ 25151974-8b0b-4e33-ac6c-927e695789d0
@@ -411,9 +476,14 @@ let
 	z3 = mulComplex(z1, z2)
 end # let
 
+# ╔═╡ 1fb809a4-7218-41c3-a54d-b524ab8192f9
+md"
+---
+###### Complex division
+"
+
 # ╔═╡ 72e9c6eb-6404-4fc8-bafa-996d335734fe
 let
-	title = "Complex division as vector operation in C"
 	xlim  = (-2.5, 4.5); ylim = (-2.5, 3.0)
 	z1 = 3 - 1im
 	ϕ1 = atan(imag(z1)/real(z1))
@@ -428,7 +498,7 @@ let
 	circleArray1 = Plots.partialcircle(0, ϕ1, 30, r1)	
 	circleArray2 = Plots.partialcircle(0, ϕ2, 30, r2)	
 	circleArray3 = Plots.partialcircle(0, ϕ3, 30, r3)	
-	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
 	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
 	plot!([(0, 0),  (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
 	plot!([(0,-1.3), (0, 2.5)], linestyle=:dash, linecolor=:black, linewidth=1)
@@ -437,20 +507,20 @@ let
 	plot!(circleArray1, linestyle=:dot, linecolor=:green, linewidth=1)
 	plot!(circleArray2, linestyle=:dot, linecolor=:blue,  linewidth=1)
 	plot!(circleArray3, linestyle=:dot, linecolor=:red,   linewidth=1)
-	annotate!(3.2, -1.0, "z1", :green)
-	annotate!(1.9, -0.4, "|z1|", :green)
-	annotate!(1.0,  2.2, "z2", :blue)
-	annotate!(0.4,  1.5, "|z2|", :blue)
-	annotate!(-.4, -1.6, "z1/z2=z3", :red)
-	annotate!(-1.0, -.7, "|z1|/|z2|=|z3|", :red)
-	annotate!(2.9, -0.4, "ϕ1", :green)
-	annotate!(1.7,  1.0, "ϕ2", :blue)
-	annotate!(1.7, -1.2, "ϕ3=ϕ1-ϕ2", :red)
+	annotate!(3.2, -1.0, ("z1", 12, :green))
+	annotate!(1.9, -0.4, ("|z1|", 12, :green))
+	annotate!(1.0,  2.2, ("z2", 12, :blue))
+	annotate!(0.4,  1.5, ("|z2|", 12, :blue))
+	annotate!(-.4, -1.6, ("z1/z2=z3", 12, :red))
+	annotate!(-1.0, -.7, ("|z1|/|z2|=|z3|", 12, :red))
+	annotate!(2.9, -0.4, ("ϕ1", 12, :green))
+	annotate!(1.7,  1.0, ("ϕ2", 12, :blue))
+	annotate!(1.6, -1.1, ("ϕ3=ϕ1-ϕ2", 12, :red))
 end # let
 
 # ╔═╡ f799d74f-5629-4171-86f1-d1ef772a617b
 md"
-###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction)
+###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 ###### in *polar* coordinates
 
 $$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
@@ -460,8 +530,8 @@ $$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \ma
 # ╔═╡ 0c54eddf-4cd1-4428-9d01-77742cc46796
 function divComplex(z1, z2)
 	makeZRectFromMagAng(
-		magnitudeFromRectZ(z1) / magnitudeFromRectZ(z2),
-		angleFromRectZ(z1) - angleFromRectZ(z2))
+		magnitudeOfZRect(z1) / magnitudeOfZRect(z2),
+		angleOfZRect(z1) - angleOfZRect(z2))
 end # function divComplex
 
 # ╔═╡ e86b123d-5658-4caa-9826-f400beda75ef
@@ -497,7 +567,6 @@ z = 2 + 1im
 
 # ╔═╡ b818345b-d79b-41a4-8b6c-1e88248a2089
 let
-	title = "Complex addition as vector addition in C"
 	xlim  = (-1.5, 4.5); ylim = (-1.5, 1.5)
 	ϕ = atan(1/2)
 	radius = 1.0
@@ -506,7 +575,7 @@ let
 	z2 = real(z)/r + -2*imag(z)/r*im
 	z3 = z1 + z2
 	circleArray = Plots.partialcircle(0, 2π, 240, radius)
-	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
 	plot!([(0, 0),   (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
 	plot!([(0, 0),   (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
 	plot!([(0,-1.3), (0, 1.5)], linestyle=:dash, linecolor=:black, linewidth=1)
@@ -514,14 +583,13 @@ let
 	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
 	plot!([z2, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
-	annotate!(2.2, 1.05, "z1", :green)
-	annotate!(1.0,-1.0,  "z2", :blue)
-	annotate!(3.6, 0.12, "z3=z1+z2", :red)
+	annotate!(2.2, 1.05, ("z1", 12, :green))
+	annotate!(1.0,-1.0,  ("z2", 12, :blue))
+	annotate!(3.5, 0.12, ("z3=z1+z2", 12, :red))
 end # let
 
 # ╔═╡ d1666436-a476-4ef1-a0e9-b9ad44300a09
 let
-	title = "Complex subtraction as vector subtraction in C"
 	xlim  = (-1.5, 4.5); ylim = (-1.5, 2.5)
 	ϕ = atan(1/2)
 	radius = 1.0
@@ -530,7 +598,7 @@ let
 	z2 = real(z)/r + -2*imag(z)/r*im
 	z3 = z1 - z2
 	circleArray = Plots.partialcircle(0, 2π, 240, radius)
-	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, title=title, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
+	plot([(0, 0), (real(z1), imag(z1))], line=:arrow, linecolor=:green, linewidth=4, xlim=xlim, ylim=ylim, legend=false, aspect_ratio=:equal)
 	plot!([(0, 0),  (real(z2), imag(z2))], line=:arrow, linecolor=:blue, linewidth=4)
 	plot!([(0, 0),  (-real(z2), -imag(z2))], line=:arrow, linecolor=:lightblue, linewidth=4)
 	plot!([(0, 0),   (real(z3), imag(z3))], line=:arrow, linecolor=:red, linewidth=4)
@@ -539,10 +607,10 @@ let
 	plot!([(-1.3, 0),(3, 0)], linestyle=:dash, linecolor=:black, linewidth=1)
 	plot!([-z2, z3], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
-	annotate!(2.2, 1.05, "z1")
-	annotate!(1.0,-1.0,  "z2")
-	annotate!(-1.0, 1.1,  "-z2")
-	annotate!(2.0, 2.0, "z3=z1-z2=z3+(-z2)")
+	annotate!( 2.2, 1.05, ("z1", 12, :green))
+	annotate!( 1.0, -1.0, ("z2", 12, :blue))
+	annotate!(-1.0, 1.1,  ("-z2", 12, :blue))
+	annotate!( 2.2, 2.0,  ("z3=z1-z2=z3+(-z2)", 12, :red))
 end # let
 
 # ╔═╡ 69628aaf-2678-45ea-a142-64dd22b8b378
@@ -1687,6 +1755,8 @@ version = "1.4.1+0"
 # ╟─afd5a931-b8ad-46f8-b0f2-894d59d53959
 # ╟─e791db57-a399-47fe-ac45-f4a61c493473
 # ╟─262fb6be-d103-4407-b30b-ff5293ce2bea
+# ╟─6d2eea9e-fd56-43c6-95a7-3d565dd0836a
+# ╟─1e2aa2f3-81a8-4252-be4f-aa575918a67b
 # ╟─4dc1459c-070f-4970-9e67-c9facdc15cef
 # ╠═82578c79-a6f3-4374-8ee2-aa8a585f4b4a
 # ╠═8a06336c-044c-4091-b7ae-f4ea60b97afa
@@ -1696,9 +1766,9 @@ version = "1.4.1+0"
 # ╠═43b5159b-40b1-41fb-8547-a889b8e9e729
 # ╠═5a5a7926-7733-40cd-8ab9-583a15e534ba
 # ╠═04532459-8d67-4ea2-9b32-f010e3100932
-# ╟─6d2eea9e-fd56-43c6-95a7-3d565dd0836a
-# ╟─1e2aa2f3-81a8-4252-be4f-aa575918a67b
+# ╠═7cde6bad-2ff7-4fec-bed6-b5d00adfb0ba
 # ╟─c02043ce-730e-42e1-ae7d-96963bdb4a75
+# ╟─ad27ac18-e0f8-4b63-942d-e5a24efbd168
 # ╠═ace9faf1-33cf-4086-b6aa-9b1fad9ddd82
 # ╠═0bb28e73-6374-4b59-8070-d6964a53c20c
 # ╠═6f3732d7-f9e6-4c6b-8a18-47e128337531
@@ -1713,18 +1783,25 @@ version = "1.4.1+0"
 # ╠═60dead94-fe17-412a-8574-e7ba010090ca
 # ╠═93dc4413-e5f8-4df8-9798-f1189962e4e7
 # ╟─74fd815e-34fa-4f89-aa06-d19ed3ca382f
+# ╟─64035b6c-2596-4977-bafb-96b2a0a0d90b
 # ╟─b818345b-d79b-41a4-8b6c-1e88248a2089
+# ╟─ff97e2e0-d581-470d-bdfb-92c4822e7970
 # ╟─27d313ff-84f8-44bb-ae90-9e71fed9d106
 # ╠═43a53b2a-0a0d-41a5-8e7c-b3106d999272
 # ╠═37766cb9-6453-47a5-b127-a87fb100f868
+# ╟─f4ee47dc-6059-4980-86a5-15b122b56751
 # ╟─d1666436-a476-4ef1-a0e9-b9ad44300a09
+# ╟─4db3fda8-63e9-48ab-ba9d-431f2ac7e061
 # ╟─c635a131-54c0-4530-9735-07fc558240fb
 # ╠═6c151933-886d-4774-a380-1ba185a1070d
 # ╠═e3cb6006-4bf0-497c-8420-55637737a981
+# ╟─ceed4c01-d4ca-47a7-add3-b14c775d95d8
 # ╟─46f29c21-f7c6-416f-8915-a957abf74186
+# ╟─36cf2a48-6f57-4a78-a55d-cab8199eba97
 # ╟─a064adda-624f-4dd6-9521-1dcfb2840189
 # ╠═f179ef07-e391-4894-a5f2-6cef7659e592
 # ╠═25151974-8b0b-4e33-ac6c-927e695789d0
+# ╟─1fb809a4-7218-41c3-a54d-b524ab8192f9
 # ╟─72e9c6eb-6404-4fc8-bafa-996d335734fe
 # ╟─f799d74f-5629-4171-86f1-d1ef772a617b
 # ╠═0c54eddf-4cd1-4428-9d01-77742cc46796
