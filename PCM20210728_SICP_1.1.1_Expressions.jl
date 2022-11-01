@@ -20,7 +20,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia/Pluto.jl-code (1.8.2/19.14) by PCM *** 2022/10/31 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/01 ***
 
 ====================================================================================
 "
@@ -106,11 +106,11 @@ md"
 
 # ╔═╡ f715a83a-3f72-4687-b46f-ad923f24d028
 let
-	function plotTree!(markLeftLeaf, markRightLeaf, markRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2) 
+	function plotBinaryTree!(markLeftLeaf, markRightLeaf, markRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2) 
 		annotate!(
 			(coordinateXOfRootMark-widthOfTree/2, 
 			 coordinateYOfRootMark+heightOfTree, 
-			 text(markLeftLeaf, 8, :black))) # mark of left vertical arm '|'
+			 text(markLeftLeaf, 9, :blue))) # mark of left vertical arm '|'
 		plot!([
 			(coordinateXOfRootMark-widthOfTree/2,   
 			coordinateYOfRootMark + heightOfTree-heightOfTree/8),  
@@ -119,7 +119,7 @@ let
 		annotate!(
 			(coordinateXOfRootMark+widthOfTree/2, 
 			coordinateYOfRootMark+heightOfTree, 
-			text(markRightLeaf, 8, :black))) # mark of right vertical arm '|'
+			text(markRightLeaf, 9, :blue))) # mark of right vertical arm '|'
 		plot!([
 			(coordinateXOfRootMark+widthOfTree/2, 
 			coordinateYOfRootMark+heightOfTree-heightOfTree/8), 
@@ -134,26 +134,29 @@ let
 			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/8)], 
 			lw=1, linecolor=:black) #  middle vertical arm '|'
 		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markRoot, 8, :black))) # mark of root '*'
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markRoot, 9, :blue))) # mark of root '*'
 	end # function plotTree!
 	#---------------------------------------------------
 	plot(xlim=(-1, 10), ylim=(0, 11), legend=:false, ticks=:none)
-	plotTree!( "2", "4", "*", 1.5,  8.0)
-	plotTree!( "3", "5", "+", 4.0,  8.0)
-	plotTree!( "*", "+", "+", 2.75, 6.0; widthOfTree=2.5)
-	plotTree!("10", "7", "-", 7.0,  6.0; widthOfTree=2.5)
-	plotTree!( "3", "+", "*", 1.5,  4.0; widthOfTree=2.5)
-	plotTree!( "-", "6", "+", 8.25, 4.0; widthOfTree=2.5)
-	plotTree!( "*", "+", "+", 4.86, 2.0; widthOfTree=6.75)
-
+	plotBinaryTree!( "2", "4", "*", 1.5,  8.0)
+	plotBinaryTree!( "3", "5", "+", 4.0,  8.0)
+	plotBinaryTree!( "*", "+", "+", 2.75, 6.0; widthOfTree=2.5)
+	plotBinaryTree!("10", "7", "--", 7.0,  6.0; widthOfTree=2.5)
+	plotBinaryTree!( "3", "+", "*", 1.5,  4.0; widthOfTree=2.5)
+	plotBinaryTree!( "-", "6", "+", 8.25, 4.0; widthOfTree=2.5)
+	plotBinaryTree!( "*", "+", "+", 4.86, 2.0; widthOfTree=6.75)
 end # let
 
 # ╔═╡ 3a917540-fd34-4e43-bf36-8837143d7cab
 md"
-###### Fig. 1.1.1.1: Kantorovic tree of
+###### Fig. 1.1.1.1: Kantorovic tree (Bauer & Wössner, 1981, p.21) of
 
-- *prefix*-expression $$+( *(3, +( *( 2, 4), +(3, 5))), +( -(10, 7), 6))$$
-- *infix*-expression $$(((2*4)+(3+5))*3)+((10-7)+6)$$
+- *prefix*-expression (from root to leaves): 
+$$+( *(3, +( *( 2, 4), +(3, 5))), +( -(10, 7), 6))$$
+- *infix*-expression (from leaf to root to leaf):
+$$(((2*4)+(3+5))*3)+((10-7)+6)$$
+- *postfix*-expression (from leaves to root):
+$$((3,((2,4)*,(3, 5)+)+)*,((10,7)-,6)+)+$$
 
 ---
 "
@@ -1197,7 +1200,7 @@ version = "1.4.1+0"
 # ╟─28c845bc-97e8-4914-837a-3cd1788d57b9
 # ╠═6493f14f-3e8a-46e4-b693-1209dde05d1a
 # ╟─54a5e954-9b50-49ca-8ef7-a296acf44220
-# ╠═f715a83a-3f72-4687-b46f-ad923f24d028
+# ╟─f715a83a-3f72-4687-b46f-ad923f24d028
 # ╟─3a917540-fd34-4e43-bf36-8837143d7cab
 # ╟─94c2b564-232c-4bc6-8c8f-d6d114d8b34c
 # ╠═6f670e03-3644-4ab8-8aeb-3ada7ccb6584
