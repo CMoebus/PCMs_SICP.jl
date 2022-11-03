@@ -14,7 +14,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.8\_Procedures\_as\_BlackBox\_Abstractions
 
- ###### Julia/pluto (1.8.2/0.19.14) code by PCM *** 2022/11/02 ***
+ ###### Julia/pluto (1.8.2/0.19.14) code by PCM *** 2022/11/03 ***
 ====================================================================================
 "
 
@@ -118,9 +118,6 @@ md"
 ###### 1st (default) *untyped* method of function 'sqrt'
 "
 
-# ╔═╡ 1789e69a-0688-4eb5-b316-0d1377c7a1f3
-sqrt(x) = sqrt_iter(1.0, x)
-
 # ╔═╡ a07e17ab-c15c-4928-a359-cc8fe507b49e
 square(x) = *(x, x)
 
@@ -142,6 +139,9 @@ function sqrtIter(guess, x)
 	else sqrtIter(improve(guess, x), x)
 	end # if
 end # function sqrtIter
+
+# ╔═╡ 1789e69a-0688-4eb5-b316-0d1377c7a1f3
+sqrt(x) = sqrtIter(1.0, x)
 
 # ╔═╡ 0fab7f8c-c6c9-41cd-9c1c-e671375c03d8
 md"
@@ -230,75 +230,74 @@ md"
 ###### ... with *infix* operators, abstract type AbstractFloat, *self-defined* type FloatOrInteger, 'while' instead of *tail-recursive* sqrt_iter
 "
 
-# ╔═╡ b0a9e50b-cf97-4715-a94e-beeae3260ea1
+# ╔═╡ 17337326-ea9c-4047-9ebd-44fd95a4e232
 let
+	yMax = 11
 	#------------------------------------------------------------------------------
-	function plotUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9)
-		plot!([
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/8), 
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree-heightOfTree/8)], 
-			lw=1, linecolor=:black) #  middle vertical arm '|'
+	function plotInvUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9)
+		plot!([                                          #  middle vertical arm '|'
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8),  # root
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree+heightOfTree/8)],                                  # leaf 
+			lw=1, linecolor=:black)                      
 		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree, text(markOfLeaf, fontSize, :blue))) # mark of leaf 'x'
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree, text(markOfLeaf, fontSize, :blue)))                  # mark of leaf 'x'
 		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue)))                                             # mark of root 'x'
 	end # function plotUnaryTree!
 	#------------------------------------------------------------------------------
-	function plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=9) 
+	function plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=9) 
 		annotate!(
 			(coordinateXOfRootMark-widthOfTree/2, 
-			 coordinateYOfRootMark+heightOfTree, 
-			 text(markOfLeftLeaf, fontSize, :blue))) # mark of left vertical arm '|'
-		plot!([
+			 coordinateYOfRootMark-heightOfTree, 
+			 text(markOfLeftLeaf, fontSize, :blue)))         # mark of left leaf 'x'
+		plot!([                                        #  plot left vertical arm '|'
 			(coordinateXOfRootMark-widthOfTree/2,   
-			coordinateYOfRootMark + heightOfTree-heightOfTree/8),  
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
-			lw=1, linecolor=:black) #  left vertical arm '|'
+			coordinateYOfRootMark-heightOfTree+heightOfTree/8),  
+			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
+			lw=1, linecolor=:black)                   
 		annotate!(
 			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark+heightOfTree, 
-			text(markOfRightLeaf, fontSize, :blue))) # mark of right vertical arm '|'
-		plot!([
+			coordinateYOfRootMark-heightOfTree, 
+			text(markOfRightLeaf, fontSize, :blue)))        # mark of right leaf 'x'
+		plot!([                                       #  plot right vertical arm '|'
 			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark+heightOfTree-heightOfTree/8), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
-			lw=1, linecolor=:black) #  right vertical arm '|'
-		plot!([
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark+heightOfTree/2), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
-			lw=1, linecolor=:black) #  horizontal bar '-'
-		plot!([
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/2), 
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/8)], 
-			lw=1, linecolor=:black) #  middle vertical arm '|'
+			coordinateYOfRootMark-heightOfTree+heightOfTree/8), 
+			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
+			lw=1, linecolor=:black)                   
+		plot!([                                           #  plot horizontal bar '-'
+			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2), 
+			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
+			lw=1, linecolor=:black)          
+		plot!([                                           #  middle vertical arm '|'
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/2), 
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8)], 
+			lw=1, linecolor=:black) 
 		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue)))                                        # mark of root leaf 'x'
 	end # function plotBinaryTree!
 	#------------------------------------------------------------------------------
-	function plotTernaryTree!(markOfLeftLeaf, markOfMiddleLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=3.0,
+	function plotInvTernaryTree!(markOfLeftLeaf, markOfMiddleLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=3.0,
 	heightOfTree=2, fontSize=9)
 		#---------------------------------------------------------
-		plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize)
+		plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize)
 		#---------------------------------------------------------
-		plotUnaryTree!(markOfMiddleLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=heightOfTree, fontSize=fontSize)
+		plotInvUnaryTree!(markOfMiddleLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=heightOfTree, fontSize=fontSize)
 	end # function plotTernaryTree!
 	#------------------------------------------------------------------------------
-	function plotQuaternyTree!(markOfLeftMostLeaf, markOfLeftLeaf, markOfRightLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=4.0, heightOfTree=2, fontSize=9)
+	function plotInvQuaternyTree!(markOfLeftMostLeaf, markOfLeftLeaf, markOfRightLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=4.0, heightOfTree=2, fontSize=9)
 		#---------------------------------------------------------
-		plotBinaryTree!(markOfLeftMostLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize)
+		plotInvBinaryTree!(markOfLeftMostLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize)
 		#---------------------------------------------------------
-		plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree/3, heightOfTree=heightOfTree, fontSize=fontSize)
+		plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree/3, heightOfTree=heightOfTree, fontSize=fontSize)
 	end # function plotQuaternyTree!
 	#------------------------------------------------------------------------------
-	plot(xlim=(-1.5, 18.0), ylim=(0, 11), legend=:false, ticks=:none)
-	plotTernaryTree!("Int64", "Int32", "Int16", "Signed", 5.25, 8.0; fontSize=8)
-	plotTernaryTree!("", "Bool", "Unsigned", "Integer", 6.7, 6.0; fontSize=8)
-	plotTernaryTree!("Float64", "Float32", "Float16", "AbstractFloat", 2.0, 6.0; widthOfTree=3.2, fontSize=8)
-    plotQuaternyTree!("", "", "Rational", "AbstractIrrational", "Real", 9.0, 4.0; 		widthOfTree=14.0, fontSize=8)
-	plotUnaryTree!("Irrational", "", 16.0, 6.0)
-	plotBinaryTree!("Complex", "Real", "Number", 4.5, 2.0; widthOfTree=9.0, fontSize=8)
-
-	#-------------------------------------------------------------------------
+	plot(xlim=(-1.5, 18.0), ylim=(0, yMax), legend=:false, ticks=:none)
+	plotInvUnaryTree!("Irrational", "AbstractIrrational", 16.0, yMax-6.0; fontSize=8)
+	plotInvTernaryTree!("Int64", "Int32", "Int16", "Signed", 5.25, yMax-8.0; fontSize=8)
+	plotInvBinaryTree!("Complex", "Real", "Number", 4.5, yMax-2.0; widthOfTree=9.0, fontSize=8)
+	plotInvTernaryTree!("", "Bool", "Unsigned", "Integer", 6.7, yMax-6.0; fontSize=8)
+	plotInvTernaryTree!("Float64", "Float32", "Float16", "AbstractFloat", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8)
+    plotInvQuaternyTree!("", "", "Rational", "AbstractIrrational", "Real", 9.0, 		yMax-4.0; widthOfTree=14.0, fontSize=8)
 	#------------------------------------------------------------------------------
 end # let
 
@@ -1433,7 +1432,7 @@ version = "1.4.1+0"
 # ╠═b06503ac-ae1e-455c-93d2-1304cff81720
 # ╠═0f5e87c1-3aa9-404a-b3e9-16104a64748c
 # ╟─e19e7261-4b1f-468f-b1b8-630fe9705b50
-# ╟─b0a9e50b-cf97-4715-a94e-beeae3260ea1
+# ╟─17337326-ea9c-4047-9ebd-44fd95a4e232
 # ╟─3dcd5d03-1e20-4d02-aeb8-ee7b96900871
 # ╠═c92b65b4-2fbe-4b50-8fa5-e91f4dc2ec40
 # ╟─81990868-f302-426d-8822-d38e052db1ca
