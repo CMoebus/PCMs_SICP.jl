@@ -20,7 +20,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.1_Expressions.jl
 
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/01 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/04 ***
 
 ====================================================================================
 "
@@ -106,11 +106,11 @@ md"
 
 # ╔═╡ f715a83a-3f72-4687-b46f-ad923f24d028
 let
-	function plotBinaryTree!(markLeftLeaf, markRightLeaf, markRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2) 
+	function plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=9) 
 		annotate!(
 			(coordinateXOfRootMark-widthOfTree/2, 
 			 coordinateYOfRootMark+heightOfTree, 
-			 text(markLeftLeaf, 9, :blue))) # mark of left vertical arm '|'
+			 text(markOfLeftLeaf, fontSize, :blue))) # mark of left vertical arm 'x'
 		plot!([
 			(coordinateXOfRootMark-widthOfTree/2,   
 			coordinateYOfRootMark + heightOfTree-heightOfTree/8),  
@@ -119,7 +119,7 @@ let
 		annotate!(
 			(coordinateXOfRootMark+widthOfTree/2, 
 			coordinateYOfRootMark+heightOfTree, 
-			text(markRightLeaf, 9, :blue))) # mark of right vertical arm '|'
+			text(markOfRightLeaf, fontSize, :blue))) # mark of right vertical arm 'x'
 		plot!([
 			(coordinateXOfRootMark+widthOfTree/2, 
 			coordinateYOfRootMark+heightOfTree-heightOfTree/8), 
@@ -134,8 +134,8 @@ let
 			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/8)], 
 			lw=1, linecolor=:black) #  middle vertical arm '|'
 		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markRoot, 9, :blue))) # mark of root '*'
-	end # function plotTree!
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
+	end # function plotBinaryTree!
 	#---------------------------------------------------
 	plot(xlim=(-1, 10), ylim=(0, 11), legend=:false, ticks=:none)
 	plotBinaryTree!( "2", "4", "*", 1.5,  8.0)
