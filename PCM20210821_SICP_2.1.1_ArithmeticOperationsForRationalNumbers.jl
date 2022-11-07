@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/05 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/07 ***
 ======================================================================================
 "
 
@@ -102,24 +102,26 @@ md"
 ###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ are implemented here as Julia-*tuples* with *named* fields
 "
 
-# ╔═╡ a27e5207-ffb7-4f91-ba46-2006be39fd81
+# ╔═╡ d2d4dd60-f2e4-421c-80cd-63fb61faf31c
 md"
----
-    ------------------------------------------------------------------------------
-      Abstract                                                            level 2
-     Operators       add_rat   sub_rat   mul_rat   div_rat   equal_rat     Domain
-    ------------------------------------------------------------------------------ 
-     Constructor /                           make_rat                     level 1  
-     Selectors                         numer          denom  
-    ------------------------------------------------------------------------------
-     Constructor /                             cons                       level 0
-     Selectors                           car            cdr          Scheme-level
-    ------------------------------------------------------------------------------
-     Constructor /             consCell = (car = ... , cdr = ...)        level -1
-     Selectors                    consCell.car    consCell.cdr        Julia-level
-    ------------------------------------------------------------------------------
+$$\begin {array}{c|c|c}
+\hline
+\text{ Abstract} &                                               & \text{level 2}   \\
+\text{Operators} & add\_rat, sub\_rat, mul\_rat,div\_rat,equal\_rat & \text{Domain} \\
+\hline
+\text{Constructor/} &                make\_rat                   & \text{level 1}   \\
+\text{Selectors}    &              numer, denom                  &                  \\
+\hline
+\text{Constructor/} &                  cons                      & \text{level 0}   \\
+\text{Selectors}    &                car, cdr         & \textit{Scheme}\text{-like} \\
+\hline
+\text{Constructor/} &    consCell = (car = ... , cdr = ...)      & \text{level -1}  \\
+\text{Selectors}    &        consCell.car, consCell.cdr          & \textit{Julia}   \\
+\hline
+\end {array}$$
 
-    Fig. 2.1.1.1: First Default Abstraction Hierarchy for Rational Number Algebra
+**Fig. 2.1.1.1**: First Default Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+
 ---
 "
 
@@ -586,26 +588,28 @@ definition of constructor $$cons$$ with constructor $$Pair(<par1>, <par2>)$$ and
 
 "
 
-# ╔═╡ 28c75fb7-1c58-46d0-90bc-534791c4693b
+# ╔═╡ 20fa866b-a9d2-4446-a57a-c01fe145aaac
 md"
+$$\begin {array}{c|c|c}
+\hline
+\text{ Abstract} &                                               & \text{level 2}   \\
+\text{Operators}&add\_rat2,sub\_rat2,mul\_rat2,div\_rat2,equal\_rat2& \text{Domain} \\
+\hline
+\text{Constructor/} &                make\_rat2                  & \text{level 1}   \\
+\text{Selectors}    &              numer2, denom2                &                  \\
+\hline
+\text{Constructor/} &                  cons2                     & \text{level 0}   \\
+\text{Selectors}    &                car2, cdr2       & \textit{Scheme}\text{-like} \\
+\hline
+\text{Constructor/} &    consCell = Pair(first:...,second:...)   & \text{level -1}  \\
+\text{Selectors}    &      consCell.first, consCell.second       & \textit{Julia}   \\
+\hline
+\end {array}$$
+
+**Fig. 2.1.1.5**: Second Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+
 ---
 
-    ------------------------------------------------------------------------------
-      Abstract                                                            level 2
-     Operators      add_rat2  sub_rat2  mul_rat2  div_rat2   equal_rat2    Domain
-    ------------------------------------------------------------------------------ 
-     Constructor /                          make_rat2                     level 1  
-     Selectors                        numer2         denom2  
-    ------------------------------------------------------------------------------
-     Constructor /                            cons2                       level 0
-     Selectors                         car2           cdr2            Scheme-like
-    ------------------------------------------------------------------------------
-     Constructor /         consCell = Pair(first: ... , second: ...)     level -1
-     Selectors                 consCell.first     consCell.second           Julia
-    ------------------------------------------------------------------------------
-
-     Fig. 2.1.1.5: Second Abstraction Hierarchy for Rational Number Algebra
----
 "
 
 # ╔═╡ 0ffbaeab-9ff4-484b-95df-3b6aab526e0d
@@ -781,26 +785,28 @@ md"
 definition of constructor $$cons$$ with constructor $$//$$ and fields $$numerator$$ and $$denominator$$
 "
 
-# ╔═╡ c47d0173-9fd4-4926-b426-42ff0f854c16
+# ╔═╡ 61794b44-f955-4486-8b1e-863dca1082c2
 md"
+$$\begin {array}{c|c|c}
+\hline
+\text{ Abstract} &                                               & \text{level 2}   \\
+\text{Operators}&add\_rat3,sub\_rat3,mul\_rat3,div\_rat3,equal\_rat3& \text{Domain} \\
+\hline
+\text{Constructor/} &                make\_rat3                  & \text{level 1}   \\
+\text{Selectors}    &              numer3, denom3                &                  \\
+\hline
+\text{Constructor/} &                  cons3                     & \text{level 0}   \\
+\text{Selectors}    &                car3, cdr3       & \textit{Scheme}\text{-like} \\
+\hline
+\text{Constructor/} &           consCell = car // cdr            & \text{level -1}  \\
+\text{Selectors}    & numerator(consCell), denominator(consCell) & \textit{Julia}   \\
+\hline
+\end {array}$$
+
+**Fig. 2.1.1.6**: Third Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+
 ---
 
-    ------------------------------------------------------------------------------
-      Abstract                                                            level 2
-     Operators      add_rat3  sub_rat3  mul_rat3  div_rat3   equal_rat3
-    ------------------------------------------------------------------------------ 
-     Constructor /                          make_rat3                     level 1  
-     Selectors                        numer3         denom3  
-    ------------------------------------------------------------------------------
-     Constructor /                            cons3                       level 0
-     Selectors                         car3           cdr3            Scheme-like
-    ------------------------------------------------------------------------------
-     Constructor /              consCell = car // cdr                    level -1
-     Selectors            numerator(consCell)   denominator(consCell)       Julia
-    ------------------------------------------------------------------------------
-
-    Fig. 2.1.1.6: Third Abstraction Hierarchy for Rational Number Algebra
----
 "
 
 # ╔═╡ 47d605b7-ec32-4b72-a329-bf47e7273972
@@ -958,26 +964,28 @@ md"
 ###### ... with type $$Rational$$
 "
 
-# ╔═╡ f1608855-54ca-464f-a48c-43046afa3dc0
+# ╔═╡ e44ece8f-5042-4c0f-a8a2-791622867ad5
 md"
+$$\begin {array}{c|c|c}
+\hline
+\text{ Abstract} &                                               & \text{level 2}   \\
+\text{Operators} &+\;\;\;\;\;\;\; -\;\;\;\;\; *\;\;\;\;\; /\;\;\;\;\;&\text{Domain} \\
+\hline
+\text{Constructor/} &                                            & \text{level 1}   \\
+\text{Selectors}    &                                            &                  \\
+\hline
+\text{Constructor/} &                                            & \text{level 0}   \\
+\text{Selectors}    &                                 & \textit{Scheme}\text{-like} \\
+\hline
+\text{Constructor/} &    consCell = //(numerator, denominator)   & \text{level -1}  \\
+\text{Selectors}    & numerator(consCell), denominator(consCell) & \textit{Julia}   \\
+\hline
+\end {array}$$
+
+**Fig. 2.1.1.7**: Fourth Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+
 ---
 
-    ------------------------------------------------------------------------------
-      Abstract                                                              level 2
-     Operators           +         -        *        /        ==           Domain
-    ------------------------------------------------------------------------------ 
-     Constructor /                                                        level 1  
-     Selectors                       
-    ------------------------------------------------------------------------------
-     Constructor /                                                        level 0
-     Selectors                                                        Scheme-like
-    ------------------------------------------------------------------------------
-     Constructor /           consCell = //(numerator, denominator)       level -1
-     Selectors                    numerator           denominator           Julia
-    ------------------------------------------------------------------------------
-
-    Fig. 2.1.1.7: Fourth Abstraction Hierarchy for Rational Number Algebra
----
 "
 
 # ╔═╡ 6b36e481-d44c-468b-b020-ff7219eb6625
@@ -1069,7 +1077,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "39d0d5866236472d6bc1a58c4e663ea8a2a2e057"
+project_hash = "57f16e3fed8a77522258206aa8caeaf282d2cc57"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -2006,7 +2014,7 @@ version = "1.4.1+0"
 # ╟─f74ced3c-487c-4428-bcfc-cc69e5416227
 # ╠═bc19acb5-0d08-4f7e-abce-c77fca0e8ac9
 # ╟─08ede030-fb83-4337-8c37-f346b1b7ebc0
-# ╟─a27e5207-ffb7-4f91-ba46-2006be39fd81
+# ╟─d2d4dd60-f2e4-421c-80cd-63fb61faf31c
 # ╟─1c6a666d-c388-4ac9-b65f-dcebf9fc082f
 # ╠═3b7faab0-b8e0-4bea-894f-16fd35e5727f
 # ╠═80fdcc6e-3435-4c3a-a73a-b4ecf54ecfb2
@@ -2072,7 +2080,7 @@ version = "1.4.1+0"
 # ╠═afe55885-aba6-4cbc-af2c-23d15bbbf6f5
 # ╟─cc592f32-8785-4735-badd-de3903c20f05
 # ╟─d4c053d6-ba2c-4d88-beef-19873926df88
-# ╟─28c75fb7-1c58-46d0-90bc-534791c4693b
+# ╟─20fa866b-a9d2-4446-a57a-c01fe145aaac
 # ╠═0ffbaeab-9ff4-484b-95df-3b6aab526e0d
 # ╠═1fddd3ae-5da7-4a32-a53e-077b8f37509c
 # ╠═b52a93ce-d551-4c8d-bcdc-2a5d69facdcc
@@ -2112,7 +2120,7 @@ version = "1.4.1+0"
 # ╠═b25d2465-7452-43e8-b709-06009642076a
 # ╟─32927d21-4f21-41ff-b90c-21a9c15a7a26
 # ╟─5f1971c7-f3bb-4dbf-aa42-4218055e1fd0
-# ╟─c47d0173-9fd4-4926-b426-42ff0f854c16
+# ╟─61794b44-f955-4486-8b1e-863dca1082c2
 # ╠═47d605b7-ec32-4b72-a329-bf47e7273972
 # ╠═e6e6754c-d86e-449f-a82e-03e0ab2a91cb
 # ╠═c356aab4-4717-46a7-b041-aa14800a0253
@@ -2141,7 +2149,7 @@ version = "1.4.1+0"
 # ╠═b64b8bc6-9746-4ac9-a0fe-dee60bc854ff
 # ╠═f38f0544-6113-4ed9-af22-d5d205078492
 # ╟─bcf4044f-f932-4a90-87bb-12963a67fc99
-# ╟─f1608855-54ca-464f-a48c-43046afa3dc0
+# ╟─e44ece8f-5042-4c0f-a8a2-791622867ad5
 # ╟─6b36e481-d44c-468b-b020-ff7219eb6625
 # ╠═20014c17-f6b4-4e0d-a3e6-5ff3dc47dab4
 # ╠═4691017a-0d04-4d94-a874-c78625a49c92
