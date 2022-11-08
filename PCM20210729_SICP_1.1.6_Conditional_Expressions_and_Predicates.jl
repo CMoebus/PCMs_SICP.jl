@@ -18,8 +18,13 @@ md"
 # ╔═╡ e8d5627a-1e6a-48a4-ad50-6013870b8890
 md"
 ###### Implication *Lucky Luke* and *me*
-People whisper: *Lucky Luke is the man who shoots faster than his shadow*. After some deep thinking I come up with this implication: *If Lucky Luke shoots faster than his shadows, I can do that the same way.* 
-Further analyses from a physicists viewpoint was done by *Nándor Bokor* (2015) and can be found [*here*](https://iopscience.iop.org/article/10.1088/0031-9120/50/6/733).
+People whisper: *Lucky Luke is the man who shoots faster than his shadow*. 
+
+After some deep thinking I come up with this implication: *If Lucky Luke shoots faster than his shadow, I also can do the very same.* 
+
+This implication is true from two different viewpoints. The *first* is the view of a *psychologist*. (S)he knows that human skill to differentiate two time-sequential events is imperfect. So *both* events in the implication are *false*. Thus the whole implication is *true*.
+
+The *second* viewpoint is that of a *physicist*. From that view *both* events are *true*. The action is always a tiny little moment earlier than the generated shadow on a reflecting wall or other canvas. This is explicated in more detail by [*Nándor Bokor*](https://iopscience.iop.org/article/10.1088/0031-9120/50/6/733)(2015). So this implication is also *true*.
 
 ---
 
@@ -29,16 +34,6 @@ Further analyses from a physicists viewpoint was done by *Nándor Bokor* (2015) 
 md"
 #### 1.1.6.1 SICP-Scheme-like *functional* Julia
 "
-
-# ╔═╡ b649e901-d3bf-4bf0-9ba8-69cd4e6bf550
-md"
-###### *case analysis* for absolute value function $$|x|$$
-"
-
-# ╔═╡ 8287786a-0c31-4d58-83fe-ff4d75513ebe
-md"
-$$|x| = \cases{\;\;\; x \text{ if } x \gt 0 \cr \;\;\; 0  \text{ if } x = 0 \cr -x \text{ if } x < 0}$$
-" 
 
 # ╔═╡ 20a147db-1759-4445-a60b-f75e9374864f
 md"
@@ -58,6 +53,16 @@ $$\begin{array}{ccc}
 ---
 
 "
+
+# ╔═╡ b649e901-d3bf-4bf0-9ba8-69cd4e6bf550
+md"
+###### *case analysis* for absolute value function $$|x|$$
+"
+
+# ╔═╡ 8287786a-0c31-4d58-83fe-ff4d75513ebe
+md"
+$$|x| = \cases{\;\;\; x \text{ if } x \gt 0 \cr \;\;\; 0  \text{ if } x = 0 \cr -x \text{ if } x < 0}$$
+" 
 
 # ╔═╡ 638667fc-0381-47a5-9288-e10b973e10b7
 abs1(x) =  
