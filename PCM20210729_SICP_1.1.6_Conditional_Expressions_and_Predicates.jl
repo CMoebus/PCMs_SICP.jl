@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -11,8 +11,18 @@ md"
 
  ###### file: PCM20210729\_SICP\_1.1.6\_Conditional\_Expressions\_and_Predicates.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/26 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/11/08 ***
 ===================================================================================
+"
+
+# ╔═╡ e8d5627a-1e6a-48a4-ad50-6013870b8890
+md"
+###### Implication *Lucky Luke* and *me*
+People whisper: *Lucky Luke is the man who shoots faster than his shadow*. After some deep thinking I come up with this implication: *If Lucky Luke shoots faster than his shadows, I can do that the same way.* 
+Further analyses from a physicists viewpoint was done by *Nándor Bokor* (2015) and can be found [*here*](https://iopscience.iop.org/article/10.1088/0031-9120/50/6/733).
+
+---
+
 "
 
 # ╔═╡ 33f31484-b07f-4550-a829-37f1d4f7feba
@@ -30,22 +40,23 @@ md"
 $$|x| = \cases{\;\;\; x \text{ if } x \gt 0 \cr \;\;\; 0  \text{ if } x = 0 \cr -x \text{ if } x < 0}$$
 " 
 
-# ╔═╡ 5a186b16-519a-49a0-95e7-4534b929d530
+# ╔═╡ 20a147db-1759-4445-a60b-f75e9374864f
 md"
 ---
 
-
-	(cond (<p_1>) <e_1>)
-
-          (<p_2>) <e_2>)
-	  
-	       ...
-   
-          (<p_n>) <e_n>))
+$$\begin{array}{ccc}
+\hline
+(cond & (<p_1> & <e_1>) \\
+      & (<p_1> & <e_1>) \\
+      & ...    & ...    \\
+      & (<p_n> & <e_n>)) \\
+\hline
+\end{array}$$
 
 **Fig. 1.1.6.1** SICP (Scheme/Lisp) conditional expression with *non-strict* evaluation
 
 ---
+
 "
 
 # ╔═╡ 638667fc-0381-47a5-9288-e10b973e10b7
@@ -301,12 +312,131 @@ $$5 < 2 < 10 := (5 < 2) \land (2 < 10)$$
 # ╔═╡ f7b6234a-1951-4111-9095-418e6a2a4d49
 (5 < 6 < 10) == ((5 < 6) && (6 < 10))
 
+# ╔═╡ c1d0f438-b1d0-44d3-8836-858fcb229935
+md"
+---
+###### Example: Implication
+
+$$\forall x,y: positive:  (x^2 \lt y^2) \Longrightarrow (x \lt y)$$
+
+This implication is proven for *positive* $$x,y$$ in Arens et al. (2018, p.29) in a tutorial style in three alternative ways (*direct, indirect*, and *contradiction*).
+This statement is even true for *nonpositive* $$x, y$$
+
+$$\forall x,y: x < y:  (x^2 \lt y^2) \Longrightarrow (x \lt y)$$
+"
+
+# ╔═╡ 91d1967b-5fc1-42db-83f2-65858a04f748
+let
+	x = 0; y = 1
+	#--------------
+	if x^2 < y^2
+		#----------
+		if x < y
+			true
+		else
+			false 
+		end # if
+		#----------
+	else
+		true
+	end # if
+	#--------------
+end # let
+
+# ╔═╡ f6bb9860-73c8-4d45-9eb9-76bbf9e4674e
+let
+	x = 0; y = 1
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
+# ╔═╡ dbc6f577-b2d1-4396-af18-e5066af805d1
+let # is 'false' because x^2 < y^2 and not(x < y)
+	x = 0; y = -1
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
+# ╔═╡ 5a755ee8-4dde-42d0-af88-1d8ae231a887
+let # is 'true' because not(x^2 < y^2)
+	x = -1; y = 0
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
+# ╔═╡ 18a5a84c-c07f-487b-a671-bb7daf4f0ce3
+let # 'false' because x^2 < y^2 and not(x < y)
+	x = -2; y = -3
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
+# ╔═╡ 49272f94-62e9-4e91-8397-bc328b63f63d
+let # is 'true' because not(x^2 < y^2)
+	x = 3; y = 3
+	#--------------
+	if x^2 < y^2
+		#----------
+		if x < y
+			true
+		else
+			false 
+		end # if
+		#----------
+	else
+		true
+	end # if
+	#--------------
+end # let
+
+# ╔═╡ 49c8f3c1-a043-44c3-9c01-b26c9a1e7f24
+let # is 'true' because not(x^2 < y^2)
+	x = 3; y = 3
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
+# ╔═╡ 4d30686d-0dc1-4d62-aa8a-1409587f2654
+let # is 'true' because not(x^2 < y^2)
+	x = 3; y = 2
+	#--------------
+	if x^2 < y^2
+		#----------
+		if x < y
+			true
+		else
+			false 
+		end # if
+		#----------
+	else
+		true
+	end # if
+	#--------------
+end # let
+
+# ╔═╡ 706a89f9-2c14-4b54-819e-2d009e777507
+let # is 'true' because not(x^2 < y^2)
+	x = 3; y = 2
+	#------------------------------------------
+	x^2 < y^2 ? (x < y ? true : false) : true
+	#------------------------------------------
+end # let
+
 # ╔═╡ 9a5d6d10-27d7-4cac-a950-6e5668955067
 md"
 ---
 ##### References
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/23 
+
+- **Arens, T., Hettlich, F., Karpfinger, Chr., Kockelkorn, U., Lichtenegger, K., & Stachel, H.,** Mathematik, 4/e, Heidelberg, Springer Spektrum, [https://doi.org/10.1007/978-3-662-56741-8](https://doi.org/10.1007/978-3-662-56741-8)
+
+- **Nándor Bokor**, 2015 Phys. Educ. 50 733, online [*here*](https://iopscience.iop.org/article/10.1088/0031-9120/50/6/733); last visit 2022/11/08
 "
 
 # ╔═╡ e89faf5f-04a8-44c3-a941-381d41782d40
@@ -329,7 +459,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.0"
+julia_version = "1.8.2"
 manifest_format = "2.0"
 project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
@@ -338,10 +468,11 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 # ╔═╡ Cell order:
 # ╟─4ba04c25-a29b-4bf0-be10-be3f20279f28
+# ╟─e8d5627a-1e6a-48a4-ad50-6013870b8890
 # ╟─33f31484-b07f-4550-a829-37f1d4f7feba
+# ╟─20a147db-1759-4445-a60b-f75e9374864f
 # ╟─b649e901-d3bf-4bf0-9ba8-69cd4e6bf550
 # ╟─8287786a-0c31-4d58-83fe-ff4d75513ebe
-# ╟─5a186b16-519a-49a0-95e7-4534b929d530
 # ╠═638667fc-0381-47a5-9288-e10b973e10b7
 # ╠═c0df9843-2a0c-4c00-a3ee-78a153bde39f
 # ╠═93ac3435-1b97-4a36-8868-69a40e6bfe67
@@ -414,6 +545,16 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═be1bb1e0-52f5-4158-9625-aa9f900b3d02
 # ╠═faeff098-044b-49bc-85a3-c0c655de80a6
 # ╠═f7b6234a-1951-4111-9095-418e6a2a4d49
+# ╟─c1d0f438-b1d0-44d3-8836-858fcb229935
+# ╠═91d1967b-5fc1-42db-83f2-65858a04f748
+# ╠═f6bb9860-73c8-4d45-9eb9-76bbf9e4674e
+# ╠═dbc6f577-b2d1-4396-af18-e5066af805d1
+# ╠═5a755ee8-4dde-42d0-af88-1d8ae231a887
+# ╠═18a5a84c-c07f-487b-a671-bb7daf4f0ce3
+# ╠═49272f94-62e9-4e91-8397-bc328b63f63d
+# ╠═49c8f3c1-a043-44c3-9c01-b26c9a1e7f24
+# ╠═4d30686d-0dc1-4d62-aa8a-1409587f2654
+# ╠═706a89f9-2c14-4b54-819e-2d009e777507
 # ╟─9a5d6d10-27d7-4cac-a950-6e5668955067
 # ╟─e89faf5f-04a8-44c3-a941-381d41782d40
 # ╟─00000000-0000-0000-0000-000000000001
