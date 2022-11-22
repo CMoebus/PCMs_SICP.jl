@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/10/27 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/22 ***
 
 =====================================================================================
 
@@ -166,14 +166,15 @@ layer         & \text{Operations or Functions}                 \\
               &                                                \\
 \hline                                                         \\
 top           & \text{representation independent}              \\
-              &                                                \\
+              & \text{------------------------------------}    \\
 (domain)      & addComplex                                     \\
               & subComplex                                     \\
               & mulComplex                                     \\
               & divComplex                                     \\
 \hline                                                         \\
 middle        & \text{representation dependent}                \\
-(interface)   & \begin{array}{cc}                              \\
+(interface)   & \text{------------------------------------}    \\
+              & \begin{array}{cc}                              \\
               & realPartOfZRect       & realPartOfZPolar       \\      
               & imagPartOfZRect       & imagPartOfZPolar       \\
               & magnitudeOfZRect      & magnitudeOfZPolar      \\
@@ -521,6 +522,16 @@ end # let
 # ╔═╡ f799d74f-5629-4171-86f1-d1ef772a617b
 md"
 ###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
+###### in *rectangular* coordinates
+
+
+[Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
+The formula can be found [here](https://www.cuemath.com/numbers/division-of-complex-numbers/).
+
+$$\frac{x_1 + y_1i}{x_2 + y_2i} = \frac{x_1 + y_1i}{x_2 + y_2i} \times \frac{x_2 - y_2i}{x_2 - y_2i}=\frac{(x_1 + y_1i)(x_2 - y_2i)}{(x_2 + y_2i)(x_2 - y_2i)}$$
+
+$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2}.$$
+
 ###### in *polar* coordinates
 
 $$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
@@ -757,9 +768,23 @@ let
 	z3 = z1 * z2
 end # let
 
-# ╔═╡ 63181711-0741-40ce-9ac7-0f8053b77254
+# ╔═╡ 85a7d6ba-609c-4c72-83cf-652a74f358b2
 md"
-###### Division in $$\mathbb C$$
+---
+###### *Division* in $$\mathbb C$$
+[Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
+The formula can be found [here](https://www.cuemath.com/numbers/division-of-complex-numbers/).
+
+$$\frac{x_1 + y_1i}{x_2 + y_2i} = \frac{x_1 + y_1i}{x_2 + y_2i} \times \frac{x_2 - y_2i}{x_2 - y_2i}=\frac{(x_1 + y_1i)(x_2 - y_2i)}{(x_2 + y_2i)(x_2 - y_2i)}$$
+
+$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2}.$$
+
+Example:
+
+$$\frac{3-1i}{1+2i}=\frac{3-1i}{1+2i}\times\frac{1-2i}{1-2i}=\frac{(3-1i)(1-2i)}{(1+2i)(1-2i)}$$
+
+$$= \frac{(3\cdot1-1\cdot2)+(1\cdot-1-3\cdot2)i}{1^2+2^2}$$
+$$=\frac{1-7i}{5}=\frac{1}{5}-\frac{7}{5}i=0.2-1.4i.$$
 "
 
 # ╔═╡ 6c3a4af2-841c-4318-a4ff-9d3118bb26fd
@@ -1844,7 +1869,7 @@ version = "1.4.1+0"
 # ╠═8ef6ff4c-d780-4909-93f3-9fb88f89aefb
 # ╟─13fba1b1-ff87-41fe-bf30-b11ae89c072c
 # ╠═21b3eb3f-023d-465e-937c-712272b5ec56
-# ╟─63181711-0741-40ce-9ac7-0f8053b77254
+# ╟─85a7d6ba-609c-4c72-83cf-652a74f358b2
 # ╠═6c3a4af2-841c-4318-a4ff-9d3118bb26fd
 # ╟─c898ef69-ff89-4846-88ed-c39245c62256
 # ╟─b0270d5f-d6b0-4a05-80f7-0b8d86ecdf84
