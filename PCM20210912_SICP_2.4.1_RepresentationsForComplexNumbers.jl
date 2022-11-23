@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/22 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/23 ***
 
 =====================================================================================
 
@@ -552,6 +552,21 @@ let
 	z3 = divComplex(z1, z2)
 end # let
 
+# ╔═╡ a4a8db4c-f63f-49f5-8ded-753d55a9d8ad
+md"
+---
+###### Inverse of complex number
+$$\frac{1}{x+yi}=\frac{1}{x+yi} \times \frac{x-yi}{x-yi}=\frac{x-yi}{x^2+y^2}$$
+$$=\frac{x}{x^2+y^2}-\frac{yi}{x^2+y^2}.$$
+"
+
+# ╔═╡ 47de4dbc-7f48-42cd-a4ed-0ef524262fd8
+let
+	z1 = makeZRectFromRealImag(1,  0)
+	z2 = makeZRectFromRealImag(1,  2)
+	z3 = divComplex(z1, z2)
+end # let      should be: 0.2 - 0.4i
+
 # ╔═╡ 78c508b3-40e1-45fd-80b3-70174ea7b5b3
 md"
 ---
@@ -763,7 +778,6 @@ md"
 # ╔═╡ 21b3eb3f-023d-465e-937c-712272b5ec56
 let
 	z1 = Complex(2, -1)
-	r1 = abs(z1)
 	z2 = Complex(2, 2)
 	z3 = z1 * z2
 end # let
@@ -790,7 +804,26 @@ $$=\frac{1-7i}{5}=\frac{1}{5}-\frac{7}{5}i=0.2-1.4i.$$
 # ╔═╡ 6c3a4af2-841c-4318-a4ff-9d3118bb26fd
 let
 	z1 = Complex(3, -1)
-	r1 = abs(z1)
+	z2 = Complex(1, 2)
+	z3 = z1 / z2
+end # let
+
+# ╔═╡ cd2c4c81-34fc-4402-a31f-500b944b6ee6
+md"
+---
+###### Inverse of complex number
+$$\frac{1}{x+yi}=\frac{1}{x+yi} \times \frac{x-yi}{x-yi}=\frac{x-yi}{x^2+y^2}$$
+$$=\frac{x}{x^2+y^2}-\frac{yi}{x^2+y^2}.$$
+
+Example:
+
+$$\frac{1}{1+2i}=\frac{1+0i}{1+2i}\times\frac{1-2i}{1-2i}=\frac{1-2i}{1^2+2^2}$$
+$$=\frac{1}{5}-\frac{2}{5}i = 0.2-0.4i.$$
+"
+
+# ╔═╡ a7d52bed-d5b0-4f74-b1df-3b7acb00f8e0
+let
+	z1 = Complex(1, 0)
 	z2 = Complex(1, 2)
 	z3 = z1 / z2
 end # let
@@ -1831,6 +1864,8 @@ version = "1.4.1+0"
 # ╟─f799d74f-5629-4171-86f1-d1ef772a617b
 # ╠═0c54eddf-4cd1-4428-9d01-77742cc46796
 # ╠═e86b123d-5658-4caa-9826-f400beda75ef
+# ╟─a4a8db4c-f63f-49f5-8ded-753d55a9d8ad
+# ╠═47de4dbc-7f48-42cd-a4ed-0ef524262fd8
 # ╟─78c508b3-40e1-45fd-80b3-70174ea7b5b3
 # ╟─8d659f59-ba30-4960-a755-866b08f270a0
 # ╟─795ca456-6ca6-4d11-b2fc-8a9014a653ad
@@ -1871,6 +1906,8 @@ version = "1.4.1+0"
 # ╠═21b3eb3f-023d-465e-937c-712272b5ec56
 # ╟─85a7d6ba-609c-4c72-83cf-652a74f358b2
 # ╠═6c3a4af2-841c-4318-a4ff-9d3118bb26fd
+# ╟─cd2c4c81-34fc-4402-a31f-500b944b6ee6
+# ╠═a7d52bed-d5b0-4f74-b1df-3b7acb00f8e0
 # ╟─c898ef69-ff89-4846-88ed-c39245c62256
 # ╟─b0270d5f-d6b0-4a05-80f7-0b8d86ecdf84
 # ╟─b9e5ea98-ce2d-4594-965e-e8003a5d86ef
