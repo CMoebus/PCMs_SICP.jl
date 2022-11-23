@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/22 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/23 ***
 
 =====================================================================================
 "
@@ -436,11 +436,12 @@ md"
 
 # ╔═╡ 02ad8e0c-581d-46fe-876b-400f6daa4865
 function applyGeneric(opSymbol, zs...) # SICP's '.args' is renamed to slurping 'zs'
-	typeTags = map(typeTag, zs)
-	proc     = myGet(opSymbol, typeTags)  # splatting of typeTags
-	content  = map(contents, zs)   
-	proc(content...)                   # application of proc to splatting of content
-	# opSymbol, zs
+	let
+		typeTags = map(typeTag, zs)
+		proc     = myGet(opSymbol, typeTags)  # splatting of typeTags
+		content  = map(contents, zs)   
+		proc(content...)               # application of proc to splatting of content
+	end # let
 end # function applyGeneric
 
 # ╔═╡ 8982c3e8-778b-4fcb-a8a8-a7c935901961
