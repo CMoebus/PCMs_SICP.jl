@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/23 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/25 ***
 
 =====================================================================================
 
@@ -451,11 +451,11 @@ md"
 ###### [Multiplication](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 ###### in *rectangular* coordinates
 
-$$subComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
-$$subComplex: (z_1, z_2) := ((x_1+y_1i), (x_2+y_2i) \mapsto (x_1x_2 + x_1y_2i + y_1ix_2 + y_1i\cdot y_2i)$$
+$$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$mulComplex: (z_1, z_2) := ((x_1+y_1i), (x_2+y_2i) \mapsto (x_1x_2 + x_1y_2i + y_1ix_2 + y_1i\cdot y_2i)$$
 $$=(x_1x_2 + x_1y_2i + y_1ix_2 - y_1y_2)=(x_1x_2 - y_1y_2)+(x_1y_2 + y_1x_2)i$$
 
-###### in *polar* coordinates
+###### and in *polar* coordinates
 
 $$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
 $$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \mapsto (\rho(z_1) \cdot \rho(z_2), \phi(z_1) + \phi(z_2))$$
@@ -524,15 +524,16 @@ md"
 ###### [Division](https://en.wikipedia.org/wiki/Complex_number#Addition_and_subtraction) in $$\mathbb C$$
 ###### in *rectangular* coordinates
 
+$$divComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
+$$divComplex: (z_1, z_2) := \frac{z_1}{z_2} = \frac{z_1}{z_2}\times\frac{\overline{z_2}}{\overline{z_2}}=\frac{z_1\overline{z_2}}{z_2\overline{z_2}}=\frac{Re(z_1\overline{z_2})}{z_2\overline{z_2}}+\frac{Im(z_1\overline{z_2})}{z_2\overline{z_2}}i$$
 
-[Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
-The formula can be found [here](https://www.cuemath.com/numbers/division-of-complex-numbers/).
+or more explicit:
 
 $$\frac{x_1 + y_1i}{x_2 + y_2i} = \frac{x_1 + y_1i}{x_2 + y_2i} \times \frac{x_2 - y_2i}{x_2 - y_2i}=\frac{(x_1 + y_1i)(x_2 - y_2i)}{(x_2 + y_2i)(x_2 - y_2i)}$$
 
-$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2}.$$
+$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2}=\frac{x_1 x_2 + y_1 y_2}{x_2^2 + y_2^2} + \frac{x_2 y_1 - x_1 y_2}{x_2^2 + y_2^2}i.$$
 
-###### in *polar* coordinates
+###### and in *polar* coordinates
 
 $$mulComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
 $$mulComplex: (z_1, z_2) := ((\rho(z_1), \phi(z_1)), (\rho(z_2), \phi(z_2))) \mapsto (\rho(z_1) / \rho(z_2), \phi(z_1) - \phi(z_2))$$
@@ -556,8 +557,12 @@ end # let
 md"
 ---
 ###### Inverse of complex number
+$$z^{-1}=\frac{1}{z}=\frac{1}{z}\times\frac{\overline{z}}{\overline{z}}=\frac{Re(\overline{z})}{z\overline{z}} + \frac{Im(\overline{z})}{z\overline{z}}i$$ 
+
+or more explicit:
+
 $$\frac{1}{x+yi}=\frac{1}{x+yi} \times \frac{x-yi}{x-yi}=\frac{x-yi}{x^2+y^2}$$
-$$=\frac{x}{x^2+y^2}-\frac{yi}{x^2+y^2}.$$
+$$=\frac{x}{x^2+y^2}-\frac{y}{x^2+y^2}i.$$
 "
 
 # ╔═╡ 47de4dbc-7f48-42cd-a4ed-0ef524262fd8
