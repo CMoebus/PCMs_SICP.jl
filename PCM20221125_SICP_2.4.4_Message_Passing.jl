@@ -9,10 +9,34 @@ md"
 =====================================================================================
 #### SICP: 2.4.4 [Message_Passing](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221125\_SICP\_2.4.4\_Message\_Passing.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/27 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/30 ***
 
 =====================================================================================
 "
+
+# ╔═╡ c2c9e443-dc14-4fa1-81fd-ba99edcfc302
+md"""
+##### Message Passing vs. Object Orientation
+The importance of *message passing* even over *object-orientation* was emphasized by [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay) one of the creators of the prototypical object-oriented script language *Smalltalk*:
+
+*... I took some pains ... to remind everyone that Smalltalk is not only NOT its syntax or the class library, it is not even about classes. 
+
+I'm sorry that I long ago coined the term "objects" for this topic because it gets many people to focus on the
+lesser idea.
+
+The big idea is "messaging" -- that is what the kernal of Smalltalk/Squeak
+is all about (and it's something that was never quite completed in our
+Xerox PARC phase). ...
+The key in making great and growable systems is much more to design how its
+modules communicate rather than what their internal properties and
+behaviors should be. 
+
+Think of the internet -- to live, it (a) has to allow
+many different kinds of ideas and realizations that are beyond any single
+standard and (b) to allow varying degrees of safe interoperability between
+these ideas.* (Kay, 1998)
+
+"""
 
 # ╔═╡ e2015d29-af47-402f-9a31-2d35b1342d1f
 md"
@@ -243,6 +267,16 @@ let
 	divComplex(z3)(1, 2)           # = 1/5 - 7/5i = 0.2 - 1.4
 end # let
 
+# ╔═╡ 3c4a66ed-a0d5-4859-9479-f9de867149ce
+md"
+---
+##### References
+
+- **Kay, A.**, *prototypes vs classes*, [http://lists.squeakfoundation.org/pipermail/squeak-dev/1998-October/017019.html](http://lists.squeakfoundation.org/pipermail/squeak-dev/1998-October/017019.html), visited 2022/11/30
+- **Wikipedia**, *Kay, Alan*, [https://en.wikipedia.org/wiki/Alan_Kay](https://en.wikipedia.org/wiki/Alan_Kay), visited 2022/11/30
+
+"
+
 # ╔═╡ 989a4b2f-1c88-420b-9a94-ff232f383a92
 md"
 ---
@@ -280,6 +314,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 # ╔═╡ Cell order:
 # ╟─52675be0-6cd6-11ed-2a19-dbb4acf40dc0
+# ╟─c2c9e443-dc14-4fa1-81fd-ba99edcfc302
 # ╟─e2015d29-af47-402f-9a31-2d35b1342d1f
 # ╟─9ab97503-e7f9-45a1-9e54-3c82240cee63
 # ╠═dc3be1ec-fe69-44e5-81e6-f1e495cc7e7f
@@ -322,6 +357,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b501d8c7-df6b-41ad-b56f-5e64d7289fba
 # ╠═f9fc84bd-a62d-48ff-94f1-f181aafdb831
 # ╠═c795a817-84b6-4e09-979c-aecf0b23dd9c
+# ╟─3c4a66ed-a0d5-4859-9479-f9de867149ce
 # ╟─989a4b2f-1c88-420b-9a94-ff232f383a92
 # ╟─7486616c-bf26-44cb-8a1a-3fa3ea521809
 # ╟─00000000-0000-0000-0000-000000000001
