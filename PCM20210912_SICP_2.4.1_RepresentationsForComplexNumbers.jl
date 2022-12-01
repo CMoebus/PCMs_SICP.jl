@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/25 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/01 ***
 
 =====================================================================================
 
@@ -525,7 +525,7 @@ md"
 ###### in *rectangular* coordinates
 
 $$divComplex: \mathbb C \times \mathbb C \rightarrow \mathbb C$$
-$$divComplex: (z_1, z_2) := \frac{z_1}{z_2} = \frac{z_1}{z_2}\times\frac{\overline{z_2}}{\overline{z_2}}=\frac{z_1\overline{z_2}}{z_2\overline{z_2}}=\frac{Re(z_1\overline{z_2})}{z_2\overline{z_2}}+\frac{Im(z_1\overline{z_2})}{z_2\overline{z_2}}i$$
+$$divComplex: (z_1, z_2) := \frac{z_1}{z_2} = \frac{z_1}{z_2}\times\frac{\overline{z_2}}{\overline{z_2}}=\frac{z_1\overline{z_2}}{z_2\overline{z_2}}=\frac{Re(z_1\overline{z_2})}{|z_2|^2}+\frac{Im(z_1\overline{z_2})}{|z_2|^2}i$$
 
 or more explicit:
 
@@ -557,7 +557,7 @@ end # let
 md"
 ---
 ###### Inverse of complex number
-$$z^{-1}=\frac{1}{z}=\frac{1}{z}\times\frac{\overline{z}}{\overline{z}}=\frac{Re(\overline{z})}{z\overline{z}} + \frac{Im(\overline{z})}{z\overline{z}}i$$ 
+$$z^{-1} = \frac{1}{z} = \frac{1}{z}\times\frac{\overline{z}}{\overline{z}} = \frac{\overline{z}}{z\overline{z}} = \frac{Re(\overline{z})}{|z|^2} + \frac{Im(\overline{z})}{|z|^2}$$ 
 
 or more explicit:
 
@@ -567,10 +567,10 @@ $$=\frac{x}{x^2+y^2}-\frac{y}{x^2+y^2}i.$$
 
 # ╔═╡ 47de4dbc-7f48-42cd-a4ed-0ef524262fd8
 let
-	z1 = makeZRectFromRealImag(1,  0)
-	z2 = makeZRectFromRealImag(1,  2)
-	z3 = divComplex(z1, z2)
-end # let      should be: 0.2 - 0.4i
+	z1 = makeZRectFromRealImag(1,  0)  # 1 + 0i = 1
+	z2 = makeZRectFromRealImag(1,  2)  # 1 + 2i
+	z3 = divComplex(z1, z2)            # 1/(1 + 2i) = 1/5 + 2/5i = 0.2 + 0.4i
+end # let      
 
 # ╔═╡ 78c508b3-40e1-45fd-80b3-70174ea7b5b3
 md"
@@ -817,12 +817,15 @@ end # let
 md"
 ---
 ###### Inverse of complex number
-$$\frac{1}{x+yi}=\frac{1}{x+yi} \times \frac{x-yi}{x-yi}=\frac{x-yi}{x^2+y^2}$$
-$$=\frac{x}{x^2+y^2}-\frac{yi}{x^2+y^2}.$$
+$$z^{-1} = \frac{1}{z} = \frac{1\overline{z}}{z\overline{z}} = \frac{\overline{z}}{|z|^2}.$$
+
+or more explicit:
+
+$$(x+yi)^{-1} = \frac{1}{x+yi}=\frac{1}{x+yi} \times \frac{x-yi}{x-yi}=\frac{x-yi}{x^2+y^2} = \frac{x}{x^2+y^2}-\frac{yi}{x^2+y^2}.$$
 
 Example:
 
-$$\frac{1}{1+2i}=\frac{1+0i}{1+2i}\times\frac{1-2i}{1-2i}=\frac{1-2i}{1^2+2^2}$$
+$$(1+2i)^{-1}=\frac{1}{1+2i}=\frac{1+0i}{1+2i}\times\frac{1-2i}{1-2i}=\frac{1-2i}{1^2+2^2}=\frac{1-2i}{5}$$
 $$=\frac{1}{5}-\frac{2}{5}i = 0.2-0.4i.$$
 "
 
