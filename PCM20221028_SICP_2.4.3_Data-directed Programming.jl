@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/11/23 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/01 ***
 
 =====================================================================================
 "
@@ -90,7 +90,7 @@ ground      & cons                                            \\
 \hline
             &                                                 \\
 basement    & Dict                                            \\
-(Julia)     & put                                             \\
+(Julia)     & myPut!                                          \\
             & myGet                                           \\
             & getOpsOfType                                    \\
             &                                                 \\
@@ -158,7 +158,7 @@ end # function contents
 md"
 $$\begin{array}{|l|c|cc|}
 \hline
-& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; \text{ Types}                                                            \\
+& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                                            \\
            &\text{args of } myGet: & (:rectangular,)  & (:polar,) \\ 
 \hline                                                                        
               &               &                 &                 \\
@@ -168,7 +168,7 @@ $$\begin{array}{|l|c|cc|}
               & angle         & angleOfZ        & angleOfZ        \\
               &               &                 &                 \\
 \hline
-& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; \text{ Types}                                                            \\                
+& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                                              \\                
         & \text{args of } myGet: & (:rectangular, :rectangular) & (:polar, :polar) \\ 
 \hline
                &              &                 &                 \\
@@ -181,7 +181,7 @@ $$\begin{array}{|l|c|cc|}
 
 \end{array}$$
 
-**Fig. 2.4.3.2** *Table* of operations for the complex-number system (cf. SICP, 1996, Fig. 2.22 or [here](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)) 
+**Fig. 2.4.3.2** *Table* of operations for the complex-number system (cf. SICP, 1996, Fig. 2.22 or [here](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002 e4_002e3)): '...each operation takes care of its own dispatching on types...'(SICP, 1996, p186)
 "
 
 # ╔═╡ bb9f139c-d8ba-4de3-9ba0-00d1e952ae35
@@ -209,7 +209,7 @@ myTableOfOpsAndTypes
 typeof(myTableOfOpsAndTypes)
 
 # ╔═╡ 77085bea-8fa6-4eab-a36c-78420ba6bbc2
-function put(op::Symbol, opTypes::Tuple, item::Function) 
+function myPut!(op::Symbol, opTypes::Tuple, item::Function) 
 	# Dict((op::Symbol, opType::Symbol) => item::Function)
 	# myTableOfOpsAndTypes[op::Symbol, opType::Symbol] = item::Function
 	myTableOfOpsAndTypes[op::Symbol, opTypes::Tuple] = item
@@ -316,19 +316,19 @@ function installRectangularPackage() # Ben's rectangular package
 		end # let
 	#--------------------------------------------------------------------
 	# interface to the rest of the system
-	put(:realPartOfZ, (:rectangular,), realPartOfZ)
-	put(:imagPartOfZ, (:rectangular,), imagPartOfZ)
-	put(:magnitudeOfZ,(:rectangular,), magnitudeOfZ)
-	put(:angleOfZ,    (:rectangular,), angleOfZ)
-	put(:makeZFromRealImag, (:rectangular,), 
+	myPut!(:realPartOfZ, (:rectangular,), realPartOfZ)
+	myPut!(:imagPartOfZ, (:rectangular,), imagPartOfZ)
+	myPut!(:magnitudeOfZ,(:rectangular,), magnitudeOfZ)
+	myPut!(:angleOfZ,    (:rectangular,), angleOfZ)
+	myPut!(:makeZFromRealImag, (:rectangular,), 
 		(x,y) -> tag!(makeZFromRealImag(x, y)))
-	put(:makeZFromMagAng,   (:rectangular,), 
+	myPut!(:makeZFromMagAng,   (:rectangular,), 
 		(r,a) -> tag!(makeZFromMagAng(r, a)))
 	#-------------------------------------------------------
-	put(:addComplexZs, (:rectangular, :rectangular), addComplexZs)
-	put(:subComplexZs, (:rectangular, :rectangular), subComplexZs)
-	put(:mulComplexZs, (:rectangular, :rectangular), mulComplexZs)
-	put(:divComplexZs, (:rectangular, :rectangular), divComplexZs)
+	myPut!(:addComplexZs, (:rectangular, :rectangular), addComplexZs)
+	myPut!(:subComplexZs, (:rectangular, :rectangular), subComplexZs)
+	myPut!(:mulComplexZs, (:rectangular, :rectangular), mulComplexZs)
+	myPut!(:divComplexZs, (:rectangular, :rectangular), divComplexZs)
 	"Ben's rectangular package installed"
 end # function installRectangularPackage
 
@@ -503,19 +503,19 @@ function installPolarPackage() # Alyssa's polar package
 			angleOfZ(z1) - angleOfZ(z2)))
 	#--------------------------------------------------------------------
 	# interface to the rest of the system
-	put(:realPartOfZ,  (:polar,), realPartOfZ)
-	put(:imagPartOfZ,  (:polar,), imagPartOfZ)
-	put(:magnitudeOfZ, (:polar,), magnitudeOfZ)
-	put(:angleOfZ,     (:polar,), angleOfZ)
-	put(:makeZFromRealImag, (:polar,),
+	myPut!(:realPartOfZ,  (:polar,), realPartOfZ)
+	myPut!(:imagPartOfZ,  (:polar,), imagPartOfZ)
+	myPut!(:magnitudeOfZ, (:polar,), magnitudeOfZ)
+	myPut!(:angleOfZ,     (:polar,), angleOfZ)
+	myPut!(:makeZFromRealImag, (:polar,),
 		(x, y) -> tag!(makeZFromRealImag(x, y)))
-	put(:makeZFromMagAng,   (:polar,),
+	myPut!(:makeZFromMagAng,   (:polar,),
 		(r, a) -> tag!(makeZFromMagAng(r, a)))	
 	#--------------------------------------------------------
-	put(:addComplexZs, (:polar, :polar), addComplexZs)
-	put(:subComplexZs, (:polar, :polar), subComplexZs)
-	put(:mulComplexZs, (:polar, :polar), mulComplexZs)
-	put(:divComplexZs, (:polar, :polar), divComplexZs)
+	myPut!(:addComplexZs, (:polar, :polar), addComplexZs)
+	myPut!(:subComplexZs, (:polar, :polar), subComplexZs)
+	myPut!(:mulComplexZs, (:polar, :polar), mulComplexZs)
+	myPut!(:divComplexZs, (:polar, :polar), divComplexZs)
 	"Alyssa's polar package installed"
 end # function installPolarPackage
 
@@ -630,9 +630,13 @@ md"
 [Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
 The formula can be found [here](https://www.cuemath.com/numbers/division-of-complex-numbers/).
 
+$$\frac{z_1}{z_2} = \frac{z_1}{z_2} \times \frac{\overline{z_2}}{\overline{z_2}} = \frac{z_1 \overline{z_2}}{|z_2|^2}$$
+
+or more explicit:
+ 
 $$\frac{x_1 + y_1i}{x_2 + y_2i} = \frac{x_1 + y_1i}{x_2 + y_2i} \times \frac{x_2 - y_2i}{x_2 - y_2i}=\frac{(x_1 + y_1i)(x_2 - y_2i)}{(x_2 + y_2i)(x_2 - y_2i)}$$
 
-$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2}.$$
+$$=\frac{(x_1 x_2 + y_1 y_2) + (x_2 y_1 - x_1 y_2)i}{x_2^2 + y_2^2} = \frac{(x_1 x_2 + y_1 y_2)}{{x_2^2 + y_2^2}} + \frac{(x_2 y_1 - x_1 y_2)i}{{x_2^2 + y_2^2}}.$$
 
 Example:
 
