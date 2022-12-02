@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/11/07 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/02 ***
 ======================================================================================
 "
 
@@ -512,7 +512,7 @@ end
 
 # ╔═╡ 61340177-3808-4a2b-906f-51b801178c6f
 md"
-##### 2.1.1.1.3.3 Output function $$print_rat$$
+##### 2.1.1.1.3.3 Output function $$print\_rat$$
 (= Transformation of *internal* into *external* form)
 
 "
