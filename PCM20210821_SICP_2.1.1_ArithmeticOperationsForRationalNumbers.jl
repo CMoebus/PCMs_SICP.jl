@@ -14,13 +14,18 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/02 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/03 ***
 ======================================================================================
 "
 
 # ╔═╡ 6011e641-b628-4642-8c55-549b05efbb89
 md"
-##### More on *rational numbers* can be found [here](https://en.wikipedia.org/wiki/Rational_number)
+##### Relations between *number* sets
+
+$$\mathbb N \subset \mathbb Z \subset \mathbb Q \subset \mathbb R \subset \mathbb C$$
+More on *rational numbers* $$\mathbb Q$$ can be found [here](https://en.wikipedia.org/wiki/Rational_number).
+
+---
 "
 
 # ╔═╡ 2b87595b-9491-4ebe-acb9-1ab7d43c4678
@@ -105,11 +110,13 @@ md"
 # ╔═╡ d2d4dd60-f2e4-421c-80cd-63fb61faf31c
 md"
 $$\begin {array}{c|c|c}
+                    & \text{Abstraction Hierarchy}               &                  \\
 \hline
-\text{ Abstract} &                                               & \text{level 2}   \\
-\text{Operators} & add\_rat, sub\_rat, mul\_rat,div\_rat,equal\_rat & \text{Domain} \\
+\text{ Abstract}    &             addRat, subRat                 & \text{level 2}   \\
+\text{Operators}    &        mulRat, divRat, equalRat            & \text{Domain}    \\
+                    &                printRat                    &                  \\
 \hline
-\text{Constructor/} &                make\_rat                   & \text{level 1}   \\
+\text{Constructor/} &                makeRat                     & \text{level 1}   \\
 \text{Selectors}    &              numer, denom                  &                  \\
 \hline
 \text{Constructor/} &                  cons                      & \text{level 0}   \\
@@ -120,7 +127,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.1**: First Default Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.1**: *First* default abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 "
@@ -233,7 +240,7 @@ let
 		plot!([                                        # plot of horizontal bar '-'
 			(coordinateXOfMiddle-lengthOfLine/2+lengthOfLine/10, coordinateYOfMiddle), 
 			(coordinateXOfMiddle+lengthOfLine/2-lengthOfLine/10, coordinateYOfMiddle)], 
-			lw=1, linecolor=:black) 
+			lw=1, linecolor=:black, arrow=true) 
 		annotate!(                                         # mark of left node  'x'
 			(coordinateXOfMiddle-lengthOfLine/2, coordinateYOfMiddle, text(markOfLeftNode, fontSize, :blue)))                  
 		annotate!(                                         # mark of right node 'x'
@@ -323,16 +330,27 @@ cdr(y)
 let
 	yMax = 4
 	#------------------------------------------------------------------------------
-	function plotHorizontalLine!(markOfLeftNode, markOfRightNode, coordinateXOfMiddle, coordinateYOfMiddle; lengthOfLine=2.0, fontSize=9)
+	function plotHorizontalArrowFromLeftToRight!(markOfLeftNode, markOfRightNode, coordinateXOfMiddle, coordinateYOfMiddle; lengthOfLine=2.0, fontSize=9)
 		plot!([                                        # plot of horizontal bar '-'
 			(coordinateXOfMiddle-lengthOfLine/2+lengthOfLine/10, coordinateYOfMiddle), 
 			(coordinateXOfMiddle+lengthOfLine/2-lengthOfLine/10, coordinateYOfMiddle)], 
-			lw=1, linecolor=:black) 
+			lw=1, linecolor=:black, arrow=true) 
 		annotate!(                                         # mark of left node  'x'
 			(coordinateXOfMiddle-lengthOfLine/2, coordinateYOfMiddle, text(markOfLeftNode, fontSize, :blue)))                  
 		annotate!(                                         # mark of right node 'x'
 			(coordinateXOfMiddle+lengthOfLine/2, coordinateYOfMiddle, text(markOfRightNode, fontSize, :blue)))       
-	end # function plotHorizontalLine!
+	end # function plotHorizontalArrowFromLeftToRight!
+	#------------------------------------------------------------------------------
+	function plotHorizontalArrowFromRightToLeft!(markOfLeftNode, markOfRightNode, coordinateXOfMiddle, coordinateYOfMiddle; lengthOfLine=2.0, fontSize=9)
+		plot!([                                        # plot of horizontal bar '-'
+			(coordinateXOfMiddle+lengthOfLine/2-lengthOfLine/10, coordinateYOfMiddle), 
+			(coordinateXOfMiddle-lengthOfLine/2+lengthOfLine/10, coordinateYOfMiddle)], 
+			lw=1, linecolor=:black, arrow=true) 
+		annotate!(                                         # mark of left node  'x'
+			(coordinateXOfMiddle-lengthOfLine/2, coordinateYOfMiddle, text(markOfLeftNode, fontSize, :blue)))                  
+		annotate!(                                         # mark of right node 'x'
+			(coordinateXOfMiddle+lengthOfLine/2, coordinateYOfMiddle, text(markOfRightNode, fontSize, :blue)))       
+	end # function plotHorizontalArrowFromRightToLeft!
 	#------------------------------------------------------------------------------
 	function plotInvUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9)
 		plot!([                                   # plot of middle vertical arm '|'
@@ -392,9 +410,9 @@ let
 	end # function plotQuaternyTree!
 	#------------------------------------------------------------------------------
 	plot(xlim=(-2.5, 12.0), ylim=(0, yMax), legend=:false, ticks=:none)
-	plotHorizontalLine!("•", "y", 9.0, yMax-2.0;lengthOfLine=4.0)
-	plotHorizontalLine!("x", "•", 1.0, yMax-2.0;lengthOfLine=4.0)
-	plotHorizontalLine!("z", "•", 2.0, yMax-1.0;lengthOfLine=6.0)
+	plotHorizontalArrowFromRightToLeft!("•", "y", 9.0, yMax-2.0;lengthOfLine=4.0)
+	plotHorizontalArrowFromLeftToRight!("x", "•", 1.0, yMax-2.0;lengthOfLine=4.0)
+	plotHorizontalArrowFromLeftToRight!("z", "•", 2.0, yMax-1.0;lengthOfLine=6.0)
 	plotInvBinaryTree!("3", "4", "•", 7.0, yMax-2.0; widthOfTree=2.0, heightOfTree=1)
 	plotInvBinaryTree!("1", "2", "•", 3.0, yMax-2.0; widthOfTree=2.0, heightOfTree=1)
 	plotInvBinaryTree!("•", "•", "•", 5.0, yMax-1.0; widthOfTree=4.0, heightOfTree=1)
@@ -435,25 +453,25 @@ md"
 
 # ╔═╡ 8b2fb52c-7519-410f-a872-610cdb911b72
 md"
-##### 2.1.1.1.3.1 Abstract *Untyped* Constructor $$make\_rat$$ based on $$cons$$
+##### 2.1.1.1.3.1 Abstract *Untyped* Constructor $$makeRat$$ based on $$cons$$
 "
 
 # ╔═╡ 680c5ec0-6cf2-4b0c-a005-751ef8a7e568
 md"
-###### *1st* method (default, *un*typed, *without* gcd) of function *make_rat*
+###### *1st* method (default, *un*typed, *without* gcd) of function $$makeRat$$
 "
 
 # ╔═╡ 7ff3b4a0-e00b-424f-8118-897019d0fc20
-make_rat(n, d) = cons(n, d)  
+makeRat(n, d) = cons(n, d)  
 
 # ╔═╡ 810b1eca-eac7-49cb-a34f-8328ea432824
 md"
-###### *2nd* method (*specialized*, *typed*, *with* gcd) of function *make_rat*
+###### *2nd* method (*specialized*, *typed*, *with* gcd) of function $$makeRat$$
 ###### ... with type $$Signed$$ and imperative *looping* construct $$while$$
 "
 
 # ╔═╡ df37be85-589a-46aa-a14c-8ab67c461ae9
-function make_rat(n::Signed, d::Signed)
+function makeRat(n::Signed, d::Signed)
 	#----------------------------------------------------------
 	function gcd2(a, b) 
 		#------------------------------------------------------
@@ -472,7 +490,7 @@ function make_rat(n::Signed, d::Signed)
 		cons(n ÷ g, d ÷ g)
 	end # let
 	#----------------------------------------=-----------------
-end # function make_rat
+end # function makeRat
 
 # ╔═╡ 764ec0e3-66c3-4a67-9473-95380e11250b
 md"
@@ -486,29 +504,29 @@ numer(x) = car(x)            # definition of abstract selector 'numer'
 denom(x) = cdr(x)            # definition of abstract selector 'denom'
 
 # ╔═╡ ca75c0f7-2e85-4436-8544-9b19aa0f57a8
-function add_rat(x, y)
-	make_rat(+(*(numer(x), denom(y)), *(numer(y), denom(x))), *(denom(x), denom(y)))
-end # function add_rat
+function addRat(x, y)
+	makeRat(+(*(numer(x), denom(y)), *(numer(y), denom(x))), *(denom(x), denom(y)))
+end # function addRat
 
 # ╔═╡ a181310f-1f46-43b2-8702-a8a60308ccfe
-function sub_rat(x, y)
-	make_rat(-(*(numer(x), denom(y)), *(numer(y), denom(x))), *(denom(x), denom(y)))
-end
+function subRat(x, y)
+	makeRat(-(*(numer(x), denom(y)), *(numer(y), denom(x))), *(denom(x), denom(y)))
+end # function subRat
 
 # ╔═╡ 778e12ad-bfe7-4f02-a946-894249fe2375
-function mul_rat(x, y)
-	make_rat(*(numer(x), numer(y)), *(denom(x), denom(y)))
-end
+function mulRat(x, y)
+	makeRat(*(numer(x), numer(y)), *(denom(x), denom(y)))
+end # function mulRat
 
 # ╔═╡ dce13d9a-7ffd-475a-84de-7826a1198f38
-function div_rat(x, y)
-	make_rat(*(numer(x), denom(y)), *(denom(x), numer(y)))
-end
+function divRat(x, y)
+	makeRat(*(numer(x), denom(y)), *(denom(x), numer(y)))
+end # function divRat
 
 # ╔═╡ bc19acb5-0d08-4f7e-abce-c77fca0e8ac9
-function equal_rat(x, y)
+function equalRat(x, y)
 	*(numer(x), denom(y)) == *(denom(x), numer(y))
-end
+end # function equalRat
 
 # ╔═╡ 61340177-3808-4a2b-906f-51b801178c6f
 md"
@@ -519,7 +537,7 @@ md"
 
 # ╔═╡ 172db576-f756-4d62-94c3-128c6ac4f847
 # idiomatic Julia-code with string interpolation "$(.....)"
-print_rat(x) = "$(numer(x))/$(denom(x))"
+printRat(x) = "$(numer(x))//$(denom(x))"
 
 # ╔═╡ a9341f5b-8b06-4994-ba6b-58070485c336
 md"
@@ -527,28 +545,28 @@ md"
 "
 
 # ╔═╡ 9b1a0332-0170-424b-be4d-abba0c042ff6
-one_half = make_rat(1, 2)
+one_half = makeRat(1, 2)
 
 # ╔═╡ 5e19e77d-ccea-4825-807d-5a278d762978
 typeof(one_half)
 
 # ╔═╡ cafada61-82c1-4231-bcd8-9887df2be87c
-one_third = make_rat(1, 3)
+one_third = makeRat(1, 3)
 
 # ╔═╡ e20d52b3-204c-4105-a362-2b9e66fe22f9
-two_twelves = make_rat(2, 12)             # with (!) application of gcd
+two_twelves = makeRat(2, 12)             # with (!) application of gcd
 
 # ╔═╡ 63d09ac2-193d-49dc-9eff-d5c14f973627
-add_rat(one_half, one_third)              # 1/2 + 1/3 = 3/6 + 2/6 = 5/6
+addRat(one_half, one_third)              # 1/2 + 1/3 = 3/6 + 2/6 = 5/6
 
 # ╔═╡ 69facaff-5c1f-4c8e-a436-81e8f9cd73b9
-equal_rat(make_rat(2, 3), make_rat(6, 9)) # 2/3 = 6/9
+equalRat(makeRat(2, 3), makeRat(6, 9)) # 2/3 = 6/9
 
 # ╔═╡ 45772e1e-aa83-46cd-add7-4f977f58dff0
-equal_rat(make_rat(1, 2), make_rat(3, 6)) # 1/2 = 3/6 => 1/2 = 1/2
+equalRat(makeRat(1, 2), makeRat(3, 6)) # 1/2 = 3/6 => 1/2 = 1/2
 
 # ╔═╡ d3d1980c-00f3-4d04-abe5-8705f61b3459
-equal_rat(make_rat(4, 3), make_rat(120, 90))  # 4/3 = 120/90 => 4/3 = 4/3
+equalRat(makeRat(4, 3), makeRat(120, 90))  # 4/3 = 120/90 => 4/3 = 4/3
 
 # ╔═╡ a861fc71-5a96-43b4-9a8f-94a603d2cb3b
 md"
@@ -571,7 +589,7 @@ md"
 # ╔═╡ 285428ce-c13e-43ca-add3-672b1e454e18
 md"
 ##### 2.1.1.2.1 Arithmetic Operations for Rational Numbers 
-###### *2nd* methods (*specialized*, *typed* ($$Pair$$)) of functions $$add\_rat$$, $$sub\_rat$$, $$mul\_rat$$, $$div\_rat$$, $$equal\_rat$$
+###### *2nd* methods (*specialized*, *typed* ($$Pair$$)) of functions $$addRat$$, $$subRat$$, $$mulRat$$, $$divRat$$, $$equalRat$$
 "
 
 # ╔═╡ cc592f32-8785-4735-badd-de3903c20f05
@@ -591,22 +609,24 @@ definition of constructor $$cons$$ with constructor $$Pair(<par1>, <par2>)$$ and
 # ╔═╡ 20fa866b-a9d2-4446-a57a-c01fe145aaac
 md"
 $$\begin {array}{c|c|c}
+                    & \text{Abstraction Hierarchy}               &                  \\
 \hline
-\text{ Abstract} &                                               & \text{level 2}   \\
-\text{Operators}&add\_rat2,sub\_rat2,mul\_rat2,div\_rat2,equal\_rat2& \text{Domain} \\
+\text{ Abstract}    &             addRat2, subRat2               & \text{level 2}   \\
+\text{Operators}    &        mulRat2, divRat2, equalRat2         & \text{Domain}    \\
+                    &                printRat                    &                  \\
 \hline
-\text{Constructor/} &                make\_rat2                  & \text{level 1}   \\
+\text{Constructor/} &                makeRat2                    & \text{level 1}   \\
 \text{Selectors}    &              numer2, denom2                &                  \\
 \hline
-\text{Constructor/} &                  cons2                     & \text{level 0}   \\
-\text{Selectors}    &                car2, cdr2       & \textit{Scheme}\text{-like} \\
+\text{Constructor/} &                 cons2                      & \text{level 0}   \\
+\text{Selectors}    &               car2, cdr2        & \textit{Scheme}\text{-like} \\
 \hline
 \text{Constructor/} &    consCell = Pair(first:...,second:...)   & \text{level -1}  \\
 \text{Selectors}    &      consCell.first, consCell.second       & \textit{Julia}   \\
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.5**: Second Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.5**: *Second* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -636,7 +656,7 @@ md"
 
 # ╔═╡ 3498e844-931f-4d46-a9aa-b9a2d3b892e7
 # idiomatic Julia-code by '÷'
-function make_rat2(n::Signed, d::Signed)::Pair
+function makeRat2(n::Signed, d::Signed)::Pair
 	#----------------------------------------------------------
 	function gcd2(a::Signed, b::Signed)::Signed
 		#---------------------------------------
@@ -653,7 +673,7 @@ function make_rat2(n::Signed, d::Signed)::Pair
 	let g = gcd2(n, d)
 		cons2(n ÷ g, d ÷ g)::Pair
 	end # let
-end # function make_rat2
+end # function makeRat2
 
 # ╔═╡ 4e179b9f-021e-4891-8e27-7fa36b827fcf
 md"
@@ -667,27 +687,27 @@ numer2(x::Pair)::Signed = car2(x::Pair)::Signed
 denom2(x::Pair)::Signed = cdr2(x::Pair)::Signed
 
 # ╔═╡ 76e3a4bc-fde2-4440-96c1-c492cc120db0
-function add_rat2(x::Pair, y::Pair)::Pair
-	make_rat2(numer2(x) * denom2(y) + numer2(y) * denom2(x), denom2(x) * denom2(y))
+function addRat2(x::Pair, y::Pair)::Pair
+	makeRat2(numer2(x) * denom2(y) + numer2(y) * denom2(x), denom2(x) * denom2(y))
 end
 
 # ╔═╡ 402d8963-26bc-4db2-b94b-ba4334e1d8fd
-function sub_rat2(x::Pair, y::Pair)::Pair
-	make_rat2(numer2(x) * denom2(y) - numer2(y) * denom2(x), denom2(x) * denom2(y))
+function subRat2(x::Pair, y::Pair)::Pair
+	makeRat2(numer2(x) * denom2(y) - numer2(y) * denom2(x), denom2(x) * denom2(y))
 end
 
 # ╔═╡ 09901068-bf38-4392-ab19-66a44d65344d
-function mul_rat2(x::Pair, y::Pair)::Pair
-	make_rat2(numer2(x) * numer2(y), denom2(x) * denom2(y))
+function mulRat2(x::Pair, y::Pair)::Pair
+	makeRat2(numer2(x) * numer2(y), denom2(x) * denom2(y))
 end
 
 # ╔═╡ 555e6212-22bd-4d0e-b221-edfe32f043f5
-function div_rat2(x::Pair, y::Pair)::Pair
-	make_rat2(numer2(x) * denom2(y), denom2(x) * numer2(y))
+function divRat2(x::Pair, y::Pair)::Pair
+	makeRat2(numer2(x) * denom2(y), denom2(x) * numer2(y))
 end
 
 # ╔═╡ afe55885-aba6-4cbc-af2c-23d15bbbf6f5
-function equal_rat2(x::Pair, y::Pair)::Bool
+function equalRat2(x::Pair, y::Pair)::Bool
 	numer2(x) * denom2(y) == denom2(x) * numer2(y)
 end
 
@@ -697,7 +717,7 @@ md"
 "
 
 # ╔═╡ 1248e659-dcdb-442c-859c-3289d5561c6f
-print_rat(x::Pair)::String = "$(numer2(x))/$(denom2(x))"
+printRat(x::Pair)::String = "$(numer2(x))//$(denom2(x))"
 
 # ╔═╡ edd94612-1772-4c7a-b8d5-cf5b4a540487
 md"
@@ -720,19 +740,19 @@ typeof(1.2)
 b2 = cons2(1.2, 3) # first argument is 'Float' but should be 'Signed'
 
 # ╔═╡ 4ee29c75-f689-4332-99b9-d7b0951d4487
-one_half2 = make_rat2(1, 2)
+one_half2 = makeRat2(1, 2)
 
 # ╔═╡ 86b40359-a87d-477e-9615-6b4803fe4fd7
-one_third2 = make_rat2(1, 3)
+one_third2 = makeRat2(1, 3)
 
 # ╔═╡ d650d480-08ed-478a-8a9f-92cce23ba072
-equal_rat2(make_rat2(1, 3), make_rat2(2, 6))
+equalRat2(makeRat2(1, 3), makeRat2(2, 6))
 
 # ╔═╡ 999406e8-787a-4f2b-9805-eed631fc6f54
-equal_rat2(make_rat2(1, 2), make_rat2(3, 6))
+equalRat2(makeRat2(1, 2), makeRat2(3, 6))
 
 # ╔═╡ 4bbd2664-5846-4487-b91c-be7ff75a4e81
-equal_rat2(make_rat2(1, 3), make_rat2(3, 6))
+equalRat2(makeRat2(1, 3), makeRat2(3, 6))
 
 # ╔═╡ 5be39e55-32ba-4809-9456-431e118b9195
 md"
@@ -748,29 +768,29 @@ md"
 "
 
 # ╔═╡ 26593de4-f70d-4aa5-86dd-d09bb6544407
-function add_rat3(x::Rational, y::Rational)::Rational
+function addRat3(x::Rational, y::Rational)::Rational
 	x + y
-end
+end # function addRat3
 
 # ╔═╡ 6662d041-af9c-472d-b9fe-efe2c4846267
-function sub_rat3(x::Rational, y::Rational)::Rational
+function subRat3(x::Rational, y::Rational)::Rational
 	x - y
-end
+end # function subRat3
 
 # ╔═╡ 8fc62f98-9a2e-4fae-83b7-a78118b656d3
-function mul_rat3(x::Rational, y::Rational)::Rational
+function mulRat3(x::Rational, y::Rational)::Rational
 	x * y
-end
+end # function mulRat3
 
 # ╔═╡ f7bd0981-1534-4c80-9697-e019f29c4a3c
-function div_rat3(x::Rational, y::Rational)::Rational
+function divRat3(x::Rational, y::Rational)::Rational
 	x // y
-end
+end # function divRat3
 
 # ╔═╡ b25d2465-7452-43e8-b709-06009642076a
-function equal_rat3(x::Rational, y::Rational)::Bool
+function equalRat3(x::Rational, y::Rational)::Bool
 	x == y
-end
+end # function equalRat3
 
 # ╔═╡ 32927d21-4f21-41ff-b90c-21a9c15a7a26
 md"
@@ -788,11 +808,13 @@ definition of constructor $$cons$$ with constructor $$//$$ and fields $$numerato
 # ╔═╡ 61794b44-f955-4486-8b1e-863dca1082c2
 md"
 $$\begin {array}{c|c|c}
+                    &        \text{Abstraction Hierarchy}        &                  \\
 \hline
-\text{ Abstract} &                                               & \text{level 2}   \\
-\text{Operators}&add\_rat3,sub\_rat3,mul\_rat3,div\_rat3,equal\_rat3& \text{Domain} \\
+\text{ Abstract}    &           addRat3, subRat3                 & \text{level 2}   \\
+\text{Operators}    &       mulRat3, divRat3, equalRat3          & \text{Domain}    \\
+                    &                printRat                    &                  \\
 \hline
-\text{Constructor/} &                make\_rat3                  & \text{level 1}   \\
+\text{Constructor/} &                makeRat3                    & \text{level 1}   \\
 \text{Selectors}    &              numer3, denom3                &                  \\
 \hline
 \text{Constructor/} &                  cons3                     & \text{level 0}   \\
@@ -803,7 +825,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.6**: Third Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.6**: *Third* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -832,9 +854,9 @@ md"
 
 # ╔═╡ 6858b169-b9dc-4a23-8dd3-8951033bd311
 # idiomatic Julia-code by '÷'
-function make_rat3(n::Int, d::Int)::Rational
+function makeRat3(n::Int, d::Int)::Rational
 	n//d
-end
+end # function makeRat3
 
 # ╔═╡ 8d014b03-6124-4937-aa35-599c01301efd
 md"
@@ -862,100 +884,109 @@ car3(cons3(1, 3))
 cdr3(cons3(1, 3))
 
 # ╔═╡ 6d096e3e-3313-4889-aa5b-387e75912d5e
-print_rat(x::Rational)::String = "$(numer3(x))/$(denom3(x))"
+printRat(x::Rational)::String = "$(numer3(x))//$(denom3(x))"
+
+# ╔═╡ 8bba74f5-f038-448e-9459-8b6a945c293d
+methods(printRat)
 
 # ╔═╡ 6931655c-b8bc-4efb-bad1-5061a5b63548
-print_rat(one_half)
+printRat(one_half)
 
 # ╔═╡ 1d2a90d7-cf23-4cef-b525-f0e0cb77586f
-print_rat(one_third)
+printRat(one_third)
 
 # ╔═╡ c85ab30f-22b4-452d-adb0-401dd0609d79
-print_rat(two_twelves)                    # with (!) application of gcd
+printRat(two_twelves)                    # with (!) application of gcd
 
 # ╔═╡ 64d8fdee-f7b2-453d-b595-f3d27c69ed20
-print_rat(make_rat(120,90))               # 120/90 = 12/9 = 4/3
+printRat(makeRat(120,90))               # 120/90 = 12/9 = 4/3
 
 # ╔═╡ 60367294-bac2-4c34-bddd-fc8c8c3a2f34
-print_rat(add_rat(one_half, one_third))   # 1/2 + 1/3 = 3/6 + 2/6 = 5/6
+printRat(addRat(one_half, one_third))   # 1/2 + 1/3 = 3/6 + 2/6 = 5/6
 
 # ╔═╡ 6009d1d7-f87d-440e-bfd5-389f7a6189fe
-print_rat(sub_rat(one_half, one_third))   # 1/2 - 1/3 = 3/6 - 2/6 = 1/6
+printRat(subRat(one_half, one_third))   # 1/2 - 1/3 = 3/6 - 2/6 = 1/6
 
 # ╔═╡ d2c09e98-d6b6-43e0-a493-a5c00700b022
-print_rat(mul_rat(one_half, one_third))   # 1/2 * 1/3 = 1/6
+printRat(mulRat(one_half, one_third))   # 1/2 * 1/3 = 1/6
 
 # ╔═╡ e8dade6c-874e-4926-bdca-0875509f35ff
-print_rat(div_rat(one_half, one_third))   # (1/2)/(1/3) = (1*3)/(2*1) = 3/2
+printRat(divRat(one_half, one_third))   # (1/2)/(1/3) = (1*3)/(2*1) = 3/2
 
 # ╔═╡ ab78e9ac-762d-4824-a17a-b61695010615
-print_rat(add_rat(one_third, one_third))  # 6/9 = 2/3 
+printRat(addRat(one_third, one_third))  # 6/9 = 2/3 
 
 # ╔═╡ 5e3ce89e-16cf-41ab-b65b-0693f152d2e6
-print_rat(make_rat(355,113))
+printRat(makeRat(355,113))
+
+# ╔═╡ 97c12566-f149-46c0-bb00-55686029f523
+methods(printRat)
 
 # ╔═╡ 451f4fcd-3cb6-400b-b7eb-b80cb6a5a712
-print_rat(one_half2)
+printRat(one_half2)
 
 # ╔═╡ db489898-bef8-4562-adf7-fab1f56e566e
-print_rat(one_third2)
+printRat(one_third2)
 
 # ╔═╡ 02fe4860-7fd6-453a-8eb2-a4654d7dd77b
-print_rat(add_rat2(one_half2, one_third2))
+printRat(addRat2(one_half2, one_third2))
 
 # ╔═╡ 04a336e5-b3d0-4c0c-9275-1ad23a1f19e2
-print_rat(sub_rat2(one_half2, one_third2))
+printRat(subRat2(one_half2, one_third2))
 
 # ╔═╡ ed2ac17e-497e-4b96-ba9b-ae7d4433c731
-print_rat(mul_rat2(one_half2, one_third2))
+printRat(mulRat2(one_half2, one_third2))
 
 # ╔═╡ 55360263-ea18-4987-98c6-396a88afc60e
-print_rat(div_rat2(one_half2, one_third2))
+printRat(divRat2(one_half2, one_third2))
 
 # ╔═╡ 6598342e-f99c-486f-b486-69ee6d488f75
-print_rat(add_rat2(one_third2, one_third2))
+printRat(addRat2(one_third2, one_third2))
 
 # ╔═╡ 985720fb-c4a2-45cd-9094-6d9363deeca1
-print_rat(make_rat2(120,90))
+printRat(makeRat2(120,90))
+
+# ╔═╡ cbb3d0bd-bf78-4f6b-b332-2289393697ec
+methods(printRat)
 
 # ╔═╡ 9672253e-c0be-4da5-9c1b-6882ce5f65c3
-one_half3 = make_rat3(1, 2)
+one_half3 = makeRat3(1, 2)
 
 # ╔═╡ ed140d1c-110e-4fcb-ba43-807b59ac30ef
-print_rat(one_half3)
+printRat(one_half3)
 
 # ╔═╡ ea6f8db4-c507-44d3-9e29-6bfc6b85b4ad
-one_third3 = make_rat3(1, 3)
+one_third3 = makeRat3(1, 3)
 
 # ╔═╡ ed389d11-5f6c-496c-84bf-6ac6b05ff5a4
-print_rat(one_third3)
+printRat(one_third3)
 
 # ╔═╡ dc14d933-62ac-4cf7-8563-71fda97afc9a
-print_rat(add_rat3(one_half3, one_third3))
+printRat(addRat3(one_half3, one_third3))
 
 # ╔═╡ 47771613-e613-497b-a020-f825a51b012d
-print_rat(sub_rat3(one_half3, one_third3))
+printRat(subRat3(one_half3, one_third3))
 
 # ╔═╡ 1a32f5c0-e644-44bc-9b0a-f47905e98f1d
-print_rat(mul_rat3(one_half3, one_third3))
+printRat(mulRat3(one_half3, one_third3))
 
 # ╔═╡ 43b0f7a2-d07a-427e-9084-e8d51b8d1e9d
-print_rat(div_rat3(one_half3, one_third3))
+printRat(divRat3(one_half3, one_third3))
 
 # ╔═╡ 1349941f-f280-47f2-814b-32b3b8ac4e4c
-equal_rat3(make_rat3(1, 3), make_rat3(2, 6))
+equalRat3(makeRat3(1, 3), makeRat3(2, 6))
 
 # ╔═╡ 7242424b-c8da-4452-b104-b3a2411fc0df
-equal_rat3(make_rat3(1, 2), make_rat3(3, 6))
+equalRat3(makeRat3(1, 2), makeRat3(3, 6))
 
 # ╔═╡ b202fbe1-f987-4e62-8f6f-3af4d3ca1048
-equal_rat3(make_rat3(1, 3), make_rat3(3, 6))
+equalRat3(makeRat3(1, 3), makeRat3(3, 6))
 
 # ╔═╡ b64b8bc6-9746-4ac9-a0fe-dee60bc854ff
-print_rat(add_rat3(one_third3, one_third3))
+printRat(addRat3(one_third3, one_third3))
 
 # ╔═╡ f38f0544-6113-4ed9-af22-d5d205078492
-print_rat(make_rat3(120, 90))
+printRat(makeRat3(120, 90))
 
 # ╔═╡ bcf4044f-f932-4a90-87bb-12963a67fc99
 md"
@@ -967,8 +998,9 @@ md"
 # ╔═╡ e44ece8f-5042-4c0f-a8a2-791622867ad5
 md"
 $$\begin {array}{c|c|c}
+                    &        \text{Abstraction Hierarchy}        &                  \\
 \hline
-\text{ Abstract} &                                               & \text{level 2}   \\
+\text{ Abstract}    &                                            & \text{level 2}   \\
 \text{Operators} &+\;\;\;\;\;\;\; -\;\;\;\;\; *\;\;\;\;\; /\;\;\;\;\;&\text{Domain} \\
 \hline
 \text{Constructor/} &                                            & \text{level 1}   \\
@@ -982,7 +1014,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.7**: Fourth Abstraction Hierarchy for Rational Number Algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.7**: *Fourth* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -1998,8 +2030,8 @@ version = "1.4.1+0"
 
 # ╔═╡ Cell order:
 # ╟─e8c1f880-0278-11ec-2538-13bb2f14d606
-# ╠═7d9a4133-99cf-40f4-9920-c0425f6676f3
 # ╟─6011e641-b628-4642-8c55-549b05efbb89
+# ╠═7d9a4133-99cf-40f4-9920-c0425f6676f3
 # ╟─2b87595b-9491-4ebe-acb9-1ab7d43c4678
 # ╟─55e8fb6e-4f94-46f2-97ff-42bfdcd37a48
 # ╟─d4e48294-c66c-4fa3-9586-89fb825a4ee8
@@ -2049,6 +2081,7 @@ version = "1.4.1+0"
 # ╠═d5c0f2d2-7e6b-4fc5-b9a2-de927eb5c024
 # ╟─61340177-3808-4a2b-906f-51b801178c6f
 # ╠═172db576-f756-4d62-94c3-128c6ac4f847
+# ╠═8bba74f5-f038-448e-9459-8b6a945c293d
 # ╟─a9341f5b-8b06-4994-ba6b-58070485c336
 # ╠═9b1a0332-0170-424b-be4d-abba0c042ff6
 # ╠═5e19e77d-ccea-4825-807d-5a278d762978
@@ -2092,6 +2125,7 @@ version = "1.4.1+0"
 # ╠═3ca05b52-413f-46aa-9fd7-659227dccbd7
 # ╟─bbccaeb3-48cf-4f65-9aa2-d0de9940e311
 # ╠═1248e659-dcdb-442c-859c-3289d5561c6f
+# ╠═97c12566-f149-46c0-bb00-55686029f523
 # ╟─edd94612-1772-4c7a-b8d5-cf5b4a540487
 # ╠═0e8fd444-fd9d-4455-8ca2-9d61f84e74d9
 # ╠═32e3fc67-3872-4a28-bd6b-9cf06bc094ac
@@ -2135,6 +2169,7 @@ version = "1.4.1+0"
 # ╠═96d4be2d-fab7-484e-8a1e-837df8e71574
 # ╠═d07fe6c8-8577-4ece-94d9-c61d44bc502c
 # ╠═6d096e3e-3313-4889-aa5b-387e75912d5e
+# ╠═cbb3d0bd-bf78-4f6b-b332-2289393697ec
 # ╠═9672253e-c0be-4da5-9c1b-6882ce5f65c3
 # ╠═ed140d1c-110e-4fcb-ba43-807b59ac30ef
 # ╠═ea6f8db4-c507-44d3-9e29-6bfc6b85b4ad
