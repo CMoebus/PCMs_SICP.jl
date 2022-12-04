@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/01 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/04 ***
 
 =====================================================================================
 "
@@ -299,7 +299,7 @@ function installRectangularPackage() # Ben's rectangular package
 			y1 = imagPartOfZ(z1)
 			y2 = imagPartOfZ(z2)
 			tag!(makeZFromRealImag(
-					(x1 * x2 + y1 * y2), 
+					(x1 * x2 - y1 * y2), 
 					(x1 * y2 + y1 * x2)))
 		end # let
 	#--------------------------------------------
@@ -618,8 +618,8 @@ md"
 
 # ╔═╡ 63e2c323-1cad-4bf6-8ad3-2c6681b76cb5
 let
-	z1 = makeZRectFromRealImag(2, -1)
-	z2 = makeZRectFromRealImag(2,  2)
+	z1 = makeZRectFromRealImag(2,  1)
+	z2 = makeZRectFromRealImag(2,  1)
 	z3 = mulComplex(z1, z2)
 end # let
 
