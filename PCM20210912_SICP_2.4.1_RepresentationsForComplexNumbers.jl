@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/01 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/06 ***
 
 =====================================================================================
 
@@ -47,7 +47,7 @@ end # let
 
 # ╔═╡ 576d32a1-4aa4-414d-84a5-99a1f5bc3208
 md"
-Fig. 2.4.1.1 Complex numbers as points (or vectors) in $$\mathbb C$$ (cf. Fig. 2.20 in SICP)
+**Fig. 2.4.1.1** Complex numbers as *points* (or *vectors*) in $$\mathbb C$$ (cf. Fig. 2.20 in SICP)
 
 ---
 "
@@ -124,7 +124,7 @@ end # let
 
 # ╔═╡ 724ba211-8069-43b8-99b1-55d755ed3c68
 md"
-Fig. 2.4.1.2 Complex numbers as *points* (or *vectors*) in $$\mathbb C$$ using *Euler's formula*
+**Fig. 2.4.1.2** Complex numbers as *points* (or *vectors*) in $$\mathbb C$$ using *Euler's formula*
 
 ---
 "
@@ -148,7 +148,7 @@ end # let
 
 # ╔═╡ e791db57-a399-47fe-ac45-f4a61c493473
 md"
-Fig. 2.4.1.3 Complex number as *point* (or *vector*) in $$\mathbb C$$ using *Euler's identity*
+**Fig. 2.4.1.3** Complex number as *point* (or *vector*) in $$\mathbb C$$ using *Euler's identity*
 "
 
 # ╔═╡ 262fb6be-d103-4407-b30b-ff5293ce2bea
@@ -193,7 +193,7 @@ ground        & cons                                           \\
 
 # ╔═╡ 1e2aa2f3-81a8-4252-be4f-aa575918a67b
 md"
-Fig. 2.4.1.4 *Data abstraction barriers* in the complex number system (cf. to SICP, Fig. 2.19)
+**Fig. 2.4.1.4** *Abstraction barriers* in the complex number system (cf. to SICP, Fig. 2.19)
 
 ---
 "
@@ -201,7 +201,7 @@ Fig. 2.4.1.4 *Data abstraction barriers* in the complex number system (cf. to SI
 # ╔═╡ 4dc1459c-070f-4970-9e67-c9facdc15cef
 md"
 ---
-###### Methods of Scheme-like *constructor* $$cons$$
+##### *Methods* of Scheme-like *constructor* $$cons$$
 "
 
 # ╔═╡ 82578c79-a6f3-4374-8ee2-aa8a585f4b4a
@@ -231,7 +231,7 @@ end
 
 # ╔═╡ 2e5ccb79-6d54-4b84-9a78-633ed533c1dc
 md"
-###### Methods of Scheme-like *selectors* $$car, cdr$$
+##### *Methods* of Scheme-like *selectors* $$car, cdr$$
 "
 
 # ╔═╡ 43b5159b-40b1-41fb-8547-a889b8e9e729
@@ -332,7 +332,7 @@ md"
 
 # ╔═╡ ff97e2e0-d581-470d-bdfb-92c4822e7970
 md"
-Fig. 1.4.1.5 Complex addition as vector addition in $$\mathbb C$$
+**Fig. 1.4.1.5** Complex *addition* as vector addition in $$\mathbb C$$
 
 ---
 "
@@ -368,7 +368,7 @@ md"
 
 # ╔═╡ 4db3fda8-63e9-48ab-ba9d-431f2ac7e061
 md"
-Fig. 1.4.1.6 Complex subtraction as vector subtraction in $$\mathbb C$$
+**Fig. 1.4.1.6** Complex *subtraction* as vector subtraction in $$\mathbb C$$
 
 ---
 "
@@ -441,7 +441,7 @@ end # let
 
 # ╔═╡ 36cf2a48-6f57-4a78-a55d-cab8199eba97
 md"
-Fig. 1.4.1.5 Complex multiplication as vector operation in $$\mathbb C$$
+**Fig. 1.4.1.5** Complex *multiplication* as vector operation in $$\mathbb C$$
 
 ---
 "
@@ -641,7 +641,7 @@ let
 	annotate!( 2.2, 1.05, ("z1", 12, :green))
 	annotate!( 1.0, -1.0, ("z2", 12, :blue))
 	annotate!(-1.0, 1.1,  ("-z2", 12, :blue))
-	annotate!( 2.2, 2.0,  ("z3=z1-z2=z3+(-z2)", 12, :red))
+	annotate!( 2.2, 2.0,  ("z3=z1-z2=z1+(-z2)", 12, :red))
 end # let
 
 # ╔═╡ 69628aaf-2678-45ea-a142-64dd22b8b378
