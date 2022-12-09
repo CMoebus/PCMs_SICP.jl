@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/04 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/09 ***
 
 =====================================================================================
 "
@@ -33,10 +33,10 @@ top         & \text{Representation-independent operations}    \\
             &                                                 \\
             & \text{Representation-independent selectors }    \\
             & \hline                                          \\
-            & realPartOfZ                                     \\
-            & imagPartOfZ                                     \\
-            & magnitudeOfZ                                    \\          
-            & angleOfZ                                        \\
+            & realPart                                        \\
+            & imagPart                                        \\
+            & magnitude                                       \\          
+            & angle                                           \\
             &                                                 \\ 
             & \text{Representation-independent constructors}  \\
             & \hline                                          \\
@@ -72,10 +72,10 @@ middle      & \text{Representation-dependent constructors}    \\
             & \begin{array}{cc} 
             & \text{Rectangular}    & \text{Polar}            \\
             & \hline                &                         \\
-            & realPartOfZRect       & realPartOfZPolar        \\ 
-            & imagPartOfZRect       & imagPartOfZPolar        \\
-            & magnitudeOfZRect      & magnitudeOfZPolar       \\
-            & angleOfZRect          & angleOfZPolar           \\
+            & realPartOfZ           & realPartOfZ             \\ 
+            & imagPartOfZ           & imagPartOfZ             \\
+            & magnitudeOfZ          & magnitudeOfZ            \\
+            & angleOfZ              & angleOfZ                \\
             &                                                 \\
             & \hline                                          \\
             & isRectangular         & isPolar                 \\
@@ -97,7 +97,7 @@ basement    & Dict                                            \\
 \hline
 \end{array}$$
 
-**Fig. 2.4.3.1** Data *abstraction barriers* in the complex number system
+**Fig. 2.4.3.1** Data *abstraction barriers* in the complex number system (cf. SICP, 1996, Fig. 2.21 or [here](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3))
 
 ---
 "
@@ -105,7 +105,7 @@ basement    & Dict                                            \\
 # ╔═╡ 45672303-1883-4d3b-b0fe-3e912d3cac46
 md"
 ---
-##### *Scheme*-like functions
+##### 2.4.3.1 *Ground*-level *SICP-Scheme*-like functions and operators
 "
 
 # ╔═╡ 43270f51-e79f-4ee4-8705-fad9b44778d4
@@ -122,16 +122,6 @@ cons(car::Any, cdr::Any)::Cons = Cons(car, cdr)::Cons
 
 # ╔═╡ d45f0975-744e-4ff4-bf6a-e5a377713bae
 cdr(cell::Cons)::Any = cell.cdr
-
-# ╔═╡ efa4ce9d-e448-4e52-b4d9-adcd6fad7f9f
-list(elements...) = 
-	if ==(elements, ())
-		cons(:nil, :nil)
-	elseif ==(lastindex(elements), 1)
-		cons(elements[1], :nil)
-	else
-		cons(elements[1], list(elements[2:end]...))
-	end #if
 
 # ╔═╡ 9c1e16cc-8650-41b8-828c-c4340cb03243
 md"
@@ -187,7 +177,7 @@ $$\begin{array}{|l|c|cc|}
 # ╔═╡ bb9f139c-d8ba-4de3-9ba0-00d1e952ae35
 md"
 ---
-##### *Procedures* for the manipulation of the *operation-type* tables
+##### *Procedures* for the manipulation of the *operation*$$\times$$*type* tables
 "
 
 # ╔═╡ ead06a15-8374-444f-9e48-394eedd20656
@@ -196,7 +186,7 @@ md"
 "
 
 # ╔═╡ 42eeefe4-0d8c-4bf2-b19a-eef3a9258e79
-Dict{Tuple, Function}                 # testing types of dictionary
+Dict{Tuple, Function}                 # types of dictionary
 
 # ╔═╡ 2e0f0c63-173c-40a1-8668-42a996c5d733
 # construction of empty table as a dictionary
@@ -211,7 +201,6 @@ typeof(myTableOfOpsAndTypes)
 # ╔═╡ 77085bea-8fa6-4eab-a36c-78420ba6bbc2
 function myPut!(op::Symbol, opTypes::Tuple, item::Function) 
 	# Dict((op::Symbol, opType::Symbol) => item::Function)
-	# myTableOfOpsAndTypes[op::Symbol, opType::Symbol] = item::Function
 	myTableOfOpsAndTypes[op::Symbol, opTypes::Tuple] = item
 end # function put
 
@@ -230,27 +219,6 @@ function myGet(op::Symbol, opType::Tuple) # instead of SICP's get
 	myTableOfOpsAndTypes[op::Symbol, opType::Tuple]
 end # function myGet
 
-# ╔═╡ 6f6ebc5e-ca92-49ea-9089-f8c30aa21d8f
-myTableOfOpsAndTypes
-
-# ╔═╡ 0eae024d-6e21-47d6-9238-ae257f62b83e
-typeof(myTableOfOpsAndTypes)
-
-# ╔═╡ e765ceb2-e500-4323-94d5-3609352b9d76
-(:a)                         # (:a) ==> Symbol
-
-# ╔═╡ 76007f35-1024-434f-910c-8b88cfa7b536
-(:a,)                        # (:a,) ==> Tuple
-
-# ╔═╡ d6e79de7-b43a-4870-b932-6571e0b60b04
-myTableOfOpsAndTypes[:realPartOfZ, (:rectangular,)]      # retrieval of method
-
-# ╔═╡ eac6bb08-e92e-4784-a37d-6748564086a6
-myGet(:realPartOfZ, (:rectangular,))
-
-# ╔═╡ 55697ad8-f53c-4fe7-a696-8c80aa8a4164
-myTableOfOpsAndTypes                          # correct content of table dictionary ?
-
 # ╔═╡ f2257d43-94b3-4b2c-8c11-05b88cddf386
 function getOpsOfType(argType)
 	filter(pairOpOpType -> 
@@ -261,27 +229,70 @@ function getOpsOfType(argType)
 		keys(myTableOfOpsAndTypes))
 end # function getOpsOfType
 
-# ╔═╡ 05792ada-72a4-4800-bc4b-67ac78c34bd4
-getOpsOfType(:rectangular) # get all ops (rows) for type (column) ':rectangular'
-
-# ╔═╡ 3f7da1a7-aacd-4a3f-b165-ca7577771a0d
+# ╔═╡ 3d71261a-930f-4a17-9d56-16e0ce8674bb
 md"
 ---
-###### Ben's *rectangular* package
+##### *Generic* arithmetic procedures
+"
+
+# ╔═╡ 02ad8e0c-581d-46fe-876b-400f6daa4865
+function applyGeneric(opSymbol, zs...) # SICP's '.args' is renamed to slurping 'zs'
+	let
+		typeTags = map(typeTag, zs)
+		proc     = myGet(opSymbol, typeTags)  # splatting of typeTags
+		content  = map(contents, zs)   
+		proc(content...)               # application of proc to splatting of content
+	end # let
+end # function applyGeneric
+
+# ╔═╡ 8982c3e8-778b-4fcb-a8a8-a7c935901961
+md"
+---
+###### Generic arithmetic *selectors*
+"
+
+# ╔═╡ 9fdd8679-bd67-4d2e-810a-5560af87edcf
+begin
+	realPart(z)  = applyGeneric(:realPart, z)
+	imagPart(z)  = applyGeneric(:imagPart, z)
+	magnitude(z) = applyGeneric(:magnitude, z)
+	angle(z)     = applyGeneric(:angle, z)
+end 
+
+# ╔═╡ efb4c70f-7dbb-4ef6-90b3-5a60cb19b23e
+md"
+---
+###### Generic arithmetic *operators*
+"
+
+# ╔═╡ fe895b18-a1c0-4a7c-8c38-37d65f031450
+begin
+	addComplex(z1, z2) = applyGeneric(:addComplex, z1, z2)
+	subComplex(z1, z2) = applyGeneric(:subComplex, z1, z2)
+	mulComplex(z1, z2) = applyGeneric(:mulComplex, z1, z2)
+	divComplex(z1, z2) = applyGeneric(:divComplex, z1, z2)
+end
+
+# ╔═╡ 5b087edd-fb98-4247-acb1-c565d3d7a630
+md"
+---
+##### *Complex* number package based on *rectangular* coordinates
 "
 
 # ╔═╡ b5b3673e-a06f-48a8-a2be-25006e5fb4a2
 function installRectangularPackage() # Ben's rectangular package
-	#--------------------------------------------------------------------
-	# definitions of internal procedures
-	tag!(x; tagType = :rectangular) = attachTag(tagType, x)
+	#================================================================================#
+	# internal procedures
+	tag!(x) = attachTag(:rectangular, x)
+	#--------------------------------------------------------
+	makeZFromRealImag(x, y) = cons(x, y)
+	makeZFromMagAng(r, a)   = cons(r * cos(a), r * sin(a))
+	#--------------------------------------------------------
 	realPartOfZ(z)  = car(z)
 	imagPartOfZ(z)  = cdr(z)
 	magnitudeOfZ(z) = √(realPartOfZ(z)^2 + imagPartOfZ(z)^2)
 	angleOfZ(z)     = atan(imagPartOfZ(z), realPartOfZ(z))
-	makeZFromRealImag(x, y) = cons(x, y)
-	makeZFromMagAng(r, a)   = cons(r * cos(a), r * sin(a))
-	#-------------------------------------------------------
+	#--------------------------------------------------------
 	addComplexZs(z1, z2) = 
 		tag!(makeZFromRealImag(
 			realPartOfZ(z1) + realPartOfZ(z2), 
@@ -314,50 +325,57 @@ function installRectangularPackage() # Ben's rectangular package
 					(x1 * x2 + y1 * y2) / denom, 
 					(x2 * y1 - x1 * y2) / denom))
 		end # let
-	#--------------------------------------------------------------------
-	# interface to the rest of the system
-	myPut!(:realPartOfZ, (:rectangular,), realPartOfZ)
-	myPut!(:imagPartOfZ, (:rectangular,), imagPartOfZ)
-	myPut!(:magnitudeOfZ,(:rectangular,), magnitudeOfZ)
-	myPut!(:angleOfZ,    (:rectangular,), angleOfZ)
+	#================================================================================#
+	# interface to rest of system
 	myPut!(:makeZFromRealImag, (:rectangular,), 
-		(x,y) -> tag!(makeZFromRealImag(x, y)))
+		(x, y) -> tag!(makeZFromRealImag(x, y)))
 	myPut!(:makeZFromMagAng,   (:rectangular,), 
-		(r,a) -> tag!(makeZFromMagAng(r, a)))
-	#-------------------------------------------------------
-	myPut!(:addComplexZs, (:rectangular, :rectangular), addComplexZs)
-	myPut!(:subComplexZs, (:rectangular, :rectangular), subComplexZs)
-	myPut!(:mulComplexZs, (:rectangular, :rectangular), mulComplexZs)
-	myPut!(:divComplexZs, (:rectangular, :rectangular), divComplexZs)
+		(r, a) -> tag!(makeZFromMagAng(r, a)))
+	#---------------------------------------------------------------------------------
+	myPut!(:realPart,  (:rectangular,), (z,) -> realPartOfZ(z))
+	myPut!(:imagPart,  (:rectangular,), (z,) -> imagPartOfZ(z))
+	myPut!(:magnitude, (:rectangular,), (z,) -> magnitudeOfZ(z))
+	myPut!(:angle,     (:rectangular,), (z,) -> angleOfZ(z))
+	#---------------------------------------------------------------------------------
+	myPut!(:addComplex, (:rectangular,:rectangular), 
+		(z1, z2) -> tag!(addComplexZs(z1, z2)))
+	myPut!(:subComplex, (:rectangular, :rectangular), 
+		(z1, z2) -> tag!(subComplexZs(z1, z2)))
+	myPut!(:mulComplex, (:rectangular, :rectangular), 
+		(z1, z2) -> tag!(mulComplexZs(z1, z2)))
+	myPut!(:divComplex, (:rectangular, :rectangular), 
+		(z1, z2) -> tag!(divComplexZs(z1, z2)))
+	#---------------------------------------------------------------------------------
 	"Ben's rectangular package installed"
+	#------------------------
 end # function installRectangularPackage
 
 # ╔═╡ ebe7b24a-beec-406b-acf8-71b414f29893
 md"
 ---
-##### Install Ben's *rectangular* package $$installRectangularPackage()$$
+###### Install Ben's *rectangular* package with $$installRectangularPackage()$$
 "
 
 # ╔═╡ 0873f8fa-5f2c-49ae-bab6-eabdf1d7ff2c
 installRectangularPackage()
 
-# ╔═╡ 44f4d7cb-cb13-46f0-b278-997aba3c6df0
-myTableOfOpsAndTypes
+# ╔═╡ 55697ad8-f53c-4fe7-a696-8c80aa8a4164
+myTableOfOpsAndTypes                          # correct content of table dictionary ?
 
 # ╔═╡ 48aa5558-1446-40ec-8c4d-f5202577d721
 keys(myTableOfOpsAndTypes)
 
-# ╔═╡ 0adca35f-afbf-48e7-9425-2f038e5a8e63
-typeof(keys(myTableOfOpsAndTypes))
-
-# ╔═╡ dcbc6a13-c8c3-4450-ab51-1aed1d4e6f79
+# ╔═╡ cb95d31c-9b8c-48a5-a20e-b77fef8c83ed
 getOpsOfType((:rectangular,))
 
-# ╔═╡ cf5e856d-28c5-4040-af0a-89392b2bc682
+# ╔═╡ 55f4e841-ca98-4c32-ac78-a402567bd958
 getOpsOfType((:rectangular, :rectangular))
 
-# ╔═╡ f6581b08-933f-4013-ac84-5f3559dba7dd
-myGet(:makeZFromMagAng, (:rectangular,))
+# ╔═╡ d6e79de7-b43a-4870-b932-6571e0b60b04
+myTableOfOpsAndTypes[:realOfZ, (:rectangular,)] # retrieval of method realPartOfZ
+
+# ╔═╡ eac6bb08-e92e-4784-a37d-6748564086a6
+myGet(:realOfZ, (:rectangular,))
 
 # ╔═╡ 31742b8a-ebcf-460e-871b-59b97c2759ff
 # test construction of complex number
@@ -369,7 +387,8 @@ myGet(:makeZFromMagAng, (:rectangular,))(2, 1)
 
 # ╔═╡ 4fc25aeb-5347-4dff-9821-ae7660849ca4
 md"
-###### *Constructor* for rectangular complex numbers *external* to Ben's package
+---
+###### *Constructor* for rectangular complex numbers (*external* to Ben's package)
 "
 
 # ╔═╡ 2161e479-a6da-4677-9f7b-021107a6d003
@@ -391,159 +410,13 @@ md"
 z1 = makeZRectFromRealImag(2, 1)      # ==> 2.0, 1.0i
 
 # ╔═╡ 2fca10b7-ffa3-4530-8bd3-e6e4d9cccc09
-z2 = makeZRectFromMagAng(2.24, 0.46)  # ==> 2.0, 1.0i
+# 2.24 ∠ 0.46 = 2.24(cos 0.46 + j sin 0.46) ==> 2.01 + 0.99i
+z2 = makeZRectFromMagAng(2.24, 0.46) # 2.24 ∠ 0.46 radians 
 
-# ╔═╡ b2ef9612-c06a-436d-9e1a-4ad69e5338be
+# ╔═╡ 485745d0-5224-4788-920e-fab135c45652
 md"
 ---
-###### Alyssa's *polar* package
-"
-
-# ╔═╡ 06365e9b-9ad4-4891-9f7a-6a23f4f7b100
-getOpsOfType(:polar)               # get all ops (rows) for type (column) ':polar'
-
-# ╔═╡ 4c1deedb-da8e-401f-bda5-df9b67dd1145
-md"
-###### *Constructor* for polar complex numbers *external* to Alyssa's package
-"
-
-# ╔═╡ 04dd57cc-fd45-4c7c-827e-2cd2012cf839
-function makeZPolarFromRealImag(x, y)                            # SICP, 1996, p.184
-	myGet(:makeZFromRealImag, (:polar,))(x, y)
-end # function makeZPolarFromRealImag
-
-# ╔═╡ e5dce11a-b925-4b8e-b30d-d8a59222a0d2
-function makeZPolarFromMagAng(r, a)                            # SICP, 1996, p.184
-	myGet(:makeZFromMagAng, (:polar,))(r, a)
-end # function makeZPolarFromMagAng
-
-# ╔═╡ b487d7d2-0f42-429f-bc9c-25d03444b1a7
-md"
-###### Test [*constructions*](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) with *polar* packagage
-"
-
-# ╔═╡ 0bad2a95-2bb5-4a41-8b31-b2065e2a0a62
-z3 = makeZPolarFromRealImag(2, 1)           # ==>   2.24 ∠ 0.46
-
-# ╔═╡ 9b758276-b59a-413d-8769-f0dc3d47c646
-z4 = makeZPolarFromMagAng(2.24, 0.46)       # ==>   2.24 ∠ 0.46
-
-# ╔═╡ 81fb14c5-bbff-48d7-8e85-f8589bbbe135
-md"
----
-###### General *selection* and *application* procedure $$applyGeneric(op, args...)$$
-"
-
-# ╔═╡ 02ad8e0c-581d-46fe-876b-400f6daa4865
-function applyGeneric(opSymbol, zs...) # SICP's '.args' is renamed to slurping 'zs'
-	let
-		typeTags = map(typeTag, zs)
-		proc     = myGet(opSymbol, typeTags)  # splatting of typeTags
-		content  = map(contents, zs)   
-		proc(content...)               # application of proc to splatting of content
-	end # let
-end # function applyGeneric
-
-# ╔═╡ 8982c3e8-778b-4fcb-a8a8-a7c935901961
-md"
----
-###### Generic selectors
-"
-
-# ╔═╡ 94293f95-856c-4df3-8399-41e37dbd2d03
-realPartOfZ(z)  = applyGeneric(:realPartOfZ, z)
-
-# ╔═╡ 7cc7fc9b-8d55-45af-929b-03d9a256a070
-imagPartOfZ(z)  = applyGeneric(:imagPartOfZ, z)
-
-# ╔═╡ 8be3e87c-e0dd-4bf7-a8cf-987f977d5a63
-magnitudeOfZ(z) = applyGeneric(:magnitudeOfZ, z)
-
-# ╔═╡ 6aef82b8-bb88-44d1-be76-60f4a666abe4
-angleOfZ(z)     = applyGeneric(:angleOfZ, z)
-
-# ╔═╡ d20e564f-f6e8-4b7e-b93a-43e6a4725212
-function installPolarPackage() # Alyssa's polar package
-	#--------------------------------------------------------------------
-	# definitions of internal procedures
-	tag!(x; tagType = :polar) = attachTag(tagType, x)
-	realPartOfZ(z)   = magnitudeOfZ(z) * cos(angleOfZ(z))
-	imagPartOfZ(z)   = magnitudeOfZ(z) * sin(angleOfZ(z))
-	magnitudeOfZ(z)  = car(z)
-	angleOfZ(z)      = cdr(z)
-	makeZFromMagAng(r, a)   = cons(r, a)
-	makeZFromRealImag(x, y) = cons(√(x^2 + y^2), atan(y, x))
-	#-------------------------------------------------------
-	addComplexZs(z1, z2) = 
-		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) + realPartOfZ(z2), 
-			imagPartOfZ(z1) + imagPartOfZ(z2))
-			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
-		end # let
-	#--------------------------------------------
-	subComplexZs(z1, z2) = 
-		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) - realPartOfZ(z2), 
-			imagPartOfZ(z1) - imagPartOfZ(z2))
-			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
-		end # let
-	#--------------------------------------------
-	mulComplexZs(z1, z2) =
-		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) * magnitudeOfZ(z2),
-			angleOfZ(z1) + angleOfZ(z2)))
-	#--------------------------------------------
-	divComplexZs(z1, z2) =
-		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) / magnitudeOfZ(z2),
-			angleOfZ(z1) - angleOfZ(z2)))
-	#--------------------------------------------------------------------
-	# interface to the rest of the system
-	myPut!(:realPartOfZ,  (:polar,), realPartOfZ)
-	myPut!(:imagPartOfZ,  (:polar,), imagPartOfZ)
-	myPut!(:magnitudeOfZ, (:polar,), magnitudeOfZ)
-	myPut!(:angleOfZ,     (:polar,), angleOfZ)
-	myPut!(:makeZFromRealImag, (:polar,),
-		(x, y) -> tag!(makeZFromRealImag(x, y)))
-	myPut!(:makeZFromMagAng,   (:polar,),
-		(r, a) -> tag!(makeZFromMagAng(r, a)))	
-	#--------------------------------------------------------
-	myPut!(:addComplexZs, (:polar, :polar), addComplexZs)
-	myPut!(:subComplexZs, (:polar, :polar), subComplexZs)
-	myPut!(:mulComplexZs, (:polar, :polar), mulComplexZs)
-	myPut!(:divComplexZs, (:polar, :polar), divComplexZs)
-	"Alyssa's polar package installed"
-end # function installPolarPackage
-
-# ╔═╡ 2bbdecd4-f786-480e-93cd-c5e5cac398f6
-installPolarPackage()
-
-# ╔═╡ efb4c70f-7dbb-4ef6-90b3-5a60cb19b23e
-md"
----
-###### Generic operators
-"
-
-# ╔═╡ 4fcc1f85-df97-4ef2-8f81-4208abdeb25a
-addComplex(z1, z2) = applyGeneric(:addComplexZs, z1, z2)
-
-# ╔═╡ bfb2492d-15df-467a-bed1-3a5731833906
-subComplex(z1, z2) = applyGeneric(:subComplexZs, z1, z2)
-
-# ╔═╡ c16870c2-fd17-413e-99f0-6ee0393a19e3
-mulComplex(z1, z2) = applyGeneric(:mulComplexZs, z1, z2)
-
-# ╔═╡ a8d5254a-8c13-4c85-8b6a-5c7a96489746
-divComplex(z1, z2) = applyGeneric(:divComplexZs, z1, z2)
-
-# ╔═╡ 049e1828-0ad7-4368-b30e-6083622f31a6
-md"
----
-##### Test calculations of complex numbers in *rectangular* form
+##### *Test* computations of complex numbers in *rectangular* form
 "
 
 # ╔═╡ 149ab1b6-9c21-40aa-bb85-cdd834f3f8ba
@@ -556,10 +429,10 @@ typeTag(z1)
 contents(z1)
 
 # ╔═╡ 3afbaf52-f5bd-4b92-b486-d05be9c15743
-applyGeneric(:realPartOfZ, z1) 
+applyGeneric(:realOfZ, z1) 
 
 # ╔═╡ e4588d6a-82e5-4a4b-a86e-1d3bd3863bfa
-applyGeneric(:imagPartOfZ, z1) 
+applyGeneric(:imagOfZ, z1) 
 
 # ╔═╡ 5562b3a3-875c-40a8-98b1-a4d809a38163
 applyGeneric(:magnitudeOfZ, z1) 
@@ -567,17 +440,20 @@ applyGeneric(:magnitudeOfZ, z1)
 # ╔═╡ 845ed715-5547-4fba-ab4c-05ac18e595a2
 applyGeneric(:angleOfZ, z1) 
 
+# ╔═╡ 11e55d16-98fb-44ca-85e1-fd11d8cd3c6c
+realPart
+
 # ╔═╡ d505818f-da2b-4265-ba6c-049bf5d4ba9e
-realPartOfZ(z1)        
+realPart(z1)        
 
 # ╔═╡ 18fd40a7-60e2-4890-9f37-84709cd92a7e
-imagPartOfZ(z1)   
+imagPart(z1)   
 
 # ╔═╡ 6b89f377-4468-4740-b9d3-01fc6de13047
-makeZRectFromRealImag(realPartOfZ(z1), imagPartOfZ(z1))
+makeZRectFromRealImag(realPart(z1), imagPart(z1))
 
 # ╔═╡ afd3c274-7c96-4884-93e5-4c7a021140aa
-makeZRectFromMagAng(magnitudeOfZ(z1), angleOfZ(z1))
+makeZRectFromMagAng(magnitude(z1), angle(z1))
 
 # ╔═╡ e768b7e4-46b6-4ed1-8dbb-ee5052312939
 md"
@@ -586,11 +462,13 @@ md"
 [Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
 "
 
-# ╔═╡ cab3d320-8ced-4dae-afab-cd592fbe3a6b
+# ╔═╡ 22be72ec-7090-45fe-963f-011f75c7e337
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	z2 = makeZRectFromRealImag(
-		realPartOfZ(z1)/magnitudeOfZ(z1), -2*imagPartOfZ(z1)/magnitudeOfZ(z1))
+	r1 = magnitude(z1)                  # √(2^2 + 1^2) = √5 ==> 2.236
+	z2 = makeZRectFromRealImag(realPart(z1)/r1, -2*imagPart(z1)/r1)
+	# (2 + 1i) + (2/2.36 - 2*1i/2.236) = (2 + 1i) + (0.894 - 0.894i) 
+	#  ==> (2.894 + 0.106i)
 	z3 = addComplex(z1, z2)
 end # let
 
@@ -601,11 +479,12 @@ md"
 [Result](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) is a complex number in *rectangular* coordinates
 "
 
-# ╔═╡ b4cfd22d-db3e-4cdb-b29c-f50dc147d2c3
+# ╔═╡ 99f58556-0d5e-423b-9b04-8cbac3167876
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	r1 = magnitudeOfZ(z1)
-	z2 = makeZRectFromRealImag(realPartOfZ(z1)/r1, -2*imagPartOfZ(z1)/r1)
+	r1 = magnitude(z1)
+	z2 = makeZRectFromRealImag(realPart(z1)/r1, -2*imagPart(z1)/r1)
+	# (2 + 1i) - (2/√5 - 2/√5i) = (2 + 1i) - (.89  -.89i) ==> (1.105 + 1.894)
 	z3 = subComplex(z1, z2)
 end # let
 
@@ -620,6 +499,7 @@ md"
 let
 	z1 = makeZRectFromRealImag(2,  1)
 	z2 = makeZRectFromRealImag(2,  1)
+	# (2 + 1i)(2 + 1i) = (2^2 + 2*1i + 1i*2 + 1^2*i^2) = (4 + 4i -1) ==> (3 + 4i)
 	z3 = mulComplex(z1, z2)
 end # let
 
@@ -650,8 +530,111 @@ $$=\frac{1-7i}{5}=\frac{1}{5}-\frac{7}{5}i=0.2-1.4i.$$
 let
 	z1 = makeZRectFromRealImag(3, -1)
 	z2 = makeZRectFromRealImag(1,  2)
-	z3 = divComplex(z1, z2)
+	z3 = divComplex(z1, z2)   # (3 - 1i)/(1 + 2i) ==> (0.2 - 1.4i)
 end # let
+
+# ╔═╡ b2ef9612-c06a-436d-9e1a-4ad69e5338be
+md"
+---
+##### *Complex* number package based on *polar* coordinates
+"
+
+# ╔═╡ d20e564f-f6e8-4b7e-b93a-43e6a4725212
+function installPolarPackage() # Alyssa's polar package
+	#====================================================================#
+	# internal procedures
+	#---------------------------------------------------------------------
+	tag!(x) = attachTag(:polar, x)
+	# attachTag(typeTag, contents) = cons(typeTag, contents) 
+	#---------------------------------------------------------------------
+	makeZFromMagAng(r, a)   = cons(r, a)
+	makeZFromRealImag(x, y) = cons(√(x^2 + y^2), atan(y, x))
+	#---------------------------------------------------------------------
+	realPartOfZ(z)   = magnitudeOfZ(z) * cos(angleOfZ(z))
+	imagPartOfZ(z)   = magnitudeOfZ(z) * sin(angleOfZ(z))
+	magnitudeOfZ(z)  = car(z)
+	angleOfZ(z)      = cdr(z)
+	#---------------------------------------------------------------------
+	addComplexZs(z1, z2) = 
+		let z3 = makeZFromRealImag(
+			realPartOfZ(z1) + realPartOfZ(z2), 
+			imagPartOfZ(z1) + imagPartOfZ(z2))
+			tag!(makeZFromMagAng(
+				magnitudeOfZ(z3), 
+				angleOfZ(z3)))
+		end # let
+	#--------------------------------------------
+	subComplexZs(z1, z2) = 
+		let z3 = makeZFromRealImag(
+			realPartOfZ(z1) - realPartOfZ(z2), 
+			imagPartOfZ(z1) - imagPartOfZ(z2))
+			tag!(makeZFromMagAng(
+				magnitudeOfZ(z3), 
+				angleOfZ(z3)))
+		end # let
+	#--------------------------------------------
+	mulComplexZs(z1, z2) =
+		tag!(makeZFromMagAng(
+			magnitudeOfZ(z1) * magnitudeOfZ(z2),
+			angleOfZ(z1) + angleOfZ(z2)))
+	#--------------------------------------------
+	divComplexZs(z1, z2) =
+		tag!(makeZFromMagAng(
+			magnitudeOfZ(z1) / magnitudeOfZ(z2),
+			angleOfZ(z1) - angleOfZ(z2)))
+	#===========================================================================#
+	# interface to rest of system
+	#----------------------------------------------------------------------------
+	myPut!(:makeZFromRealImag, (:polar,),
+		(x, y) -> tag!(makeZFromRealImag(x, y)))
+	myPut!(:makeZFromMagAng,   (:polar,),
+		(r, a) -> tag!(makeZFromMagAng(r, a)))	
+	#----------------------------------------------------------------------------
+	myPut!(:realPart,          (:polar,),     (z,) -> realPartOfZ(z))
+	myPut!(:imagPart,          (:polar,),     (z,) -> imagPartOfZ(z))
+	myPut!(:magnitude,         (:polar,),     (z,) -> magnitudeOfZ(z))
+	myPut!(:angle,             (:polar,),     (z,) -> angleOfZ(z))
+	#----------------------------------------------------------------------------
+	myPut!(:addComplex, (:polar, :polar), (z1, z2) -> tag!(addComplexZs(z1, z2)))
+	myPut!(:subComplex, (:polar, :polar), (z1, z2) -> tag!(subComplexZs(z1, z2)))
+	myPut!(:mulComplex, (:polar, :polar), (z1, z2) -> tag!(mulComplexZs(z1, z2)))
+	myPut!(:divComplex, (:polar, :polar), (z1, z2) -> tag!(divComplexZs(z1, z2)))
+	#----------------------------------------------------------------------------
+	"Alyssa's polar package installed"
+	#----------------------------------------------------------------------------
+end # function installPolarPackage
+
+# ╔═╡ 2bbdecd4-f786-480e-93cd-c5e5cac398f6
+installPolarPackage()
+
+# ╔═╡ 06365e9b-9ad4-4891-9f7a-6a23f4f7b100
+getOpsOfType(:polar)               # get all ops (rows) for type (column) ':polar'
+
+# ╔═╡ 4c1deedb-da8e-401f-bda5-df9b67dd1145
+md"
+###### *Constructor* for polar complex numbers *external* to Alyssa's package
+"
+
+# ╔═╡ 04dd57cc-fd45-4c7c-827e-2cd2012cf839
+function makeZPolarFromRealImag(x, y)                            # SICP, 1996, p.184
+	myGet(:makeZFromRealImag, (:polar,))(x, y)
+end # function makeZPolarFromRealImag
+
+# ╔═╡ e5dce11a-b925-4b8e-b30d-d8a59222a0d2
+function makeZPolarFromMagAng(r, a)                            # SICP, 1996, p.184
+	myGet(:makeZFromMagAng, (:polar,))(r, a)
+end # function makeZPolarFromMagAng
+
+# ╔═╡ b487d7d2-0f42-429f-bc9c-25d03444b1a7
+md"
+###### Test [*constructions*](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) with *polar* packagage
+"
+
+# ╔═╡ 0bad2a95-2bb5-4a41-8b31-b2065e2a0a62
+z3 = makeZPolarFromRealImag(2, 1)           # ==>   2.24 ∠ 0.46
+
+# ╔═╡ 9b758276-b59a-413d-8769-f0dc3d47c646
+z4 = makeZPolarFromMagAng(2.24, 0.46)       # ==>   2.24 ∠ 0.46
 
 # ╔═╡ 15715a76-6549-4012-83e2-689a69d250e3
 md"
@@ -672,10 +655,10 @@ md"
 # ╔═╡ 9db9b3ae-5842-4278-a1b7-dfd5cc048527
 let
 	z0 = makeZRectFromRealImag(2, 1)
-	z1 = makeZPolarFromMagAng(magnitudeOfZ(z0), angleOfZ(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(
-		realPartOfZ(z0)/magnitudeOfZ(z0), -realPartOfZ(z0)/magnitudeOfZ(z0))
-	z3 = makeZPolarFromMagAng(magnitudeOfZ(z2), angleOfZ(z2))
+		realPart(z0)/magnitude(z0), -realPart(z0)/magnitude(z0))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
  	addComplex(z1, z3)    # (2.8964 ∠ 0.0365) or (2.8945 + 0.1054i)
 end # let
 
@@ -689,10 +672,10 @@ md"
 # ╔═╡ 6f6bbf9f-a0de-4114-9e23-1cac8f525dc8
 let
 	z0 = makeZRectFromRealImag(2, 1)
-	z1 = makeZPolarFromMagAng(magnitudeOfZ(z0), angleOfZ(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(
-		realPartOfZ(z0)/magnitudeOfZ(z0), -realPartOfZ(z0)/magnitudeOfZ(z0))
-	z3 = makeZPolarFromMagAng(magnitudeOfZ(z2), angleOfZ(z2))
+		realPart(z0)/magnitude(z0), -realPart(z0)/magnitude(z0))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
  	subComplex(z1, z3)    #  (2.1934 ∠ 1.0425)  or  (1.1056 + 1.8944i)
 end # let
 
@@ -706,9 +689,9 @@ md"
 # ╔═╡ 6a374dcf-bf22-41aa-8a19-b8e45b494eae
 let
 	z0 = makeZRectFromRealImag(2, -1)
-	z1 = makeZPolarFromMagAng(magnitudeOfZ(z0), angleOfZ(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(2,  2)
-	z3 = makeZPolarFromMagAng(magnitudeOfZ(z2), angleOfZ(z2))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
 	mulComplex(z1, z3)   #  (6.3246 ∠ 0.3218) or (6.0000 + 2.0000i)
 end # let
 
@@ -722,9 +705,9 @@ md"
 # ╔═╡ 67513820-6d48-44c1-93be-fd079e873d18
 let
 	z0 = makeZRectFromRealImag(3, -1)
-	z1 = makeZPolarFromMagAng(magnitudeOfZ(z0), angleOfZ(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(1,  2)
-	z3 = makeZPolarFromMagAng(magnitudeOfZ(z2), angleOfZ(z2))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
 	#  (1.41 ∠ 4.85) = (1.41 ∠ 4.85-2π) = (1.41 ∠ -1.43)
 	divComplex(z1, z3)  # (1.41 ∠ -1.43) or (0.20 − 1.4i)
 end # let
@@ -774,7 +757,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═61b610a5-401b-4652-a9e9-cd46263c099b
 # ╠═4b3dcc1b-0469-4cb4-bc0f-1f1e6a370d6d
 # ╠═d45f0975-744e-4ff4-bf6a-e5a377713bae
-# ╠═efa4ce9d-e448-4e52-b4d9-adcd6fad7f9f
 # ╟─9c1e16cc-8650-41b8-828c-c4340cb03243
 # ╠═9c97c826-f317-4a24-bb0b-8ae8b552af6d
 # ╠═4ac58d4a-3820-46e8-b1e7-12ead084f116
@@ -790,25 +772,23 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─4b0e56fd-1a03-4ed8-b691-fd106929e923
 # ╠═106dba00-6a16-4f5d-bb84-7a31509eb62c
 # ╠═92d64081-2d5d-419a-947e-1e1cc6b3b9fb
-# ╠═6f6ebc5e-ca92-49ea-9089-f8c30aa21d8f
-# ╠═0eae024d-6e21-47d6-9238-ae257f62b83e
-# ╠═e765ceb2-e500-4323-94d5-3609352b9d76
-# ╠═76007f35-1024-434f-910c-8b88cfa7b536
-# ╠═d6e79de7-b43a-4870-b932-6571e0b60b04
-# ╠═eac6bb08-e92e-4784-a37d-6748564086a6
-# ╠═55697ad8-f53c-4fe7-a696-8c80aa8a4164
 # ╠═f2257d43-94b3-4b2c-8c11-05b88cddf386
-# ╠═05792ada-72a4-4800-bc4b-67ac78c34bd4
-# ╟─3f7da1a7-aacd-4a3f-b165-ca7577771a0d
+# ╟─3d71261a-930f-4a17-9d56-16e0ce8674bb
+# ╠═02ad8e0c-581d-46fe-876b-400f6daa4865
+# ╟─8982c3e8-778b-4fcb-a8a8-a7c935901961
+# ╠═9fdd8679-bd67-4d2e-810a-5560af87edcf
+# ╟─efb4c70f-7dbb-4ef6-90b3-5a60cb19b23e
+# ╠═fe895b18-a1c0-4a7c-8c38-37d65f031450
+# ╟─5b087edd-fb98-4247-acb1-c565d3d7a630
 # ╠═b5b3673e-a06f-48a8-a2be-25006e5fb4a2
 # ╟─ebe7b24a-beec-406b-acf8-71b414f29893
 # ╠═0873f8fa-5f2c-49ae-bab6-eabdf1d7ff2c
-# ╠═44f4d7cb-cb13-46f0-b278-997aba3c6df0
+# ╠═55697ad8-f53c-4fe7-a696-8c80aa8a4164
 # ╠═48aa5558-1446-40ec-8c4d-f5202577d721
-# ╠═0adca35f-afbf-48e7-9425-2f038e5a8e63
-# ╠═dcbc6a13-c8c3-4450-ab51-1aed1d4e6f79
-# ╠═cf5e856d-28c5-4040-af0a-89392b2bc682
-# ╠═f6581b08-933f-4013-ac84-5f3559dba7dd
+# ╠═cb95d31c-9b8c-48a5-a20e-b77fef8c83ed
+# ╠═55f4e841-ca98-4c32-ac78-a402567bd958
+# ╠═d6e79de7-b43a-4870-b932-6571e0b60b04
+# ╠═eac6bb08-e92e-4784-a37d-6748564086a6
 # ╠═31742b8a-ebcf-460e-871b-59b97c2759ff
 # ╠═8dff3423-4621-47d2-be08-871e40f9602f
 # ╟─4fc25aeb-5347-4dff-9821-ae7660849ca4
@@ -817,6 +797,27 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─85b10bef-d897-4dbe-8648-c0e76ce5b676
 # ╠═71c6e66e-4887-4cc0-b3d7-565b9f6fe33c
 # ╠═2fca10b7-ffa3-4530-8bd3-e6e4d9cccc09
+# ╟─485745d0-5224-4788-920e-fab135c45652
+# ╠═149ab1b6-9c21-40aa-bb85-cdd834f3f8ba
+# ╠═1d581b15-1712-4dcb-a681-b748e08b7e4c
+# ╠═b7bbc511-2034-4536-947f-f211bae04133
+# ╠═3afbaf52-f5bd-4b92-b486-d05be9c15743
+# ╠═e4588d6a-82e5-4a4b-a86e-1d3bd3863bfa
+# ╠═5562b3a3-875c-40a8-98b1-a4d809a38163
+# ╠═845ed715-5547-4fba-ab4c-05ac18e595a2
+# ╠═11e55d16-98fb-44ca-85e1-fd11d8cd3c6c
+# ╠═d505818f-da2b-4265-ba6c-049bf5d4ba9e
+# ╠═18fd40a7-60e2-4890-9f37-84709cd92a7e
+# ╠═6b89f377-4468-4740-b9d3-01fc6de13047
+# ╠═afd3c274-7c96-4884-93e5-4c7a021140aa
+# ╟─e768b7e4-46b6-4ed1-8dbb-ee5052312939
+# ╠═22be72ec-7090-45fe-963f-011f75c7e337
+# ╟─e8d6a66f-414a-4e70-8705-4f4445bc48c8
+# ╠═99f58556-0d5e-423b-9b04-8cbac3167876
+# ╟─f1ad9656-1105-4c60-abfd-982c5d0802fe
+# ╠═63e2c323-1cad-4bf6-8ad3-2c6681b76cb5
+# ╟─9b1e91c5-ab05-4e25-80c7-c3f690fdeb50
+# ╠═3a46c792-3b37-4cfc-a371-a5e9a0f068cb
 # ╟─b2ef9612-c06a-436d-9e1a-4ad69e5338be
 # ╠═d20e564f-f6e8-4b7e-b93a-43e6a4725212
 # ╠═2bbdecd4-f786-480e-93cd-c5e5cac398f6
@@ -827,38 +828,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─b487d7d2-0f42-429f-bc9c-25d03444b1a7
 # ╠═0bad2a95-2bb5-4a41-8b31-b2065e2a0a62
 # ╠═9b758276-b59a-413d-8769-f0dc3d47c646
-# ╟─81fb14c5-bbff-48d7-8e85-f8589bbbe135
-# ╠═02ad8e0c-581d-46fe-876b-400f6daa4865
-# ╟─8982c3e8-778b-4fcb-a8a8-a7c935901961
-# ╠═94293f95-856c-4df3-8399-41e37dbd2d03
-# ╠═7cc7fc9b-8d55-45af-929b-03d9a256a070
-# ╠═8be3e87c-e0dd-4bf7-a8cf-987f977d5a63
-# ╠═6aef82b8-bb88-44d1-be76-60f4a666abe4
-# ╟─efb4c70f-7dbb-4ef6-90b3-5a60cb19b23e
-# ╠═4fcc1f85-df97-4ef2-8f81-4208abdeb25a
-# ╠═bfb2492d-15df-467a-bed1-3a5731833906
-# ╠═c16870c2-fd17-413e-99f0-6ee0393a19e3
-# ╠═a8d5254a-8c13-4c85-8b6a-5c7a96489746
-# ╟─049e1828-0ad7-4368-b30e-6083622f31a6
-# ╠═149ab1b6-9c21-40aa-bb85-cdd834f3f8ba
-# ╠═1d581b15-1712-4dcb-a681-b748e08b7e4c
-# ╠═b7bbc511-2034-4536-947f-f211bae04133
-# ╠═3afbaf52-f5bd-4b92-b486-d05be9c15743
-# ╠═e4588d6a-82e5-4a4b-a86e-1d3bd3863bfa
-# ╠═5562b3a3-875c-40a8-98b1-a4d809a38163
-# ╠═845ed715-5547-4fba-ab4c-05ac18e595a2
-# ╠═d505818f-da2b-4265-ba6c-049bf5d4ba9e
-# ╠═18fd40a7-60e2-4890-9f37-84709cd92a7e
-# ╠═6b89f377-4468-4740-b9d3-01fc6de13047
-# ╠═afd3c274-7c96-4884-93e5-4c7a021140aa
-# ╟─e768b7e4-46b6-4ed1-8dbb-ee5052312939
-# ╠═cab3d320-8ced-4dae-afab-cd592fbe3a6b
-# ╟─e8d6a66f-414a-4e70-8705-4f4445bc48c8
-# ╠═b4cfd22d-db3e-4cdb-b29c-f50dc147d2c3
-# ╟─f1ad9656-1105-4c60-abfd-982c5d0802fe
-# ╠═63e2c323-1cad-4bf6-8ad3-2c6681b76cb5
-# ╟─9b1e91c5-ab05-4e25-80c7-c3f690fdeb50
-# ╠═3a46c792-3b37-4cfc-a371-a5e9a0f068cb
 # ╟─15715a76-6549-4012-83e2-689a69d250e3
 # ╠═039dd612-772f-429c-bb55-bda320c1d0a7
 # ╟─28f5eb24-4bbd-415c-a3a8-2a8df9e303ec
