@@ -9,7 +9,7 @@ md"
 ====================================================================================
 ##### SICP: 2.5.1 [Generic Arithmetic Operations](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e1)
 ###### file: PCM20221128\_SICP\_2.5.1\_GenericArithmeticOperations.jl
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/08 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/09 ***
 ====================================================================================
 "
 
@@ -172,12 +172,12 @@ md"
 
 # ╔═╡ a576dcd3-5992-4605-8bd4-b366130e687a
 begin
-	myNumer(x)     = applyGeneric(:numer, x)     # generic selector numerator
-	myDenom(x)     = applyGeneric(:denom, x)     # generic selector denominator
-	myReal(z)      = applyGeneric(:real, z)      # generic selector realPart
-	myImag(z)      = applyGeneric(:imag, z)      # generic selector imagPart
-	myMagnitude(z) = applyGeneric(:magnitude, z) # generic selector magnitude or norm
-	myAngle(z)     = applyGeneric(:angle, z)     # generic selector angle
+	numerator(x)       = applyGeneric(:numer, x)   # generic selector numerator
+	denominator(x)       = applyGeneric(:denom, x) # generic selector denominator
+	myReal(z)      = applyGeneric(:real, z)        # generic selector realPart
+	myImag(z)      = applyGeneric(:imag, z)        # generic selector imagPart
+	myMagnitude(z) = applyGeneric(:magnitude, z)   # generic selector norm
+	myAngle(z)     = applyGeneric(:angle, z)       # generic selector angle
 end
 
 # ╔═╡ 66ad6609-fa02-4c5d-936b-091de42c5bf2
@@ -317,10 +317,10 @@ function installRationalPackage()
 	# local procedures
 	tag!(x) = attachTag(:rational, x)
 	#-------------------------------------------------
-	myNumer(x) = car(x)
-	myDenom(x) = cdr(x)
+	numerator(x)   = car(x)
+	denominator(x) = cdr(x)
 	#-------------------------------------------------
-	printRat(x) = "$(myNumer(x))//$(myDenom(x))"
+	printRat(x) = "$(numerator(x))//$(denominator(x))"
 	#-------------------------------------------------
 	makeRat(x, y) = 
 		let n = round(Int, x)
@@ -331,32 +331,32 @@ function installRationalPackage()
 	#-------------------------------------------------
 	addRat(x, y) = 
 		makeRat(
-			numer(x) * denom(y) + numer(y) * denom(x), 
-			denom(x) * denom(y))
+			numerator(x) * denominator(y) + numerator(y) * denominator(x), 
+			denominator(x) * denominator(y))
 	#-------------------------------------------------
 	subRat(x, y) = 
 		makeRat(
-			numer(x) * denom(y) - numer(y) * denom(x), 
-			denom(x) *denom(y))
+			numerator(x) * denominator(y) - numerator(y) * denominator(x), 
+			denominator(x) * denominator(y))
 	#-------------------------------------------------
 	mulRat(x, y) =
 		makeRat(
-			numer(x) * numer(y), 
-			denom(x) * denom(y))
+			numerator(x) * numerator(y), 
+			denominator(x) * denominator(y))
 	#-------------------------------------------------
 	divRat(x, y) =
 		makeRat(
-			numer(x) * denom(y), 
-			denom(x) * numer(y))
+			numerator(x) * denominator(y), 
+			denominator(x) * numerator(y))
 	#-------------------------------------------------
 	equalRat(x, y) =
-		numer(x) * denom(y) == denom(x) * numer(y)
+		numerator(x) * denominator(y) == denominator(x) * numerator(y)
 	#===================================================================#
 	# interface to rest of system
 	myPut!(:print,(:rational,),             (x,) -> printRat(x))
 	myPut!(:make, (:rational,),           (n, d) -> tag!(makeRat(n, d)))
-	myPut!(:numer,(:rational,),             (x,) -> myNumer(x))
-	myPut!(:denom,(:rational,),             (x,) -> myDenom(x))
+	myPut!(:numer,(:rational,),             (x,) -> numerator(x))
+	myPut!(:denom,(:rational,),             (x,) -> denominator(x))
 	#--------------------------------------------------------------------
 	myPut!(:add,  (:rational, :rational), (x, y) -> tag!(addRat(x, y)))
 	myPut!(:sub,  (:rational, :rational), (x, y) -> tag!(subRat(x, y)))
@@ -400,10 +400,10 @@ oneHalf = makeRational(2, 4)       # 2//4 ==> 1.0//2.0
 myPrint(oneHalf)                   # "1.0//2.0"
 
 # ╔═╡ 7d4b921a-ea56-44fd-a98c-097e2268e315
-myNumer(oneHalf)
+numerator(oneHalf)
 
 # ╔═╡ 7b449582-33d1-4c6f-8378-46b92722be1b
-myDenom(oneHalf)
+denominator(oneHalf)
 
 # ╔═╡ 7c610221-9c3a-4836-a308-d407d0fe918a
 oneThird = makeRational(9, 27)     # 9//27 ==> 1.0//3.0
@@ -837,8 +837,12 @@ end # let
 # ╔═╡ 0b7cd85b-cf32-4ce5-981f-e801c41eecdf
 md"
 ---
-###### *Multiplication* of *polar* complex numbers
-"
+###### *Multiplication* of *polar* complex numbers (using *Euler's* formula)
+
+[*Euler's* formula](https://en.wikipedia.org/wiki/Euler%27s_formula):
+
+$$z = x + yi = |z|(cos \phi + i \cdot sin \phi) = r\cdot e^{i\phi}$$
+" 
 
 # ╔═╡ 2def8fc2-0b8f-43e2-9ac4-4ac0fa4bc999
 let
@@ -848,15 +852,18 @@ let
 	z2 = Complex(2,  2)
 	# z3 = makeZPolarFromMagAng(myMagnitude(z2), myAngle(z2))
 	z3 = abs(z2) * exp(angle(z2)*im)
-	# mul(z1, z3)   #  (6.3246 ∠ 0.3218) or (6.0000 + 2.0000i)
-    z4 = z1 * z3
-	("|z4|=$(abs(z4)),∠z4=$(angle(z4)),|z4|*exp(angle(z4)*im)=$(abs(z4)*exp(angle(z4)*im))")
+	# z4 = mul(z1, z3) ==> (6.3246 ∠ 0.3218) or (6.0000 + 2.0000i)
+    z4 = abs(z0) * abs(z2) * exp((angle(z0) + angle(z2))*im)
 end # let
 
 # ╔═╡ f47e8917-eaae-4377-8873-373a5fef0537
 md"
 ---
-###### *Division* of *polar* complex numbers
+###### *Division* of *polar* complex numbers (using *Euler's* formula)
+
+[*Euler's* formula](https://en.wikipedia.org/wiki/Euler%27s_formula):
+
+$$z = x + yi = |z|(cos \phi + i \cdot sin \phi) = r\cdot e^{i\phi}$$
 "
 
 # ╔═╡ d5fbb6ed-8572-4d77-aeb6-52d6a281995d
@@ -870,8 +877,7 @@ let
 	z3 = abs(z2) * exp(angle(z2)*im)
 	#  (1.41 ∠ 4.85) = (1.41 ∠ 4.85-2π) = (1.41 ∠ -1.43)
 	# div(z1, z3)  # (1.41 ∠ -1.43) or (0.20 − 1.4i)
-	z4 = z1 / z3
-	("|z4|=$(abs(z4)),∠z4=$(angle(z4)),|z4|*exp(angle(z4)*im)=$(abs(z4)*exp(angle(z4)*im))")
+	z4 = abs(z0) / abs(z2) * exp((angle(z0) - angle(z2))*im)
 end # let
 
 # ╔═╡ 120e829a-db3e-4861-8d6c-87379d0b5072
