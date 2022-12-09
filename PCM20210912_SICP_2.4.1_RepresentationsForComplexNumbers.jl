@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
 ###### file: PCM20210912\_SICP\_2.4.1\_RepresentationsForComplexNumbers.jl
-###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/06 ***
+###### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/09 ***
 
 =====================================================================================
 
@@ -114,8 +114,8 @@ let
 	plot!([(0, 1),   (2, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!([(0, 0),   (0, 1)], linestyle=:dash, linecolor=:blue, linewidth=1)
 	plot!(circleArray, linestyle=:dot, linecolor=:blue, linewidth=1)
-	annotate!(2.6, 1.05, ("z = r⋅exp(iϕ)", 12, :red))
-	annotate!(1.3, 0.4, ("exp(iϕ)", 12, :blue))
+	annotate!(2.6, 1.05, ("z = |z|⋅exp(iϕ)", 12, :red))
+	annotate!(1.3, 0.3, ("exp(iϕ)", 12, :blue))
 	annotate!(2.14, 0.5, ("y", 12))
 	annotate!(1.2,-0.1, ("x", 12))
 	annotate!(0.6, 0.15, ("ϕ", 12, :blue))
@@ -128,6 +128,19 @@ md"
 
 ---
 "
+
+# ╔═╡ d0ed924a-378d-48d3-b0f9-ffd98ef98208
+function eulersFormula(z::Complex)
+	(abs(z), angle(z), abs(z)*exp(im*angle(z)))
+end # function eulersFormula
+
+# ╔═╡ 0af14617-878d-445f-a230-fdfc04d0d5fb
+md"
+[Complex(2, 1)](https://www.intmath.com/complex-numbers/convert-polar-rectangular-interactive.php) ==> 2.00 + 1.00i = 2.24 ∠ 0.46 radians
+"
+
+# ╔═╡ 1aa0467e-da7c-4253-b2dd-8e41931337b6
+eulersFormula(Complex(2, 1))
 
 # ╔═╡ afd5a931-b8ad-46f8-b0f2-894d59d53959
 let
@@ -1818,6 +1831,9 @@ version = "1.4.1+0"
 # ╟─eb2b46af-1eda-4b19-988d-ab8b2f7c3525
 # ╟─46638e2b-704f-43df-9b61-a387762f78c9
 # ╟─724ba211-8069-43b8-99b1-55d755ed3c68
+# ╠═d0ed924a-378d-48d3-b0f9-ffd98ef98208
+# ╟─0af14617-878d-445f-a230-fdfc04d0d5fb
+# ╠═1aa0467e-da7c-4253-b2dd-8e41931337b6
 # ╟─afd5a931-b8ad-46f8-b0f2-894d59d53959
 # ╟─e791db57-a399-47fe-ac45-f4a61c493473
 # ╟─262fb6be-d103-4407-b30b-ff5293ce2bea
