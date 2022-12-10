@@ -9,7 +9,7 @@ md"
 ====================================================================================
 ##### SICP: 2.5.1 [Generic Arithmetic Operations](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e1)
 ###### file: PCM20221128\_SICP\_2.5.1\_GenericArithmeticOperations.jl
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/09 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/10 ***
 ====================================================================================
 "
 
@@ -113,22 +113,35 @@ end # function getOpsOfType
 md"
 $$\begin{array}{|c|}
 \hline                                                                         \\
-\text{Domain-specific} \textit{ generic } \text{operations}                    \\     
+\text{Domain-specific} \textit{ generic } \text{operations}                    \\
+\hline                                                                         \\
 add \;\;\;\;\;\;\;\;\;\; sub                                                   \\
 mul \;\;\;\;\;\;\;\;\;\; div                                                   \\
+numerator                                                                      \\
+denominator                                                                    \\
                                                                                \\
 \hline                                                                         \\
 \text{Generic} \textit{ arithmetic } \text{package}                            \\     
 \begin{array}{c|c|c}
+                        & \hline                          &                    \\
 \text{Rational}         & \text{Complex}                  & \text{Ordinary}    \\
 \text{arithmetic}       & \text{arithmetic}               & \text{arithmetic}  \\
 \hline                                                                         \\
 addRat \;\; subRat \;\; & addComplex \;\; subComplex \;\; & \;\; + \;\; -      \\
 mulRat \;\; divRat \;\; & mulComplex \;\; divComplex \;\; & \;\; * \;\; /      \\
+numerRat                & realPart                        &                    \\
+denomRat                & imagPart                        &                    \\
                         &                                 &                    \\
 \hline                                                                         \\
                         & \text{Rectangular}\;\;\;\;\;\text{Polar} &           \\
-                        &                                 &                    \\
+                        & \hline                          &                    \\
+                        & addComplexRect \;\; addComplexPolar &                \\
+                        & subComplexRect \;\; subComplexPolar &                \\
+                        & mulComplexRect \;\; mulComplexPolar &                \\
+                        & divComplexRect \;\; divComplexPolar &                \\
+                        & realPartRect   \;\; realPartPolar   &                \\
+                        & imagPartRect   \;\; imagPartPolar   &                \\
+                        &                                     &                \\
 \end{array}                                                                    \\
 \hline
 \end{array}$$
@@ -172,12 +185,12 @@ md"
 
 # ╔═╡ a576dcd3-5992-4605-8bd4-b366130e687a
 begin
-	numerator(x)       = applyGeneric(:numer, x)   # generic selector numerator
-	denominator(x)       = applyGeneric(:denom, x) # generic selector denominator
-	myReal(z)      = applyGeneric(:real, z)        # generic selector realPart
-	myImag(z)      = applyGeneric(:imag, z)        # generic selector imagPart
-	myMagnitude(z) = applyGeneric(:magnitude, z)   # generic selector norm
-	myAngle(z)     = applyGeneric(:angle, z)       # generic selector angle
+	numerator(x)   = applyGeneric(:numer, x)       # generic selector numerator
+	denominator(x) = applyGeneric(:denom, x)       # generic selector denominator
+	realPart(z)    = applyGeneric(:realPart, z)    # generic selector realPart
+	imagPart(z)    = applyGeneric(:imagPart, z)    # generic selector imagPart
+	magnitude(z)   = applyGeneric(:magnitude, z)   # generic selector norm
+	angle(z)       = applyGeneric(:angle, z)       # generic selector angle
 end
 
 # ╔═╡ 66ad6609-fa02-4c5d-936b-091de42c5bf2
@@ -201,15 +214,16 @@ md"
 
 # ╔═╡ 2a734656-20d2-437b-abe2-5f2437b4addb
 function installSICPNumberPackage()
-	#-----------------------------------------------------------------------
+	#======================================================================#
 	# local procedures
 	tag!(x) = attachTag(:sicpNumber, x)
 	#----------------------------------------
 	printSicpNumber(sicpNumber) = sicpNumber
 	#======================================================================#
 	# interface to rest of system
+	myPut!(:print,(:sicpNumber,),                       printSicpNumber)
+	#-----------------------------------------------------------------------
 	myPut!(:make, (:sicpNumber,),                  x -> tag!(x))
-	myPut!(:print,(:sicpNumber,),                  x -> printSicpNumber(x))
 	#-----------------------------------------------------------------------
 	myPut!(:add,  (:sicpNumber, :sicpNumber), (x, y) -> tag!(x + y))
 	myPut!(:sub,  (:sicpNumber, :sicpNumber), (x, y) -> tag!(x - y))
@@ -217,7 +231,7 @@ function installSICPNumberPackage()
 	myPut!(:div,  (:sicpNumber, :sicpNumber), (x, y) -> tag!(x / y))
 	#-----------------------------------------------------------------------
 	"package sicpNumber done" 
-	#-----------------------------------------------------------------------
+	#======================================================================#
 end # function installJuliaNumberPackage
 
 # ╔═╡ 6c05818e-bd48-42f4-bb9c-240aee64b8d5
@@ -313,58 +327,59 @@ md"
 
 # ╔═╡ 70c0ba7d-d6b4-4e1c-8095-a909a833ad7d
 function installRationalPackage()
-	#===================================================================#
+	#====================================================================#
 	# local procedures
 	tag!(x) = attachTag(:rational, x)
-	#-------------------------------------------------
-	numerator(x)   = car(x)
-	denominator(x) = cdr(x)
-	#-------------------------------------------------
-	printRat(x) = "$(numerator(x))//$(denominator(x))"
-	#-------------------------------------------------
+	#---------------------------------------------------------------------
+	numerRat(x) = car(x)
+	denomRat(x) = cdr(x)
+	#---------------------------------------------------------------------
+	printRat(x) = "$(numerRat(x))//$(denomRat(x))"
+	#---------------------------------------------------------------------
 	makeRat(x, y) = 
 		let n = round(Int, x)
 			d = round(Int, y)
 			g = gcd(n, d)
 			cons(n / g, d / g)
 		end # let
-	#-------------------------------------------------
+	#---------------------------------------------------------------------
 	addRat(x, y) = 
 		makeRat(
-			numerator(x) * denominator(y) + numerator(y) * denominator(x), 
-			denominator(x) * denominator(y))
-	#-------------------------------------------------
+			numerRat(x) * denomRat(y) + numerRat(y) * denomRat(x), 
+			denomRat(x) * denomRat(y))
+	#---------------------------------------------------------------------
 	subRat(x, y) = 
 		makeRat(
-			numerator(x) * denominator(y) - numerator(y) * denominator(x), 
-			denominator(x) * denominator(y))
-	#-------------------------------------------------
+			numerRat(x) * denomRat(y) - numerRat(y) * denomRat(x), 
+			denomRat(x) * denomRat(y))
+	#---------------------------------------------------------------------
 	mulRat(x, y) =
 		makeRat(
-			numerator(x) * numerator(y), 
-			denominator(x) * denominator(y))
-	#-------------------------------------------------
+			numerRat(x) * numerRat(y), 
+			denomRat(x) * denomRat(y))
+	#---------------------------------------------------------------------
 	divRat(x, y) =
 		makeRat(
-			numerator(x) * denominator(y), 
-			denominator(x) * numerator(y))
-	#-------------------------------------------------
+			numerRat(x) * denomRat(y), 
+			denomRat(x) * numerRat(y))
+	#---------------------------------------------------------------------
 	equalRat(x, y) =
-		numerator(x) * denominator(y) == denominator(x) * numerator(y)
-	#===================================================================#
+		numerRat(x) * denomRat(y) == denomRat(x) * numerRat(y)
+	#====================================================================#
 	# interface to rest of system
-	myPut!(:print,(:rational,),             (x,) -> printRat(x))
+	myPut!(:print,(:rational,),                     printRat)
+	myPut!(:numer,(:rational,),                     numerRat)
+	myPut!(:denom,(:rational,),                     denomRat)
+	#---------------------------------------------------------------------
 	myPut!(:make, (:rational,),           (n, d) -> tag!(makeRat(n, d)))
-	myPut!(:numer,(:rational,),             (x,) -> numerator(x))
-	myPut!(:denom,(:rational,),             (x,) -> denominator(x))
-	#--------------------------------------------------------------------
+	#---------------------------------------------------------------------
 	myPut!(:add,  (:rational, :rational), (x, y) -> tag!(addRat(x, y)))
 	myPut!(:sub,  (:rational, :rational), (x, y) -> tag!(subRat(x, y)))
 	myPut!(:mul,  (:rational, :rational), (x, y) -> tag!(mulRat(x, y)))
 	myPut!(:div,  (:rational, :rational), (x, y) -> tag!(divRat(x, y)))
-	#--------------------------------------------------------------------
+	#---------------------------------------------------------------------
 	"installRationalPackage done"
-	#--------------------------------------------------------------------
+	#====================================================================#
 end # function installRationalPackage
 
 # ╔═╡ c986fde7-f56f-4eea-bf28-9984ace2a580
@@ -437,42 +452,42 @@ function installRectangularPackage() # Ben's rectangular package
 	#================================================================================#
 	# internal procedures
 	tag!(x) = attachTag(:rectangular, x)
-	#--------------------------------------------------------
+	#----------------------------------------------------------
 	makeZFromRealImag(x, y) = cons(x, y)
 	makeZFromMagAng(r, a)   = cons(r * cos(a), r * sin(a))
-	#--------------------------------------------------------
-	realPartOfZ(z)  = car(z)
-	imagPartOfZ(z)  = cdr(z)
-	magnitudeOfZ(z) = √(realPartOfZ(z)^2 + imagPartOfZ(z)^2)
-	angleOfZ(z)     = atan(imagPartOfZ(z), realPartOfZ(z))
-	#--------------------------------------------------------
-	addComplexZs(z1, z2) = 
+	#----------------------------------------------------------
+	realPartRect(z)  = car(z)
+	imagPartRect(z)  = cdr(z)
+	magnitudeRect(z) = √(realPartRect(z)^2 + imagPartRect(z)^2)
+	angleRect(z)     = atan(imagPartRect(z), realPartRect(z))
+	#----------------------------------------------------------
+	addComplexRect(z1, z2) = 
 		makeZFromRealImag(
-			realPartOfZ(z1) + realPartOfZ(z2), 
-			imagPartOfZ(z1) + imagPartOfZ(z2))
+			realPartRect(z1) + realPartRect(z2), 
+			imagPartRect(z1) + imagPartRect(z2))
 	#--------------------------------------------
-	subComplexZs(z1, z2) = 
+	subComplexRect(z1, z2) = 
 		makeZFromRealImag(
-			realPartOfZ(z1) - realPartOfZ(z2), 
-			imagPartOfZ(z1) - imagPartOfZ(z2))
+			realPartRect(z1) - realPartRect(z2), 
+			imagPartRect(z1) - imagPartRect(z2))
 	#--------------------------------------------
-	mulComplexZs(z1, z2) = 
+	mulComplexRect(z1, z2) = 
 		let
-			x1 = realPartOfZ(z1)
-			x2 = realPartOfZ(z2)
-			y1 = imagPartOfZ(z1)
-			y2 = imagPartOfZ(z2)
+			x1 = realPartRect(z1)
+			x2 = realPartRect(z2)
+			y1 = imagPartRect(z1)
+			y2 = imagPartRect(z2)
 			makeZFromRealImag(
 				(x1 * x2 - y1 * y2), 
 				(x1 * y2 + y1 * x2))
 		end # let
 	#--------------------------------------------
-	divComplexZs(z1, z2) = 
+	divComplexRect(z1, z2) = 
 		let
-			x1 = realPartOfZ(z1)
-			x2 = realPartOfZ(z2)
-			y1 = imagPartOfZ(z1)
-			y2 = imagPartOfZ(z2)
+			x1 = realPartRect(z1)
+			x2 = realPartRect(z2)
+			y1 = imagPartRect(z1)
+			y2 = imagPartRect(z2)
 			denominator = (x2^2 + y2^2)
 			makeZFromRealImag(
 				(x1 * x2 + y1 * y2) / denominator, 
@@ -484,19 +499,19 @@ function installRectangularPackage() # Ben's rectangular package
 		(x,y) -> tag!(makeZFromRealImag(x, y)))
 	myPut!(:makeZFromMagAng,   (:rectangular,), 
 		(r,a) -> tag!(makeZFromMagAng(r, a)))
-	#-----------------------------------------------------------
-	myPut!(:real,     (:rectangular,), (z,) -> realPartOfZ(z))
-	myPut!(:imag,     (:rectangular,), (z,) -> imagPartOfZ(z))
-	myPut!(:magnitude,(:rectangular,), (z,) -> magnitudeOfZ(z))
-	myPut!(:angle,    (:rectangular,), (z,) -> angleOfZ(z))
 	#---------------------------------------------------------------------------------
-	myPut!(:add, (:rectangular, :rectangular), (z1, z2) -> tag!(addComplexZs(z1, z2)))
-	myPut!(:sub, (:rectangular, :rectangular), (z1, z2) -> tag!(subComplexZs(z1, z2)))
-	myPut!(:mul, (:rectangular, :rectangular), (z1, z2) -> tag!(mulComplexZs(z1, z2)))
-	myPut!(:div, (:rectangular, :rectangular), (z1, z2) -> tag!(divComplexZs(z1, z2)))
+	myPut!(:realPart,  (:rectangular,),                  realPartRect)
+	myPut!(:imagPart,  (:rectangular,),                  imagPartRect)
+	myPut!(:magnitude, (:rectangular,),                  magnitudeRect)
+	myPut!(:angle,     (:rectangular,),                  angleRect)
+	#---------------------------------------------------------------------------------
+	myPut!(:add, (:rectangular, :rectangular), (z1, z2)->tag!(addComplexRect(z1, z2)))
+	myPut!(:sub, (:rectangular, :rectangular), (z1, z2)->tag!(subComplexRect(z1, z2)))
+	myPut!(:mul, (:rectangular, :rectangular), (z1, z2)->tag!(mulComplexRect(z1, z2)))
+	myPut!(:div, (:rectangular, :rectangular), (z1, z2)->tag!(divComplexRect(z1, z2)))
 	#---------------------------------------------------------------------------------
 	"Ben's rectangular package installed"
-	#---------------------------------------------------------------------------------
+	#================================================================================#
 end # function installRectangularPackage
 
 # ╔═╡ c6b227b7-0fd0-403f-bb4c-af35d35bc4e4
@@ -533,8 +548,8 @@ md"
 # ╔═╡ bf573744-d9ec-4157-9f08-572d5289cd59
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	r1 = myMagnitude(z1)                  # √(2^2 + 1^2) = √5 ==> 2.236
-	z2 = makeZRectFromRealImag(myReal(z1)/r1, -2*myImag(z1)/r1)
+	r1 = magnitude(z1)                  # √(2^2 + 1^2) = √5 ==> 2.236
+	z2 = makeZRectFromRealImag(realPart(z1)/r1, -2*imagPart(z1)/r1)
 	# (2 + 1i) + (2/2.36 - 2*1i/2.236) = (2 + 1i) + (0.894 - 0.894i) 
 	#  ==> (2.894 + 0.106i)
 	z3 = add(z1, z2)
@@ -543,8 +558,8 @@ end # let
 # ╔═╡ ce57e202-3aa0-416b-9662-113d12f7ba52
 let
 	z1 = makeZRectFromRealImag(2, 1)
-	r1 = myMagnitude(z1)
-	z2 = makeZRectFromRealImag(myReal(z1)/r1, -2*myImag(z1)/r1)
+	r1 = magnitude(z1)
+	z2 = makeZRectFromRealImag(realPart(z1)/r1, -2*imagPart(z1)/r1)
 	# (2 + 1i) - (2/√5 - 2/√5i) = (2 + 1i) - (.89  -.89i) ==> (1.105 + 1.894)
 	z3 = sub(z1, z2)
 end # let
@@ -589,67 +604,66 @@ md"
 
 # ╔═╡ 4e90ff13-3841-481b-9a5f-1a9dfa18bfd8
 function installPolarPackage() # Alyssa's polar package
-	#====================================================================#
+	#========================================================================#
 	# internal procedures
-	#---------------------------------------------------------------------
+	#-------------------------------------------------------------------------
 	tag!(x) = attachTag(:polar, x)
-	# attachTag(typeTag, contents) = cons(typeTag, contents) 
-	#---------------------------------------------------------------------
+	#-------------------------------------------------------------------------
 	makeZFromMagAng(r, a)   = cons(r, a)
 	makeZFromRealImag(x, y) = cons(√(x^2 + y^2), atan(y, x))
-	#---------------------------------------------------------------------
-	realPartOfZ(z)   = magnitudeOfZ(z) * cos(angleOfZ(z))
-	imagPartOfZ(z)   = magnitudeOfZ(z) * sin(angleOfZ(z))
-	magnitudeOfZ(z)  = car(z)
-	angleOfZ(z)      = cdr(z)
-	#---------------------------------------------------------------------
-	addComplexZs(z1, z2) = 
+	#-------------------------------------------------------------------------
+	realPartPolar(z)   = magnitudePolar(z) * cos(anglePolar(z))
+	imagPartPolar(z)   = magnitudePolar(z) * sin(anglePolar(z))
+	magnitudePolar(z)  = car(z)
+	anglePolar(z)      = cdr(z)
+	#-------------------------------------------------------------------------
+	addComplexPolar(z1, z2) = 
 		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) + realPartOfZ(z2), 
-			imagPartOfZ(z1) + imagPartOfZ(z2))
+			realPartPolar(z1) + realPartPolar(z2), 
+			imagPartPolar(z1) + imagPartPolar(z2))
 			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
+				magnitudePolar(z3), 
+				anglePolar(z3)))
 		end # let
 	#--------------------------------------------
-	subComplexZs(z1, z2) = 
+	subComplexPolar(z1, z2) = 
 		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) - realPartOfZ(z2), 
-			imagPartOfZ(z1) - imagPartOfZ(z2))
+			realPartPolar(z1) - realPartPolar(z2), 
+			imagPartPolar(z1) - imagPartPolar(z2))
 			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
+				magnitudePolar(z3), 
+				anglePolar(z3)))
 		end # let
 	#--------------------------------------------
-	mulComplexZs(z1, z2) =
+	mulComplexPolar(z1, z2) =
 		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) * magnitudeOfZ(z2),
-			angleOfZ(z1) + angleOfZ(z2)))
+			magnitudePolar(z1) * magnitudePolar(z2),
+			anglePolar(z1) + anglePolar(z2)))
 	#--------------------------------------------
-	divComplexZs(z1, z2) =
+	divComplexPolar(z1, z2) =
 		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) / magnitudeOfZ(z2),
-			angleOfZ(z1) - angleOfZ(z2)))
-	#====================================================================#
+			magnitudePolar(z1) / magnitudePolar(z2),
+			anglePolar(z1) - anglePolar(z2)))
+	#========================================================================#
 	# interface to rest of system
-	#---------------------------------------------------------------------
+	#-------------------------------------------------------------------------
 	myPut!(:makeZFromRealImag, (:polar,),
 		(x, y) -> tag!(makeZFromRealImag(x, y)))
 	myPut!(:makeZFromMagAng,   (:polar,),
 		(r, a) -> tag!(makeZFromMagAng(r, a)))	
-	#---------------------------------------------------------------------
-	myPut!(:real,         (:polar,),   (z,) -> realPartOfZ(z))
-	myPut!(:imag,         (:polar,),   (z,) -> imagPartOfZ(z))
-	myPut!(:magnitude,    (:polar,),   (z,) -> magnitudeOfZ(z))
-	myPut!(:angle,        (:polar,),   (z,) -> angleOfZ(z))
-	#---------------------------------------------------------------------
-	myPut!(:add, (:polar, :polar), (z1, z2) -> tag!(addComplexZs(z1, z2)))
-	myPut!(:sub, (:polar, :polar), (z1, z2) -> tag!(subComplexZs(z1, z2)))
-	myPut!(:mul, (:polar, :polar), (z1, z2) -> tag!(mulComplexZs(z1, z2)))
-	myPut!(:div, (:polar, :polar), (z1, z2) -> tag!(divComplexZs(z1, z2)))
-	#---------------------------------------------------------------------
+	#-------------------------------------------------------------------------
+	myPut!(:real,         (:polar,),           realPartPolar)
+	myPut!(:imag,         (:polar,),           imagPartPolar)
+	myPut!(:magnitude,    (:polar,),           magnitudePolar)
+	myPut!(:angle,        (:polar,),           anglePolar)
+	#-------------------------------------------------------------------------
+	myPut!(:add, (:polar, :polar), (z1, z2) -> tag!(addComplexPolar(z1, z2)))
+	myPut!(:sub, (:polar, :polar), (z1, z2) -> tag!(subComplexPolar(z1, z2)))
+	myPut!(:mul, (:polar, :polar), (z1, z2) -> tag!(mulComplexPolar(z1, z2)))
+	myPut!(:div, (:polar, :polar), (z1, z2) -> tag!(divComplexPolar(z1, z2)))
+	#-------------------------------------------------------------------------
 	"Alyssa's polar package installed"
-	#---------------------------------------------------------------------
+	#========================================================================#
 end # function installPolarPackage
 
 # ╔═╡ ddf22741-2fbe-46bc-abc7-052be48a5a9d
@@ -685,38 +699,38 @@ md"
 # ╔═╡ 1de38341-0d9d-4b32-be47-2945dac2b7c6
 let
 	z0 = makeZRectFromRealImag(2, 1)
-	z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(
-			myReal(z0)/myMagnitude(z0), -myReal(z0)/myMagnitude(z0))
-	z3 = makeZPolarFromMagAng(myMagnitude(z2), myAngle(z2))
+			realPart(z0)/magnitude(z0), -realPart(z0)/magnitude(z0))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
  	add(z1, z3)    # (2.8964 ∠ 0.0365) or (2.8945 + 0.1054i)
 end # let
 
 # ╔═╡ 9b7837b3-1b41-46c9-a10f-d872f92cf184
 let
 	z0 = makeZRectFromRealImag(2, 1)
-	z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(
-		myReal(z0)/myMagnitude(z0), -myReal(z0)/myMagnitude(z0))
-	z3 = makeZPolarFromMagAng(myMagnitude(z2), myAngle(z2))
+		realPart(z0)/magnitude(z0), -realPart(z0)/magnitude(z0))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
  	sub(z1, z3)    #  (2.1934 ∠ 1.0425)  or  (1.1056 + 1.8944i)
 end # let
 
 # ╔═╡ 9ef822cc-93aa-4d10-856a-774a3318cabf
 let
 	z0 = makeZRectFromRealImag(2, -1)
-	z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(2,  2)
-	z3 = makeZPolarFromMagAng(myMagnitude(z2), myAngle(z2))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
 	mul(z1, z3)   #  (6.3246 ∠ 0.3218) or (6.0000 + 2.0000i)
 end # let
 
 # ╔═╡ 45ecf3da-2375-4312-b440-055b7728d22b
 let
 	z0 = makeZRectFromRealImag(3, -1)
-	z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
+	z1 = makeZPolarFromMagAng(magnitude(z0), angle(z0))
 	z2 = makeZRectFromRealImag(1,  2)
-	z3 = makeZPolarFromMagAng(myMagnitude(z2), myAngle(z2))
+	z3 = makeZPolarFromMagAng(magnitude(z2), angle(z2))
 	#  (1.41 ∠ 4.85) = (1.41 ∠ 4.85-2π) = (1.41 ∠ -1.43)
 	div(z1, z3)  # (1.41 ∠ -1.43) or (0.20 − 1.4i)
 end # let
@@ -846,6 +860,7 @@ $$z = x + yi = |z|(cos \phi + i \cdot sin \phi) = r\cdot e^{i\phi}$$
 
 # ╔═╡ 2def8fc2-0b8f-43e2-9ac4-4ac0fa4bc999
 let
+	angle = Base.angle
 	z0 = Complex(2, -1)
 	# z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
 	z1 = abs(z0) * exp(angle(z0)*im)
@@ -868,6 +883,7 @@ $$z = x + yi = |z|(cos \phi + i \cdot sin \phi) = r\cdot e^{i\phi}$$
 
 # ╔═╡ d5fbb6ed-8572-4d77-aeb6-52d6a281995d
 let
+	angle = Base.angle
 	z0 = Complex(3, -1)
 	# z1 = makeZPolarFromMagAng(myMagnitude(z0), myAngle(z0))
 	z1 = abs(z0) * exp(angle(z0)*im)
