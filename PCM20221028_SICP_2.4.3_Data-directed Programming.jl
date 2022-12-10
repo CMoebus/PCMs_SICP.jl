@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/09 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/10 ***
 
 =====================================================================================
 "
@@ -54,10 +54,10 @@ top         & \text{Representation-independent operations}    \\
             & \text{Representation-dependent operations}      \\
             & \begin{array}{cc} 
             & \hline                                          \\
-            & addComplexZs          & addComplexZs            \\
-            & subComplexZs          & subComplexZs            \\
-            & mulComplexZs          & mulComplexZs            \\
-            & divComplexZs          & divComplexZs            \\
+            & addComplexRectangular & addComplexPolar         \\
+            & subComplexRectangular & subComplexPolar         \\
+            & mulComplexRectangular & mulComplexPolar         \\
+            & divComplexRectangular & divComplexPolar         \\
             & \end{array}                                     \\
 middle      & \text{Representation-dependent constructors}    \\
 (interface) & \begin{array}{cc} 
@@ -72,10 +72,10 @@ middle      & \text{Representation-dependent constructors}    \\
             & \begin{array}{cc} 
             & \text{Rectangular}    & \text{Polar}            \\
             & \hline                &                         \\
-            & realPartOfZ           & realPartOfZ             \\ 
-            & imagPartOfZ           & imagPartOfZ             \\
-            & magnitudeOfZ          & magnitudeOfZ            \\
-            & angleOfZ              & angleOfZ                \\
+            & realPartRectangular   & realPartPolar           \\ 
+            & imagPartRectangular   & imagPartPolar           \\
+            & magnitudeRectangular  & magnitudePolar          \\
+            & angleRectangular      & anglePolar              \\
             &                                                 \\
             & \hline                                          \\
             & isRectangular         & isPolar                 \\
@@ -148,25 +148,27 @@ end # function contents
 md"
 $$\begin{array}{|l|c|cc|}
 \hline
-& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                                            \\
-           &\text{args of } myGet: & (:rectangular,)  & (:polar,) \\ 
+                                                               \\
+& \text{args of } & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                \\
+              & myGet       & (:rectangular,) & (:polar,)      \\ 
 \hline                                                                        
-              &               &                 &                 \\
-              & realPart      & realPartOfZ     & realPartOfZ     \\
-\text{Opera-} & imagPart      & imagPartOfZ     & imagPartOfZ     \\
-\text{tions}  & magnitude     & magnitudeOfZ    & magnitudeOfZ    \\
-              & angle         & angleOfZ        & angleOfZ        \\
-              &               &                 &                 \\
+              &             &                 &                \\
+              & realPart    & realPartRect    & realPartPolar  \\
+\text{Opera-} & imagPart    & imagPartRect    & imagPartPolar  \\
+\text{tions}  & magnitude   & magnitudeRect   & magnitudePolar \\
+              & angle       & angleRect       & anglePolar     \\
+              &             &                 &                \\
 \hline
-& & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                                              \\                
-        & \text{args of } myGet: & (:rectangular, :rectangular) & (:polar, :polar) \\ 
+                                                               \\
+& \text{args of } & \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\text{(Dispatching on) Types}                                                              \\                
+        & myGet & (:rectangular, :rectangular) & (:polar, :polar) \\ 
 \hline
-               &              &                 &                 \\
-\text{Opera-}  & addComplex   & addComplexZs    & addComplexZs    \\
-\text{tions}   & subComplex   & subComplexZs    & subComplexZs    \\
-\text{tions}   & mulComplex   & mulComplexZs    & mulComplexZs    \\
-\text{tions}   & divComplex   & divComplexZs    & divComplexZs    \\
-               &              &                 &                 \\
+              &             &                       &                 \\
+              & addComplex  & addComplexRect & addComplexPolar \\
+\text{Opera-} & subComplex  & subComplexRect & subComplexPolar \\
+\text{tions}  & mulComplex  & mulComplexRect & mulComplexPolar \\
+              & divComplex  & divComplexRect & divComplexPolar \\
+              &             &                       &                 \\
 \hline
 
 \end{array}$$
@@ -281,73 +283,73 @@ md"
 
 # ╔═╡ b5b3673e-a06f-48a8-a2be-25006e5fb4a2
 function installRectangularPackage() # Ben's rectangular package
-	#================================================================================#
+	#===============================================================#
 	# internal procedures
 	tag!(x) = attachTag(:rectangular, x)
-	#--------------------------------------------------------
+	#----------------------------------------------------------------
 	makeZFromRealImag(x, y) = cons(x, y)
 	makeZFromMagAng(r, a)   = cons(r * cos(a), r * sin(a))
-	#--------------------------------------------------------
-	realPartOfZ(z)  = car(z)
-	imagPartOfZ(z)  = cdr(z)
-	magnitudeOfZ(z) = √(realPartOfZ(z)^2 + imagPartOfZ(z)^2)
-	angleOfZ(z)     = atan(imagPartOfZ(z), realPartOfZ(z))
-	#--------------------------------------------------------
-	addComplexZs(z1, z2) = 
+	#----------------------------------------------------------------
+	realPartRect(z)  = car(z)
+	imagPartRect(z)  = cdr(z)
+	magnitudeRect(z) = √(realPartRect(z)^2 + imagPartRect(z)^2)
+	angleRect(z)     = atan(imagPartRect(z), realPartRect(z))
+	#----------------------------------------------------------------
+	addComplexRect(z1, z2) = 
 		tag!(makeZFromRealImag(
-			realPartOfZ(z1) + realPartOfZ(z2), 
-			imagPartOfZ(z1) + imagPartOfZ(z2)))
+			realPartRect(z1) + realPartRect(z2), 
+			imagPartRect(z1) + imagPartRect(z2)))
 	#--------------------------------------------
-	subComplexZs(z1, z2) = 
+	subComplexRect(z1, z2) = 
 		tag!(makeZFromRealImag(
-			realPartOfZ(z1) - realPartOfZ(z2), 
-			imagPartOfZ(z1) - imagPartOfZ(z2)))
+			realPartRect(z1) - realPartRect(z2), 
+			imagPartRect(z1) - imagPartRect(z2)))
 	#--------------------------------------------
-	mulComplexZs(z1, z2) = 
+	mulComplexRect(z1, z2) = 
 		let
-			x1 = realPartOfZ(z1)
-			x2 = realPartOfZ(z2)
-			y1 = imagPartOfZ(z1)
-			y2 = imagPartOfZ(z2)
+			x1 = realPartRect(z1)
+			x2 = realPartRect(z2)
+			y1 = imagPartRect(z1)
+			y2 = imagPartRect(z2)
 			tag!(makeZFromRealImag(
 					(x1 * x2 - y1 * y2), 
 					(x1 * y2 + y1 * x2)))
 		end # let
 	#--------------------------------------------
-	divComplexZs(z1, z2) = 
+	divComplexRect(z1, z2) = 
 		let
-			x1 = realPartOfZ(z1)
-			x2 = realPartOfZ(z2)
-			y1 = imagPartOfZ(z1)
-			y2 = imagPartOfZ(z2)
+			x1 = realPartRect(z1)
+			x2 = realPartRect(z2)
+			y1 = imagPartRect(z1)
+			y2 = imagPartRect(z2)
 			denom = (x2^2 + y2^2)
 			tag!(makeZFromRealImag(
 					(x1 * x2 + y1 * y2) / denom, 
 					(x2 * y1 - x1 * y2) / denom))
 		end # let
-	#================================================================================#
+	#===============================================================#
 	# interface to rest of system
 	myPut!(:makeZFromRealImag, (:rectangular,), 
 		(x, y) -> tag!(makeZFromRealImag(x, y)))
 	myPut!(:makeZFromMagAng,   (:rectangular,), 
 		(r, a) -> tag!(makeZFromMagAng(r, a)))
-	#---------------------------------------------------------------------------------
-	myPut!(:realPart,  (:rectangular,), (z,) -> realPartOfZ(z))
-	myPut!(:imagPart,  (:rectangular,), (z,) -> imagPartOfZ(z))
-	myPut!(:magnitude, (:rectangular,), (z,) -> magnitudeOfZ(z))
-	myPut!(:angle,     (:rectangular,), (z,) -> angleOfZ(z))
-	#---------------------------------------------------------------------------------
+	#----------------------------------------------------------------
+	myPut!(:realPart,  (:rectangular,), realPartRect)
+	myPut!(:imagPart,  (:rectangular,), imagPartRect)
+	myPut!(:magnitude, (:rectangular,), magnitudeRect)
+	myPut!(:angle,     (:rectangular,), angleRect)
+	#----------------------------------------------------------------
 	myPut!(:addComplex, (:rectangular,:rectangular), 
-		(z1, z2) -> tag!(addComplexZs(z1, z2)))
+		(z1, z2) -> tag!(addComplexRect(z1, z2)))
 	myPut!(:subComplex, (:rectangular, :rectangular), 
-		(z1, z2) -> tag!(subComplexZs(z1, z2)))
+		(z1, z2) -> tag!(subComplexRect(z1, z2)))
 	myPut!(:mulComplex, (:rectangular, :rectangular), 
-		(z1, z2) -> tag!(mulComplexZs(z1, z2)))
+		(z1, z2) -> tag!(mulComplexRect(z1, z2)))
 	myPut!(:divComplex, (:rectangular, :rectangular), 
-		(z1, z2) -> tag!(divComplexZs(z1, z2)))
-	#---------------------------------------------------------------------------------
+		(z1, z2) -> tag!(divComplexRect(z1, z2)))
+	#----------------------------------------------------------------
 	"Ben's rectangular package installed"
-	#------------------------
+	#===============================================================#
 end # function installRectangularPackage
 
 # ╔═╡ ebe7b24a-beec-406b-acf8-71b414f29893
@@ -372,10 +374,10 @@ getOpsOfType((:rectangular,))
 getOpsOfType((:rectangular, :rectangular))
 
 # ╔═╡ d6e79de7-b43a-4870-b932-6571e0b60b04
-myTableOfOpsAndTypes[:realOfZ, (:rectangular,)] # retrieval of method realPartOfZ
+myTableOfOpsAndTypes[:realPart, (:rectangular,)] # retrieval of method realPartOfZ
 
 # ╔═╡ eac6bb08-e92e-4784-a37d-6748564086a6
-myGet(:realOfZ, (:rectangular,))
+myGet(:realPart, (:rectangular,))
 
 # ╔═╡ 31742b8a-ebcf-460e-871b-59b97c2759ff
 # test construction of complex number
@@ -429,16 +431,16 @@ typeTag(z1)
 contents(z1)
 
 # ╔═╡ 3afbaf52-f5bd-4b92-b486-d05be9c15743
-applyGeneric(:realOfZ, z1) 
+applyGeneric(:realPart, z1) 
 
 # ╔═╡ e4588d6a-82e5-4a4b-a86e-1d3bd3863bfa
-applyGeneric(:imagOfZ, z1) 
+applyGeneric(:imagPart, z1) 
 
 # ╔═╡ 5562b3a3-875c-40a8-98b1-a4d809a38163
-applyGeneric(:magnitudeOfZ, z1) 
+applyGeneric(:magnitude, z1) 
 
 # ╔═╡ 845ed715-5547-4fba-ab4c-05ac18e595a2
-applyGeneric(:angleOfZ, z1) 
+applyGeneric(:angle, z1) 
 
 # ╔═╡ 11e55d16-98fb-44ca-85e1-fd11d8cd3c6c
 realPart
@@ -541,67 +543,66 @@ md"
 
 # ╔═╡ d20e564f-f6e8-4b7e-b93a-43e6a4725212
 function installPolarPackage() # Alyssa's polar package
-	#====================================================================#
+	#==============================================================================#
 	# internal procedures
-	#---------------------------------------------------------------------
+	#-------------------------------------------------------------------------------
 	tag!(x) = attachTag(:polar, x)
-	# attachTag(typeTag, contents) = cons(typeTag, contents) 
 	#---------------------------------------------------------------------
 	makeZFromMagAng(r, a)   = cons(r, a)
 	makeZFromRealImag(x, y) = cons(√(x^2 + y^2), atan(y, x))
 	#---------------------------------------------------------------------
-	realPartOfZ(z)   = magnitudeOfZ(z) * cos(angleOfZ(z))
-	imagPartOfZ(z)   = magnitudeOfZ(z) * sin(angleOfZ(z))
-	magnitudeOfZ(z)  = car(z)
-	angleOfZ(z)      = cdr(z)
+	realPartPolar(z)   = magnitudePolar(z) * cos(anglePolar(z))
+	imagPartPolar(z)   = magnitudePolar(z) * sin(anglePolar(z))
+	magnitudePolar(z)  = car(z)
+	anglePolar(z)      = cdr(z)
 	#---------------------------------------------------------------------
-	addComplexZs(z1, z2) = 
+	addComplexPolar(z1, z2) = 
 		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) + realPartOfZ(z2), 
-			imagPartOfZ(z1) + imagPartOfZ(z2))
+			realPartPolar(z1) + realPartPolar(z2), 
+			imagPartPolar(z1) + imagPartPolar(z2))
 			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
+				magnitudePolar(z3), 
+				anglePolar(z3)))
 		end # let
 	#--------------------------------------------
-	subComplexZs(z1, z2) = 
+	subComplexPolar(z1, z2) = 
 		let z3 = makeZFromRealImag(
-			realPartOfZ(z1) - realPartOfZ(z2), 
-			imagPartOfZ(z1) - imagPartOfZ(z2))
+			realPartPolar(z1) - realPartPolar(z2), 
+			imagPartPolar(z1) - imagPartPolar(z2))
 			tag!(makeZFromMagAng(
-				magnitudeOfZ(z3), 
-				angleOfZ(z3)))
+				magnitudePolar(z3), 
+				anglePolar(z3)))
 		end # let
 	#--------------------------------------------
-	mulComplexZs(z1, z2) =
+	mulComplexPolar(z1, z2) =
 		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) * magnitudeOfZ(z2),
-			angleOfZ(z1) + angleOfZ(z2)))
+			magnitudePolar(z1) * magnitudePolar(z2),
+			anglePolar(z1) + anglePolar(z2)))
 	#--------------------------------------------
-	divComplexZs(z1, z2) =
+	divComplexPolar(z1, z2) =
 		tag!(makeZFromMagAng(
-			magnitudeOfZ(z1) / magnitudeOfZ(z2),
-			angleOfZ(z1) - angleOfZ(z2)))
-	#===========================================================================#
+			magnitudePolar(z1) / magnitudePolar(z2),
+			anglePolar(z1) - anglePolar(z2)))
+	#==============================================================================#
 	# interface to rest of system
-	#----------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------
 	myPut!(:makeZFromRealImag, (:polar,),
 		(x, y) -> tag!(makeZFromRealImag(x, y)))
 	myPut!(:makeZFromMagAng,   (:polar,),
 		(r, a) -> tag!(makeZFromMagAng(r, a)))	
-	#----------------------------------------------------------------------------
-	myPut!(:realPart,          (:polar,),     (z,) -> realPartOfZ(z))
-	myPut!(:imagPart,          (:polar,),     (z,) -> imagPartOfZ(z))
-	myPut!(:magnitude,         (:polar,),     (z,) -> magnitudeOfZ(z))
-	myPut!(:angle,             (:polar,),     (z,) -> angleOfZ(z))
-	#----------------------------------------------------------------------------
-	myPut!(:addComplex, (:polar, :polar), (z1, z2) -> tag!(addComplexZs(z1, z2)))
-	myPut!(:subComplex, (:polar, :polar), (z1, z2) -> tag!(subComplexZs(z1, z2)))
-	myPut!(:mulComplex, (:polar, :polar), (z1, z2) -> tag!(mulComplexZs(z1, z2)))
-	myPut!(:divComplex, (:polar, :polar), (z1, z2) -> tag!(divComplexZs(z1, z2)))
-	#----------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------
+	myPut!(:realPart,          (:polar,),     realPartPolar)
+	myPut!(:imagPart,          (:polar,),     imagPartPolar)
+	myPut!(:magnitude,         (:polar,),     magnitudePolar)
+	myPut!(:angle,             (:polar,),     anglePolar)
+	#-------------------------------------------------------------------------------
+	myPut!(:addComplex, (:polar, :polar), (z1, z2) -> tag!(addComplexPolar(z1, z2)))
+	myPut!(:subComplex, (:polar, :polar), (z1, z2) -> tag!(subComplexPolar(z1, z2)))
+	myPut!(:mulComplex, (:polar, :polar), (z1, z2) -> tag!(mulComplexPolar(z1, z2)))
+	myPut!(:divComplex, (:polar, :polar), (z1, z2) -> tag!(divComplexPolar(z1, z2)))
+	#-------------------------------------------------------------------------------
 	"Alyssa's polar package installed"
-	#----------------------------------------------------------------------------
+	#==============================================================================#
 end # function installPolarPackage
 
 # ╔═╡ 2bbdecd4-f786-480e-93cd-c5e5cac398f6
