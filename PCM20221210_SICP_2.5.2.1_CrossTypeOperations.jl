@@ -9,8 +9,13 @@ md"
 ====================================================================================
 #### SICP: 2.5.2.1 [*Cross-type* operations](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e2) 
 ###### file: PCM20221210\_SICP\_2.5.2.1\_CrossTypeOperations.jl
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/10 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/11***
 ====================================================================================
+"
+
+# ╔═╡ 3dfa205d-5fe6-45ae-a9c6-86503e124f4e
+md"
+#### 2.5.2.1.1 SICP-*Scheme*-like functions and operators
 "
 
 # ╔═╡ 484a99cf-172c-42c4-988e-5f74f6ab04fe
@@ -305,7 +310,27 @@ md"
 let
 	z = makeZRectFromRealImag(2, 1)
     x = makeSicpNumber(3)
-	add(z, x)
+	add(z, x)         # NRW: cross-type operation
+end # let
+
+# ╔═╡ 79f8e0c3-6237-4e0a-8eea-7fb24ae77148
+md"
+---
+#### 2.5.2.1.2 *idiographic* Julia functions and operators
+"
+
+# ╔═╡ 82c5475a-88ba-44ac-88de-1847922cea3f
+let
+	z = Complex(2, 1)
+	x = 3
+	z + x             # NEW: cross-type operation
+end # let
+
+# ╔═╡ 42d19c5a-69b4-41f1-9eba-b04cb2a2f78f
+let
+	z = Complex(2, 1)
+	x = 3.0
+	z + x             # NEW: cross-type operation
 end # let
 
 # ╔═╡ b3f14dc2-c6fc-4587-b4ba-b469e47e03ee
@@ -342,6 +367,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
 # ╔═╡ Cell order:
 # ╟─7f7e11f0-78ac-11ed-1ded-d9cdbbfa0be4
+# ╟─3dfa205d-5fe6-45ae-a9c6-86503e124f4e
 # ╟─484a99cf-172c-42c4-988e-5f74f6ab04fe
 # ╠═d454be34-a245-495f-95f6-0d51976e95f0
 # ╠═f745c49d-bfaf-4297-9e73-18c41883ed24
@@ -381,6 +407,9 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═0c0748de-ef11-4537-91d3-a7216b751812
 # ╟─0ab451c8-fa20-471c-9042-ac2f28d98a5a
 # ╠═0cb813cb-89ff-41c7-b76a-b75ac16d3fc6
+# ╟─79f8e0c3-6237-4e0a-8eea-7fb24ae77148
+# ╠═82c5475a-88ba-44ac-88de-1847922cea3f
+# ╠═42d19c5a-69b4-41f1-9eba-b04cb2a2f78f
 # ╟─b3f14dc2-c6fc-4587-b4ba-b469e47e03ee
 # ╟─1fc32013-f090-4816-b8aa-c962a2911599
 # ╟─00000000-0000-0000-0000-000000000001
