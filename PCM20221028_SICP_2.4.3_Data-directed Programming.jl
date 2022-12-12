@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### SICP: 2.4.3 [Data-directed Programming and Additivity](https://sarabander.github.io/sicp/html/2_002e4.xhtml#g_t2_002e4_002e3)
 ##### file: PCM20221028\_SICP\_2.4.3_Data-directed Programming.jl
-##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/10 ***
+##### code: Julia/Pluto.jl (1.8.2/0.19.14) by PCM *** 2022/12/12 ***
 
 =====================================================================================
 "
@@ -222,13 +222,13 @@ function myGet(op::Symbol, opType::Tuple) # instead of SICP's get
 end # function myGet
 
 # ╔═╡ f2257d43-94b3-4b2c-8c11-05b88cddf386
-function getOpsOfType(argType)
+function getOpsOfType(table, argType)
 	filter(pairOpOpType -> 
 		let
 			(op, opType) = pairOpOpType
 			opType == argType ? true : false
 		end, # let
-		keys(myTableOfOpsAndTypes))
+		keys(table))
 end # function getOpsOfType
 
 # ╔═╡ 3d71261a-930f-4a17-9d56-16e0ce8674bb
@@ -368,10 +368,10 @@ myTableOfOpsAndTypes                          # correct content of table diction
 keys(myTableOfOpsAndTypes)
 
 # ╔═╡ cb95d31c-9b8c-48a5-a20e-b77fef8c83ed
-getOpsOfType((:rectangular,))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular,))
 
 # ╔═╡ 55f4e841-ca98-4c32-ac78-a402567bd958
-getOpsOfType((:rectangular, :rectangular))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular, :rectangular))
 
 # ╔═╡ d6e79de7-b43a-4870-b932-6571e0b60b04
 myTableOfOpsAndTypes[:realPart, (:rectangular,)] # retrieval of method realPartOfZ
@@ -609,7 +609,15 @@ end # function installPolarPackage
 installPolarPackage()
 
 # ╔═╡ 06365e9b-9ad4-4891-9f7a-6a23f4f7b100
-getOpsOfType(:polar)               # get all ops (rows) for type (column) ':polar'
+# get all ops (rows) for type (column) '(:polar,)'
+getOpsOfType(myTableOfOpsAndTypes, (:polar,)) 
+
+# ╔═╡ d6d3b4f0-3ddf-4f9e-a027-5fce5df444f9
+
+
+# ╔═╡ 8027339b-87a4-4d7a-a291-71d6df76f780
+# get all ops (rows) for type (column) '(:polar, :polar)'
+getOpsOfType(myTableOfOpsAndTypes, (:polar, :polar)) 
 
 # ╔═╡ 4c1deedb-da8e-401f-bda5-df9b67dd1145
 md"
@@ -823,6 +831,8 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═d20e564f-f6e8-4b7e-b93a-43e6a4725212
 # ╠═2bbdecd4-f786-480e-93cd-c5e5cac398f6
 # ╠═06365e9b-9ad4-4891-9f7a-6a23f4f7b100
+# ╠═d6d3b4f0-3ddf-4f9e-a027-5fce5df444f9
+# ╠═8027339b-87a4-4d7a-a291-71d6df76f780
 # ╟─4c1deedb-da8e-401f-bda5-df9b67dd1145
 # ╠═04dd57cc-fd45-4c7c-827e-2cd2012cf839
 # ╠═e5dce11a-b925-4b8e-b30d-d8a59222a0d2
