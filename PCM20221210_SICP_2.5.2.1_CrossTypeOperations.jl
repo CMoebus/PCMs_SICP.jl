@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: 2.5.2.1 [*Cross-type* operations](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e2) 
 ###### file: PCM20221210\_SICP\_2.5.2.1\_CrossTypeOperations.jl
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/11***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/12 ***
 ====================================================================================
 "
 
@@ -95,13 +95,13 @@ function myGet(op::Symbol, opType::Tuple) # instead of SICP's get
 end # function myGet
 
 # ╔═╡ a026c282-4a44-4bc3-a29c-09141221a54a
-function getOpsOfType(argType)
+function getOpsOfType(table, argType)
 	filter(pairOpOpType -> 
 		let
 			(op, opType) = pairOpOpType
 			opType == argType ? true : false
 		end, # let
-		keys(myTableOfOpsAndTypes))
+		keys(table))
 end # function getOpsOfType
 
 # ╔═╡ 48c39822-85ea-4267-bd2a-915b7432dcfe
@@ -182,10 +182,10 @@ end # function installJuliaNumberPackage
 installSICPNumberPackage()
 
 # ╔═╡ abf37201-e26f-4cd3-bca9-ec8ac3474a4a
-getOpsOfType((:sicpNumber,))
+getOpsOfType(myTableOfOpsAndTypes, (:sicpNumber,))
 
 # ╔═╡ 465967d5-75f4-4ac8-a7f1-86ece3aa8830
-getOpsOfType((:sicpNumber, :sicpNumber))
+getOpsOfType(myTableOfOpsAndTypes, (:sicpNumber, :sicpNumber))
 
 # ╔═╡ 61580cf8-331b-4129-a981-5732022a4c9b
 md"
@@ -281,13 +281,14 @@ end # function installRectangularPackage
 installRectangularPackage()
 
 # ╔═╡ 1364620d-69f7-4953-8409-07c7a22ca9a0
-getOpsOfType((:rectangular,))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular,))
 
 # ╔═╡ aed7bad9-42c6-4a12-86b6-1eedfb80f71e
-getOpsOfType((:rectangular, :rectangular))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular, :rectangular))
 
 # ╔═╡ e8cac3db-7deb-40e6-a540-865b03fc1d33
-getOpsOfType((:rectangular, :sicpNumber))  # NEW: cross-type operation	
+# NEW: cross-type operation	
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular, :sicpNumber))  
 
 # ╔═╡ bc973e5b-405b-4677-8880-053109466c61
 md"
