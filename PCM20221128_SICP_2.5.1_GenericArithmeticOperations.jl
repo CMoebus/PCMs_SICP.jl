@@ -9,7 +9,7 @@ md"
 ====================================================================================
 ##### SICP: 2.5.1 [Generic Arithmetic Operations](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e1)
 ###### file: PCM20221128\_SICP\_2.5.1\_GenericArithmeticOperations.jl
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/10 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2022/12/12 ***
 ====================================================================================
 "
 
@@ -100,13 +100,13 @@ function myGet(op::Symbol, opType::Tuple) # instead of SICP's get
 end # function myGet
 
 # ╔═╡ 71aee367-6d51-41ff-9d65-9cf0e313e81d
-function getOpsOfType(argType)
+function getOpsOfType(table, argType)
 	filter(pairOpOpType -> 
 		let
 			(op, opType) = pairOpOpType
 			opType == argType ? true : false
 		end, # let
-		keys(myTableOfOpsAndTypes))
+		keys(table))
 end # function getOpsOfType
 
 # ╔═╡ 8e888d27-0b63-471b-9130-e696b3c6a7e9
@@ -243,10 +243,10 @@ md"
 installSICPNumberPackage()
 
 # ╔═╡ f6db0bdd-82e0-4d2e-8ee0-5f46a47d6779
-getOpsOfType((:sicpNumber,))
+getOpsOfType(myTableOfOpsAndTypes, (:sicpNumber,))
 
 # ╔═╡ 3966cebe-8aa5-4bf0-8dc2-4ad5c5ba1874
-getOpsOfType((:sicpNumber, :sicpNumber))
+getOpsOfType(myTableOfOpsAndTypes, (:sicpNumber, :sicpNumber))
 
 # ╔═╡ 3ea75801-d119-4ed1-86c5-b63e27e6e492
 md"
@@ -386,10 +386,10 @@ end # function installRationalPackage
 installRationalPackage()
 
 # ╔═╡ 8927ee89-93da-49ed-83eb-645e901a36e5
-getOpsOfType((:rational,))
+getOpsOfType(myTableOfOpsAndTypes, (:rational,))
 
 # ╔═╡ 4472a8e2-52d3-4902-b076-ce862f29f663
-getOpsOfType((:rational, :rational))
+getOpsOfType(myTableOfOpsAndTypes, (:rational, :rational))
 
 # ╔═╡ 6f5d7f81-c900-4340-afe8-b0046c5738c8
 md"
@@ -518,10 +518,10 @@ end # function installRectangularPackage
 installRectangularPackage()
 
 # ╔═╡ d650355d-2f3d-45f0-9a88-299effe3667d
-getOpsOfType((:rectangular,))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular,))
 
 # ╔═╡ 2d53e3c6-0835-45cd-9796-52d262bc0d55
-getOpsOfType((:rectangular, :rectangular))
+getOpsOfType(myTableOfOpsAndTypes, (:rectangular, :rectangular))
 
 # ╔═╡ abfe14e8-738a-4a1c-beb3-d3e6f0cc975f
 md"
@@ -670,10 +670,10 @@ end # function installPolarPackage
 installPolarPackage()
 
 # ╔═╡ 304759c2-1322-49a0-bade-e7a2452f6774
-getOpsOfType((:polar,))        # get all ops (rows) for type (column) ':polar'
+getOpsOfType(myTableOfOpsAndTypes, (:polar,))        # get all ops (rows) for type (column) ':polar'
 
 # ╔═╡ 8cdb4671-6f71-42bf-94e9-1d31343038e5
-getOpsOfType((:polar, :polar)) 
+getOpsOfType(myTableOfOpsAndTypes, (:polar, :polar)) 
 
 # ╔═╡ 3631639d-e62e-4669-b6c3-7730206dfbe7
 md"
@@ -908,7 +908,7 @@ md"
 # ╔═╡ 3c5134dc-82a4-4499-bb7e-d85efed47b13
 md"
 ---
-##### end of ch. 1.1.1
+##### end of ch. 2.5.1
 "
 
 # ╔═╡ dcc52aa9-52ea-448f-9394-1c0e8b736635
