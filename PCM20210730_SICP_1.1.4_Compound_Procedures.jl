@@ -14,7 +14,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/11/04 ***
+ ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/12/16 ***
 ===================================================================================
 "
 
@@ -75,10 +75,15 @@ md"
 ###### unintended (!) use of untyped function; need for typing is obvious
 "
 
-# ╔═╡ 30d4dbf5-0465-4534-96bb-e8995a4d5f93
+# ╔═╡ f47941e1-f7fc-4809-b162-2b68918b9bbf
+md"
+**Fig. 1.1.4.1** modified excerpt from Julia's type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11 or [here](https://global.discourse-cdn.com/business5/uploads/julialang/original/2X/4/4612397a30b75f0c3d7c48072f142d01d2309fc9.png))
+"
+
+# ╔═╡ 83f9928b-8c10-45cc-a9a1-f9df7d41c834
 let
-	yMax = 11
-	#------------------------------------------------------------------------------
+	yMax = 10
+	#===============================================================================#
 	function plotInvUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9)
 		plot!([                                   # plot of middle vertical arm '|'
 			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8),  # root
@@ -135,25 +140,20 @@ let
 		#---------------------------------------------------------
 		plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree/3, heightOfTree=heightOfTree, fontSize=fontSize)
 	end # function plotQuaternyTree!
+	#===============================================================================#
+	plot(xlim=(-1.5, 19.0), ylim=(1, yMax), legend=:false, ticks=:none)
 	#------------------------------------------------------------------------------
-	plot(xlim=(-1.5, 18.0), ylim=(0, yMax), legend=:false, ticks=:none)
-	plotInvUnaryTree!("Irrational", "AbstractIrrational", 16.0, yMax-6.0; fontSize=8)
-	plotInvTernaryTree!("Int64", "Int32", "Int16", "Signed", 5.25, yMax-8.0; fontSize=8)
-	plotInvBinaryTree!("Complex", "Real", "Number", 4.5, yMax-2.0; widthOfTree=9.0, fontSize=8)
-	plotInvTernaryTree!("", "Bool", "Unsigned", "Integer", 6.7, yMax-6.0; fontSize=8)
-	plotInvTernaryTree!("Float64", "Float32", "Float16", "AbstractFloat", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8)
-    plotInvQuaternyTree!("", "", "Rational", "AbstractIrrational", "Real", 9.0, 		yMax-4.0; widthOfTree=14.0, fontSize=8)
-	#------------------------------------------------------------------------------
+	plotInvUnaryTree!("Irrational", "", 11.3, yMax-6.0; fontSize=8)
+	plotInvUnaryTree!("Float64", "", 16.0, yMax-6.0; fontSize=8)
+	plotInvBinaryTree!("", "Complex", "Number", 13.5, yMax-2.0; widthOfTree=9.0, fontSize=8)
+	plotInvQuaternyTree!("Integer", "Rational", "AbstractIrrational", "AbstractFloat", "Real", 9.0, yMax-4.0; widthOfTree=14.0, fontSize=8)
+	plotInvBinaryTree!("Bool", "Int64", "", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8)
+	#===============================================================================#
 end # let
-
-# ╔═╡ f47941e1-f7fc-4809-b162-2b68918b9bbf
-md"
-**Fig. 1.1.4.1** modified excerpt from Julia's type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11 or [here](https://global.discourse-cdn.com/business5/uploads/julialang/original/2X/4/4612397a30b75f0c3d7c48072f142d01d2309fc9.png))
-"
 
 # ╔═╡ 3836b76c-5f05-487e-bcc1-e5261629c1fc
 md"
-###### we need a more *specialized* abstract type than Real because because we *don't* need Ration and AbstractIrrational
+###### we need a more *specialized* abstract type than Real because because we *don't* need Rational and AbstractIrrational here
 "
 
 # ╔═╡ fe3227b9-b6e6-47ce-9dad-e817d1c5b171
@@ -298,7 +298,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "39d0d5866236472d6bc1a58c4e663ea8a2a2e057"
+project_hash = "57f16e3fed8a77522258206aa8caeaf282d2cc57"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -492,9 +492,9 @@ version = "0.21.0+0"
 
 [[deps.Glib_jll]]
 deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE2_jll", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "fb83fbe02fe57f2c068013aa94bcdf6760d3a7a7"
+git-tree-sha1 = "d3b3624125c1474292d0d8ed0f65554ac37ddb23"
 uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
-version = "2.74.0+1"
+version = "2.74.0+2"
 
 [[deps.Graphite2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -640,9 +640,9 @@ version = "1.42.0+0"
 
 [[deps.Libiconv_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "42b62845d70a619f063a7da093d995ec8e15e778"
+git-tree-sha1 = "c7cb1f5d892775ba13767a87c7ada0b980ea0a71"
 uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
-version = "1.16.1+1"
+version = "1.16.1+2"
 
 [[deps.Libmount_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -832,9 +832,9 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[deps.Qt5Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "xkbcommon_jll"]
-git-tree-sha1 = "c6c0f690d0cc7caddb74cef7aa847b824a16b256"
+git-tree-sha1 = "0c03844e2231e12fda4d0086fd7cbe4098ee8dc5"
 uuid = "ea2cea3b-5b76-57ae-a6ef-0a8af62496e1"
-version = "5.15.3+1"
+version = "5.15.3+2"
 
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
@@ -1243,7 +1243,7 @@ version = "1.4.1+0"
 # ╠═84bb8887-9df3-4ff0-ab50-eb144cd2f118
 # ╟─0cd52b1c-6e27-4dcf-a7e6-441745238e3e
 # ╠═a8ca27fa-bd58-4163-895f-bf44a4392476
-# ╟─30d4dbf5-0465-4534-96bb-e8995a4d5f93
+# ╟─83f9928b-8c10-45cc-a9a1-f9df7d41c834
 # ╟─f47941e1-f7fc-4809-b162-2b68918b9bbf
 # ╟─3836b76c-5f05-487e-bcc1-e5261629c1fc
 # ╠═fe3227b9-b6e6-47ce-9dad-e817d1c5b171
