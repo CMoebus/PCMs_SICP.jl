@@ -14,7 +14,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/12/16 ***
+ ###### Julia/Pluto.jl-code (1.8.3/19.12) by PCM *** 2022/12/16 ***
 ===================================================================================
 "
 
@@ -73,11 +73,6 @@ md"
 # ╔═╡ 0cd52b1c-6e27-4dcf-a7e6-441745238e3e
 md"
 ###### unintended (!) use of untyped function; need for typing is obvious
-"
-
-# ╔═╡ f47941e1-f7fc-4809-b162-2b68918b9bbf
-md"
-**Fig. 1.1.4.1** modified excerpt from Julia's type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11 or [here](https://global.discourse-cdn.com/business5/uploads/julialang/original/2X/4/4612397a30b75f0c3d7c48072f142d01d2309fc9.png))
 "
 
 # ╔═╡ 83f9928b-8c10-45cc-a9a1-f9df7d41c834
@@ -150,6 +145,11 @@ let
 	plotInvBinaryTree!("Bool", "Int64", "", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8)
 	#===============================================================================#
 end # let
+
+# ╔═╡ f47941e1-f7fc-4809-b162-2b68918b9bbf
+md"
+**Fig. 1.1.4.1** modified excerpt from Julia's type hierarchy (a more complete excerpt can be found in Nazarathy & Klok, 2021, p.11 or [here](https://global.discourse-cdn.com/business5/uploads/julialang/original/2X/4/4612397a30b75f0c3d7c48072f142d01d2309fc9.png))
+"
 
 # ╔═╡ 3836b76c-5f05-487e-bcc1-e5261629c1fc
 md"
@@ -296,7 +296,7 @@ Plots = "~1.35.8"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.2"
+julia_version = "1.8.3"
 manifest_format = "2.0"
 project_hash = "57f16e3fed8a77522258206aa8caeaf282d2cc57"
 
