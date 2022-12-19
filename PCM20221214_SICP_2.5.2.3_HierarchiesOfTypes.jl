@@ -12,7 +12,7 @@ md"
 ===================================================================================
 #### SICP\_2.5.2.3\_[Hierarchies\_of\_Types](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e2)
 ##### file: PCM20221214\_SICP\_2.5.2.3\_HierarchiesOfTypes.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2022/12/18 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2022/12/19 ***
 ===================================================================================
 "
  
@@ -281,79 +281,119 @@ md"
 
 # ╔═╡ 61eeec88-9cb1-47c0-b9ce-b458e01fbeea
 let
-	yMax  = 10
-	arrow = :head
+	yMax      = 10
+	arrow     = :head
+	rootIsTop = true
 	#===============================================================================#
-	function plotInvUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9, arrow=nothing)
+	function plotUnaryTree!(markOfLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=2, fontSize=9, arrow=nothing, rootIsTop=false)
 		plot!([                                   #  of vertical bar or arrow '|'
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree + heightOfTree/8),  # leaf
-			(coordinateXOfRootMark, coordinateYOfRootMark - heightOfTree/8)], # root 
+			(coordinateXOfRootMark,
+			rootIsTop ?                                          # leaf
+				coordinateYOfRootMark-heightOfTree+heightOfTree/8 :
+				coordinateYOfRootMark+heightOfTree-heightOfTree/8),  
+			(coordinateXOfRootMark,
+			rootIsTop ?                                          # root 
+				coordinateYOfRootMark-heightOfTree/8 :
+				coordinateYOfRootMark+heightOfTree/8)], 
 			lw=1, linecolor=:black, arrow=arrow)                      
 		annotate!(                                               # mark of leaf 'x'
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree, text(markOfLeaf, fontSize, :blue)))                  
+			(coordinateXOfRootMark, 
+			rootIsTop ?  
+				coordinateYOfRootMark-heightOfTree : 
+				coordinateYOfRootMark+heightOfTree, 
+			text(markOfLeaf, fontSize, :blue)))                  
 		annotate!(                                               # mark of root 'x'
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue)))                                             
+			(coordinateXOfRootMark, 
+			coordinateYOfRootMark, text(markOfRoot, fontSize, :blue)))
 	end # function plotUnaryTree!
 	#------------------------------------------------------------------------------
-	function plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=9, arrow=nothing) 
-		annotate!(                                          # mark of left leaf 'x'
+	function plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=9, arrow=nothing, rootIsTop=false) 
+		annotate!(                                            # mark of left leaf 'x'
 			(coordinateXOfRootMark-widthOfTree/2, 
-			 coordinateYOfRootMark-heightOfTree, 
-			 text(markOfLeftLeaf, fontSize, :blue)))         
-		plot!([                                     # plot of left vertical arm '|'
+			rootIsTop ? 
+			 	coordinateYOfRootMark - heightOfTree : 
+			 	coordinateYOfRootMark + heightOfTree, 
+			text(markOfLeftLeaf, fontSize, :blue))) 
+		plot!([                                        # plot of left vertical bar '|'
 			(coordinateXOfRootMark-widthOfTree/2,   
-			coordinateYOfRootMark-heightOfTree+heightOfTree/8),  
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
-			lw=1, linecolor=:black, arrow=arrow)                   
-		annotate!(                                         # mark of right leaf 'x'
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark-heightOfTree, 
-			text(markOfRightLeaf, fontSize, :blue)))        
-		plot!([                                    # plot of right vertical arm '|'
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark-heightOfTree+heightOfTree/8), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
-			lw=1, linecolor=:black, arrow=arrow)                   
-		plot!([                                        # plot of horizontal bar '-'
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
-			lw=1, linecolor=:black)          
-		plot!([                                   # plot of middle vertical arm '|'
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/2), 
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8)], 
+			rootIsTop ?
+				coordinateYOfRootMark - heightOfTree + heightOfTree/8 :
+				coordinateYOfRootMark + heightOfTree - heightOfTree/8),  
+			(coordinateXOfRootMark-widthOfTree/2, 
+			rootIsTop ? 
+				coordinateYOfRootMark-heightOfTree/2 :
+				coordinateYOfRootMark+heightOfTree/2)], 
 			lw=1, linecolor=:black, arrow=arrow) 
-		annotate!(                                          # mark of root leaf 'x'
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue)))                                       
+		annotate!(                                           # mark of right leaf 'x'
+			(coordinateXOfRootMark+widthOfTree/2, 
+			rootIsTop ? 
+			 	coordinateYOfRootMark - heightOfTree : 
+			 	coordinateYOfRootMark + heightOfTree, 
+			text(markOfRightLeaf, fontSize, :blue))) 
+		plot!([                                        # plot of left vertical bar '|'
+			(coordinateXOfRootMark+widthOfTree/2,   
+			rootIsTop ?
+				coordinateYOfRootMark - heightOfTree + heightOfTree/8 :
+				coordinateYOfRootMark + heightOfTree - heightOfTree/8),  
+			(coordinateXOfRootMark+widthOfTree/2, 
+			rootIsTop ? 
+				coordinateYOfRootMark-heightOfTree/2 :
+				coordinateYOfRootMark+heightOfTree/2)], 
+			lw=1, linecolor=:black, arrow=arrow) 
+		plot!([                                          #  plot horizontal bar '-'
+			(coordinateXOfRootMark-widthOfTree/2, 
+			rootIsTop ?
+					coordinateYOfRootMark-heightOfTree/2 :
+					coordinateYOfRootMark+heightOfTree/2), 
+			(coordinateXOfRootMark+widthOfTree/2,
+			rootIsTop ?
+				coordinateYOfRootMark-heightOfTree/2 :
+				coordinateYOfRootMark+heightOfTree/2)], 
+			lw=1, linecolor=:black)
+		plot!([                                     #  plot of middle vertical bar '|'
+			(coordinateXOfRootMark, 
+			rootIsTop ? 
+				coordinateYOfRootMark-heightOfTree/2 :
+				coordinateYOfRootMark+heightOfTree/2), 
+			(coordinateXOfRootMark, 
+			rootIsTop ? 
+				coordinateYOfRootMark-heightOfTree/8 :
+				coordinateYOfRootMark+heightOfTree/8)], 
+			lw=1, linecolor=:black, arrow=arrow) #  plot of middle vertical bar '|'
+		annotate!(
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
 	end # function plotBinaryTree!
 	#------------------------------------------------------------------------------
-	function plotInvTernaryTree!(markOfLeftLeaf, markOfMiddleLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=3.0,
-	heightOfTree=2, fontSize=9, arrow=nothing)
+	function plotTernaryTree!(markOfLeftLeaf, markOfMiddleLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=3.0,
+	heightOfTree=2, fontSize=9, arrow=nothing, rootIsTop=false)
 		#---------------------------------------------------------
-		plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow)
+		plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow, rootIsTop=rootIsTop)
 		#---------------------------------------------------------
-		plotInvUnaryTree!(markOfMiddleLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow)
+		plotUnaryTree!(markOfMiddleLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow, rootIsTop=rootIsTop)
 	end # function plotTernaryTree!
 	#------------------------------------------------------------------------------
-	function plotInvQuaternyTree!(markOfLeftMostLeaf, markOfLeftLeaf, markOfRightLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=4.0, heightOfTree=2, fontSize=9, arrow=nothing)
+	function plotQuaternyTree!(markOfLeftMostLeaf, markOfLeftLeaf, markOfRightLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=4.0, heightOfTree=2, fontSize=9, arrow=nothing, rootIsTop=false)
 		#---------------------------------------------------------
-		plotInvBinaryTree!(markOfLeftMostLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow)
+		plotBinaryTree!(markOfLeftMostLeaf, markOfRightMostLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow, rootIsTop=rootIsTop)
 		#---------------------------------------------------------
-		plotInvBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree/3, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow)
+		plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=widthOfTree/3, heightOfTree=heightOfTree, fontSize=fontSize, arrow=arrow, rootIsTop=rootIsTop)
 	end # function plotQuaternyTree!
 	#===============================================================================#
 	plot(xlim=(-1.5, 19.0), ylim=(1, yMax), legend=:false, ticks=:none)
-	#------------------------------------------------------------------------------
-	plotInvUnaryTree!("Irrational", "", 11.3, yMax-6.0; fontSize=8, arrow=arrow)
-	plotInvUnaryTree!("Float64", "", 16.0, yMax-6.0; fontSize=8, arrow=arrow)
-	plotInvBinaryTree!("", "Complex", "Number", 13.5, yMax-2.0; widthOfTree=9.0, fontSize=8, arrow=arrow)
-	plotInvBinaryTree!("Bool", "Int64", "", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8, arrow=arrow)
-	plotInvQuaternyTree!("Integer", "Rational", "AbstractIrrational", "AbstractFloat", "Real", 9.0, yMax-4.0; widthOfTree=14.0, fontSize=8, arrow=arrow)
+	#-------------------------------------------------------------------------------
+	plotUnaryTree!("Irrational", "", 11.3, 4, heightOfTree=2.0, fontSize=8, arrow=arrow, rootIsTop=rootIsTop)
+	plotUnaryTree!("Float", "", 16.0, 4, heightOfTree=2.0, fontSize=8, arrow=arrow, rootIsTop=rootIsTop)
+	#-------------------------------------------------------------------------------
+	plotBinaryTree!("Bool", "Int64", "Integer", 2.0, yMax-6.0; widthOfTree=3.2, fontSize=8, arrow=arrow, rootIsTop=rootIsTop)
+	plotBinaryTree!("", "Complex", "Number", 13.5, yMax-2.0; widthOfTree=9.0, fontSize=8, arrow=arrow, rootIsTop=rootIsTop)
+	#-------------------------------------------------------------------------------
+	plotQuaternyTree!("Integer", "Rational", "AbstractIrrational", "AbstractFloat", "Real", 9.0, yMax-4.0; widthOfTree=14.0, fontSize=8, arrow=arrow, rootIsTop=rootIsTop)
 	#===============================================================================#
 end # let
 
 # ╔═╡ 79b4a655-f20a-4af7-9d15-65dfed8b3818
 md"
-**Fig. 2.5.2.3.3**: [*DAG*](https://en.wikipedia.org/wiki/Directed_acyclic_graph) of *Julian* main types with *Julian* number systems as *nodes* and the *subset* or [*coerce*](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e2) relation as *edges*
+**Fig. 2.5.2.3.3**: [*DAG*](https://en.wikipedia.org/wiki/Directed_acyclic_graph) of *Julian* main types with *Julian* number systems as *nodes* and the *supertype*, [*coerce*](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e2), or [*convert*](https://docs.julialang.org/en/v1/base/base/#Base.convert) relation as *edges*
 
 ---
 "
@@ -369,12 +409,6 @@ $$\mathbb Z \approx Integer$$
 $$\mathbb N \approx Integer$$
 
 ---
-"
-
-# ╔═╡ b8652666-a56c-4255-95dc-4d9e246ddde9
-md"
----
-#### 2.5.2.3.3 Inadequacies of hierarchies
 "
 
 # ╔═╡ 2bc6dd6b-42ff-4cbd-b139-1dc80c0de037
@@ -1399,7 +1433,6 @@ version = "1.4.1+0"
 # ╟─61eeec88-9cb1-47c0-b9ce-b458e01fbeea
 # ╟─79b4a655-f20a-4af7-9d15-65dfed8b3818
 # ╟─4febdd8b-a406-47bc-a8df-9b5655d1b993
-# ╟─b8652666-a56c-4255-95dc-4d9e246ddde9
 # ╟─2bc6dd6b-42ff-4cbd-b139-1dc80c0de037
 # ╟─3dc793d1-f87a-43ca-8dab-806cc15f64d8
 # ╟─00000000-0000-0000-0000-000000000001
