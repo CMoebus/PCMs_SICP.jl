@@ -259,21 +259,21 @@ let
 	#===============================================================================#
 	plot(xlim=(-1.5, xMax), ylim=(1, yMax), legend=:false, ticks=:none)
 	#-------------------------------------------------------------------------------
-	plotBinaryTree!("Triangle(s)", "Quadrilateral(s)", "Polygon(s)", xMax-11.0, yMax-0.0; widthOfTree=10.0, heightOfTree=3.0, fontSize=8, arrow=arrow, rootIsTop=true)
+	plotBinaryTree!("Triangle(s)", "Quadrilateral(s)", "Polygon(s)", xMax-11.0, yMax-2.0; widthOfTree=10.0, heightOfTree=3.0, fontSize=8, arrow=arrow, rootIsTop=true)
 	#------------------------------------------------------------------------------
-	plotBinaryTree!("Isoscele(s)", "Right(s)", "Triangle(s)", xMax-16.0, yMax-3.0; widthOfTree=5.0, heightOfTree=4.5, fontSize=8, arrow=arrow, rootIsTop=true)
+	plotBinaryTree!("Isoscele(s)", "Right(s)", "Triangle(s)", xMax-16.0, yMax-5.0; widthOfTree=5.0, heightOfTree=4.5, fontSize=8, arrow=arrow, rootIsTop=true)
 	#------------------------------------------------------------------------------
-	plotBinaryTree!("Trapezoid(s)", "Kite(s)", "Quadrilateral(s)", xMax-6.0, yMax-3.0; widthOfTree=9.0, heightOfTree=3.0, fontSize=8, arrow=arrow, rootIsTop=true)
+	plotBinaryTree!("Trapezoid(s)", "Kite(s)", "Quadrilateral(s)", xMax-6.0, yMax-5.0; widthOfTree=9.0, heightOfTree=3.0, fontSize=8, arrow=arrow, rootIsTop=true)
 	#------------------------------------------------------------------------------
-	plotUnaryTree!("", "IsoscelesRight(s)", xMax-16.0, yMax-11.0; heightOfTree=6.5, fontSize=8, arrow=:tail, rootIsTop=false)
+	plotUnaryTree!("", "IsoscelesRight(s)", xMax-16.0, yMax-11.0; heightOfTree=4.5, fontSize=8, arrow=:tail, rootIsTop=false)
 	#------------------------------------------------------------------------------
-	plotUnaryTree!("Isoscele(s)", "Equilateral(s)", xMax-18.5, yMax-13.0; heightOfTree=5.5, fontSize=8, arrow=nothing, rootIsTop=false)
+	plotUnaryTree!("Isoscele(s)", "Equilateral(s)", xMax-18.5, yMax-13.0; heightOfTree=3.5, fontSize=8, arrow=:tail, rootIsTop=false)
 	#------------------------------------------------------------------------------
-	plotBinaryTree!("Square(s)", "Rhomb(us|i)", "", xMax-6.0, yMax-2.6; widthOfTree=3.0, heightOfTree=6.0, fontSize=8, arrow=:head, rootIsTop=true)
+	plotBinaryTree!("Square(s)", "Rhomb(us|i)", "", xMax-6.0, yMax-4.6; widthOfTree=3.0, heightOfTree=6.0, fontSize=8, arrow=:head, rootIsTop=true)
 	#------------------------------------------------------------------------------
-	plotUnaryTree!("Trapezoid(s)", "Parallelogram(s)", xMax-10.5, yMax-8.0; heightOfTree=2, fontSize=8, arrow=:tail, rootIsTop=false)
+	plotUnaryTree!("Trapezoid(s)", "Parallelogram(s)", xMax-10.5, yMax-10.0; heightOfTree=2, fontSize=8, arrow=:tail, rootIsTop=false)
 	#------------------------------------------------------------------------------
-	plotUnaryTree!("", "Rectangle(s)", xMax-10.5, yMax-10.0; heightOfTree=2, fontSize=8, arrow=:tail, rootIsTop=false)  # Parallelogram <--> Rectangle
+	plotUnaryTree!("", "Rectangle(s)", xMax-10.5, yMax-12.0; heightOfTree=2, fontSize=8, arrow=:tail, rootIsTop=false)  # Parallelogram <--> Rectangle
 	#===============================================================================#
 end # let
 
