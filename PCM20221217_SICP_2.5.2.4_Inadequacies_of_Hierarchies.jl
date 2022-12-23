@@ -12,7 +12,7 @@ md"
 ===================================================================================
 #### SICP\_2.5.2.4\_[Inadequacies\_of\_Hierarchies]()
 ##### file: PCM20221217\_SICP\_2.5.2.4\_Inadequacies\_of\_Hierarchies.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2022/12/22 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2022/12/23 ***
 
 ===================================================================================
 "
@@ -20,7 +20,7 @@ md"
 # ╔═╡ 10385c82-54cd-4df0-afea-2706b821175f
 md"
 ##### Concept hierarchy of 2D-Polygons
-SICP presents an informal example of a concept hierarchy with *mixed* types. This is shown in Fig. 2.5.2.4.1 (below). Alternative and more formal hierarchies with the same set or subset of figures are [known](https://en.wikipedia.org/wiki/Quadrilateral). These hierarchies were constructed with [*Euler*](https://en.wikipedia.org/wiki/Quadrilateral#/media/File:Euler_diagram_of_quadrilateral_types.svg) or [*Hasse*](https://en.wikipedia.org/wiki/Quadrilateral#/media/File:Symmetries_of_square.svg) diagrams.
+SICP presents an informal example of a concept hierarchy with *mixed* types. We refine their concept nodes by a partion into *abstract* and *concrete* concepts. This is shown in Fig. 2.5.2.4.1 (below). Alternative and more formal hierarchies with the same set or subset of figures are [known](https://en.wikipedia.org/wiki/Quadrilateral). These hierarchies were constructed with [*Euler*](https://en.wikipedia.org/wiki/Quadrilateral#/media/File:Euler_diagram_of_quadrilateral_types.svg) or [*Hasse*](https://en.wikipedia.org/wiki/Quadrilateral#/media/File:Symmetries_of_square.svg) diagrams.
 "
 
 # ╔═╡ e7ee86ea-28aa-48b0-8ff6-c5bb66fec663
@@ -157,6 +157,11 @@ md"
 ---
 "
 
+# ╔═╡ f431d55b-5f3c-440e-91ec-90c6ca87606f
+md"
+Fig. 2.5.2.4.1 is an example of an *informal* concept hierarchy with *multiple* inheritance. Each *abstract* concept is mapped to a Julian *abstract type*. The same is done with *concrete* versions. A *type* is defined as a set of possible values. Because of semantic ambiguities for certain concepts (here: IsoscelesRightTriangle(s), Rhomb(us|i), and Square(s)) we have to *demix* this *multiple* inheritance hierarchy into one with *single* inheritance (Fig. 2.5.2.4.2, below). 
+"
+
 # ╔═╡ 081bbd02-5b10-48d0-be04-d434708549c5
 let
 	xMax        = 20.0
@@ -279,10 +284,16 @@ end # let
 
 # ╔═╡ adf35063-d418-4013-80c4-a2510b5d1f68
 md"
-**Fig. 2.5.2.4.2**: *Super-/subtype* hierarchy of *abstract* and *concrete* types of 2D-polygons; *super-/sub*type relations are denoted by *up-arrows*.
+**Fig. 2.5.2.4.2**: *Demixed* super-/subtype hierarchy of *abstract* and *concrete* types of 2D-polygons; *super-/sub*type relations are denoted by *up-arrows*.
 
 ---
 "
+
+# ╔═╡ d85e5bf0-d529-4c57-86e2-32f254182bc3
+md"""
+In a footnote SICP gives a resumé on hierarchies with *multiple* inheritance: "*... much of the complexity of object-oriented programming languages - and the subtle and confusing differences among contemporary object-oriented languages - centers on the treatment of generic operations on interrelated types.*"(SICP, 1996, p.200)
+
+"""
 
 # ╔═╡ f4bea9bb-da9b-49de-86bd-7ea63e8c9237
 md"
@@ -1240,8 +1251,10 @@ version = "1.4.1+0"
 # ╟─10385c82-54cd-4df0-afea-2706b821175f
 # ╟─e7ee86ea-28aa-48b0-8ff6-c5bb66fec663
 # ╟─41c792b6-4884-41b1-b3cd-573a19bf7842
+# ╟─f431d55b-5f3c-440e-91ec-90c6ca87606f
 # ╟─081bbd02-5b10-48d0-be04-d434708549c5
 # ╟─adf35063-d418-4013-80c4-a2510b5d1f68
+# ╟─d85e5bf0-d529-4c57-86e2-32f254182bc3
 # ╟─f4bea9bb-da9b-49de-86bd-7ea63e8c9237
 # ╟─fe37adb6-46e7-4d1e-9ed8-5ca2079e7b04
 # ╟─00000000-0000-0000-0000-000000000001
