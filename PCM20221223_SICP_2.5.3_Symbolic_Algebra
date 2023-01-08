@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [2.5.3\_Symbolic\_Algebra](https://sarabander.github.io/sicp/html/2_002e5.xhtml#g_t2_002e5_002e3)
 ##### file: PCM20221223\_SICP\_2.5.3\_Symbolic\_Algebra
-##### code: Julia (1.8.3) and Pluto (0.19.14) *** PCM 2023/01/06 ***
+##### code: Julia (1.8.3) and Pluto (0.19.14) *** PCM 2023/01/08 ***
 ====================================================================================
 
 "
@@ -72,19 +72,19 @@ md"
 car(cell::Cons) = cell.car
 
 # ╔═╡ c8ff2dbb-096a-45f1-87c3-4a3174678965
-car(x::Tuple) = x[1]                                 # new !
+car(x::Tuple) = x[1]                                 # new 
 
 # ╔═╡ 0ffa49f1-800e-4ef3-952c-5a6ccd072484
-car(x::Vector) = x[1]
+car(x::Vector) = x[1]                                # new 
 
 # ╔═╡ a50dae37-c2ce-440d-964b-9e55a4399c0e
 cdr(cell::Cons)::Any = cell.cdr
 
 # ╔═╡ dc2fd68a-913c-4469-b4aa-ce9ff2606b36
-cdr(x::Tuple) = x[2:end]                             # new !
+cdr(x::Tuple) = x[2:end]                             # new 
 
 # ╔═╡ 8c0c5da0-4195-4e1b-8ee9-fa948d8bb6c2
-cdr(x::Vector) = x[2:end]
+cdr(x::Vector) = x[2:end]                            # new 
 
 # ╔═╡ 9d8161f2-bae1-448f-91d4-470592e359e2
 md"
@@ -147,7 +147,7 @@ md"
 firstTerm(termList::Cons) = car(termList)
 
 # ╔═╡ 5c69be91-132b-4e7b-9a36-acfdedad6056
-firstTerm(termList::Tuple) = termList[1]
+firstTerm(termList::Tuple) = termList[1]         # new
 
 # ╔═╡ e3b0ca86-b46b-457a-a106-bfad819b7452
 firstTerm(termList::Vector) = termList[1]        # new
@@ -156,7 +156,7 @@ firstTerm(termList::Vector) = termList[1]        # new
 restTerms(termList::Cons) = cdr(termList)
 
 # ╔═╡ ff6a02bf-08ff-41f5-9072-00b69a965144
-restTerms(termList::Tuple) = termList[2:end]
+restTerms(termList::Tuple) = termList[2:end]     # new
 
 # ╔═╡ ad7e01ab-3d75-441a-8a16-3a524f603198
 restTerms(termList::Vector) = termList[2:end]    # new
@@ -485,12 +485,19 @@ car(car(cdr(cdr(poly1))))
 # ╔═╡ f7fcef9d-f562-4246-9e37-5bf4433b0cff
 cdr(car(cdr(cdr(poly1))))
 
+# ╔═╡ c3b820dd-54c3-4271-a9e9-e848d477bfb0
+md"
+---
+$$add(poly1, poly2) = ((2, 9), (1, 6), (0, 3)) = 3 + 6x + 9x^2$$
+"
+
 # ╔═╡ 668e571d-b0f7-4d74-b1aa-a85cf0ffbd64
 add(poly1, poly2)
 
 # ╔═╡ 1a5177fe-b229-471c-bb2b-d38099b3b33c
 md"
-###### *sparse* polynomial:
+---
+###### *sparse* polynomials:
 $$x^{100} + 2x^2 + 1$$
 represented as
 
@@ -505,14 +512,29 @@ poly3 = makePolynomial(:x, ((100, 1), (2, 2), (0, 1)))
 # ╔═╡ 509fbca4-4a38-4289-93d6-4b8283df69eb
 poly1
 
+# ╔═╡ dce482f6-e04c-41dd-be6c-3249aef4dbc0
+md"
+$$add(poly1, poly3) = ((100, 1), (2, 5), (1, 2), (0, 2)) = 2 + 2x + 5x^2 + x^{100}$$
+"
+
 # ╔═╡ 3d3a1fd3-96b4-4cfe-bff9-4807874710d0
 add(poly1, poly3)
 
 # ╔═╡ febd216d-0d1d-4e96-9b0a-1dfb780e5d3d
 poly2
 
+# ╔═╡ 3913b58f-4fcb-496c-bd6c-33e0f2f32122
+md"
+$$add(poly2, poly3) = ((100,1),(2,8),(1,4),(0,3)) = 3 + 4x + 8x^2 + x^{100}$$
+"
+
 # ╔═╡ 1e9105cd-d244-47e4-8a7b-e08f6fce7465
 add(poly2, poly3)
+
+# ╔═╡ ca702d61-e3a4-41df-adbc-c7e0f12e43a1
+md"
+$$poly4 = 1 + 2y^2 + y^{100}$$
+"
 
 # ╔═╡ 13995526-8136-449c-ab60-8d88130d1c54
 poly4 = makePolynomial(:y, ((100, 1), (2, 2), (0, 1)))
@@ -520,11 +542,29 @@ poly4 = makePolynomial(:y, ((100, 1), (2, 2), (0, 1)))
 # ╔═╡ cd0f3689-38e5-4d0e-a892-228cd936096b
 add(poly3, poly4)
 
+# ╔═╡ 3a530306-ac42-4bb8-8702-b11589f9fea4
+md"
+---
+$$poly5 = ((1, 2), (0, 1)) = 2x + 1$$
+"
+
 # ╔═╡ e720b845-7f3e-4b23-9e38-ec5089fac575
 poly5 = makePolynomial(:x, ((1, 2), (0, 1)))
 
+# ╔═╡ 910e1c41-5bea-4107-bf0f-ba9eac7727cf
+md"
+$$poly6 = ((1, 4), (0, 2)) = 4x + 2$$
+"
+
 # ╔═╡ 727f5258-e560-4b8f-ba54-11d174af83f1
 poly6 = makePolynomial(:x, ((1, 4), (0, 2)))
+
+# ╔═╡ 19a7531e-fdec-4aac-9c82-5a84d9aaf1f1
+md"
+$$mul(poly5, poly6) = (1,2)*poly6 + (0, 1)*poly6$$ 
+$$= ((2,8),(1,4)) + ((1,4),(0,2))$$
+$$= ((2,8), (1,8),(0,2))= 2 + 8x +8x^2$$
+"
 
 # ╔═╡ 426dc65a-3ca1-41c3-b1bb-391644da3616
 mul(poly5, poly6)
@@ -535,13 +575,22 @@ poly1
 # ╔═╡ f16a01e3-d94e-4163-a38c-f66246d3238e
 poly2
 
+# ╔═╡ 5f23f7f1-acec-42da-bff5-4130f7dc2fee
+md"
+---
+$$mul(poly1, poly2) = (2,3)*poly2 + (1,2)*poly2 + (0,1)*poly2$$
+$$=((4, 18),(3,12),(2,6))+((3,12),(2,8),(1,4))+((2,6),(1,4),(0,2))$$
+$$=((4,18),(3,24)),(2,20),(1,8),(0,2))$$
+$$=2 +8x + 20x^2 + 24x^3 + 18x^4$$
+"
+
 # ╔═╡ 07bf91ba-f1e0-4881-9d00-692f0d56269e
 mul(poly1, poly2)
 
 # ╔═╡ b55fbdd4-2e1c-416a-9862-9ede871e1d4c
 md"
 ---
-##### 2.5.3.2 Idiomatic Julia
+##### 2.5.3.2 Idiomatic Julia using [Polynomials.jl](https://juliamath.github.io/Polynomials.jl/stable/)
 "
 
 # ╔═╡ afd79221-36f1-456a-81de-efdf26315d07
@@ -567,6 +616,21 @@ poly5R = Polynomial([1, 2])                            # poly5 in reverse order
 # ╔═╡ 2f0d9a6e-6b1b-47e2-bfa2-9a4896f0fd87
 poly6R = Polynomial([2, 4])                            # poly6 in reverse order
 
+# ╔═╡ 7911df10-28bd-43f7-9814-32d458a29115
+md"
+$$poly2R2nd = 2 + 4x + 6x^2$$
+$$poly3R2nd = 1 + 2x^2 + x^{100}$$
+"
+
+# ╔═╡ 0793a2c3-2e67-4ad2-9811-03f434d50fcb
+SP = SparsePolynomial
+
+# ╔═╡ b097c862-b3ae-4004-adfd-a1417c052c93
+poly2R2nd = 2 + 4*Polynomials.basis(SP, 1) + 6*Polynomials.basis(SP, 2)
+
+# ╔═╡ aaca51c9-3178-4d7a-8de8-d51e1dd924c2
+poly3R2nd = 1 + 2*Polynomials.basis(SP, 2) + Polynomials.basis(SP, 100)
+
 # ╔═╡ 977edc3e-4ecb-4fe0-92c9-6dddcfc0c098
 md"
 ---
@@ -584,6 +648,9 @@ poly2R + poly3R
 
 # ╔═╡ 68fa2c1a-0c43-439a-9646-403f6b896ac2
 poly3R + poly4R            # poly3R is in :x; poly4R is in :y
+
+# ╔═╡ b5870398-75e7-4cec-860b-60b365778ad5
+poly2R2nd + poly3R2nd
 
 # ╔═╡ 9877d577-a0a8-4f61-8700-129e3bdd216c
 md"
@@ -603,12 +670,24 @@ poly1R * poly3R
 # ╔═╡ 84b14f41-6310-4cfe-8d02-eb0bd9916446
 poly2R * poly3R
 
+# ╔═╡ 14dac475-d492-47ca-a290-d5832df04106
+poly2R2nd * poly3R2nd
+
 # ╔═╡ 43f453a7-b629-4ad6-8e9f-4d4ae4c45b29
 md"
 ---
 ##### end of ch. 2.5.3
 ---
 
+"
+
+# ╔═╡ a1ec9800-2b42-473f-ab58-0b73bfe5527b
+md"
+---
+##### References
+- Polynomials.jl, [https://juliamath.github.io/Polynomials.jl/stable/](https://juliamath.github.io/Polynomials.jl/stable/); visited 2023/01/08
+- SparsePolynomial, [https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.SparsePolynomial](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.SparsePolynomial); visited 2023/01/08
+---
 "
 
 # ╔═╡ 165ea39b-3c68-4558-811d-1c705ff52d5b
@@ -760,20 +839,28 @@ version = "5.1.1+0"
 # ╠═640fb6ab-ce0b-4349-9b59-6304bd1693cc
 # ╠═4d7c9c29-49ec-4e26-9c39-afa740740986
 # ╠═f7fcef9d-f562-4246-9e37-5bf4433b0cff
+# ╟─c3b820dd-54c3-4271-a9e9-e848d477bfb0
 # ╠═668e571d-b0f7-4d74-b1aa-a85cf0ffbd64
 # ╟─1a5177fe-b229-471c-bb2b-d38099b3b33c
 # ╠═28ece29b-a4c1-42e9-b8d1-df9da9ede5bd
 # ╠═509fbca4-4a38-4289-93d6-4b8283df69eb
+# ╟─dce482f6-e04c-41dd-be6c-3249aef4dbc0
 # ╠═3d3a1fd3-96b4-4cfe-bff9-4807874710d0
 # ╠═febd216d-0d1d-4e96-9b0a-1dfb780e5d3d
+# ╟─3913b58f-4fcb-496c-bd6c-33e0f2f32122
 # ╠═1e9105cd-d244-47e4-8a7b-e08f6fce7465
+# ╟─ca702d61-e3a4-41df-adbc-c7e0f12e43a1
 # ╠═13995526-8136-449c-ab60-8d88130d1c54
 # ╠═cd0f3689-38e5-4d0e-a892-228cd936096b
+# ╟─3a530306-ac42-4bb8-8702-b11589f9fea4
 # ╠═e720b845-7f3e-4b23-9e38-ec5089fac575
+# ╟─910e1c41-5bea-4107-bf0f-ba9eac7727cf
 # ╠═727f5258-e560-4b8f-ba54-11d174af83f1
+# ╟─19a7531e-fdec-4aac-9c82-5a84d9aaf1f1
 # ╠═426dc65a-3ca1-41c3-b1bb-391644da3616
 # ╠═433a6f15-4181-42c7-b868-78f8b698bf15
 # ╠═f16a01e3-d94e-4163-a38c-f66246d3238e
+# ╟─5f23f7f1-acec-42da-bff5-4130f7dc2fee
 # ╠═07bf91ba-f1e0-4881-9d00-692f0d56269e
 # ╟─b55fbdd4-2e1c-416a-9862-9ede871e1d4c
 # ╠═26fa8766-db69-4811-8b35-78502aafac58
@@ -784,17 +871,24 @@ version = "5.1.1+0"
 # ╠═07d7e3c6-adc4-4e21-bdfa-cb70fbeadfc1
 # ╠═87ccaaf8-e1d7-43be-882d-65fd85cac002
 # ╠═2f0d9a6e-6b1b-47e2-bfa2-9a4896f0fd87
+# ╟─7911df10-28bd-43f7-9814-32d458a29115
+# ╠═0793a2c3-2e67-4ad2-9811-03f434d50fcb
+# ╠═b097c862-b3ae-4004-adfd-a1417c052c93
+# ╠═aaca51c9-3178-4d7a-8de8-d51e1dd924c2
 # ╟─977edc3e-4ecb-4fe0-92c9-6dddcfc0c098
 # ╠═bde86ebe-f115-4d90-a78c-68cb32db992a
 # ╠═2a838b3f-f2b3-42a6-be69-4094526e6fca
 # ╠═ee57922d-dfe0-43aa-9e81-f803852c407d
 # ╠═68fa2c1a-0c43-439a-9646-403f6b896ac2
+# ╠═b5870398-75e7-4cec-860b-60b365778ad5
 # ╟─9877d577-a0a8-4f61-8700-129e3bdd216c
 # ╠═ba052304-82bd-4430-b485-635aed726749
 # ╠═2a6bd43c-45d4-47d2-9851-ab2115c76750
 # ╠═a78d07f9-83c8-4892-a595-22d1d09b1de1
 # ╠═84b14f41-6310-4cfe-8d02-eb0bd9916446
+# ╠═14dac475-d492-47ca-a290-d5832df04106
 # ╟─43f453a7-b629-4ad6-8e9f-4d4ae4c45b29
+# ╟─a1ec9800-2b42-473f-ab58-0b73bfe5527b
 # ╟─165ea39b-3c68-4558-811d-1c705ff52d5b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
