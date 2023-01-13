@@ -184,8 +184,55 @@ acc(:withdraw)(60)
 # ╔═╡ b2d1a37d-d5c7-4233-9346-e2c5da7e204d
 md"
 ---
-##### 3.1.1.2 Idiomatic Julia
+##### 3.1.1.2 Idiomatic Julia with $$mutable$$ $$struct$$ $$Account$$ and *multiple dispatch*
 "
+
+# ╔═╡ 1044aa81-2c86-453a-bdf6-6e473033e9ce
+mutable struct Account
+	balance::Float64
+end # struct
+
+# ╔═╡ 4412266e-5cfd-43f3-bc40-dcb444dc984b
+function withdraw2(object, amount)
+	let balance = object.balance
+		if balance >= amount 
+			begin 
+				balance = balance - amount 
+				object.balance = balance
+			end # begin
+		else
+			"Insufficient Funds"
+		end # if
+	end # let
+end # function withdraw2
+
+# ╔═╡ f55e1b4d-84da-4491-bc92-fa31f25b026f
+function deposit2(object, amount)
+	let balance = object.balance
+		begin 
+			balance = balance + amount 
+			object.balance = balance
+		end # begin
+	end # let
+end # function deposit2
+
+# ╔═╡ 620fd9d3-6370-47ba-91d3-75610182a5dd
+ac01 = Account(100)
+
+# ╔═╡ 40e63b6d-96de-45de-8ce0-8f10b3b8e3f2
+ac01.balance
+
+# ╔═╡ 3a1e7bc9-5164-41ed-8f79-86cbc7f45cac
+withdraw2(ac01, 50)
+
+# ╔═╡ f4c66f05-039d-408f-96e9-006de5a56bf4
+withdraw2(ac01, 60)
+
+# ╔═╡ 64796bde-35cf-485c-a89d-dc35dac790c4
+deposit2(ac01, 40)
+
+# ╔═╡ bb1c18e1-3441-464e-8704-247605473fe2
+withdraw2(ac01, 60)
 
 # ╔═╡ 1e4ee91e-d7d4-4ead-ba91-fa755d054126
 md"
@@ -251,6 +298,15 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═5ae4f78b-6388-4d9c-9f93-ee714d2c9d67
 # ╠═74731df8-fdb6-4bbc-a384-081117c2e9b6
 # ╟─b2d1a37d-d5c7-4233-9346-e2c5da7e204d
+# ╠═1044aa81-2c86-453a-bdf6-6e473033e9ce
+# ╠═4412266e-5cfd-43f3-bc40-dcb444dc984b
+# ╠═f55e1b4d-84da-4491-bc92-fa31f25b026f
+# ╠═620fd9d3-6370-47ba-91d3-75610182a5dd
+# ╠═40e63b6d-96de-45de-8ce0-8f10b3b8e3f2
+# ╠═3a1e7bc9-5164-41ed-8f79-86cbc7f45cac
+# ╠═f4c66f05-039d-408f-96e9-006de5a56bf4
+# ╠═64796bde-35cf-485c-a89d-dc35dac790c4
+# ╠═bb1c18e1-3441-464e-8704-247605473fe2
 # ╟─1e4ee91e-d7d4-4ead-ba91-fa755d054126
 # ╟─d6236f84-e645-4c30-9fd2-51e60ff59d0f
 # ╟─00000000-0000-0000-0000-000000000001
