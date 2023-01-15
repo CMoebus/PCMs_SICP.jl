@@ -190,10 +190,13 @@ md"
 # ╔═╡ 1044aa81-2c86-453a-bdf6-6e473033e9ce
 mutable struct Account
 	balance::Float64
-	Account(balance) = 
+	# 1st explicit (but redundant) inner constructor to bind local var 'balance'
+	Account(balance) =   
 		balance >= 0.0 ? 
 		new(balance) : 
-		"negative initial balance not allowed"
+		"negative initial balance not allowed" 
+	# 2nd inner constructor to bind local var 'balance' to default value '0.0'
+	Account() = new(0.0) 
 end # struct
 
 # ╔═╡ 4412266e-5cfd-43f3-bc40-dcb444dc984b
@@ -246,6 +249,12 @@ deposit2(acc01, 40)
 
 # ╔═╡ bb1c18e1-3441-464e-8704-247605473fe2
 withdraw2(acc01, 60)
+
+# ╔═╡ 2775e29d-375f-46cc-8d38-143d7264c2d3
+acc03 = Account()                 # use of default initial value
+
+# ╔═╡ b94e1bd0-c027-4bec-ad5b-3d42ef89be89
+acc03.balance
 
 # ╔═╡ 1e4ee91e-d7d4-4ead-ba91-fa755d054126
 md"
@@ -323,6 +332,8 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═f4c66f05-039d-408f-96e9-006de5a56bf4
 # ╠═64796bde-35cf-485c-a89d-dc35dac790c4
 # ╠═bb1c18e1-3441-464e-8704-247605473fe2
+# ╠═2775e29d-375f-46cc-8d38-143d7264c2d3
+# ╠═b94e1bd0-c027-4bec-ad5b-3d42ef89be89
 # ╟─1e4ee91e-d7d4-4ead-ba91-fa755d054126
 # ╟─d6236f84-e645-4c30-9fd2-51e60ff59d0f
 # ╟─00000000-0000-0000-0000-000000000001
