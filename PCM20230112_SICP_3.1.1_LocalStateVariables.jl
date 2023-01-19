@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: [3.1.1\_Local\_State\_Variables](https://sarabander.github.io/sicp/html/3_002e1.xhtml#g_t3_002e1_002e1)
 ##### file: PCM20230112\_SICP:\_3.1.1\_LocalStateVariables.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/18 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/19 ***
 
 ====================================================================================
 
@@ -327,13 +327,172 @@ acc11._balance                     #  encapsulation achieved !
 # ╔═╡ 8b2a3131-9b97-451e-a87f-516cb9995a31
 acc11._balance = 999
 
+# ╔═╡ 7ce887c0-7309-4da6-ac99-2c3cdf05af42
+md"
+---
+##### *Encapsulation* with Private, Public Types, and Closures I
+
+To emphasis the necessity and issue of encapsulation of software written in Julia [Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/) quotes [Kwong, 2020, ch.8, p.315](https://subscription.packtpub.com/book/programming/9781838648817/11) : 
+*Based on the Principle of Least Privilege (POLP), we would consider hiding unnecessary implementation details to the client of the interface. However, Julia's data structure is transparent – all fields are automatically exposed and accessible. This poses a potential problem because any improper usage or mutation can break the system. Additionally, by accessing the fields directly, the code becomes more tightly coupled with the underlying implementation of an object.*
+
+[Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/) provides as a prototypical implementation an OO-area-computation of rectangular objects. The idea is to *distribute* the generation of instances with *private* and *public* fields containing *class methods* over *private* types, *public* types, and a function *closure*.
+"
+
+# ╔═╡ 77bfbb6f-715e-47d1-8ac6-355541f1fd99
+begin
+	# private type '_Rectangle' (Cox. "the private stuff")
+	struct _Rectangle
+  		width::Float64
+  		height::Float64
+	end # struct _Rectangle
+	#----------------------
+	# public type 'Rectangle' (Cox: "the public stuff")
+	struct Rectangle
+  		area::Function
+	end # struct Rectangle
+	#----------------------
+	# Class 'Rectangle' by function closure 'Rectangle' (Cox: "the closure trick")
+	function Rectangle(width::Float64, height::Float64)
+  		self = _Rectangle(width, height)  # generation of private object '_Rectangle'
+  		area() = self.width * self.height # definition public nullary function 'area'
+  	return Rectangle(area)                # generation of object with field 'area'
+	end # function Rectangle              # export of object with public field 'area'
+end # begin
+
+# ╔═╡ 6c625f30-4244-4980-8615-8c11faa62102
+rect45 = Rectangle(4.0, 5.0)  # generation of object 'rect45' with public field 'area'
+
+# ╔═╡ bed00389-ccad-4b48-957b-570b36d6acb6
+rect45
+
+# ╔═╡ 72926649-b487-480d-a811-3cdcd4801881
+rect45.width                     #  encapsulation achieved !
+
+# ╔═╡ e1239c7c-2fd1-4281-a452-fa3b0dfca253
+rect45.height                    #  encapsulation achieved !
+
+# ╔═╡ 460aad5d-3fa9-4f11-b05e-7f9d6775d3a7
+rect45.area                      # field 'area' contains the nullary function 'area'
+
+# ╔═╡ 8e0ea6fb-092d-4500-8e6e-3b4ef6f1dd95
+rect45.area()                    # application of nullary 'area' function
+
+# ╔═╡ d8fb7198-5a29-464d-83b6-c847a2b4c6d4
+md"
+---
+##### *Encapsulation* with Private, Public Types, and Closures II
+- We advocate the idea that the function *closure* should take the role of the conventional *OO-class*.
+"
+
+# ╔═╡ aa2b2dba-6f21-45a8-aa0d-9395d008b63a
+md"
+###### *private* type $$\_Account2$$ with *private* field $$\_balance$$
+"
+
+# ╔═╡ c63648ad-755c-46b0-8aa6-10be02a31855
+mutable struct _Account2
+	_balance
+	# 1st explicit (but redundant) inner constructor to bind local var 'balance'
+	_Account2(_balance) =   
+		_balance >= 0.0 ? 
+		new(_balance) :         # <--- 1st inner constructor
+		"negative initial balance not allowed" 
+	# 2nd inner constructor to bind local var '_balance' to default value '0.0'
+	_Account2() = new(0.0)        # <--- 2nd inner constructor
+end # mutable struct _Account
+
+# ╔═╡ ec46d9b4-809c-465f-ba9d-8b574b2dff76
+md"
+###### *public* type $$Account2$$ with *public* fields of $$Function$$ type
+"
+
+# ╔═╡ 6bd5f80d-0b8b-4476-9da8-46f00e488ec1
+struct Account2
+	  withdraw::Function
+	   deposit::Function
+	getBalance::Function
+end # struct Account
+
+# ╔═╡ fc264809-87ea-4050-ac8e-ed5349ef13ef
+md"
+###### *Mimicking* Class $$makeAccount2$$ by function closure $$makeAccount2$$
+"
+
+# ╔═╡ ee123b18-47e0-47b7-a483-abce6ef34df8
+function makeAccount2(amount)
+	#----------------------------------------------------------------------
+	# generation of private object 'eAO' = 'encapsulatedAccountObject'
+	eAO = _Account2(amount) 
+	#----------------------------------------------------------------------
+	# definition of public methods 'withdraw', 'deposit', and 'getBalance'
+	#    under use of private field '_balance'
+	function withdraw(amount)
+		let balance = eAO._balance
+			if balance >= amount 
+				begin 
+					balance = balance - amount 
+					eAO._balance = balance
+				end # begin
+			else
+				"Insufficient Funds"
+			end # if
+		end # let
+	end # function withdraw
+	#----------------------------------------------------------------------
+	function deposit(amount)
+		let balance = eAO._balance
+			begin 
+				balance = balance + amount 
+				eAO._balance = balance
+			end # begin
+		end # let
+	end # function deposit
+	#----------------------------------------------------------------------
+	function getBalance()
+		let balance = eAO._balance
+			balance
+		end # let
+	end # function getBalance
+	#----------------------------------------------------------------------
+	return Account2(withdraw, deposit, getBalance)
+end # function makeAccount2
+
+# ╔═╡ fc449af5-3172-4284-b1a4-f486972ce263
+ # make instance 'acc1946' by class (=closure) 'makeAccount2'
+acc1946 = makeAccount2(200)
+
+# ╔═╡ fac2f24f-28ae-4e45-9dd0-7f94293eacdc
+acc1946.balance                           #  encapsulation achieved !
+
+# ╔═╡ b72dba10-d2e6-4e47-8262-62a24d5960ac
+acc1946.withdraw
+
+# ╔═╡ da384a7f-f0b8-442f-9d4a-04e857812e04
+acc1946.withdraw(20)
+
+# ╔═╡ ae3ee4a5-7b70-44eb-9ad3-69d882831da1
+acc1946.balance                            #  encapsulation achieved !
+
+# ╔═╡ f06d6218-3553-4708-90ea-e73b607f703a
+acc1946.deposit(40)
+
+# ╔═╡ 243ba1d5-8bad-4a45-b3f1-dd03bf2bfc67
+ acc1946.balance                           #  encapsulation achieved !
+
+# ╔═╡ b2b11fb4-a59a-4a45-a708-5e7ab7391aee
+ acc1946.getBalance()     # access to private fiel '_balance' only by 'getBalance()'
+
 # ╔═╡ c898f559-6acd-4a6d-9876-4672f7ee3780
 md"
 ---
 ##### References
-- **Christianson, A.**, *ObjectOrientation and Polymorphism in Julia*, [https://github.com/ninjaaron/oo-and-polymorphism-in-julia](https://github.com/ninjaaron/oo-and-polymorphism-in-julia), last visit 2023/01/18
 - **Cox, M.**, *Julia Encapsulation*, [https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/), last visit 2023/01/18
+
 - **Kwong, T.**, *Hands-On Design Patterns and Best Practices with Julia*, 2020, [https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia](https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia)
+
+---
+##### Further Reading
+- **Christianson, A.**, *ObjectOrientation and Polymorphism in Julia*, [https://github.com/ninjaaron/oo-and-polymorphism-in-julia](https://github.com/ninjaaron/oo-and-polymorphism-in-julia), last visit 2023/01/18
 - **Rackauckas, Ch.**, *Type-Dispatch Design: Post Object-Oriented Programming for Julia*, [http://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/](http://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/), last visit 2023/01/18
 - **Rackauckas, Ch.**, *Multiple Dispatch Designs: Duck Typing, Hierarchies and Traits*, [http://ucidatascienceinitiative.github.io/IntroToJulia/Html/DispatchDesigns](http://ucidatascienceinitiative.github.io/IntroToJulia/Html/DispatchDesigns), last visit 2023/01/18
 "
@@ -434,6 +593,29 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═2775e29d-375f-46cc-8d38-143d7264c2d3
 # ╠═b94e1bd0-c027-4bec-ad5b-3d42ef89be89
 # ╠═8b2a3131-9b97-451e-a87f-516cb9995a31
+# ╟─7ce887c0-7309-4da6-ac99-2c3cdf05af42
+# ╠═77bfbb6f-715e-47d1-8ac6-355541f1fd99
+# ╠═6c625f30-4244-4980-8615-8c11faa62102
+# ╠═bed00389-ccad-4b48-957b-570b36d6acb6
+# ╠═72926649-b487-480d-a811-3cdcd4801881
+# ╠═e1239c7c-2fd1-4281-a452-fa3b0dfca253
+# ╠═460aad5d-3fa9-4f11-b05e-7f9d6775d3a7
+# ╠═8e0ea6fb-092d-4500-8e6e-3b4ef6f1dd95
+# ╟─d8fb7198-5a29-464d-83b6-c847a2b4c6d4
+# ╟─aa2b2dba-6f21-45a8-aa0d-9395d008b63a
+# ╠═c63648ad-755c-46b0-8aa6-10be02a31855
+# ╟─ec46d9b4-809c-465f-ba9d-8b574b2dff76
+# ╠═6bd5f80d-0b8b-4476-9da8-46f00e488ec1
+# ╟─fc264809-87ea-4050-ac8e-ed5349ef13ef
+# ╠═ee123b18-47e0-47b7-a483-abce6ef34df8
+# ╠═fc449af5-3172-4284-b1a4-f486972ce263
+# ╠═fac2f24f-28ae-4e45-9dd0-7f94293eacdc
+# ╠═b72dba10-d2e6-4e47-8262-62a24d5960ac
+# ╠═da384a7f-f0b8-442f-9d4a-04e857812e04
+# ╠═ae3ee4a5-7b70-44eb-9ad3-69d882831da1
+# ╠═f06d6218-3553-4708-90ea-e73b607f703a
+# ╠═243ba1d5-8bad-4a45-b3f1-dd03bf2bfc67
+# ╠═b2b11fb4-a59a-4a45-a708-5e7ab7391aee
 # ╟─c898f559-6acd-4a6d-9876-4672f7ee3780
 # ╟─1e4ee91e-d7d4-4ead-ba91-fa755d054126
 # ╟─d6236f84-e645-4c30-9fd2-51e60ff59d0f
