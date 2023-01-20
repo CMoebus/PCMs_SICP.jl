@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: [3.1.1\_Local\_State\_Variables](https://sarabander.github.io/sicp/html/3_002e1.xhtml#g_t3_002e1_002e1)
 ##### file: PCM20230112\_SICP:\_3.1.1\_LocalStateVariables.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/19 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/20 ***
 
 ====================================================================================
 
@@ -381,7 +381,7 @@ rect45.area()                    # application of nullary 'area' function
 md"
 ---
 ##### *Encapsulation* with Private, Public Types, and Closures II
-- We advocate the idea that the function *closure* should take the role of the conventional *OO-class*.
+We advocate the idea that the function *closure* should take the role of the conventional *OO-class*, at least in Julia. This is in tradition with traditional software engineering folklore [(Grignoli, 2010)](https://stackoverflow.com/questions/3368713/whats-the-difference-between-closures-and-traditional-classes). The answers to this question reflect the problem from the view of *C++*, *Java*, *Scheme*, and *Python*. We think that *Julia* fits into this list near *Scheme*.
 "
 
 # ╔═╡ aa2b2dba-6f21-45a8-aa0d-9395d008b63a
@@ -487,6 +487,8 @@ md"
 ---
 ##### References
 - **Cox, M.**, *Julia Encapsulation*, [https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/), last visit 2023/01/18
+
+- **Grignoli, S.**, *What's the difference between closures and traditional classes?*, [https://stackoverflow.com/questions/3368713/whats-the-difference-between-closures-and-traditional-classes](https://stackoverflow.com/questions/3368713/whats-the-difference-between-closures-and-traditional-classes), last visit 2023/01/20
 
 - **Kwong, T.**, *Hands-On Design Patterns and Best Practices with Julia*, 2020, [https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia](https://github.com/PacktPublishing/Hands-on-Design-Patterns-and-Best-Practices-with-Julia)
 
