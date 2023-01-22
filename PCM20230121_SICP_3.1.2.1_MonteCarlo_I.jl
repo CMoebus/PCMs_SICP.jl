@@ -50,14 +50,8 @@ end # function piError
 # ╔═╡ cf308e67-c82b-4036-b00b-95d4b097a8cb
 piError(1E3)
 
-# ╔═╡ c3f69458-edb6-4f91-a2ba-26d978a95e84
-@time piError(1E3)
-
 # ╔═╡ e4b12c43-752e-4476-b4f5-35d8bb24fc39
 piError(1E7)
-
-# ╔═╡ d796be2c-abb4-4e8f-94dd-145d453afec5
-@time piError(1E7)
 
 # ╔═╡ 7e9b5455-d069-4212-9de6-1d48fb886b2f
 md"
@@ -107,6 +101,12 @@ estimatePi(1E3)
 # ╔═╡ d2578b2d-c68e-40b9-8ab6-5ad8599fe126
 estimatePi(1E4)
 
+# ╔═╡ 8c9a4c8a-885d-4b0a-9ee8-e83607b69471
+isapprox(estimatePi(1E4), π; atol= 1E-2)   # ==> true 
+
+# ╔═╡ 4e94ba50-384a-4b3f-b9b8-ba19d30fe25d
+isapprox(estimatePi(1E4), π; atol= 1E-3)   # ==> false
+
 # ╔═╡ e26f4676-4d79-4bd2-86ae-fc9d7c37ba0f
 estimatePi(1E5)
 
@@ -136,29 +136,50 @@ end # function estimatePi2
 # ╔═╡ bc93c4ce-59c9-44a9-b73f-ed40eba9a9ee
 estimatePi2(1E1)
 
+# ╔═╡ bc57fdd1-925a-4efc-9b12-39ee034597e1
+isapprox(estimatePi2(1E1), π; atol= 1E-1)
+
 # ╔═╡ 34333c9b-08f5-41ed-98f7-8c8b197a4c19
 estimatePi2(1E2)
+
+# ╔═╡ 4af65a33-383d-49df-b48f-02b34d860678
+isapprox(estimatePi2(1E2), π; atol= 1E-2)
 
 # ╔═╡ f4084511-f570-48fb-bb7b-4d13329991a4
 estimatePi2(1E3)
 
+# ╔═╡ 30009358-cec0-48cc-b6d6-9ba357ce95ae
+isapprox(estimatePi2(1E3), π; atol= 1E-2)
+
 # ╔═╡ 8777d7d9-79eb-4496-9252-3f0292563e34
 estimatePi2(1E4)
+
+# ╔═╡ 759debd7-a516-46c8-9920-022b33708dfd
+isapprox(estimatePi2(1E4), π; atol= 1E-2)
 
 # ╔═╡ 2b8f9242-f758-4756-a43c-1cdcb0569646
 estimatePi2(1E5)
 
+# ╔═╡ d0b0ca2d-8ec4-4b26-82fe-a584fe01d97c
+1E-2
+
+# ╔═╡ fded31d8-5755-4ba2-8877-3ca7dff1e1af
+isapprox(estimatePi2(1E5), π; atol= 1E-2)
+
 # ╔═╡ 6254d92f-d6db-4c28-bf73-98d28361fb10
 estimatePi2(1E6)
 
-# ╔═╡ ccf6524f-762a-49ea-82d7-6efc4be4109e
-@time estimatePi2(1E6)
+# ╔═╡ 1f99c5f4-c143-4a8f-b87d-d0a3c0bcdb12
+isapprox(estimatePi2(1E6), π; atol= 1E-3)
 
 # ╔═╡ 04def250-24a7-455c-941d-fc275702756b
 estimatePi2(1E7)
 
-# ╔═╡ dbfd2f56-6091-412c-8ef3-e6c0165b9495
-@time estimatePi2(1E7)
+# ╔═╡ 9aaffbcd-afa2-46bc-b6d4-a85c9d10b0a1
+isapprox(estimatePi2(1E7), π; atol= 1E-3)
+
+# ╔═╡ ce6d7e0c-8316-4908-abb3-99c998ddf72d
+isapprox(estimatePi2(1E8), π; atol= 1E-3)
 
 # ╔═╡ 4984e96a-192b-46c6-8150-8664ae56fdb2
 md"
@@ -261,9 +282,7 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 # ╠═9924e9d3-bcdb-4743-a530-f2f1d80b9eb2
 # ╠═4d4035d0-c234-4643-a03f-1867450991aa
 # ╠═cf308e67-c82b-4036-b00b-95d4b097a8cb
-# ╠═c3f69458-edb6-4f91-a2ba-26d978a95e84
 # ╠═e4b12c43-752e-4476-b4f5-35d8bb24fc39
-# ╠═d796be2c-abb4-4e8f-94dd-145d453afec5
 # ╟─7e9b5455-d069-4212-9de6-1d48fb886b2f
 # ╠═5fa95eab-19ad-4a6e-91c9-294106c2b515
 # ╠═4ebdd843-ea90-4248-afb4-0a5f525f2cdb
@@ -275,19 +294,28 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 # ╠═37097866-0f3d-4e52-8568-58f888343e93
 # ╠═38e3d2df-88d0-4065-be0b-c674f3374c4f
 # ╠═d2578b2d-c68e-40b9-8ab6-5ad8599fe126
+# ╠═8c9a4c8a-885d-4b0a-9ee8-e83607b69471
+# ╠═4e94ba50-384a-4b3f-b9b8-ba19d30fe25d
 # ╠═e26f4676-4d79-4bd2-86ae-fc9d7c37ba0f
 # ╟─8490eca3-22b5-4fc8-8260-8f133f32494f
 # ╠═4f58bcf8-989c-45e8-a38c-91e55c2b9d61
 # ╠═a30c1632-0465-4c6b-ba0b-5d54939bb71c
 # ╠═bc93c4ce-59c9-44a9-b73f-ed40eba9a9ee
+# ╠═bc57fdd1-925a-4efc-9b12-39ee034597e1
 # ╠═34333c9b-08f5-41ed-98f7-8c8b197a4c19
+# ╠═4af65a33-383d-49df-b48f-02b34d860678
 # ╠═f4084511-f570-48fb-bb7b-4d13329991a4
+# ╠═30009358-cec0-48cc-b6d6-9ba357ce95ae
 # ╠═8777d7d9-79eb-4496-9252-3f0292563e34
+# ╠═759debd7-a516-46c8-9920-022b33708dfd
 # ╠═2b8f9242-f758-4756-a43c-1cdcb0569646
+# ╠═d0b0ca2d-8ec4-4b26-82fe-a584fe01d97c
+# ╠═fded31d8-5755-4ba2-8877-3ca7dff1e1af
 # ╠═6254d92f-d6db-4c28-bf73-98d28361fb10
-# ╠═ccf6524f-762a-49ea-82d7-6efc4be4109e
+# ╠═1f99c5f4-c143-4a8f-b87d-d0a3c0bcdb12
 # ╠═04def250-24a7-455c-941d-fc275702756b
-# ╠═dbfd2f56-6091-412c-8ef3-e6c0165b9495
+# ╠═9aaffbcd-afa2-46bc-b6d4-a85c9d10b0a1
+# ╠═ce6d7e0c-8316-4908-abb3-99c998ddf72d
 # ╟─4984e96a-192b-46c6-8150-8664ae56fdb2
 # ╠═dcede2f0-5772-4e9f-bd94-bfc01f728e92
 # ╠═cbfe40ec-f4b5-47ae-91e9-83d488f51fed
