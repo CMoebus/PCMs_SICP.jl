@@ -12,11 +12,16 @@ md"
 ====================================================================================
 #### SICP: [3.1.2.2 Monte Carlo II](https://uol.de/en/lcs/probabilistic-programming/webchurch-and-openbugs/pi-by-monte-carlo-simulation)
 ##### file: PCM20230122\_SICP\_3.1.2.2\_MonteCarlo\_II.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/22 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/23 ***
 
 ====================================================================================
 "
 
+
+# ╔═╡ 038fc20c-d3d8-4ac2-ae80-1f969ad69094
+md"
+##### Estimating $$\pi$$ by Monte-Carlo Integration
+"
 
 # ╔═╡ a7d207c2-ae5d-44a8-95f4-44803c352c03
 Random.seed!(1234)
@@ -34,11 +39,13 @@ md"
 
 # ╔═╡ c04dea82-58e1-497c-a69b-ca3b9877ca38
 function insideQuarterOfUnitCircle()
-	let x = rand()
-		y = rand()
-		sqrt(x^2 + y^2) <= 1.0
-	end # let
+	x = rand() # uniform distributed random floating number in [0,1) 
+	y = rand() # uniform distributed random floating number in [0,1) 
+	x*x + y*y  <= 1.0    # if inside then success 
 end # function insideQuarterOfUnitCircle
+
+# ╔═╡ 772cdc15-5581-4a56-a136-7861437d5941
+(x, y) = rand(2)
 
 # ╔═╡ cd738883-199d-4dad-94c7-308755691575
 [insideQuarterOfUnitCircle() for _ in 1:10]
@@ -130,12 +137,14 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 # ╔═╡ Cell order:
 # ╟─01038920-9a55-11ed-3235-5f0b343b83be
+# ╟─038fc20c-d3d8-4ac2-ae80-1f969ad69094
 # ╠═88823b36-0880-436d-9b89-627cc8a444b2
 # ╠═a7d207c2-ae5d-44a8-95f4-44803c352c03
 # ╠═e7030dce-9ea2-4a8a-b905-90050951e013
 # ╠═34ae0113-daef-44fc-980f-b090733a89e5
 # ╟─245d424c-7eaf-40f5-9563-bde745840d51
 # ╠═c04dea82-58e1-497c-a69b-ca3b9877ca38
+# ╠═772cdc15-5581-4a56-a136-7861437d5941
 # ╠═cd738883-199d-4dad-94c7-308755691575
 # ╠═c24f1e16-5b1b-44c0-bb34-0854f5ee313f
 # ╠═42bf84d5-1a34-42e7-98b8-6c49995c8bda
