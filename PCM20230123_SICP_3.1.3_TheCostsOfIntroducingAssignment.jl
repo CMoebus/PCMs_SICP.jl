@@ -7,7 +7,7 @@ using InteractiveUtils
 # ╔═╡ 70a6b632-9b31-11ed-0879-69b1c734fd11
 md"
 ====================================================================================
-#### SICP: 3.1.3 The Costs of Introducing Assignment
+#### SICP: [3.1.3 The Costs of Introducing Assignment](https://sarabander.github.io/sicp/html/3_002e1.xhtml#g_t3_002e1_002e3)
 ##### file: PCM20230123\_SICP\_3.1.3\_TheCostsOfIntroducingAssignment.jl
 ##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/24 ***
 
