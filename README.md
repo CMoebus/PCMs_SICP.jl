@@ -12,3 +12,5 @@ The time needed is not trivial. We estimate that a newbee to programming needs 1
 
 Ok, let's go !
 C.M.
+
+P.S.: The electronic version of SICP can be found here: https://sarabander.github.io/sicp/html/Foreword.xhtml#Foreword
