@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.2 The Environment Model of Evaluation](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2)
 ##### file: PCM20230126\_SICP\_3.2\_TheEnvironmentModelOfEvaluation.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/27 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/28 ***
 
 ====================================================================================
 "
@@ -50,9 +50,9 @@ begin
 	annotate!( 6.0,  7.0, ("C", 14, :black))
 	annotate!( 9.0,  7.0, ("D", 14, :black))
 	plot!([( 7,4),  ( 7,9)], line = (:arrow, 2, :red)) # uparrow C	
-	plot!([( 6,4),  ( 7,4)], line = (:arrow, 2, :red)) # toTheRight C
+	plot!([( 6,4),  ( 7,4)], line = (2, :red))         # toTheRight C
 	plot!([( 8,4),  ( 8,9)], line = (:arrow, 2, :red)) # uparrow D
-	plot!([( 9,4),  ( 8,4)], line = (:arrow, 2, :red)) # toTheLeft D
+	plot!([( 9,4),  ( 8,4)], line = (2, :red))         # toTheLeft D
 	plot!([( 4,0.5),( 4,2)], line = (:arrow, 2, :red)) # uparrow A
 	plot!([(11,0.5),(11,2)], line = (:arrow, 2, :red)) # uparrow A
 end # begin
