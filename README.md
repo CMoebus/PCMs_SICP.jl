@@ -8,7 +8,7 @@ In the end it is guaranteed that the learner has acquired several competencies. 
 
 Learners expecting a gamified learning environment (https://en.wikipedia.org/wiki/Gamification_of_learning) will be disappointed. This is a rather academic (dry ;) ) learning experience. So your intrinsic motivation in studying Julia should be rather high.
 
-The time needed is not trivial. We estimate that a newbee to programming needs 12 months (2 semesters) of self-studying SICP and SICP.jl (the original SICP-book and our Julia-scripts). The time investment should be 1-2 hours per day. It is expected that some of the SICP-exercises should be solved..
+The time investment needed is not trivial. We estimate that a newbee to programming needs 1-2 hours/day over a 12 month period (2 semesters). This includes studying SICP (the original SICP-book), SICP.jl (our Julia-scripts), and solving exercises. 
 
 Ok, let's go !
 C.M.
