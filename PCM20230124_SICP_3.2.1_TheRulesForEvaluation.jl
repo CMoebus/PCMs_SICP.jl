@@ -36,10 +36,13 @@ md"
 "
 
 # ╔═╡ 85508544-c61f-4c0c-b7e8-d86b4504c85f
-rectangle(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
+rectangleObj(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
+
+# ╔═╡ af7aac00-bb27-4492-aa15-bfd2cf89560b
+rectangleObj(4, 3, 4.5, 9)
 
 # ╔═╡ 36700724-6802-441f-9170-fc1e59d2b1f2
-square(w, x, y) = rectangle(w, w, x, y) 	# square(width, x-coord, y-coord) 
+squareObj(w, x, y) = rectangleObj(w, w, x, y) 	# square(width, x-coord, y-coord) 
 
 # ╔═╡ cd7a0889-ce50-47d9-b083-982f60f2eeaf
 # adapted from LazarA in https://discourse.julialang.org/t/plot-a-circle-with-a-given-radius-with-plots-jl/23295/4
@@ -55,22 +58,24 @@ begin
 	#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
 	#-----------------------------------------------------------------------------
-	# square(width, x-coord, y-coord) 
-	plot!(square(4.0, 4.5, 9.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0
-	annotate!( 8.0, 12.2, ("E0", 12, :blue))               # E0
-	annotate!( 5.7, 10.8, ("others:...", 11, :blue))       # E0
-	annotate!( 5.5,  9.8, ("square:", 11, :blue))          # E0	
+	# rectangleObj(w, h, x, y)
+	plot!(rectangleObj(4, 3, 4.5, 9),fillcolor=plot_color(:cornflowerblue,0.2)) # E0
+	annotate!( 8.0, 11.3, ("E0", 12, :blue))               # E0
+	annotate!( 5.7, 10.7, ("others:...", 10, :blue))       # E0
+	annotate!( 5.5,  9.7, ("square:", 10, :blue))          # E0	
 	#-----------------------------------------------------------------------------
-	plot!(square(4.0, 1.5, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0'
-	annotate!( 5.0,  5.0, ("E0'", 12, :blue))              # E0'
-	annotate!( 2.6,  3.6, ("parm: x", 11, :blue))          # E0'
-	annotate!( 3.1,  2.6, ("body: *(x, x)", 11, :blue))    # E0'
+	# rectangleObj(w, h, x, y)
+	plot!(rectangleObj(4,3, 1.5, 2.0),fillcolor=plot_color(:cornflowerblue,0.2)) # E0'
+	annotate!( 5.0,  4.2, ("E0'", 12, :blue))              # E0'
+	annotate!( 2.6,  3.6, ("parm: x", 10, :blue))          # E0'
+	annotate!( 3.1,  2.6, ("body: *(x, x)", 10, :blue))    # E0'
 	#-----------------------------------------------------------------------------
-	plot!([(6.6, 4.2), (6.6,9.8)], line = (2, :red), linestyle=:dash) # downline C	
-	# arrowToTheLeft
-	plot!([(5.5,4.2),(6.6,4.2)],arrow=:tail,line=(2,:red),linestyle=:dash)
-	plot!([(7.0,3.5),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
-	plot!([(5.5,3.5),(7.0,3.5)],line=(2,:red))             # lineToTheRight
+	# dash downline	
+	plot!([(6.6, 3.6), (6.6,9.8)], line = (2, :red), linestyle=:dash) 
+	# dashed arrowToTheLeft
+	plot!([(5.5,3.6),(6.6,3.6)],arrow=:tail,line=(2,:red),linestyle=:dash)
+	plot!([(7.0,3.0),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
+	plot!([(5.5,3.0),(7.0,3.0)],line=(2,:red))             # lineToTheRight
 	#-----------------------------------------------------------------------------
 	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
 end # begin
@@ -107,34 +112,38 @@ $$square(6) \Longrightarrow 36$$ after parameter-argument binding and extension 
 
 # ╔═╡ 4ed2ff2f-09fa-4079-a375-81ea55766fc5
 begin
-	#-----------------------------------------------------------------------------
+		#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
 	#-----------------------------------------------------------------------------
-	# square(width, x-coord, y-coord) 
-	plot!(square(4.0, 4.5, 9.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0
-	annotate!( 8.0, 12.2, ("E0", 12, :blue))               # E0
-	annotate!( 5.7, 10.8, ("others:...", 11, :blue))       # E0
-	annotate!( 5.5,  9.8, ("square:", 11, :blue))          # E0	
+	# rectangleObj(w, h, x, y)
+	plot!(rectangleObj(4, 3, 4.5, 9),fillcolor=plot_color(:cornflowerblue,0.2)) # E0
+	annotate!( 8.0, 11.3, ("E0", 12, :blue))               # E0
+	annotate!( 5.7, 10.7, ("others:...", 10, :blue))       # E0
+	annotate!( 5.5,  9.7, ("square:", 10, :blue))          # E0	
 	#-----------------------------------------------------------------------------
-	plot!(square(4.0, 1.5, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0'
-	annotate!( 5.0,  5.0, ("E0'", 12, :blue))              # E0'
-	annotate!( 2.6,  3.6, ("parm: x", 11, :blue))          # E0'
-	annotate!( 3.1,  2.6, ("body: *(x, x)", 11, :blue))    # E0'
-	#-----------------------------------------------------------------------------
-	plot!(square(4.0, 9.0, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E1
-	annotate!(12.5,  5.0, ("E1", 12, :blue))               # E1
-	annotate!( 9.7,  3.6, ("x: 6", 11, :blue))             # E1
-	#-----------------------------------------------------------------------------
-	plot!([(6.6, 4.2), (6.6,9.8)], line = (2, :red), linestyle=:dash) # downline C	
-	# arrowToTheLeft
-	plot!([(5.5,4.2),(6.6,4.2)],arrow=:tail,line=(2,:red),linestyle=:dash)
-	plot!([(7.0,3.5),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
-	plot!([(5.5,3.5),(7.0,3.5)],line=(2,:red))             # lineToTheRight
-	#-----------------------------------------------------------------------------
-	plot!([( 8,4),  ( 8,9)], line = (:arrow, 2, :red))     # uparrow D
-	plot!([( 9,4),  ( 8,4)], line = (2, :red))             # toTheLeft D
+	# rectangleObj(w, h, x, y)
+	plot!(rectangleObj(4, 3, 1.5, 2),fillcolor=plot_color(:cornflowerblue,0.2)) # E0'
+	annotate!( 5.0,  4.2, ("E0'", 12, :blue))              # E0'
+	annotate!( 2.6,  3.6, ("parm: x", 10, :blue))          # E0'
+	annotate!( 3.1,  2.6, ("body: *(x, x)", 10, :blue))    # E0'
 	#-----------------------------------------------------------------------------
 	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
+	#-----------------------------------------------------------------------------
+	plot!(rectangleObj(2, 3, 9.0, 2.0),fillcolor=plot_color(:cornflowerblue, 0.2))# E1
+	annotate!(10.5,  4.2, ("E1", 12, :blue))               # E1
+	annotate!( 9.7,  2.6, ("x: 6", 10, :blue))             # E1
+	#-----------------------------------------------------------------------------
+	# dash downline	
+	plot!([(6.6, 3.7), (6.6,9.8)], line = (2, :red), linestyle=:dash) 
+	# arrowToTheLeft
+	plot!([(5.5,3.7),(6.6,3.7)],arrow=:tail,line=(2,:red),linestyle=:dash)
+	#-----------------------------------------------------------------------------
+	plot!([(7.0,3.0),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
+	plot!([(5.5,3.0),(7.0,3.0)],line=(2,:red))             # lineToTheRight
+	#-----------------------------------------------------------------------------
+	plot!([(7.5, 3), (7.5, 9)], line = (:arrow, 2, :red))  # uparrow D
+	plot!([( 9, 3),  (7.5, 3)], line = (2, :red))          # toTheLeft D
+	#-----------------------------------------------------------------------------
 end # begin
 
 # ╔═╡ 25fac027-1ee6-4488-9d69-cf57b23600f9
@@ -1135,6 +1144,7 @@ version = "1.4.1+0"
 # ╟─a224ee70-9a3c-471f-aec6-5a7bcb3b5666
 # ╠═d8605b7e-3cfa-42b9-bfd2-ae0fa8afe8fa
 # ╠═85508544-c61f-4c0c-b7e8-d86b4504c85f
+# ╠═af7aac00-bb27-4492-aa15-bfd2cf89560b
 # ╠═36700724-6802-441f-9170-fc1e59d2b1f2
 # ╠═cd7a0889-ce50-47d9-b083-982f60f2eeaf
 # ╟─28acbc1a-9a7a-452a-b4a0-8f96485837ad
