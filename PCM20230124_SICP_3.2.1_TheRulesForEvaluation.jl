@@ -12,15 +12,20 @@ md"
 ====================================================================================
 #### SICP: [3.2.1 The Rules for Evaluation](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e1)
 ##### file: PCM20230124\_SICP\_3.2.1\_TheRulesForEvaluation.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/28 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/29 ***
 
 ====================================================================================
 "
 
 # ╔═╡ 78539779-7135-43c9-ad94-f53d8789ba66
 md"
-*The environment model of evaluation replaces the substitution model in specifying what it means to apply a compound procedure to arguments.
-... a procedure is always a pair consisting of some code and a pointer to an environment.* (SICP, 1996, p.238)
+*- The environment model of evaluation **replaces** the substitution model in specifying what it means to apply a compound procedure to arguments.*
+
+*- ... a procedure is always a **pair** consisting of some code and a pointer to an environment.*
+
+*- Procedures are **created** in one way only: by evaluataing a $$\lambda$$-expression.*
+
+*- This produces a procedure whose **code** is obtained from the text of the $$\lambda$$-expression and whose **environment** is the environment in which the $$\lambda$$-expression was evaluated to produce the procedure* (SICP, 1996, p.238)
 "
 
 # ╔═╡ a224ee70-9a3c-471f-aec6-5a7bcb3b5666
@@ -36,25 +41,38 @@ rectangle(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
 # ╔═╡ 36700724-6802-441f-9170-fc1e59d2b1f2
 square(w, x, y) = rectangle(w, w, x, y) 	# square(width, x-coord, y-coord) 
 
+# ╔═╡ cd7a0889-ce50-47d9-b083-982f60f2eeaf
+# adapted from LazarA in https://discourse.julialang.org/t/plot-a-circle-with-a-given-radius-with-plots-jl/23295/4
+circleShape(x, y, r) =                   
+	let θ = LinRange(0, 2π, 100)
+		xs = x .+ r*sin.(θ)
+		ys = y .+ r*cos.(θ)
+		xs, ys
+	end # let
+
 # ╔═╡ 28acbc1a-9a7a-452a-b4a0-8f96485837ad
 begin
 	#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
+	#-----------------------------------------------------------------------------
 	# square(width, x-coord, y-coord) 
 	plot!(square(4.0, 4.5, 9.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0
-	annotate!( 5.0, 12.2, ("E0", 12, :blue))               # E0
+	annotate!( 8.0, 12.2, ("E0", 12, :blue))               # E0
 	annotate!( 5.7, 10.8, ("others:...", 11, :blue))       # E0
-	annotate!( 5.8,  9.8, ("square:...", 11, :blue))       # E0	
+	annotate!( 5.5,  9.8, ("square:", 11, :blue))          # E0	
+	#-----------------------------------------------------------------------------
 	plot!(square(4.0, 1.5, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0'
-	annotate!( 2.1,  5.0, ("E0'", 12, :blue))              # E0'
+	annotate!( 5.0,  5.0, ("E0'", 12, :blue))              # E0'
 	annotate!( 2.6,  3.6, ("parm: x", 11, :blue))          # E0'
 	annotate!( 3.1,  2.6, ("body: *(x, x)", 11, :blue))    # E0'
+	#-----------------------------------------------------------------------------
 	plot!([(6.6, 4.2), (6.6,9.8)], line = (2, :red), linestyle=:dash) # downline C	
 	# arrowToTheLeft
 	plot!([(5.5,4.2),(6.6,4.2)],arrow=:tail,line=(2,:red),linestyle=:dash)
 	plot!([(7.0,3.5),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
 	plot!([(5.5,3.5),(7.0,3.5)],line=(2,:red))             # lineToTheRight
 	#-----------------------------------------------------------------------------
+	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
 end # begin
 
 # ╔═╡ dfafeb4d-93b6-482d-b025-dc15652f8da5
@@ -91,27 +109,32 @@ $$square(6) \Longrightarrow 36$$ after parameter-argument binding and extension 
 begin
 	#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
+	#-----------------------------------------------------------------------------
 	# square(width, x-coord, y-coord) 
 	plot!(square(4.0, 4.5, 9.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0
-	annotate!( 5.0, 12.2, ("E0", 12, :blue))               # E0
+	annotate!( 8.0, 12.2, ("E0", 12, :blue))               # E0
 	annotate!( 5.7, 10.8, ("others:...", 11, :blue))       # E0
-	annotate!( 5.8,  9.8, ("square:...", 11, :blue))       # E0	
+	annotate!( 5.5,  9.8, ("square:", 11, :blue))          # E0	
+	#-----------------------------------------------------------------------------
 	plot!(square(4.0, 1.5, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E0'
-	annotate!( 2.1,  5.0, ("E0'", 12, :blue))              # E0'
+	annotate!( 5.0,  5.0, ("E0'", 12, :blue))              # E0'
 	annotate!( 2.6,  3.6, ("parm: x", 11, :blue))          # E0'
 	annotate!( 3.1,  2.6, ("body: *(x, x)", 11, :blue))    # E0'
+	#-----------------------------------------------------------------------------
 	plot!(square(4.0, 9.0, 2.0), fillcolor=plot_color(:cornflowerblue, 0.2)) # E1
-	annotate!( 9.6,  5.0, ("E1", 12, :blue))               # E1
+	annotate!(12.5,  5.0, ("E1", 12, :blue))               # E1
 	annotate!( 9.7,  3.6, ("x: 6", 11, :blue))             # E1
+	#-----------------------------------------------------------------------------
 	plot!([(6.6, 4.2), (6.6,9.8)], line = (2, :red), linestyle=:dash) # downline C	
 	# arrowToTheLeft
 	plot!([(5.5,4.2),(6.6,4.2)],arrow=:tail,line=(2,:red),linestyle=:dash)
 	plot!([(7.0,3.5),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
 	plot!([(5.5,3.5),(7.0,3.5)],line=(2,:red))             # lineToTheRight
-	
+	#-----------------------------------------------------------------------------
 	plot!([( 8,4),  ( 8,9)], line = (:arrow, 2, :red))     # uparrow D
 	plot!([( 9,4),  ( 8,4)], line = (2, :red))             # toTheLeft D
 	#-----------------------------------------------------------------------------
+	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
 end # begin
 
 # ╔═╡ 25fac027-1ee6-4488-9d69-cf57b23600f9
@@ -1113,6 +1136,7 @@ version = "1.4.1+0"
 # ╠═d8605b7e-3cfa-42b9-bfd2-ae0fa8afe8fa
 # ╠═85508544-c61f-4c0c-b7e8-d86b4504c85f
 # ╠═36700724-6802-441f-9170-fc1e59d2b1f2
+# ╠═cd7a0889-ce50-47d9-b083-982f60f2eeaf
 # ╟─28acbc1a-9a7a-452a-b4a0-8f96485837ad
 # ╟─dfafeb4d-93b6-482d-b025-dc15652f8da5
 # ╟─7fad9ca2-bb22-4a56-8bdc-a668d80c4850
