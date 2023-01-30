@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.2.1 The Rules for Evaluation](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e1)
 ##### file: PCM20230124\_SICP\_3.2.1\_TheRulesForEvaluation.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/29 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/30 ***
 
 ====================================================================================
 "
@@ -36,13 +36,10 @@ md"
 "
 
 # ╔═╡ 85508544-c61f-4c0c-b7e8-d86b4504c85f
-rectangleObj(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
-
-# ╔═╡ af7aac00-bb27-4492-aa15-bfd2cf89560b
-rectangleObj(4, 3, 4.5, 9)
+rectangleObj(x, y, w, h) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
 
 # ╔═╡ 36700724-6802-441f-9170-fc1e59d2b1f2
-squareObj(w, x, y) = rectangleObj(w, w, x, y) 	# square(width, x-coord, y-coord) 
+squareObj(x, y, w) = rectangleObj(x, y, w, w) 	# square(x-coord, y-coord, width) 
 
 # ╔═╡ cd7a0889-ce50-47d9-b083-982f60f2eeaf
 # adapted from LazarA in https://discourse.julialang.org/t/plot-a-circle-with-a-given-radius-with-plots-jl/23295/4
@@ -54,31 +51,45 @@ circleShape(x, y, r) =
 	end # let
 
 # ╔═╡ 28acbc1a-9a7a-452a-b4a0-8f96485837ad
-begin
+let
 	#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
 	#-----------------------------------------------------------------------------
-	# rectangleObj(w, h, x, y)
-	plot!(rectangleObj(4, 3, 4.5, 9),fillcolor=plot_color(:cornflowerblue,0.2)) # E0
-	annotate!( 8.0, 11.3, ("E0", 12, :blue))               # E0
-	annotate!( 5.7, 10.7, ("others:...", 10, :blue))       # E0
-	annotate!( 5.5,  9.7, ("square:", 10, :blue))          # E0	
+	# draw gloabal environment
+	function drawGlobalEnvironment(x, y, w, h)
+		plot!(rectangleObj(x, y, w, h),fillcolor=plot_color(:cornflowerblue, 0.2), line=:blue)                                                 # E0
+		annotate!(x+3.5, y+2.3, ("E0", 11, :blue))                  # E0
+		annotate!(x+1.2, y+1.7, ("others:...", 9, :blue))           # E0
+		annotate!(x+1.0, y+0.7, ("square:", 9, :blue))              # E0	
+	end # function drawGlobalEnvironment
+	drawGlobalEnvironment(4.5, 9, 4, 3)
 	#-----------------------------------------------------------------------------
-	# rectangleObj(w, h, x, y)
-	plot!(rectangleObj(4,3, 1.5, 2.0),fillcolor=plot_color(:cornflowerblue,0.2)) # E0'
-	annotate!( 5.0,  4.2, ("E0'", 12, :blue))              # E0'
-	annotate!( 2.6,  3.6, ("parm: x", 10, :blue))          # E0'
-	annotate!( 3.1,  2.6, ("body: *(x, x)", 10, :blue))    # E0'
+	# lambda-expression of square
+	function drawLambdaSquare(x, y, w, h)
+		plot!(rectangleObj(x, y, w, h),fillcolor=plot_color(:cornflowerblue,0.2), line=(:dash, :blue))                                       # E0'
+		annotate!(x+w/3,    y+w/2.25, ("parm: x", 9, :blue))       # E0'
+		annotate!(x+w/2.15, y+w/4,    ("body: *(x, x)", 9, :blue)) # E0'
+	end # function drawLambdaSquare
+	drawLambdaSquare(2.5, 2.3, 3, 2)                    # lambda-expression of square
 	#-----------------------------------------------------------------------------
-	# dash downline	
-	plot!([(6.6, 3.6), (6.6,9.8)], line = (2, :red), linestyle=:dash) 
-	# dashed arrowToTheLeft
-	plot!([(5.5,3.6),(6.6,3.6)],arrow=:tail,line=(2,:red),linestyle=:dash)
-	plot!([(7.0,3.0),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
-	plot!([(5.5,3.0),(7.0,3.0)],line=(2,:red))             # lineToTheRight
+	function drawArrowDashDownLeft(x, y, w, h)
+		# dash downline	
+		plot!([(x, y), (x, y-h)], line = (1.3, :red), linestyle=:dash) 
+		# dashed arrowToTheLeft
+		plot!([(x, y-h),(x-1.1, y-h)],line=(1.3, :red), linestyle=:dash, arrow=:head)
+	end # function drawDashDownLeft
+	drawArrowDashDownLeft(6.6, 9.6, 1.1, 6.2)
 	#-----------------------------------------------------------------------------
-	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
-end # begin
+	function drawArrowRightUp(x, y, w, h)
+		# uparrow C	
+		plot!([(x+w, y),(x+w, y+h)], line = (:arrow, 1.3, :red), linestyle=:dash)  
+		# lineToTheRight
+		plot!([(x, y),(x+w, y)],line=(1.3,:red), linestyle=:dash)                   
+	end # function drawArrowRightUp
+	drawArrowRightUp(5.5, 3, 1.4, 6)
+	#-----------------------------------------------------------------------------
+	plot!(circleShape(6.6, 9.6, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
+end # let
 
 # ╔═╡ dfafeb4d-93b6-482d-b025-dc15652f8da5
 md"
@@ -111,40 +122,60 @@ $$square(6) \Longrightarrow 36$$ after parameter-argument binding and extension 
 "
 
 # ╔═╡ 4ed2ff2f-09fa-4079-a375-81ea55766fc5
-begin
-		#-----------------------------------------------------------------------------
+let
+	#-----------------------------------------------------------------------------
 	plot(title="Structure of Environment Frames", xlims=(0, 15), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:yes, titlelocation = :center)
 	#-----------------------------------------------------------------------------
-	# rectangleObj(w, h, x, y)
-	plot!(rectangleObj(4, 3, 4.5, 9),fillcolor=plot_color(:cornflowerblue,0.2)) # E0
-	annotate!( 8.0, 11.3, ("E0", 12, :blue))               # E0
-	annotate!( 5.7, 10.7, ("others:...", 10, :blue))       # E0
-	annotate!( 5.5,  9.7, ("square:", 10, :blue))          # E0	
+	# draw global environment E0
+	function drawGlobalEnvironment(x, y, w, h)
+		plot!(rectangleObj(x, y, w, h),fillcolor=plot_color(:cornflowerblue, 0.2), line=:blue)                                                 # E0
+		annotate!(x+w*0.9,  y+h*0.77, ("E0", 11, :blue))            # E0
+		annotate!(x+w*0.28, y+h*0.5,  ("others:...", 9, :blue))     # E0
+		annotate!(x+w*0.25, y+h*0.23, ("square:", 9, :blue))        # E0	
+	end # function drawGlobalEnvironment
+	drawGlobalEnvironment(4.5, 9, 4, 3)
 	#-----------------------------------------------------------------------------
-	# rectangleObj(w, h, x, y)
-	plot!(rectangleObj(4, 3, 1.5, 2),fillcolor=plot_color(:cornflowerblue,0.2)) # E0'
-	annotate!( 5.0,  4.2, ("E0'", 12, :blue))              # E0'
-	annotate!( 2.6,  3.6, ("parm: x", 10, :blue))          # E0'
-	annotate!( 3.1,  2.6, ("body: *(x, x)", 10, :blue))    # E0'
+	# lambda-expression of rectangle
+	function drawLambdaRectangle(x, y, w, h)
+		plot!(rectangleObj(x, y, w, h),fillcolor=plot_color(:cornflowerblue,0.2), line=(:dash, :blue))                                        # E0'
+		annotate!(x+w/3,    y+w/2.25, ("parm: x", 9, :blue))        # E0'
+		annotate!(x+w/2.15, y+w/4,    ("body: *(x, x)", 9, :blue))  # E0'
+	end # function drawLambdaRectangle
+	drawLambdaRectangle(2.5, 2.3, 3, 2)           # lambda-expression of rectangle
 	#-----------------------------------------------------------------------------
-	plot!(circleShape(6.6, 9.7, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
+	function drawArrowDashDownLeft(x, y, w, h)
+		# dash downline	
+		plot!([(x, y), (x, y-h)], line = (1.3, :red), linestyle=:dash) 
+		# dashed arrowToTheLeft
+		plot!([(x, y-h),(x-1.1, y-h)],line=(1.3, :red), linestyle=:dash, arrow=:head)
+	end # function drawDashDownLeft
+	drawArrowDashDownLeft(6.6, 9.6, 1.1, 6.2)
 	#-----------------------------------------------------------------------------
-	plot!(rectangleObj(2, 3, 9.0, 2.0),fillcolor=plot_color(:cornflowerblue, 0.2))# E1
-	annotate!(10.5,  4.2, ("E1", 12, :blue))               # E1
-	annotate!( 9.7,  2.6, ("x: 6", 10, :blue))             # E1
+	function drawArrowRightUp(x, y, w, h)
+		# uparrow C	
+		plot!([(x+w, y),(x+w, y+h)], line = (:arrow, 1.3, :red), linestyle=:dash)  
+		# lineToTheRight
+		plot!([(x, y),(x+w, y)],line=(1.3,:red), linestyle=:dash)                   
+	end # function drawArrowRightUp
+	drawArrowRightUp(5.5, 3, 1.4, 6)
 	#-----------------------------------------------------------------------------
-	# dash downline	
-	plot!([(6.6, 3.7), (6.6,9.8)], line = (2, :red), linestyle=:dash) 
-	# arrowToTheLeft
-	plot!([(5.5,3.7),(6.6,3.7)],arrow=:tail,line=(2,:red),linestyle=:dash)
+	plot!(circleShape(6.6, 9.6, 0.2), seriestype=[:shape], lw=0.5, c=:red, linecolor=:red, legend=:false)
+	#============================================================================#
+	# draw local environment E1
+	function drawLocalEnvironment(x, y, w, h)
+		plot!(rectangleObj(x, y, w, h),fillcolor=plot_color(:cornflowerblue, 0.2), line=:blue)                                                 # E1
+		annotate!(x+w*0.8, y+h*0.75, ("E1", 11, :blue))             # E1
+		annotate!(x+w*0.3,  y+h*0.35, ("x: 6", 9, :blue))           # E1	
+	end # function drawLocalEnvironment E1
+	drawLocalEnvironment(9, 4, 2, 2)
 	#-----------------------------------------------------------------------------
-	plot!([(7.0,3.0),(7.0,9.0)], line = (:arrow, 2, :red)) # uparrow C	
-	plot!([(5.5,3.0),(7.0,3.0)],line=(2,:red))             # lineToTheRight
+	function drawArrowLeftUp(x, y, w, h)
+		plot!([(x-w, y),(x-w, y+h)], line = (:arrow, 2, :red))   # uparrow C	
+		plot!([(x, y),(x-w, y)],line=(2,:red))                   # lineToTheRight
+	end # function drawArrowLeftUp
+	drawArrowLeftUp(8.9, 5, 1.4, 4)
 	#-----------------------------------------------------------------------------
-	plot!([(7.5, 3), (7.5, 9)], line = (:arrow, 2, :red))  # uparrow D
-	plot!([( 9, 3),  (7.5, 3)], line = (2, :red))          # toTheLeft D
-	#-----------------------------------------------------------------------------
-end # begin
+end # let
 
 # ╔═╡ 25fac027-1ee6-4488-9d69-cf57b23600f9
 md"
@@ -216,7 +247,7 @@ Plots = "~1.38.3"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.3"
+julia_version = "1.8.5"
 manifest_format = "2.0"
 project_hash = "4aa5240c0625a5c9fb53ded0ddfcbc6926f9c61c"
 
@@ -298,7 +329,7 @@ version = "4.5.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "0.5.2+0"
+version = "1.0.1+0"
 
 [[deps.Contour]]
 git-tree-sha1 = "d05d9e7b7aedff4e5b51a029dced05cfb6125781"
@@ -1144,7 +1175,6 @@ version = "1.4.1+0"
 # ╟─a224ee70-9a3c-471f-aec6-5a7bcb3b5666
 # ╠═d8605b7e-3cfa-42b9-bfd2-ae0fa8afe8fa
 # ╠═85508544-c61f-4c0c-b7e8-d86b4504c85f
-# ╠═af7aac00-bb27-4492-aa15-bfd2cf89560b
 # ╠═36700724-6802-441f-9170-fc1e59d2b1f2
 # ╠═cd7a0889-ce50-47d9-b083-982f60f2eeaf
 # ╟─28acbc1a-9a7a-452a-b4a0-8f96485837ad
