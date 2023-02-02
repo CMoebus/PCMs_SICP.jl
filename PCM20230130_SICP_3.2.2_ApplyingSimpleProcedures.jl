@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.2.2 Applying Simple Procedures](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e2)
 ##### file: PCM20230130\_SICP\_3.2.2\_ApplyingSimpleProcedures.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/01 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/02 ***
 
 ====================================================================================
 "
@@ -120,7 +120,7 @@ md"
 # ╔═╡ 4010a628-c7e6-47cb-81b6-d46a79c60e21
 let
 	#-----------------------------------------------------------------------------
-	plot(title="Environments Created by Evluating 'f(5)'", xlims=(0, 20), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:no, titlelocation = :center)
+	plot(title="Environments Created by Evaluation of 'f(5)'", xlims=(0, 20), ylims=(-0.5, 14), scale=:same, legend=:no, showaxis=:no, titlelocation = :center)
 	#-----------------------------------------------------------------------------
 	# draw global environment E0
 	function drawEnvironmentE0(x, y, w, h, envName; wx1=0.95, wx2=0.31, 		wx3=0.76, wx4=0.06, wy1=10.85, wy2=0.35, wy3=0.6, wy4=0.10)
@@ -204,9 +204,9 @@ let
 	drawArrowLeftUp(16.8, 2.8, 0.5, 6.2)
 	#-----------------------------------------------------------------------------
 	# draw local environment E4
-	drawLocalEnvironment(17.1, 4.6, 2, 2.0, "E4", binding1="x: 10", wx1=0.78, 
+	drawLocalEnvironment(17.5, 4.6, 2, 2.0, "E4", binding1="x: 10", wx1=0.78, 
 	wx2=0.4, wy1=0.75, wy2=0.35)
-	drawArrowLeftUp(17.1, 5.6, 0.5, 3.4)
+	drawArrowLeftUp(17.5, 5.6, 0.5, 3.4)
 	#-----------------------------------------------------------------------------
 end # let
 
@@ -216,6 +216,66 @@ md"
 
 ---
 "
+
+# ╔═╡ 61ca7874-80c8-43f6-b9ab-a8333ef654b2
+let square = x -> *(x, x)  # Global Environment E0
+	sumOfSquares = (x, y) -> +(square(x), square(y))
+	f = a -> sumOfSquares(+(a, 1), *(a, 2))
+	let a = 5  # Local Environment E1
+		let x =  6   # Local Environment E2
+			y = 10
+			+(square(x), square(y))        # ==> 136
+			+(let x = 6    # Local Environment E3
+				*(x, x)                    # ==> 36
+			 end, # let E3
+			 let x = 10    # Local Environment E4
+				*(x, x)                    # ==> 100
+			 end) # let E4                 # ==> 136
+		end # let E2
+		sumOfSquares(+(a, 1), *(a, 2))     # ==> 136
+	end # let E1
+	f(5)                                   # ==> 136
+end # let E0
+
+# ╔═╡ 254e93c2-af3c-41da-9572-55f5b8cb9cd0
+let x = 6    # Local Environment E3
+	*(x, x)                                    # ==> 36
+end # let E3
+
+# ╔═╡ 8fd6cb37-d306-40ec-95c2-ada6fd5774db
+let x = 10    # Local Environment E4
+	*(x, x)                                    # ==> 100
+end # let E4 
+
+# ╔═╡ 57f79e2b-b1f4-488a-9ccb-3413481d82ff
++(
+	let x = 6     # Local Environment E3
+		*(x, x)                                # ==> 36
+	end # let E3
+ , 
+ 	let x = 10    # Local Environment E4
+		*(x, x)                                # ==> 100
+	end # let E4
+)                                              # ==> 136
+
+# ╔═╡ 44cd1b2e-64fe-4e29-9f75-9dd44ca3e01b
+let square = x -> *(x, x)                          # Global Environment E0
+	sumOfSquares = (x, y) -> +(square(x), square(y))
+	f = a -> sumOfSquares(+(a, 1), *(a, 2))
+	let x =  6                                     # Local Environment E2
+		y = 10
+ 		+(square(x), square(y))                    # ==> 136
+	end # let E2
+end # let E0
+
+# ╔═╡ 0f7e9001-a5d0-4410-aa61-2f9007ed9715
+let square = x -> *(x, x)                          # Global Environment E0
+	sumOfSquares = (x, y) -> +(square(x), square(y))
+	f = a -> sumOfSquares(+(a, 1), *(a, 2))
+	let a = 5                                      # Local Environment E1
+		sumOfSquares(+(a, 1), *(a, 2))     # ==> 136
+	end # let E1
+end # let E0
 
 # ╔═╡ e2406358-09c6-4d15-97a0-48629c448c4d
 md"
@@ -1181,6 +1241,12 @@ version = "1.4.1+0"
 # ╟─d094551c-bfbe-4192-9ab0-7907bc26deb2
 # ╟─4010a628-c7e6-47cb-81b6-d46a79c60e21
 # ╟─421abbf2-3c06-487f-bdc1-dcc754a0a265
+# ╠═61ca7874-80c8-43f6-b9ab-a8333ef654b2
+# ╠═254e93c2-af3c-41da-9572-55f5b8cb9cd0
+# ╠═8fd6cb37-d306-40ec-95c2-ada6fd5774db
+# ╠═57f79e2b-b1f4-488a-9ccb-3413481d82ff
+# ╠═44cd1b2e-64fe-4e29-9f75-9dd44ca3e01b
+# ╠═0f7e9001-a5d0-4410-aa61-2f9007ed9715
 # ╟─e2406358-09c6-4d15-97a0-48629c448c4d
 # ╟─f13528b1-2e83-4b12-99bb-e93d005d746c
 # ╟─00000000-0000-0000-0000-000000000001
