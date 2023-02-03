@@ -12,9 +12,14 @@ md"
 ====================================================================================
 #### SICP: [3.2.2 Applying Simple Procedures](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e2)
 ##### file: PCM20230130\_SICP\_3.2.2\_ApplyingSimpleProcedures.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/02 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/03 ***
 
 ====================================================================================
+"
+
+# ╔═╡ f30c9800-9bce-4f2e-9748-1889e8cd8bce
+md"
+##### 3.2.2.1 Scheme-like Julia
 "
 
 # ╔═╡ 6b9597af-57bb-47cf-9568-d62f395f68cd
@@ -217,63 +222,52 @@ md"
 ---
 "
 
-# ╔═╡ 61ca7874-80c8-43f6-b9ab-a8333ef654b2
-let square = x -> *(x, x)  # Global Environment E0
+# ╔═╡ a68133d3-214e-4ae4-a422-ca155c1a5ed0
+md"
+---
+##### 3.2.2.2 Detailed simulation of environments with $$let$$*s*
+"
+
+# ╔═╡ b56a9fc6-281c-490a-9e7d-9fc107eaefd1
+let square = x -> *(x, x)                             # Global Environment E0
 	sumOfSquares = (x, y) -> +(square(x), square(y))
 	f = a -> sumOfSquares(+(a, 1), *(a, 2))
-	let a = 5  # Local Environment E1
-		let x =  6   # Local Environment E2
-			y = 10
-			+(square(x), square(y))        # ==> 136
-			+(let x = 6    # Local Environment E3
-				*(x, x)                    # ==> 36
-			 end, # let E3
-			 let x = 10    # Local Environment E4
-				*(x, x)                    # ==> 100
-			 end) # let E4                 # ==> 136
-		end # let E2
-		sumOfSquares(+(a, 1), *(a, 2))     # ==> 136
+	#-------------------------------------------------
+	f(5)                                              # ==> 136
+end # let E0
+
+# ╔═╡ e2118dc8-f6fd-4a9e-8fbb-c6d2779be9ae
+let square = x -> *(x, x)                             # Global Environment E0
+	sumOfSquares = (x, y) -> +(square(x), square(y))
+	f = a -> sumOfSquares(+(a, 1), *(a, 2))
+	#-------------------------------------------------
+	let a = 5                                         # Local Environment E1
+		#---------------------------------------------
+		sumOfSquares(+(a, 1), *(a, 2))                # ==> 136
 	end # let E1
-	f(5)                                   # ==> 136
 end # let E0
 
-# ╔═╡ 254e93c2-af3c-41da-9572-55f5b8cb9cd0
-let x = 6    # Local Environment E3
-	*(x, x)                                    # ==> 36
-end # let E3
-
-# ╔═╡ 8fd6cb37-d306-40ec-95c2-ada6fd5774db
-let x = 10    # Local Environment E4
-	*(x, x)                                    # ==> 100
-end # let E4 
-
-# ╔═╡ 57f79e2b-b1f4-488a-9ccb-3413481d82ff
-+(
-	let x = 6     # Local Environment E3
-		*(x, x)                                # ==> 36
-	end # let E3
- , 
- 	let x = 10    # Local Environment E4
-		*(x, x)                                # ==> 100
-	end # let E4
-)                                              # ==> 136
-
-# ╔═╡ 44cd1b2e-64fe-4e29-9f75-9dd44ca3e01b
-let square = x -> *(x, x)                          # Global Environment E0
+# ╔═╡ a89375c2-2cce-439b-b1ed-d21adf2c1ab1
+let square = x -> *(x, x)                             # Global Environment E0
 	sumOfSquares = (x, y) -> +(square(x), square(y))
 	f = a -> sumOfSquares(+(a, 1), *(a, 2))
-	let x =  6                                     # Local Environment E2
-		y = 10
- 		+(square(x), square(y))                    # ==> 136
-	end # let E2
-end # let E0
-
-# ╔═╡ 0f7e9001-a5d0-4410-aa61-2f9007ed9715
-let square = x -> *(x, x)                          # Global Environment E0
-	sumOfSquares = (x, y) -> +(square(x), square(y))
-	f = a -> sumOfSquares(+(a, 1), *(a, 2))
-	let a = 5                                      # Local Environment E1
-		sumOfSquares(+(a, 1), *(a, 2))     # ==> 136
+	#-------------------------------------------------
+	let a = 5                                         # Local Environment E1
+		#---------------------------------------------
+		let x =  6                                    # Local Environment E2
+			y = 10
+			#-----------------------------------------
+			+(
+				let x = 6                             # Local Environment E3
+				#-------------------------------------
+					*(x, x)                           # ==> 36
+			 	end, # let E3
+			 	let x = 10   					  	  # Local Environment E4
+				#-------------------------------------
+					*(x, x)                    		  # ==> 100
+				end # let E4
+			)                                         # ==> 136
+		end # let E2
 	end # let E1
 end # let E0
 
@@ -1229,6 +1223,7 @@ version = "1.4.1+0"
 
 # ╔═╡ Cell order:
 # ╟─5aa8a8b0-a0b9-11ed-3c73-095fdc0f4e0f
+# ╟─f30c9800-9bce-4f2e-9748-1889e8cd8bce
 # ╠═86e3a28d-acf8-4104-b32d-76f7514da301
 # ╠═6b9597af-57bb-47cf-9568-d62f395f68cd
 # ╠═3cea7cfa-a0c7-4063-81ae-ec91da94749f
@@ -1241,12 +1236,10 @@ version = "1.4.1+0"
 # ╟─d094551c-bfbe-4192-9ab0-7907bc26deb2
 # ╟─4010a628-c7e6-47cb-81b6-d46a79c60e21
 # ╟─421abbf2-3c06-487f-bdc1-dcc754a0a265
-# ╠═61ca7874-80c8-43f6-b9ab-a8333ef654b2
-# ╠═254e93c2-af3c-41da-9572-55f5b8cb9cd0
-# ╠═8fd6cb37-d306-40ec-95c2-ada6fd5774db
-# ╠═57f79e2b-b1f4-488a-9ccb-3413481d82ff
-# ╠═44cd1b2e-64fe-4e29-9f75-9dd44ca3e01b
-# ╠═0f7e9001-a5d0-4410-aa61-2f9007ed9715
+# ╟─a68133d3-214e-4ae4-a422-ca155c1a5ed0
+# ╠═b56a9fc6-281c-490a-9e7d-9fc107eaefd1
+# ╠═e2118dc8-f6fd-4a9e-8fbb-c6d2779be9ae
+# ╠═a89375c2-2cce-439b-b1ed-d21adf2c1ab1
 # ╟─e2406358-09c6-4d15-97a0-48629c448c4d
 # ╟─f13528b1-2e83-4b12-99bb-e93d005d746c
 # ╟─00000000-0000-0000-0000-000000000001
