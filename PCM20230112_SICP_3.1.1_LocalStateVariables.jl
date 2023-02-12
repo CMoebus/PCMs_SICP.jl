@@ -23,7 +23,11 @@ md"
 # ╔═╡ b9751ac2-95b0-43e0-8f0e-f6be4ac565fe
 md"
 ##### *Encapsulation* in Julia
-Under what circumstances is it possible to achieve *encapsulation* despite the fact we have *no* keywords $$private$$ or $$public$$.
+Under what circumstances is it possible to achieve *encapsulation* despite the fact we have *no* keywords $$private$$ or $$public$$ ?
+
+To emphasis the necessity and issue of encapsulation of software written in Julia [Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/) quotes [Kwong, 2020, ch.8, p.315](https://subscription.packtpub.com/book/programming/9781838648817/11) : 
+*Based on the Principle of Least Privilege (POLP), we would consider hiding unnecessary implementation details to the client of the interface. However, Julia's data structure is transparent – all fields are automatically exposed and accessible. This poses a potential problem because any improper usage or mutation can break the system. Additionally, by accessing the fields directly, the code becomes more tightly coupled with the underlying implementation of an object.*
+
 We can demonstrate that in some circumstances it is possible to skim off information from object's fields if their names are known or could be guessed. So explicit countermeasures have to be taken. In several blogs *encapsulation* in Julia is a central topic (s.a. *references*, below).
 "
 
@@ -57,18 +61,6 @@ begin
 	end # function withdraw1
 	#----------------------------------
 end # begin    
-
-# ╔═╡ 6c72ecc9-0f66-428e-8063-924125e23bc0
-withdraw(25)                       # 100 - 25 ==> 75
-
-# ╔═╡ 721753d9-33ad-47a1-a422-d272624bf71e
-withdraw(25)                       #  75 - 25 ==> 50
-
-# ╔═╡ 07667dbd-8c42-4c21-a8a4-d6761df2e1f3
-withdraw(60)                       #  50 - 60 = -10 ==> "Insufficient Funds"
-
-# ╔═╡ a6f371d6-45f5-4f1f-979d-e08562f47279
-withdraw(15)                       #  50 - 15 ==> 35
 
 # ╔═╡ 68d841c6-507e-4fb6-b5d3-7c0d2a29e646
 balance                            # *no* encapsulation achieved !   :(
@@ -294,12 +286,88 @@ md"
 #### 3.1.1.2 Idiomatic Julia
 "
 
+# ╔═╡ 970ed801-7c4e-4d8b-b24f-b954a8e7f02a
+md"
+##### 3.1.1.2.1 *Recommended* Julia with *Types* and *Multiple-dispatch Functions*
+"
+
+# ╔═╡ 9d11406c-6777-4e75-81ec-49544014f2a9
+md"
+This simple approach is typical *Julian* and recommended by its creators, but as will be demonstrated *encapsulation* of object's field $balance$ *cannot* be achieved. So other propsals have to be followed.
+"
+
+# ╔═╡ 8d3bd44c-a065-4c58-b475-b0261b7f7f71
+begin 
+	#----------------------------------------------------------
+	mutable struct Account
+		balance::Number           # should be a private field
+	end # mutable struct Account
+	#---------------------------------------------------------
+	function getBalance(self)
+		self.balance
+	end # function getBalance
+	#-------------------------------------------------
+	function withdraw(self, amount)
+		if 	self.balance >= amount  
+			self.balance -= amount 
+		else
+			"Insufficient Funds"
+		end # if
+	end # function withdraw
+	#-------------------------------------------------
+	function deposit!(self, amount)
+		self.balance += amount 
+	end # function deposit!
+	#-------------------------------------------------
+end # begin 
+
+
+# ╔═╡ 6c72ecc9-0f66-428e-8063-924125e23bc0
+withdraw(25)                       # 100 - 25 ==> 75
+
+# ╔═╡ 721753d9-33ad-47a1-a422-d272624bf71e
+withdraw(25)                       #  75 - 25 ==> 50
+
+# ╔═╡ 07667dbd-8c42-4c21-a8a4-d6761df2e1f3
+withdraw(60)                       #  50 - 60 = -10 ==> "Insufficient Funds"
+
+# ╔═╡ a6f371d6-45f5-4f1f-979d-e08562f47279
+withdraw(15)                       #  50 - 15 ==> 35
+
+# ╔═╡ 799bd826-4a3a-41a8-abe4-fc02f81e3e0b
+acc1946 = Account(400)
+
+# ╔═╡ 6dbcadbb-12cb-464a-a248-bd761d0c6aae
+acc1947 = Account(300)
+
+# ╔═╡ 69695e61-ae4e-4bbf-beac-f9de6830c91c
+getBalance(acc1946)
+
+# ╔═╡ 89bbd3ed-9bf1-47bb-bc96-06017635ceb8
+getBalance(acc1947)
+
+# ╔═╡ 3335eaec-669e-46a0-975f-49c61418d491
+withdraw(acc1946, 25)
+
+# ╔═╡ 41303df3-689d-4194-95aa-ac1d3f4b045b
+withdraw(acc1947, 25)
+
+# ╔═╡ b29100e7-1ce2-4f2e-b031-efb172a722a3
+deposit!(acc1946, 125)
+
+# ╔═╡ 6abe7ba2-eb7c-43b4-a3ad-1a5db8d01b77
+deposit!(acc1947, 125)
+
+# ╔═╡ 69a854b9-15db-458f-bae7-051883b52714
+acc1946.balance            #  no encapsulation achieved !   :(
+
+# ╔═╡ 99c9ef5a-e169-41b3-b33a-db97c4453b95
+acc1947.balance            #  no encapsulation achieved !   :(
+
 # ╔═╡ 7ce887c0-7309-4da6-ac99-2c3cdf05af42
 md"
-##### 3.1.1.2.1 *Encapsulation* with Types and Constructors
-
-To emphasis the necessity and issue of encapsulation of software written in Julia [Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/) quotes [Kwong, 2020, ch.8, p.315](https://subscription.packtpub.com/book/programming/9781838648817/11) : 
-*Based on the Principle of Least Privilege (POLP), we would consider hiding unnecessary implementation details to the client of the interface. However, Julia's data structure is transparent – all fields are automatically exposed and accessible. This poses a potential problem because any improper usage or mutation can break the system. Additionally, by accessing the fields directly, the code becomes more tightly coupled with the underlying implementation of an object.*
+---
+##### 3.1.1.2.2 *Encapsulation* with Types and Constructors
 
 [Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/) provides as a prototypical implementation an OO-area-computation of rectangular objects. The idea is to *distribute* the generation of instances with *private* and *public* fields containing *class methods* over *private* types, *public* types, and a function *closure*.
 
@@ -390,7 +458,7 @@ rect45.area()                    # () ==> 4 * 5 ==> 20.0
 # ╔═╡ b0076f41-dc5b-453f-aaed-f89a10e9d357
 md"
 ---
-##### 3.1.1.2.2 *Mutable Types* and *Constructors* in the Bank Account Problem
+##### 3.1.1.2.3 *Mutable Types* and *Constructors* in the Bank Account Problem
 "
 
 # ╔═╡ 2cc5aa62-86d3-4352-a0e6-752d0b0dc495
@@ -552,7 +620,20 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═23bc9d98-0716-428a-bfd1-8f9dcf992a29
 # ╠═736f13f9-f0d8-4a77-938b-9f184c1bc6f6
 # ╟─2524cf60-fb90-4eca-99ab-ca73816fde82
-# ╟─7ce887c0-7309-4da6-ac99-2c3cdf05af42
+# ╟─970ed801-7c4e-4d8b-b24f-b954a8e7f02a
+# ╟─9d11406c-6777-4e75-81ec-49544014f2a9
+# ╠═8d3bd44c-a065-4c58-b475-b0261b7f7f71
+# ╠═799bd826-4a3a-41a8-abe4-fc02f81e3e0b
+# ╠═6dbcadbb-12cb-464a-a248-bd761d0c6aae
+# ╠═69695e61-ae4e-4bbf-beac-f9de6830c91c
+# ╠═89bbd3ed-9bf1-47bb-bc96-06017635ceb8
+# ╠═3335eaec-669e-46a0-975f-49c61418d491
+# ╠═41303df3-689d-4194-95aa-ac1d3f4b045b
+# ╠═b29100e7-1ce2-4f2e-b031-efb172a722a3
+# ╠═6abe7ba2-eb7c-43b4-a3ad-1a5db8d01b77
+# ╠═69a854b9-15db-458f-bae7-051883b52714
+# ╠═99c9ef5a-e169-41b3-b33a-db97c4453b95
+# ╠═7ce887c0-7309-4da6-ac99-2c3cdf05af42
 # ╟─81336351-e171-4a5f-b3e5-fdc920134a6c
 # ╠═77bfbb6f-715e-47d1-8ac6-355541f1fd99
 # ╠═6d66c9ed-c2bf-483a-a17f-9b9012a8e6f6
