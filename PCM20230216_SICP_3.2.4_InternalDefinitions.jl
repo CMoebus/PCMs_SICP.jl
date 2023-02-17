@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: [3.2.4 Internal Definitions](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e4)
 ##### file: PCM20230216\_SICP\_3.2.4\_InternalDefinitions.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/16 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/17 ***
 
 ====================================================================================
 "
@@ -62,91 +62,74 @@ mySqrt(4)^2
 
 # ╔═╡ 1c09fa26-1007-4fbf-949a-12af9e5b1225
 md"
-###### Global and local definitions mit $let$ and $\lambda$-expressions
+---
+##### 3.2.4.2 Definitions with *nested* $let$ and $\lambda$-expressions and *application* in *E0*
 "
 
 # ╔═╡ bad831b4-dff1-473a-94ed-3aabdc388e88
-let 
+let                                                          # global environment E0
 	#--------------------------------------------------------------------------------
-	mySqrt2        =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		square     =      x -> x * x                         #  local environment E1
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
+	closureInE0 =                                            # 1st binding in E0
+		x ->                               
+			#------------------------------------------------------------------------
+			let                                              #  local environment E1
+				#--------------------------------------------------------------------
+				square     =      x -> x * x                 # binding in E1
+				goodEnough =                                 # binding in E1
+					guess  ->                                # binding in E1
+						<(abs(-(square(guess), x)), 0.001)
+				improve    =                                 # binding in E1
+					guess  -> average(guess, /(x, guess))
+				sqrtIter   =                                 # binding in E1
+					guess  -> goodEnough(guess) ?
 								guess :
 								sqrtIter(improve(guess))
 
-		average    = (x, y) -> (x + y)/2.0
-		#----------------------------------------------------------------------------
-		sqrtIter(1.0)
-	end # let local environment E1
+				average    =                                 # binding in E1
+					(x, y) -> (x + y)/2.0
+				#--------------------------------------------------------------------
+				sqrtIter(1.0)
+			end # let local environment E1
 	#--------------------------------------------------------------------------------
-	mySqrt2(2)^2
- # global environment E0
+	mySqrt2     = closureInE0                                # 2nd binding in E0
+	#--------------------------------------------------------------------------------
+	mySqrt2(2)^2                                             # application in E0
 end # let  global environment E0
 
-# ╔═╡ a25e7902-6ee9-415b-bedf-3453a1c4fc7e
+# ╔═╡ e0ca0383-37fd-4b3f-984e-939c6856a151
 md"
 ---
-##### 3.2.4.2 Simulation of environments with *nested* $let$s
+###### Environments *E0* and *E1* after definitions
 "
 
-# ╔═╡ b539fcc1-c866-4903-83af-b3c2a721e32e
-md"
-###### Algorithm with nested $let$s
-"
-
-# ╔═╡ c061fb55-3379-4a83-bd81-7c461206e2c0
-let 
+# ╔═╡ ea207616-dba5-457e-a55b-80162996b1d9
+let                                                          # global environment E0
 	#--------------------------------------------------------------------------------
-	mySqrt2        =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		square     =      x -> x * x                         #  local environment E1
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
+	closureInE0 =                                            # 1st binding in E0
+		x ->                               
+			#------------------------------------------------------------------------
+			let                                              #  local environment E1
+				#--------------------------------------------------------------------
+				square     =      x -> x * x                 # binding in E1
+				goodEnough =                                 # binding in E1
+					guess  ->                                # binding in E1
+						<(abs(-(square(guess), x)), 0.001)
+				improve    =                                 # binding in E1
+					guess  -> average(guess, /(x, guess))
+				sqrtIter   =                                 # binding in E1
+					guess  -> goodEnough(guess) ?
 								guess :
 								sqrtIter(improve(guess))
 
-		average    = (x, y) -> (x + y)/2.0
-		#----------------------------------------------------------------------------
-		sqrtIter(1.0)
-	end # let local environment E1
+				average    =                                 # binding in E1
+					(x, y) -> (x + y)/2.0
+				#--------------------------------------------------------------------
+				sqrtIter(1.0)
+			end # let local environment E1
 	#--------------------------------------------------------------------------------
-	mySqrt2(2)^2
- # global environment E0
-end # let  global environment E0
-
-# ╔═╡ a28b0a63-6df9-4423-ab8e-ca458dcfabbb
-md"
----
-###### Environments *E0* and *E1* after *global* and *internal* (=local) definitions
-"
-
-# ╔═╡ c66c2258-25c4-4442-a955-f9f3f19bc964
-let 
+	mySqrt2     = closureInE0                                # 2nd binding in E0
 	#--------------------------------------------------------------------------------
-	mySqrt2        =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		square     =      x -> x * x                         #  local environment E1
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
-								guess :
-								sqrtIter(improve(guess))
-
-		average    = (x, y) -> (x + y)/2.0
-		#----------------------------------------------------------------------------
-	end # let local environment E1
-	#--------------------------------------------------------------------------------
- # global environment E0
+	# mySqrt2(2)^2                                           # application in E0
 end # let  global environment E0
 
 # ╔═╡ 523391cc-e2f4-49a4-ba9d-5c205b3843be
@@ -156,109 +139,137 @@ md"
 Result is new binding $x=2$ (cf. Fig.3.11, SICP, 1996):
 "
 
-# ╔═╡ 485a50a9-0858-4639-813b-9d003d1d8e8b
-let 
+# ╔═╡ 1b3f120f-c2aa-4d42-a7be-adab650428b5
+let                                                          # global environment E0
 	#--------------------------------------------------------------------------------
-	# mySqrt2      =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		x          = 2.0
-		square     =      x -> x * x                         #  local environment E1
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
+	closureInE0 =                                            # 1st binding in E0      
+			#------------------------------------------------------------------------
+			let                                              #  local environment E1
+				#--------------------------------------------------------------------
+				x          =   2.0                           # new binding
+				square     =      x -> x * x                 # binding in E1
+				goodEnough =                                 # binding in E1
+					guess  ->                                # binding in E1
+						<(abs(-(square(guess), x)), 0.001)
+				improve    =                                 # binding in E1
+					guess  -> average(guess, /(x, guess))
+				sqrtIter   =                                 # binding in E1
+					guess  -> goodEnough(guess) ?
 								guess :
 								sqrtIter(improve(guess))
 
-		average    = (x, y) -> (x + y)/2.0
-		#----------------------------------------------------------------------------
-		sqrtIter(1.0)
-	end # let local environment E1
+				average    =                                 # binding in E1
+					(x, y) -> (x + y)/2.0
+				#--------------------------------------------------------------------
+				sqrtIter(1.0)
+			end # let local environment E1
 	#--------------------------------------------------------------------------------
- # global environment E0
+	mySqrt2     = closureInE0                                # 2nd binding in E0
+	#--------------------------------------------------------------------------------
+	# mySqrt2(2)^2                                           # application in E0
 end # let  global environment E0
 
 # ╔═╡ 8e565a5a-8381-465a-b79f-a63f493b3570
 md"
 ---
 ###### Environments *E0*, *E1*, and *E2* after *application* $sqrtIter(1.0)$
-Result is new binding $guess=1.0$ (cf. Fig.3.11, SICP, 1996):
+Result is new binding $guess=1.0$ in *E2* (cf. Fig.3.11, SICP, 1996):
 "
 
-# ╔═╡ c6581a0f-8690-459b-9c12-2c01846e0018
-let 
+# ╔═╡ 4c1fb8a7-752a-44f6-879d-c889198667d3
+let                                                          # global environment E0
 	#--------------------------------------------------------------------------------
-	# mySqrt2      =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		x          = 2.0
-		square     =      x -> x * x                         #  local environment E1
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
+	closureInE0 =                                            # 1st binding in E0      
+			#------------------------------------------------------------------------
+			let                                              #  local environment E1
+				#--------------------------------------------------------------------
+				x          =   2.0                           # new binding
+				square     =      x -> x * x                 # binding in E1
+				goodEnough =                                 # binding in E1
+					guess  ->                                # binding in E1
+						<(abs(-(square(guess), x)), 0.001)
+				improve    =                                 # binding in E1
+					guess  -> average(guess, /(x, guess))
+				sqrtIter   =                                 # binding in E1
+					guess  -> goodEnough(guess) ?
 								guess :
 								sqrtIter(improve(guess))
 
-		average    = (x, y) -> (x + y)/2.0
-		#----------------------------------------------------------------------------
-		let 
-			#------------------------------------------------------------------------
-			guess = 1.0                                     #  local environment E2
-			#------------------------------------------------------------------------
-			goodEnough(guess) ?
-								guess :
-								sqrtIter(improve(guess))
-		end #  # let local environment E2
-	end # let local environment E1
+				average    =                                 # binding in E1
+					(x, y) -> (x + y)/2.0
+				#--------------------------------------------------------------------
+				let                                          # local environment E2
+					#----------------------------------------------------------------
+					guess = 1.0                              # binding in E2
+					#----------------------------------------------------------------
+					goodEnough(guess) ?
+						guess :
+						sqrtIter(improve(guess))
+					#----------------------------------------------------------------
+				end #  # let local environment E2
+				#--------------------------------------------------------------------
+				# sqrtIter(1.0)
+			end # let local environment E1
 	#--------------------------------------------------------------------------------
+	mySqrt2     = closureInE0                                # 2nd binding in E0
+	#--------------------------------------------------------------------------------
+	# mySqrt2(2)^2                                           # application in E0
 end # let  global environment E0
 
 # ╔═╡ 3d56eebc-132c-4231-94f4-6cbd2fe51985
 md"
 ---
 ###### Environments *E0*, *E1*, and *E2* after *application* $goodEnough(1.0)$
-Result is new binding $guess=1.0$ (cf. Fig.3.11, SICP, 1996):
+Result is new binding $guess=1.0$ in *E3* (cf. Fig.3.11, SICP, 1996):
 "
 
-# ╔═╡ f80e0478-a0fa-4c3c-ab63-8ef4a96fe00e
-let 
+# ╔═╡ 96955c6d-20ac-46ac-a202-c564a85993d7
+let                                                          # global environment E0
 	#--------------------------------------------------------------------------------
-	# mySqrt2      =      x ->                               # global environment E0
-	#--------------------------------------------------------------------------------
-	let 
-		#----------------------------------------------------------------------------
-		x          = 2.0                                     #  local environment E1
-		square     =      x -> x * x                        
-		goodEnough = guess  -> <(abs(-(square(guess), x)), 0.001)
-		improve    = guess  -> average(guess, /(x, guess))
-		sqrtIter   = guess  -> goodEnough(guess) ?
+	closureInE0 =                                            # 1st binding in E0      
+			#------------------------------------------------------------------------
+			let                                              #  local environment E1
+				#--------------------------------------------------------------------
+				x          =   2.0                           # new binding
+				square     =   x -> x * x                    # binding in E1
+				goodEnough =                                 # binding in E1
+					guess  ->                                # binding in E1
+						<(abs(-(square(guess), x)), 0.001)
+				improve    =                                 # binding in E1
+					guess  -> average(guess, /(x, guess))
+				sqrtIter   =                                 # binding in E1
+					guess  -> goodEnough(guess) ?
 								guess :
 								sqrtIter(improve(guess))
 
-		average    = (x, y) -> (x + y)/2.0
-		let 
-			#------------------------------------------------------------------------
-			guess = 1.0                                     #  local environment E2
-			#------------------------------------------------------------------------
-			let
+				average    =                                 # binding in E1
+					(x, y) -> (x + y)/2.0
 				#--------------------------------------------------------------------
-				guess = 1.0                                 #  local environment E3
-				sqrtIter(improve(guess))
+				let                                          # local environment E2
+					#----------------------------------------------------------------
+					guess = 1.0                              # binding in E2
+					#----------------------------------------------------------------
+					let                                      # local environment E3
+						#------------------------------------------------------------
+						guess = 1.0                                 
+						sqrtIter(improve(guess))
+						#------------------------------------------------------------
+					end # let local environment E3
 				#--------------------------------------------------------------------
-			end # let local environment E3
-			#------------------------------------------------------------------------
-		end #  # let local environment E2
-		#----------------------------------------------------------------------------
-	end # let local environment E1
+				end # let local environment E2
+				#--------------------------------------------------------------------
+				# sqrtIter(1.0)
+			end # let local environment E1
 	#--------------------------------------------------------------------------------
+	mySqrt2     = closureInE0                                # 2nd binding in E0
+	#--------------------------------------------------------------------------------
+	# mySqrt2(2)^2                                           # application in E0
 end # let  global environment E0
 
 # ╔═╡ 8e10c0ad-7347-45d7-9892-2f7a62800850
 md"
 ---
-##### end of ch. 3.2.3
+##### end of ch. 3.2.4
 "
 
 
@@ -297,17 +308,14 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b16eef0c-d3b9-4e99-b670-55f60c98412f
 # ╟─1c09fa26-1007-4fbf-949a-12af9e5b1225
 # ╠═bad831b4-dff1-473a-94ed-3aabdc388e88
-# ╟─a25e7902-6ee9-415b-bedf-3453a1c4fc7e
-# ╟─b539fcc1-c866-4903-83af-b3c2a721e32e
-# ╠═c061fb55-3379-4a83-bd81-7c461206e2c0
-# ╟─a28b0a63-6df9-4423-ab8e-ca458dcfabbb
-# ╠═c66c2258-25c4-4442-a955-f9f3f19bc964
+# ╟─e0ca0383-37fd-4b3f-984e-939c6856a151
+# ╠═ea207616-dba5-457e-a55b-80162996b1d9
 # ╟─523391cc-e2f4-49a4-ba9d-5c205b3843be
-# ╠═485a50a9-0858-4639-813b-9d003d1d8e8b
+# ╠═1b3f120f-c2aa-4d42-a7be-adab650428b5
 # ╟─8e565a5a-8381-465a-b79f-a63f493b3570
-# ╠═c6581a0f-8690-459b-9c12-2c01846e0018
+# ╠═4c1fb8a7-752a-44f6-879d-c889198667d3
 # ╟─3d56eebc-132c-4231-94f4-6cbd2fe51985
-# ╠═f80e0478-a0fa-4c3c-ab63-8ef4a96fe00e
+# ╠═96955c6d-20ac-46ac-a202-c564a85993d7
 # ╟─8e10c0ad-7347-45d7-9892-2f7a62800850
 # ╟─045fba1d-ec31-4716-b674-905cdb9dc7dd
 # ╟─00000000-0000-0000-0000-000000000001
