@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: [3.2.3 Frames as the Repository of Local State](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3)
 ##### file: PCM20230214\_SICP\_3.2.3\_FramesAsRepositoryOfLocalState.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/17 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/18 ***
 
 ====================================================================================
 "
@@ -57,204 +57,233 @@ w2(50)
 # ╔═╡ 4ef4f6df-f568-41c5-ad04-16525752a520
 md"""
 ---
-###### Simulated global environment *E0* after *definition* of $makeWithDraw$
+###### $let$-simulated environment *E0* after *definition* of $makeWithDraw$
 
-Result is a *binding* of variable name $makeWithDraw$ with the *higher-order* $\lambda$-function (cf. [Fig. 3.6, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996):
+Result is a *binding* of variable name $makeWithDraw$ with a *closure* (= *higher-order* $\lambda$-function) in $let$-simulated *global* environment *E0* (cf. [Fig. 3.6, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996):
 
-$balance \rightarrow ....''insufficient funds''$
 """
 
-# ╔═╡ c3f6d564-b16e-47e9-b2d0-88d8f1bb1ef1
+# ╔═╡ 83d587ed-981c-4dec-ba71-554b0addc97d
 let                                               # global environment E0
-	#---------------------------------------------------------------------
-	makeWithDraw =                                # binding 'makeWitDraw'             
-		closureInE0 =                             # ...with 'closureInE0'
+	#----------------------------------------------------------------------
+	closureInE0 =                                 # 1st binding
 			balance -> 
 				amount -> 
 					>=(balance, amount) ?
 						balance -= amount :
 						"insufficient funds"
-	#---------------------------------------------------------------------
-	w1 = makeWithDraw(100)
-	w1(50)
+	#-----------------------------------------------------------
+	makeWithDraw = closureInE0                    # 2nd binding 
+	#----------------------------------------------------------------------
+	# w1 = makeWithDraw(100)                   1st test (should work here)
+	# w1(50)   # ==> 50                        2nd test (should work here)
+	#----------------------------------------------------------------------
 end # let global environment E0
 
 # ╔═╡ 136e5a22-6456-4b4a-ada0-bd17f9f6d980
 md"""
 ---
-###### Simulated local environment *E1* after *application* $makeWithDraw(100)$  
-Result is a *closure* with *nonlocal* variable $balance$ (cf. [Fig. 3.7, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996):
+###### $let$-simulated local environment *E1* after *application* $makeWithDraw(100)$  
+Result is a second *closure* in $let$-simulated *local* environment *E1* with *nonlocal* variable $balance$ (cf. [Fig. 3.7, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996):
 """
 
-# ╔═╡ f7cdad03-20ac-4f1c-9fd7-043e8b65eeb8
+# ╔═╡ bf55018b-7066-46e1-b81e-378684f5c34c
 let                                               # global environment E0
-	#---------------------------------------------------------------------
-	makeWithDraw =                                # binding 'makeWitDraw'             
-		closureInE0 =                             # ...with 'closureInE0'
+	#----------------------------------------------------------------------
+	closureInE0 =                                 # 1st binding in E0
 			balance -> 
 				amount -> 
 					>=(balance, amount) ?
 						balance -= amount :
 						"insufficient funds"
-	#---------------------------------------------------------------------
-	let                                           #  local environment E1
-		#-----------------------------------------------------------------
-		balance = 100                             #  binding 'balance'
-		#-----------------------------------------------------------------
-		closureInE1 =                             # closure in E1 ...
+	#-----------------------------------------------------------
+	makeWithDraw = closureInE0                    # 2nd binding in E0
+	#----------------------------------------------------------------------
+	let                                           # local environment E1
+		#------------------------------------------------------------------
+		balance = 100                             #  1st binding in E1
+		#------------------------------------------------------------------
+		closureInE1 =                             #  2nd binding in E1
 			amount ->                             
 				>=(balance, amount) ?   #  ...with free variable 'balance'
 				balance -= amount :
 				"insufficient funds"
-		#-----------------------------------------------------------------
+		#------------------------------------------------------------------
 	end # let local environment E1
-	#---------------------------------------------------------------------
-	# w1 = makeWithDraw(100)
-	# w1(50)
+	#----------------------------------------------------------------------
+	# w1 = makeWithDraw(100)                   1st test (should work here)
+	# w1(50)   # ==> 50                        2nd test (should work here)
+	#----------------------------------------------------------------------
 end # let global environment E0
 
 # ╔═╡ 834e4e28-b884-4945-a687-74ba401b7168
 md"
 ---
-###### Simulated global environment *E0* after *assignment* $$w1 = makeWithDraw(100)$$
+###### $let$-simulated environment *E0* after *assignment* $$w1 = makeWithDraw(100)$$
 Result is a new binding for $w1$ in *E0*  (cf. [Fig. 3.7, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996):
 "
 
-# ╔═╡ d7076991-5dd5-42e0-b849-7f658fb43762
+# ╔═╡ 45793f66-8011-4b85-9c26-cb79cb953409
 let                                               # global environment E0
-	#-------------------------------------------------------------------------
-	makeWithDraw =                          # binding 'makeWitDraw' in E0             
-		closureInE0 =                       # ...with 'closureInE0'
+	#----------------------------------------------------------------------
+	closureInE0 =                                 # binding in E0
 			balance -> 
 				amount -> 
 					>=(balance, amount) ?
 						balance -= amount :
 						"insufficient funds"
-	#-------------------------------------------------------------------------
-	w1 =                                          # binding 'w1' in E0 
-	#-------------------------------------------------------------------------
-		let                                           #  local environment E1
-			#-----------------------------------------------------------------
-			balance = 100                             #  binding 'balance'
-			#-----------------------------------------------------------------
-			closureInE1 =                             # closure in E1 ...
+	#-----------------------------------------------------------
+	makeWithDraw = closureInE0                    # binding in E0
+	#----------------------------------------------------------------------
+	object =                                      # binding in E0
+	#----------------------------------------------------------------------
+		let                                       # local environment E1
+			#--------------------------------------------------------------
+			balance = 100                         #  1st binding in E1
+			#--------------------------------------------------------------
+			closureInE1 =                         #  2nd binding in E1
 				amount ->                             
-					>=(balance, amount) ?   #  ...with free variable 'balance'
+					>=(balance, amount) ?         #  ...free 'balance'
 					balance -= amount :
 					"insufficient funds"
-		#---------------------------------------------------------------------
-	end # let local environment E1
-	#-------------------------------------------------------------------------
-	# w1 = makeWithDraw(100)
-	# w1(50)
+			#--------------------------------------------------------------
+		end # let local environment E1
+	#----------------------------------------------------------------------
+	w1 = object                                   # binding in E0
+	# w1(40)   #==> 60                         1st test (should work here)
+	#----------------------------------------------------------------------
+	# w1 = makeWithDraw(100)                   1st test (should work here)
+	# w1(50)   # ==> 50                        2nd test (should work here)
+	#----------------------------------------------------------------------
+end # let global environment E0
+
+# ╔═╡ f0344e13-d13c-4d0e-96d3-1252b273fec5
+md"
+---
+###### $let$-simulated environment *E0* after *assignment* $$w2 = makeWithDraw(60)$$
+Result is a new binding for $w2$ in *E0*  (cf. [Fig. 3.7, 3.10, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996). In contrast to Fig. 3.10 in SICP the code of closure $closureInE1$ appears here in two different places. A compiler should detect that the *code* of $closureInE1$ is identical and optimize that. Only $balance$ in the surrounding environments *E11, E12* have different values $100$ and $60$:
+" 
+
+# ╔═╡ 5cc5772b-e1a3-4c78-b334-016bd9b4874e
+let                                               # global environment E0
+	#----------------------------------------------------------------------
+	closureInE0 =                                 # binding in E0
+			balance -> 
+				amount -> 
+					>=(balance, amount) ?
+						balance -= amount :
+						"insufficient funds"
+	#-----------------------------------------------------------
+	makeWithDraw = closureInE0                    # binding in E0
+	#----------------------------------------------------------------------
+	object11 =                                    # binding in E0
+	#----------------------------------------------------------------------
+		let                                       # local environment E11
+			#--------------------------------------------------------------
+			balance = 100                         #  1st binding in E11
+			#--------------------------------------------------------------
+			closureInE1 =                         #  2nd binding in E11
+				amount ->                             
+					>=(balance, amount) ?         #  ...free 'balance'
+					balance -= amount :
+					"insufficient funds"
+			#--------------------------------------------------------------
+		end # let local environment E11
+	#----------------------------------------------------------------------
+	object12 =                                    # binding in E0
+	#----------------------------------------------------------------------
+		let                                       # local environment E12
+			#--------------------------------------------------------------
+			balance = 60                          #  1st binding in E12
+			#--------------------------------------------------------------
+			closureInE1 =                         #  2nd binding in E12
+				amount ->                             
+					>=(balance, amount) ?         #  ...free 'balance'
+					balance -= amount :
+					"insufficient funds"
+			#--------------------------------------------------------------
+		end # let local environment E12
+	#----------------------------------------------------------------------
+	w1 = object11                                   # binding in E0
+	w2 = object12                                    # binding in E0
+	# w1(40)   # ==> 60                            test (should work here)
+	# w2(60)   # ==>  0                            test (should work here)
+	# w1(10)   # ==> 50                            test (should work here)
+	# w2(10)   # ==> "insufficient funds"          test (should work here)
+	# w1(40), w2(60), w1(10), w2(10)  # ==>  (60, 0, 50, "insuff...")
+	#----------------------------------------------------------------------
+	# w1 = makeWithDraw(100)                   1st test (should work here)
+	# w1(50)   # ==> 50                        2nd test (should work here)
+	#----------------------------------------------------------------------
 end # let global environment E0
 
 # ╔═╡ 5ff13056-9e59-4dd5-875b-d104e3cd1fe7
 md"
 ---
-###### Simulated local environment *E2* after *application* $$w1(50)$$
-Result is the reduced $balance=100-50\Rightarrow 50$ (cf. Fig. 3.8-9, SICP, 1996):
+###### $let$-simulated environments after *application* $$w1(50)$$
+(cf. Fig. 3.7-10, SICP, 1996). In contrast to SICP the accounts $w1, w2$ are initialized with different values $100, 60$. So the environment *E1* gets different identifiers *E11, E12*, too:
 "
 
-# ╔═╡ 40f34058-0978-4203-be35-23c97c7a335d
-let                                                   # global environment E0
-	#-------------------------------------------------------------------------
-	makeWithDraw =                              # binding 'makeWitDraw' in E0 
-	#-------------------------------------------------------------------------
-		closureInE0 =                                 # ...with 'closureInE0'
+# ╔═╡ 6c926024-b1ca-4f48-abaf-58c83a70e8df
+let                                               # global environment E0
+	#----------------------------------------------------------------------
+	closureInE0 =                                 # binding in E0
 			balance -> 
 				amount -> 
 					>=(balance, amount) ?
 						balance -= amount :
 						"insufficient funds"
-	#-------------------------------------------------------------------------
-	w1 =                                            #      binding 'w1' in E0 
-	#-------------------------------------------------------------------------
-		let                                         #    local environment E1
-			#-----------------------------------------------------------------
-			balance = 100                           # binding 'balance' in E1
-			#-----------------------------------------------------------------
-			closureInE1 =                           #           closure in E1
+	#-----------------------------------------------------------
+	makeWithDraw = closureInE0                    # binding in E0
+	#----------------------------------------------------------------------
+	object11 =                                    # binding in E0
+	#----------------------------------------------------------------------
+		let                                       # local environment E11
+			#--------------------------------------------------------------
+			balance = 100                         #  1st binding in E11
+			#--------------------------------------------------------------
+			closureInE1 =                         #  2nd binding in E11
 				amount ->                             
-					>=(balance, amount) ?           # free variable 'balance'
+					>=(balance, amount) ?         #  ...free 'balance'
 					balance -= amount :
 					"insufficient funds"
-			#-----------------------------------------------------------------
-			let                                     #    local environment E2
-				amount = 50                         #  binding 'amount' in E2
-				#-------------------------------------------------------------
+			#--------------------------------------------------------------
+			let                                   #  local environment E2
+				amount = 50                       # binding 'amount' in E2
+				#----------------------------------------------------------
 				>=(balance, amount) ?
 					balance -= amount :
 					"insufficient funds"
-				#-------------------------------------------------------------
+				#----------------------------------------------------------
 			end  #  let local environment E2
-			#-----------------------------------------------------------------
-		end # let local environment E1
-	#-------------------------------------------------------------------------
-	# w1 = makeWithDraw(100)
-	# w1(50)
-end # let global environment E0
-
-# ╔═╡ 53e00671-e18d-468e-922d-83728af1a00a
-md"
----
-###### Simulated global environment *E0* after *application* $w1(50)$ and after *assignment* $$w2 = makeWithDraw(100)$$
-Result is a new binding for $w2$ in *E0* and a new value of $balance = 100-10\Rightarrow90$ in object $w2$ and *2nd* environment *E1*. There is a slight deviation in correspondance between our code and [Fig. 3.10, SICP](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e3), 1996). The closure $closureInE1$ appears two-times in the code. Maybe a compiler is able to avoid code duplications:
-"
-
-# ╔═╡ 7b990a9c-7966-4773-ab8b-418514703fd5
-let                                                   # global environment E0
-	#-------------------------------------------------------------------------
-	makeWithDraw =                              # binding 'makeWitDraw' in E0 
-	#-------------------------------------------------------------------------
-		closureInE0 =                                 # ...with 'closureInE0'
-			balance -> 
-				amount -> 
-					>=(balance, amount) ?
-						balance -= amount :
-						"insufficient funds"
-	#-------------------------------------------------------------------------
-	w1 =                                            #      binding 'w1' in E0 
-	#-------------------------------------------------------------------------
-		let                                         #    local environment E1
-			#-----------------------------------------------------------------
-			balance = 100                           # binding 'balance' in E1
-			#-----------------------------------------------------------------
-			closureInE1 =                           #           closure in E1
+			#--------------------------------------------------------------
+		end # let local environment E11
+	#----------------------------------------------------------------------
+	object12 =                                    # binding in E0
+	#----------------------------------------------------------------------
+		let                                       # local environment E12
+			#--------------------------------------------------------------
+			balance = 60                          #  1st binding in E12
+			#--------------------------------------------------------------
+			closureInE1 =                         #  2nd binding in E12
 				amount ->                             
-					>=(balance, amount) ?           # free variable 'balance'
+					>=(balance, amount) ?         #  ...free 'balance'
 					balance -= amount :
 					"insufficient funds"
-			#-----------------------------------------------------------------
-			let                                     #    local environment E2
-				amount = 50                         #  binding 'amount' in E2
-				#-------------------------------------------------------------
-				>=(balance, amount) ?
-					balance -= amount :
-					"insufficient funds"
-				#-------------------------------------------------------------
-			end  #  let local environment E2
-			#-----------------------------------------------------------------
-		end # let local environment E1
-	#-------------------------------------------------------------------------
-	w2 =                                            #      binding 'w2' in E0 
-	#-------------------------------------------------------------------------
-		let                                         #    local environment E1
-			#-----------------------------------------------------------------
-			balance = 100                           # binding 'balance' in E1
-			#-----------------------------------------------------------------
-			closureInE1 =                           #           closure in E1
-				amount ->                             
-					>=(balance, amount) ?           # free variable 'balance'
-					balance -= amount :
-					"insufficient funds"
-			#-----------------------------------------------------------------
-		end # let local environment E1
-	#-------------------------------------------------------------------------
-	# w1 = makeWithDraw(100)
-	# w1(50) ==> 50
-	# w2 = makeWithDraw(100)
-	w2(10)  # ==> 90
+			#--------------------------------------------------------------
+		end # let local environment E12
+	#----------------------------------------------------------------------
+	w1 = object11                                   # binding in E0
+	w2 = object12                                    # binding in E0
+	# w1       # ==> 50                            test (should work here)
+	# w2(60)   # ==> 40                            test (should work here)
+	# w1       # ==> 50                            test (should work here)
+	# w2(10)   # ==> 30                            test (should work here)
+	w1, w2(60), w1, w2(10) #  ==> (50, 0, 50, "insuff...")
+	#----------------------------------------------------------------------
+	# w1 = makeWithDraw(100)                   1st test (should work here)
+	# w1(50)   # ==> 50                        2nd test (should work here)
+	#----------------------------------------------------------------------
 end # let global environment E0
 
 # ╔═╡ f79a2b5d-6a88-4579-8345-a083b0ddfed6
@@ -299,15 +328,15 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═6ca2031d-f7ef-4303-9c20-bbf25dde37a4
 # ╠═fbb40881-d204-40bf-a827-f86d00b05635
 # ╟─4ef4f6df-f568-41c5-ad04-16525752a520
-# ╠═c3f6d564-b16e-47e9-b2d0-88d8f1bb1ef1
+# ╠═83d587ed-981c-4dec-ba71-554b0addc97d
 # ╟─136e5a22-6456-4b4a-ada0-bd17f9f6d980
-# ╠═f7cdad03-20ac-4f1c-9fd7-043e8b65eeb8
+# ╠═bf55018b-7066-46e1-b81e-378684f5c34c
 # ╟─834e4e28-b884-4945-a687-74ba401b7168
-# ╠═d7076991-5dd5-42e0-b849-7f658fb43762
+# ╠═45793f66-8011-4b85-9c26-cb79cb953409
+# ╟─f0344e13-d13c-4d0e-96d3-1252b273fec5
+# ╠═5cc5772b-e1a3-4c78-b334-016bd9b4874e
 # ╟─5ff13056-9e59-4dd5-875b-d104e3cd1fe7
-# ╠═40f34058-0978-4203-be35-23c97c7a335d
-# ╟─53e00671-e18d-468e-922d-83728af1a00a
-# ╠═7b990a9c-7966-4773-ab8b-418514703fd5
+# ╠═6c926024-b1ca-4f48-abaf-58c83a70e8df
 # ╟─f79a2b5d-6a88-4579-8345-a083b0ddfed6
 # ╟─885934c6-b121-437d-89ea-0ec2b739830b
 # ╟─00000000-0000-0000-0000-000000000001
