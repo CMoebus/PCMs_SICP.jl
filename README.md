@@ -1,5 +1,8 @@
 # PCMs_SICP.jl
 ## Learning Julia/Pluto.jl by Self-exploring SICP
+
+This is a personal learning-diary when exploring Julia by exploiing SICP.  I used Lisp and especially Scheme regularly from time to time. I loved Scheme for its elegance and minimalism. But for production purposes in various scientic projects I had to use other languages for pragmatic reasons, like Fortran, Prolog, R, Javascript, Bugs, Stan, WebPPL and even Python. But I was always looking for a language as elegant as Scheme but with a greater usability and usefulness. Several year ago David Barber gave advice to give Julia a try. In the end I stumbled across the fascinating probabilistic programming languages Gen and Turing, both embedded in Julia. That was the starting point to deal with Julia to have a solid fundament for modeling in Gen and Turing.
+
 Here we present transpilations of SICP-Scheme-scripts into Julia as well as alternatives exploiting idiomatic JULIA constructs within a Pluto.jl-embedding. Pluto.jl offers reactive notebooks very suitable for educational purposes. 
 
 We use Pluto.jl as a learning environment for self-guided learning Julia. The original SICP is expected to be the accompanying study-guide. All SICP-Scheme-scripts are reconstructed in Julia in a stepwise manner. Furthermore idiomatic Julia scripts are added to demonstrate solutions made possible by advanced Julia features.
