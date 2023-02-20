@@ -112,6 +112,32 @@ The *interface* of pair-related functions $cons, cadr$, and $cdr$ is similar to 
 
 So the *interface* of our Scheme-like functions resembles in form and function expressions of *McCarthy's meta-language*.
 
+The three different signatures are:
+
+"
+
+# ╔═╡ 80ed0fe4-9f5b-4521-8189-f7f1273706fb
+md"
+$$\begin {array}{c|c|c}
+                    &          \text{Language Level}             &                  \\
+\hline
+\text{algorithmic:}  &            \text{programming:}         & \text{programming:} \\
+\text{M-exprs}       &              \text{S-exprs}            & \text{Julia-exprs} \\
+\text{McCarthy, Allen} &         \text{Lisp, Scheme}          & \text{Julia}       \\ 
+\hline
+\text{cons[<arg1>,<arg2>]} & \text{(cons <arg1> <arg2>)}&\text{cons(<arg1>,<arg2>)} \\
+\hline
+\text{car[cons[<a1>,<a2>]]}&\text{(car(cons <a1> <a2>))}&\text{car(cons(<a1>,<a2>))}\\
+\text{==<a1>}     &     \text{==<a1>}                       &  \text{==<a1>}  \\
+\hline
+\text{cdr[cons[<a1>,<a2>]]}&\text{(cdr(cons <a1> <a2>))}&\text{cdr(cons(<a1>,<a2>))}\\
+\text{==<a2>}     &     \text{==<a2>}                       &  \text{==<a2>}  \\
+\hline
+\end {array}$$
+
+**Fig. 2.1.1.1**: Abstraction levels for basic *constructor* and *selector* functions $cons, car$, and $cdr$
+
+---
 "
 
 # ╔═╡ d2d4dd60-f2e4-421c-80cd-63fb61faf31c
@@ -134,7 +160,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.1**: *First* default abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.2**: *First* default abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 "
@@ -222,7 +248,7 @@ end # let
 
 # ╔═╡ b068c8b6-7cfd-47c0-9e87-ee4cd7537bce
 md"
-**Fig. 2.1.1.2** $$consCell := (1 \bullet 2)$$
+**Fig. 2.1.1.3** $$consCell := (1 \bullet 2)$$
 
 ---
 "
@@ -319,7 +345,7 @@ end # let
 
 # ╔═╡ 6a584664-cda8-41c1-8bfe-2b7d5b5e1e28
 md"
-**Fig. 2.1.1.3** consCell $$y \mapsto (3 \bullet 4)$$
+**Fig. 2.1.1.4** consCell $$y \mapsto (3 \bullet 4)$$
 
 ---
 "
@@ -428,7 +454,7 @@ end # let
 
 # ╔═╡ d1cd6289-c53d-4561-9895-4958c3e150b5
 md"
-**Fig. 2.1.1.4** consCell $$z \mapsto cons(x \bullet y) = ((1 \bullet 2) \bullet (3 \bullet 4))$$
+**Fig. 2.1.1.5** consCell $$z \mapsto cons(x \bullet y) = ((1 \bullet 2) \bullet (3 \bullet 4))$$
 
 ---
 "
@@ -633,7 +659,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.5**: *Second* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.6**: *Second* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -832,7 +858,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.6**: *Third* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.7**: *Third* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -1021,7 +1047,7 @@ $$\begin {array}{c|c|c}
 \hline
 \end {array}$$
 
-**Fig. 2.1.1.7**: *Fourth* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
+**Fig. 2.1.1.8**: *Fourth* abstraction hierarchy for *rational* number algebra or [here](https://sarabander.github.io/sicp/html/2_002e1.xhtml#g_t2_002e1))
 
 ---
 
@@ -2055,6 +2081,7 @@ version = "1.4.1+0"
 # ╟─f74ced3c-487c-4428-bcfc-cc69e5416227
 # ╠═bc19acb5-0d08-4f7e-abce-c77fca0e8ac9
 # ╟─08ede030-fb83-4337-8c37-f346b1b7ebc0
+# ╟─80ed0fe4-9f5b-4521-8189-f7f1273706fb
 # ╟─d2d4dd60-f2e4-421c-80cd-63fb61faf31c
 # ╟─1c6a666d-c388-4ac9-b65f-dcebf9fc082f
 # ╠═3b7faab0-b8e0-4bea-894f-16fd35e5727f
