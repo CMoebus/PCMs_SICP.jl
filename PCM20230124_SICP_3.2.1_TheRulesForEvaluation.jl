@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.2.1 The Rules for Evaluation](https://sarabander.github.io/sicp/html/3_002e2.xhtml#g_t3_002e2_002e1)
 ##### file: PCM20230124\_SICP\_3.2.1\_TheRulesForEvaluation.jl
-##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/01/30 ***
+##### Julia/Pluto.jl-code (1.8.3/0.19.14) by PCM *** 2023/02/21 ***
 
 ====================================================================================
 "
@@ -33,6 +33,11 @@ md"
 ---
 ###### *Global* environment *E0* 
 (simulated by a $$let$$-expression)
+"
+
+# ╔═╡ 6d49451f-46d8-4d1a-9d4d-d794b246e276
+md"
+We are not very satisfied by environment *diagrams* as introduced by Weizenbaum (1968) and presented by Allen (1978, p. 143). Unfortunately their semantics could not be explored in simulation runs. Instead we represent the environments by *nested* $let$-expressions. These are syntactic sugar for nested $\lambda$-expressions. Thus simulations in Julia are easy possible.
 "
 
 # ╔═╡ 85508544-c61f-4c0c-b7e8-d86b4504c85f
@@ -104,7 +109,10 @@ md"
 "
 
 # ╔═╡ 5002c5cb-7cbc-4143-83fc-08e2912aa6f6
-let square = x -> *(x, x)  # simulated global environment E0
+let                        # simulated global environment E0
+	#-------------------------------------------------------
+	square = x -> *(x, x)  
+	#-------------------------------------------------------
 	square                 # square ==> x -> *(x, x); square evaluates to λ-expression
 end # let E0
 
@@ -183,8 +191,12 @@ md"
 "
 
 # ╔═╡ 109f49c7-c120-4854-acd0-a10bca16ab1c
-let square = x -> *(x, x)        # simulated global environment E0
-	let x = 6                    # parameter-argument binding, extending E0 by E1
+let                              # simulated global environment E0
+	square = x -> *(x, x)        
+	let                          # parameter-argument binding, extending E0 by E1
+		#--------------------------------------------------------
+		x = 6                    
+		#--------------------------------------------------------
 		square(x)                # ==> (x -> *(x, x))(x)
 		(x -> *(x, x))(x)        # ==> (x -> *(x, x))(6)
 		(x -> *(x, x))(6)        # ==> *(6, 6)
@@ -218,12 +230,21 @@ md"
 - **Rule 4**: Evaluating the expression '<symbol> = <value>' in some environment locates the binding of the variable in the environment and changes that binding to indicate the new value. That is, one finds the first frame in the environment that contains a binding for the variable and modifies that frame.
 "
 
+# ╔═╡ 5ffc8937-ca71-4ffa-b876-7e0c4b6642d6
+md"
+---
+##### References
+
+- **Allen, J.**, The Anatomy of Lisp, New York: McGraw Hill, 1978
+- **Weizenbaum, J.**, [*The FUNARG Problem*](https://en.wikipedia.org/wiki/Funarg_problem) *Explained*, [unpublished memorandum](https://www.softwarepreservation.org/projects/LISP/MIT/Weizenbaum-FUNARG_Problem_Explained-1968.pdf), MIT, Cambridge Mass., 1968
+- **Wikipedia**, [*The FUNARG Problem*](https://en.wikipedia.org/wiki/Funarg_problem), last visit 2023/02/21
+"
+
 # ╔═╡ 453908cd-138d-459d-80ab-52c2e69ff86a
 md"
 ---
 ##### end of ch. 3.2.1
 "
-
 
 # ╔═╡ 47829574-dbc0-4c68-9cad-fd5564e3ec99
 md"
@@ -1173,6 +1194,7 @@ version = "1.4.1+0"
 # ╟─eeebdde0-9c08-11ed-1bee-89bc2518d37a
 # ╟─78539779-7135-43c9-ad94-f53d8789ba66
 # ╟─a224ee70-9a3c-471f-aec6-5a7bcb3b5666
+# ╟─6d49451f-46d8-4d1a-9d4d-d794b246e276
 # ╠═d8605b7e-3cfa-42b9-bfd2-ae0fa8afe8fa
 # ╠═85508544-c61f-4c0c-b7e8-d86b4504c85f
 # ╠═36700724-6802-441f-9170-fc1e59d2b1f2
@@ -1190,6 +1212,7 @@ version = "1.4.1+0"
 # ╟─4d2bd09b-3de7-487d-abc8-03511e3fd9cc
 # ╟─98ed3edc-b7ce-47bb-8c91-cdb7b5a4a894
 # ╟─9c34669d-2ad6-4255-bd24-4c0080a4fc22
+# ╟─5ffc8937-ca71-4ffa-b876-7e0c4b6642d6
 # ╟─453908cd-138d-459d-80ab-52c2e69ff86a
 # ╟─47829574-dbc0-4c68-9cad-fd5564e3ec99
 # ╟─00000000-0000-0000-0000-000000000001
