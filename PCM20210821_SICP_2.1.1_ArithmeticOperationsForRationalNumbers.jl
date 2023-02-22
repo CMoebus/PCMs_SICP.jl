@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2023/02/20 ***
+###### Julia/Pluto.jl-code (1.8.2/0.19.14) by PCM *** 2023/02/22 ***
 ======================================================================================
 "
 
@@ -104,13 +104,13 @@ $$(x=y) \equiv \left(\frac{n_x}{d_x} = \frac{n_y}{d_y}\right) \equiv (n_x d_y = 
 md"
 ---
 ##### 2.1.1.1.2 Pairs (... as *Named* Tuples)
-###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ as Julia-*tuples* with *named* fields. 
+###### Scheme's pair constructor $$cons$$ and Selectors $$car$$ and $$cdr$$ as Julia-*functions* and -*tuples* with *named* fields. 
 
-The *interface* of pair-related functions $cons, cadr$, and $cdr$ is similar to *M-expr*-functions (= *Meta-language* expressions) introduced by *McCarthy* et al. (1965, p.9). 
+The *interface* of pair-related functions $cons, cadr$, and $cdr$ is similar to *[M-expressions](https://en.wikipedia.org/wiki/M-expression)* (= *Meta-language* expressions) introduced by *McCarthy* et al. (1965, p.9). 
 
-...*there are two LISP's: there is the algorithmic language and there is the programming language. The programing language is a data structure representation of the algorithmic language. The algorithmic language is called the* **meta-language** *or* **M-expr LISP**, *and for historical purposes, the programming language is called* **S-expr LISP**  (Allen, J., 1978, p.107).
+...*there are two LISP's: there is the algorithmic language and there is the programming language. The programing language is a data structure representation of the algorithmic language. The algorithmic language is called the* **meta-language** *or* **M-expr LISP**, *and for historical purposes, the programming language is called* **[S-expr](https://en.wikipedia.org/wiki/S-expression) LISP**  (Allen, J., 1978, p.107).
 
-So the *interface* of our Scheme-like functions resembles in form and function expressions of *McCarthy's meta-language*.
+So the *interface* of our Scheme-like Julia-functions resembles in form and function expressions of *McCarthy's meta-language*.
 
 The three different signatures are:
 
@@ -770,7 +770,7 @@ cdr2(a2)
 typeof(1.2)
 
 # ╔═╡ 4bed1729-8c79-4cf1-95e3-3285010a5622
-b2 = cons2(1.2, 3) # first argument is 'Float' but should be 'Signed'
+b2 = cons2(1.2, 3)            # first argument is 'Float' but should be 'Signed'
 
 # ╔═╡ 4ee29c75-f689-4332-99b9-d7b0951d4487
 one_half2 = makeRat2(1, 2)
@@ -1115,6 +1115,8 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/27
 - **Allen, J.**, *The Anatomy of Lisp*, New York: McGraw Hill, 1978
 - **McCarthy, J., Abrahams, P.W., Edwards, D.J., Hart, T.P., & Levin, M.I.**, *LISP 1.5 Programmer's Manual*, Cambridge, Mass.: The MIT Press, 1965, 1979(11/e) 
+- **Wikipedia**; *M-expression*; [https://en.wikipedia.org/wiki/M-expression](https://en.wikipedia.org/wiki/M-expression), last visit 2023/02/22
+- **Wikipedia**; *S-expression*; [https://en.wikipedia.org/wiki/S-expression](https://en.wikipedia.org/wiki/S-expression), last visit 2023/02/22
 - **Wikipedia**; *Rational approximation to π*, [https://en.wikipedia.org/wiki/Approximations_of_%CF%80](https://en.wikipedia.org/wiki/Approximations_of_%CF%80), last visit 2022/08/27
 "
 
