@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: 3.3.1 [Mutable List Structure](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1)
 ##### file: PCM20230219\_SICP\_3.3.1\_MutableListStructure.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/21 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/25 ***
 
 ====================================================================================
 "
@@ -20,7 +20,7 @@ md"
 "
 
 # ╔═╡ bd62ca5c-23d3-4a1f-844d-7280a79aadf8
-mutable struct Cons
+mutable struct Cons # 'mutable' is dangerous ! 
 	car
 	cdr
 end # struct Cons
@@ -56,104 +56,132 @@ function setCdr!(cons::Cons, cdr)
 	cons
 end # setCdr!
 
+# ╔═╡ 34d785d5-feb7-4c5f-ad0e-649c38a6e972
+md"
+---
+Mutation is a dangerous concept, especially in combination with *Pluto*. Pluto is a *reactive* notebook. That means that all instances of a variable in diverse places (cells) are constrained to have the *same* value. The consequence is that *all* instances get the *latest* binding. So the history of bindings shrinks to the *latest* one. To avoid this effect we embed mutations in a $let\; x=... y=... set...end$-expression, so bindings are *local*.
+"
+
 # ╔═╡ 963528f4-2b12-4a92-9a0f-f80d0679265c
 md"
 ---
-###### Equivalent to Scheme-list $x:= ((a\;b)\;c\;d)$
+###### Start configuration
 (cf. [**Fig. 3.12**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
+In *Julia* a call of our function 'cons' evaluates to the *structure* 'Cons'.
+
+*Scheme*-list: 
+
+$x:= (((a\;b)\centerdot(c\;d))=((a\;b)\;c\;d)$
+$y:= (e\;f)$
+
+*Julia*-structure:
+
+$x := Cons(Cons(:a, Cons(:b, :nil)), Cons(:c, Cons(:d, :nil)))$
+$y := Cons(:e, Cons(:f, :nil))$
+
 "
 
-# ╔═╡ c8c8e0c8-3885-4e1e-b36d-4c586ce25156
-x0 = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
-
-# ╔═╡ 87e67458-9389-4309-9237-03531362decf
-md"
----
-###### Equivalent to Scheme-list $y:= (e\;f)$
-(cf. [**Fig. 3.12**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
-"
-
-# ╔═╡ ec9733b7-4d40-4377-b93e-7678cd94db83
-y0 = cons(:e, cons(:f, :nil))
+# ╔═╡ 74f35c1e-bc32-4a33-a4f8-f9193e189701
+let 
+	x = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
+	y = cons(:e, cons(:f, :nil)) 
+	x, y
+end # let
 
 # ╔═╡ b03a3591-63d9-44e2-a3c8-38fa8eb164d3
 md"
 ---
-###### Equivalent to effect of Scheme-application $xMod := (set\text{-}car! \; x \; y)$ 
+###### *Mutating* Application $x2 = setCar!(x, y)$:
+(cf. [**Fig. 3.13**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996).
 
-Scheme-list: $xMod := ((e\;f)\;(c\;d))\text{ and } y := (e\;f)$
+Scheme (*before* mutation):
 
-equivalent to Julia's structure: $xMod := cons(cons(e,cons(f,:nil)), cons(c,cons(d,:nil))$
+$x := (a\;b)\centerdot(c\;d))=((a\;b)\;c\;d)$
+$y := (e\;f)$
 
-The Scheme-list fragment $(a\;b)$ equivalent to Julia's $cons(:a, cons(:b, :nil))$ is now garbage.
-(cf. [**Fig. 3.13**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
+Scheme (*after* mutation):
+
+$x := (set\text{-}car! \; x \; y) = ((e\;f)\centerdot(c\;d))=((e\;f)\;c\;d)$
+$y := (e\;f)$
+
+Julia (*before* mutation):
+
+$x := Cons(Cons(:a, Cons(:b, :nil)), Cons(:c, Cons(:d, :nil)))$
+$y := Cons(:e, Cons(:f, :nil))$
+
+Julia (*after* mutation):
+
+$x = setCar!(x, y) = Cons(Cons(:e, Cons(:f, :nil)), Cons(:c, Cons(:d, :nil)))$
+$y = Cons(:e, Cons(:f, :nil))$
+Julia's $Cons(:a, Cons(:b, :nil))$ is now garbage.
+
 "
-
-# ╔═╡ d408189b-3825-4964-8b67-565d3d50da35
-let 
-	x1 = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
-	y1 = cons(:e, cons(:f, :nil))
-	xMod = setCar!(x1, y1)
-end # let
-
-# ╔═╡ 8f5ff5b0-350b-4c91-b4c4-f6d6193f4698
-x0   #  is not modified 
-
-# ╔═╡ 0c83ec3f-84b4-46f5-97f6-e381fc6092af
-y0   # is not modified 
 
 # ╔═╡ c7f5e87b-7363-4ecf-b7fe-874d1eec7fda
 md"
 ---
-###### Effect of $z = cons(y, cdr(x))$:
-
-Scheme-list 
-
-$z := ((e\;f)\;(c\;d))$
-
-equivalent Julia-'list'
-
-$z = cons(cons(e,cons(f,:nil)), cons(cons(c,cons(d,:nil))))$
-
+###### *Non*mutating Application $z = cons(x, cdr(y))$:
 (cf. [**Fig. 3.14**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
+
+*Scheme*:
+
+$x:= (((a\;b)\centerdot(c\;d))=((a\;b)\;c\;d)$
+$y:= (e\;f)$
+$z = cons(y, cdr(x)) = ((e\;f)\centerdot(c\;d)) = ((e\;f)\;c\;d)$
+
+*Julia*:
+
+$x = Cons(Cons(:a, Cons(:b, :nil)), Cons(:c, Cons(:d, :nil)))$
+$y = Cons(:e, Cons(:f, :nil))$
+$z = cons(y, cdr(x)) = Cons(Cons(:e,Cons(:f,:nil)), Cons(Cons(:c,Cons(:d,:nil))))$
+
 "
 
-# ╔═╡ c2a6b312-c578-4dc2-8493-549a1b364646
-x0
-
-# ╔═╡ 43ef4a5d-bf04-450b-9a18-9eeffdb142ad
-y0
-
-# ╔═╡ 9046e78e-645c-4f78-9a8d-6b736316193b
-z = cons(y0, cdr(x0))
+# ╔═╡ 5ba1029e-1c86-4c61-901e-4229dd501e8f
+let 
+	x = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
+	y = cons(:e, cons(:f, :nil)) 
+	# ==> Cons(Cons(:e, Cons(:f, :nil)), Cons(:c, Cons(:d, :nil)))
+	cons(y, cdr(x))
+end # let
 
 # ╔═╡ 5b03f41b-7833-4001-ba61-7f26b0b10bc3
 md"
 ---
-###### Effect of $xMod2 = setCdr!(x, y)$:
-
-Scheme-list 
-
-$xMod2 := ((a\;b)\;(e\;f))$
-
-equivalent Julia-'list'
-
-$z = cons(cons(e,cons(f,:nil)), cons(cons(c,cons(d,:nil))))$
-
+###### *Mutating* Application $setCdr!(x, y)$
 (cf. [**Fig. 3.15**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
+
+Scheme (*before* mutation):
+
+$x := (((a\;b)\centerdot(c\;d))=((a\;b)\;c\;d)$
+$y := (e\;f)$
+
+Scheme (*after* mutation): 
+
+$x := (setCdr!\;x,\; y) = ((a\;b)\centerdot(e\;f))=((a\;b)\;e\;f)$
+
+Julia (*before* mutation):
+
+$x = Cons(Cons(:a, Cons(:b, :nil)), Cons(:c, Cons(:d, :nil)))$
+$y = Cons(:e, Cons(:f, :nil))$
+
+Julia (*after* mutation):
+
+$x = setCdr!(x, y) = ...$
+$... = Cons(Cons(:a,Cons(:b,:nil)), Cons(Cons(:e,Cons(:f,:nil))))$
+
 "
 
-# ╔═╡ 9f41e621-ab36-47aa-8da9-8a61a43f158e
-let
-	x2 = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
-	y2 = cons(:e, cons(:f, :nil))
-	xMod2 = setCdr!(x2, y2), y2
-end # let
+# ╔═╡ 524590ef-079a-47c4-8c36-dc9897a8c340
+md"
+---
+###### Implementing cons in terms of two mutators $setCar!$ and $setCdr!$
+"
 
 # ╔═╡ c8d27bd2-fe57-44f5-89b8-1df77ccad610
 md"
 ---
-##### Identity and Sharing
+##### Sharing and Identity
 "
 
 # ╔═╡ 3f94dfb1-7898-4b43-9a63-24c8e3aefdde
@@ -174,19 +202,26 @@ md"
 (cf. [**Fig. 3.16**](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1), SICP, 1996)
 "
 
-# ╔═╡ 5c6aea1f-1102-403e-9b2f-ed3c6581abfe
-x3 = list(:a, :b)
-
-# ╔═╡ 254a626b-dcc0-4d55-870a-be8b25f1d642
+# ╔═╡ 386563cc-1c7b-4896-92c6-482aa289842c
 md"
-###### Scheme-list $z1 := ((a\;b)\;a\;b)$
+---
+*Scheme*: 
+
+$x := (list\;\; 'a\;\; 'b) = (cons\; 'a\; (cons\; 'b\; nil)) \Rightarrow (a\;b)$
+$z1 := (cons\;x\;x) = ((a\;b)\centerdot(a\;b)) = ((a\;b)\;a\;b)$
+
+*Julia*:
+
+$x = list(:a,\;:b) = Cons(:a,\; Cons(:b,\;:nil))$
+$z1 = cons(x, x) = Cons(Cons(:a, Cons(:b, :nil)), Cons(:a, Cons(:b, :nil)))$
 "
 
-# ╔═╡ 1366b525-b6d6-48ca-ae29-7967bf41e85b
-z1 = cons(x3, x3)
-
-# ╔═╡ cc213f56-5a0b-414d-8e39-de0b1085e254
-z1.car == z1.cdr   # ==> true             # shared !
+# ╔═╡ 1dc3e03a-8361-45f4-bffd-bad162dc1ff4
+let 
+	x = list(:a, :b)
+	z1 = cons(x, x)
+	z1, z1.car == z1.cdr ? "==> sharing of pairs :)" : "==> nonsharing of pairs :("
+end # let
 
 # ╔═╡ 42d35aa7-8958-43b1-b70e-80a388ac5e62
 md"
@@ -197,26 +232,175 @@ md"
 
 # ╔═╡ 68759b9d-e392-40f6-b5b8-eccba62d7331
 md"
-###### Scheme-list $z2 := ((a\;b)\;a\;b)$
+*Scheme*:
+
+$(list\;\; 'a\;\; 'b) = (cons\; 'a\; (cons\; 'b\; nil)) \Rightarrow (a\;b)$
+$z2 = (cons (list\;'a\;'b)\; (list\;'a\;'b)) = (('a\;'b)\centerdot('b\;'c))=(('a\;'b)\;'b\;'c)$
+
+
+
+*Julia*:
+
+$list(:a,\;:b) = Cons(:a,\; Cons(:b,\;:nil))$
+$z2 = cons(list(:a, :b), list(:a, :b)) =...$
+$...= Cons(Cons(:a, Cons(:b, :nil)), Cons(:a, Cons(:b,:nil)))$
 "
 
-# ╔═╡ 96450d2f-1e96-4ad8-b86b-d8e251a7cdbe
-z2 = cons(list(:a, :b), list(:a, :b))
-
-# ╔═╡ d3f91061-107e-4577-8183-5a4aa4821516
-z2.car == z2.cdr                   # ==> false     # different pairs
-
-# ╔═╡ 9b807199-c72a-41e2-a75e-0e919f2fb4bf
-z2.car.car     == z2.cdr.car       # ==> true      # identical symbol ':a'
-
-# ╔═╡ e46490ac-3c85-4f46-82a1-dbdb856b56a4
-z2.car.cdr.car == z2.cdr.cdr.car   # ==> true      # identical symbol ':b'
+# ╔═╡ 25853a74-9d7c-46ca-9a5d-a070f8264025
+let 
+	x = list(:a, :b)
+	z2 = cons(list(:a, :b), list(:a, :b))
+	z2, z2.car == z2.cdr ? "==> sharing of pairs :)" : "==> nonsharing of pairs :("
+end # let
 
 # ╔═╡ f49f88ff-b434-479e-ad0a-0b1009c09d7f
 md"
 ---
-###### $setToWow!$
+###### Mutation of lists with *shared* and *non*shared pairs (= cons- or Cons-cells)  by $setToWow!$
 "
+
+# ╔═╡ 7dae5653-87f3-4961-aa15-14608dde8eea
+md"
+---
+###### Mutation of lists with *shared* pairs by $setToWow!(z1)$
+
+*Scheme*: 
+
+$x := (list\;\; 'a\;\; 'b) = (cons\; 'a\; (cons\; 'b\; nil)) \Rightarrow (a\;b)$
+$z1 := (cons\;x\;x) = ((a\;b)\centerdot(a\;b)) = ((a\;b)\;a\;b)$
+$(seToWow!\;z1) := ((wow\;b).(wow\;b)) = ((wow\;b)\;wow\;b)$
+
+*Julia*:
+
+$x = list(:a,\;:b) = Cons(:a,\; Cons(:b,\;:nil))$
+$z1 = cons(x, x) = Cons(Cons(:a, Cons(:b, :nil)), Cons(:a, Cons(:b, :nil)))$
+$setToWow!(z1) = Cons(Cons(:wow, Cons(:b, :nil)), Cons(:wow, Cons(:b, :nil)))$
+
+"
+
+# ╔═╡ ee731a0d-79c8-43cb-8120-62d482f8fb5d
+md"
+---
+###### Mutation of lists with *non*shared pairs with $setToWow!(z2)$
+
+*Scheme*: 
+
+$x := (list\;\; 'a\;\; 'b) = (cons\; 'a\; (cons\; 'b\; nil)) \Rightarrow (a\;b)$
+$z2 := (cons\;(list\;\; 'a\;\; 'b)\;(list\;\; 'a\;\; 'b)) = ((a\;b)\centerdot(a\;b)) = ((a\;b)\;a\;b)$
+$(seToWow!\;z2) := ((wow\;b).(a\;b)) = ((wow\;b)\;a\;b)$
+
+*Julia*:
+
+$x = list(:a,\;:b) = Cons(:a,\; Cons(:b,\;:nil))$
+$z2 = Cons(Cons(:a, Cons(:b, :nil)), Cons(:a, Cons(:b, :nil)))$
+$setToWow!(z2) = Cons(Cons(:wow, Cons(:b, :nil)), Cons(:a, Cons(:b, :nil)))$
+"
+
+# ╔═╡ 4e7e9954-b411-4ef9-b7e0-d5a2f8999543
+md"
+---
+##### Mutation is just assignment
+"
+
+# ╔═╡ faed53ac-758f-43fe-880c-42d1c0a89868
+md"
+###### *Pairs* as Procedures
+"
+
+# ╔═╡ 18df98a6-8e77-48a4-bbd3-37ad9b0d3a45
+# taken from ch. 2.1.3
+#------------------------------------------------------
+function cons2(car, cdr)
+	function dispatch(message)
+		message == :car ? car :
+		message == :cdr ? cdr :
+		error("Undefined operation -- CONS: $message")
+	end # function dispatch
+	dispatch
+end # function
+
+# ╔═╡ 9843d588-5380-4afc-9205-6830219baa9c
+car2(z) = z(:car)
+
+# ╔═╡ f03e600f-35db-4169-92bd-1b790e19cdda
+cdr2(z) = z(:cdr)
+
+# ╔═╡ 51fbca79-96dd-4989-be41-ce03b3140064
+md"
+---
+"
+
+# ╔═╡ 51368535-faf8-4f19-97e0-0f900e21ae17
+cons2(:a, :c)(:car) == :a        # ==> true -->  :)
+
+# ╔═╡ e5ea6b19-2c73-48db-84ad-d42e51a64a32
+cons2(:a, :c)(:cdr) == :c        # ==> true -->  :)
+
+# ╔═╡ 6c520987-adeb-47b8-ae9a-bd24cfec0d61
+let 
+	z = cons2(1, 3)
+end # let
+
+# ╔═╡ 86a20838-3feb-4acc-bcf4-4b61aa0b28dc
+let 
+	z = cons2(1, 3)
+	z(:car)
+end # let
+
+# ╔═╡ 4668c2e4-25ce-477f-9178-bec3e6d39c75
+let 
+	z = cons2(1, 3)
+	z(:cdr)
+end # let
+
+# ╔═╡ 4862d998-eb91-4067-8429-5c8a6f53ca60
+md"
+---
+###### *Mutable Data Objects* as Procedures
+"
+
+# ╔═╡ 39a6a94b-9af5-427c-8c06-cd86a6b960f4
+function cons3(car, cdr)  
+	#--------------------------------------------------
+	function setCar!(newCar)
+		car = newCar
+	end # function setCar!
+	#--------------------------------------------------
+	function setCdr!(value)
+		cdr = newCdr
+	end # function setCdr!
+	#--------------------------------------------------
+	function dispatch(message)
+		message == :car     ?     car :
+		message == :cdr     ?     cdr :
+		message == :setCar! ? setCar! :
+		message == :setCdr! ? setCdr! :
+		error("Undefined operation -- CONS: $message")
+	end # function dispatch
+	#--------------------------------------------------
+	dispatch # closure with free variables car, cdr, setCar!, setCdr!
+end # function cons3
+
+# ╔═╡ 7ea9af63-81c0-4fc0-a524-bd90c2ed4746
+car3(z) = z(:car)
+
+# ╔═╡ ea967c82-7dc5-4586-908b-1345978ba69e
+cdr3(z) = z(:cdr)
+
+# ╔═╡ a6861e42-d98e-43ab-a431-f3588f64afc5
+# 2nd (!) method; the 1st needed as 1st parm a 'Cons'
+function setCar!(z, newCar) 
+	z(:setCar!)(newCar)
+	z
+end # function setCar!
+
+# ╔═╡ 70532e8c-ba7e-4163-bc65-a18cccac23ff
+let 
+	x = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
+	y = cons(:e, cons(:f, :nil)) 
+	# ==> Cons(Cons(:e, Cons(:f, :nil)), Cons(:c, Cons(:d, :nil)))
+	setCar!(x, y)
+end # let
 
 # ╔═╡ 7d08280b-db84-480f-9a22-99724d08e66a
 function setToWow!(x)
@@ -224,23 +408,226 @@ function setToWow!(x)
 	x
 end # function setToWow!
 
-# ╔═╡ 7dae5653-87f3-4961-aa15-14608dde8eea
-md"
-###### Scheme-list $z3 := ((wow\;b)\;wow\;b)$
-*after* applying $setToWow!$ to $z1 := ((a\;b)\;a\;b)$
-"
-
-# ╔═╡ 4be523be-d512-4ee9-abf8-1b764bf7aba5
-z3 = setToWow!(z1)
-
-# ╔═╡ 998883e7-6f83-47f2-a91f-4678ec2dd950
-md"
-###### Scheme-list $z4 := ((wow\;b)\;a\;b)$
-*after* applying $setToWow!$ to $z2 := ((a\;b)\;a\;b)$
-"
+# ╔═╡ ddec30d5-52fa-4267-9736-6b2c523a47ba
+let 
+	x = list(:a, :b)
+	z1 = cons(x, x)
+	setToWow!(z1)
+end # let
 
 # ╔═╡ 095473d1-c4db-44c0-8159-f5cc04bcf801
-z4 = setToWow!(z2)
+let 
+	x = list(:a, :b)
+	z2 = cons(list(:a, :b), list(:a, :b))
+	setToWow!(z2)
+end # let
+
+# ╔═╡ f380d122-c359-491f-8c5e-992f8ab80c21
+# 2nd (!) method; the 1st needed as 1st parm a 'Cons'
+function setCdr!(z, newCdr) 
+	z(:setCdr!)(newCdr)
+	z
+end # function setCdr!
+
+# ╔═╡ 28941107-d0ea-4c32-8bb3-1b822190f68a
+let 
+	x = cons(cons(:a, cons(:b, :nil)), cons(:c, cons(:d, :nil)))
+	y = cons(:e, cons(:f, :nil)) 
+	# ==> Cons(Cons(:a, Cons(:b, :nil)), Cons(:e, Cons(:f, :nil)))
+	setCdr!(x, y)
+end # let
+
+# ╔═╡ c6d01f37-03ab-42be-b757-5ce9fc350aa6
+function consWithMutators(car, cdr)
+	let 
+		new = Cons(nothing, nothing)
+		setCar!(new, car)
+		setCdr!(new, cdr)
+	end # let
+end # function consWithMutators
+
+# ╔═╡ 7a88fbb8-9684-4d5d-a5f4-d0d7706b489f
+z11 = consWithMutators(:c, :d)
+
+# ╔═╡ 1f989823-7642-4a07-b2fa-8faa0a3da325
+z11.car
+
+# ╔═╡ 9caa69ae-be37-48dd-850a-6ea1d41e8dd6
+z11.cdr
+
+# ╔═╡ 4915ce5e-a46d-4246-a3d7-16ff01cbc531
+md"
+---
+###### Selection in Scheme-lists $x := ((a\; b)\; c\; d)$ and $y := (e\; f)$
+(cf. **Fig. 3.12**, SICP, 1996)
+"
+
+# ╔═╡ 1379f90c-0e0c-482c-a507-a2fac0170b7a
+# *replication* of x but *here with* 'cons3'
+# built as a nested 'Cons'-structure (big 'C') !
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+end # let
+
+# ╔═╡ 8af591d3-b18c-494b-b439-1f89a3423d41
+let                           
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:car) # ==> Cons(:a, Cons(:b, :nil))let
+end # let 
+
+# ╔═╡ 512a19f1-0842-4a4e-9e87-a3122bf5efba
+let                           
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:car)                            # ==> Cons(:a, Cons(:b, :nil))let
+	x(:car)(:car) == :a                # ==> true -->    :)
+end # let 
+
+# ╔═╡ e544bfa0-a8cf-48d5-aa2d-1b66ded12087
+let                           
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:car)                            # ==> Cons(:a, Cons(:b, :nil))let
+	x(:car)(:car) == :a                # ==> true -->    :)
+	x(:car)(:cdr)(:car) == :b          # ==> true -->    :)
+end # let 
+
+# ╔═╡ 3e61e457-dc30-41e6-9454-a7d28e8a0f65
+let                           
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:car)                            # ==> Cons(:a, Cons(:b, :nil))let
+	x(:car)(:car) == :a                # ==> true -->    :)
+	x(:car)(:cdr)(:car) == :b          # ==> true -->    :)
+	x(:cdr)(:car) == :c                # ==> true -->    :)
+end # let 
+
+# ╔═╡ dab33c0b-aeed-4187-b867-0d870c24e69d
+let                           
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:car)                            # ==> Cons(:a, Cons(:b, :nil))
+	x(:car)(:car) == :a                # ==> true -->    :)
+	x(:car)(:cdr)(:car) == :b          # ==> true -->    :)
+	x(:cdr)(:car) == :c                # ==> true -->    :)
+	x(:cdr)(:cdr)(:car) == :d          # ==> true -->    :)
+end # let 
+
+# ╔═╡ cb629a58-d93a-48c3-a1a6-786975283490
+let                           
+	y = cons3(:e, cons3(:f, :nil))     # ==> Cons(:e, Cons(:f, :nil))
+end # let 
+
+# ╔═╡ e7570fd4-7c7a-4963-b98e-4869f26ab9e3
+let                           
+	y = cons3(:e, cons3(:f, :nil))     # ==> Cons(:e, Cons(:f, :nil))
+	y(:car) == :e                      # ==> true -->    :)   
+end # let 
+
+# ╔═╡ cbe705f3-1853-4514-9708-d2fdb7c69802
+let                           
+	y = cons3(:e, cons3(:f, :nil))     # ==> Cons(:e, Cons(:f, :nil))
+	y(:car) == :e                      # ==> true -->    :)   
+	y(:cdr)(:car) == :f                # ==> true -->    :) 
+end # let 
+
+# ╔═╡ 3c02de21-2a3f-4796-bb50-be473c07403e
+md"
+---
+###### Mutation by $setCar!(x, y)$
+(**Fig.3.13**, SICP, 1996)
+
+Scheme (*before* mutation):
+
+$x:= ((a\; b)\;(c\; d))$
+$y:= (e\; f)$
+
+Scheme (*after* mutation):
+
+$x:= (setCar!\; x\; y) := ((e\; f)\;(c\; d))$
+
+Julia (*before* mutation):
+
+$x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil)))$
+
+Julia (*after* mutation):
+
+$x := x(:setCar!)(y):=cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))$
+
+"
+
+# ╔═╡ a93cdd9a-dd61-4801-8967-901a8e5ebae9
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)  
+end # let
+
+# ╔═╡ 0f9a5602-4cd5-4205-9d2b-5cbc3f96275f
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+end # let
+
+# ╔═╡ 5fc53445-cb49-417f-9e4d-fc951366c23c
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+	x(:car)(:car) == :e         # ==> true  -->  :)
+end # let
+
+# ╔═╡ b0fa1f1e-bac5-401d-b52e-3e8771a7dfe7
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+	x(:car)(:car) == :e         # ==> true  -->  :)
+	x(:car)(:cdr)(:car) == :f   # ==> true  -->  :)
+end # let
+
+# ╔═╡ 7cc03a60-3f21-4375-abb2-5810e6e71942
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+	x(:car)(:car) == :e         # ==> true  -->  :)
+	x(:car)(:cdr)(:car) == :f   # ==> true  -->  :)
+	x(:cdr)                     # ==> cons3(:c, cons3(:d, :nil))
+end # let
+
+# ╔═╡ 3767c9c6-51a6-44ef-b943-e7368c9144b5
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+	x(:car)(:car) == :e         # ==> true  -->  :)
+	x(:car)(:cdr)(:car) == :f   # ==> true  -->  :)
+	x(:cdr)                     # ==> cons3(:c, cons3(:d, :nil))
+	x(:cdr)(:car) == :c         # ==> true  -->  :)
+end # let
+
+# ╔═╡ 832a435d-9582-4bdc-bc75-a8cbb53366e1
+let
+	x = cons3(cons3(:a, cons3(:b, :nil)), cons3(:c, cons3(:d, :nil))) 
+	y = cons3(:e, cons3(:f, :nil))
+	# ==> cons3(cons3(:e, cons3(:f, :nil)), cons3(:c, cons3(:d, :nil)))
+	x(:setCar!)(y)
+	x(:car)                     # ==> cons3(:e, cons3(:f, :nil))
+	x(:car)(:car) == :e         # ==> true  -->  :)
+	x(:car)(:cdr)(:car) == :f   # ==> true  -->  :)
+	x(:cdr)                     # ==> cons3(:c, cons3(:d, :nil))
+	x(:cdr)(:car) == :c         # ==> true  -->  :)
+	x(:cdr)(:cdr)(:car) == :d  # ==> true  -->  :)
+end # let
 
 # ╔═╡ f24a3af4-a34e-4d44-96c8-13654e5c2db8
 md"
@@ -284,39 +671,69 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─64a572cf-a84c-4730-b1e3-96a592df7db0
 # ╠═017e8090-9c40-4dba-a851-1cc939f79b85
 # ╠═571a9137-1eeb-4c01-af51-27d11ca4c503
+# ╟─34d785d5-feb7-4c5f-ad0e-649c38a6e972
 # ╟─963528f4-2b12-4a92-9a0f-f80d0679265c
-# ╠═c8c8e0c8-3885-4e1e-b36d-4c586ce25156
-# ╟─87e67458-9389-4309-9237-03531362decf
-# ╠═ec9733b7-4d40-4377-b93e-7678cd94db83
+# ╠═74f35c1e-bc32-4a33-a4f8-f9193e189701
 # ╟─b03a3591-63d9-44e2-a3c8-38fa8eb164d3
-# ╠═d408189b-3825-4964-8b67-565d3d50da35
-# ╠═8f5ff5b0-350b-4c91-b4c4-f6d6193f4698
-# ╠═0c83ec3f-84b4-46f5-97f6-e381fc6092af
+# ╠═70532e8c-ba7e-4163-bc65-a18cccac23ff
 # ╟─c7f5e87b-7363-4ecf-b7fe-874d1eec7fda
-# ╠═c2a6b312-c578-4dc2-8493-549a1b364646
-# ╠═43ef4a5d-bf04-450b-9a18-9eeffdb142ad
-# ╠═9046e78e-645c-4f78-9a8d-6b736316193b
+# ╠═5ba1029e-1c86-4c61-901e-4229dd501e8f
 # ╟─5b03f41b-7833-4001-ba61-7f26b0b10bc3
-# ╠═9f41e621-ab36-47aa-8da9-8a61a43f158e
+# ╠═28941107-d0ea-4c32-8bb3-1b822190f68a
+# ╟─524590ef-079a-47c4-8c36-dc9897a8c340
+# ╠═c6d01f37-03ab-42be-b757-5ce9fc350aa6
+# ╠═7a88fbb8-9684-4d5d-a5f4-d0d7706b489f
+# ╠═1f989823-7642-4a07-b2fa-8faa0a3da325
+# ╠═9caa69ae-be37-48dd-850a-6ea1d41e8dd6
 # ╟─c8d27bd2-fe57-44f5-89b8-1df77ccad610
 # ╠═3f94dfb1-7898-4b43-9a63-24c8e3aefdde
 # ╟─e5bb0a44-3cba-401e-a43d-5de6b7495369
-# ╠═5c6aea1f-1102-403e-9b2f-ed3c6581abfe
-# ╟─254a626b-dcc0-4d55-870a-be8b25f1d642
-# ╠═1366b525-b6d6-48ca-ae29-7967bf41e85b
-# ╠═cc213f56-5a0b-414d-8e39-de0b1085e254
+# ╟─386563cc-1c7b-4896-92c6-482aa289842c
+# ╠═1dc3e03a-8361-45f4-bffd-bad162dc1ff4
 # ╟─42d35aa7-8958-43b1-b70e-80a388ac5e62
 # ╟─68759b9d-e392-40f6-b5b8-eccba62d7331
-# ╠═96450d2f-1e96-4ad8-b86b-d8e251a7cdbe
-# ╠═d3f91061-107e-4577-8183-5a4aa4821516
-# ╠═9b807199-c72a-41e2-a75e-0e919f2fb4bf
-# ╠═e46490ac-3c85-4f46-82a1-dbdb856b56a4
+# ╠═25853a74-9d7c-46ca-9a5d-a070f8264025
 # ╟─f49f88ff-b434-479e-ad0a-0b1009c09d7f
 # ╠═7d08280b-db84-480f-9a22-99724d08e66a
 # ╟─7dae5653-87f3-4961-aa15-14608dde8eea
-# ╠═4be523be-d512-4ee9-abf8-1b764bf7aba5
-# ╟─998883e7-6f83-47f2-a91f-4678ec2dd950
+# ╠═ddec30d5-52fa-4267-9736-6b2c523a47ba
+# ╟─ee731a0d-79c8-43cb-8120-62d482f8fb5d
 # ╠═095473d1-c4db-44c0-8159-f5cc04bcf801
+# ╟─4e7e9954-b411-4ef9-b7e0-d5a2f8999543
+# ╟─faed53ac-758f-43fe-880c-42d1c0a89868
+# ╠═18df98a6-8e77-48a4-bbd3-37ad9b0d3a45
+# ╠═9843d588-5380-4afc-9205-6830219baa9c
+# ╠═f03e600f-35db-4169-92bd-1b790e19cdda
+# ╟─51fbca79-96dd-4989-be41-ce03b3140064
+# ╠═51368535-faf8-4f19-97e0-0f900e21ae17
+# ╠═e5ea6b19-2c73-48db-84ad-d42e51a64a32
+# ╠═6c520987-adeb-47b8-ae9a-bd24cfec0d61
+# ╠═86a20838-3feb-4acc-bcf4-4b61aa0b28dc
+# ╠═4668c2e4-25ce-477f-9178-bec3e6d39c75
+# ╟─4862d998-eb91-4067-8429-5c8a6f53ca60
+# ╠═39a6a94b-9af5-427c-8c06-cd86a6b960f4
+# ╠═7ea9af63-81c0-4fc0-a524-bd90c2ed4746
+# ╠═ea967c82-7dc5-4586-908b-1345978ba69e
+# ╠═a6861e42-d98e-43ab-a431-f3588f64afc5
+# ╠═f380d122-c359-491f-8c5e-992f8ab80c21
+# ╟─4915ce5e-a46d-4246-a3d7-16ff01cbc531
+# ╠═1379f90c-0e0c-482c-a507-a2fac0170b7a
+# ╠═8af591d3-b18c-494b-b439-1f89a3423d41
+# ╠═512a19f1-0842-4a4e-9e87-a3122bf5efba
+# ╠═e544bfa0-a8cf-48d5-aa2d-1b66ded12087
+# ╠═3e61e457-dc30-41e6-9454-a7d28e8a0f65
+# ╠═dab33c0b-aeed-4187-b867-0d870c24e69d
+# ╠═cb629a58-d93a-48c3-a1a6-786975283490
+# ╠═e7570fd4-7c7a-4963-b98e-4869f26ab9e3
+# ╠═cbe705f3-1853-4514-9708-d2fdb7c69802
+# ╟─3c02de21-2a3f-4796-bb50-be473c07403e
+# ╠═a93cdd9a-dd61-4801-8967-901a8e5ebae9
+# ╠═0f9a5602-4cd5-4205-9d2b-5cbc3f96275f
+# ╠═5fc53445-cb49-417f-9e4d-fc951366c23c
+# ╠═b0fa1f1e-bac5-401d-b52e-3e8771a7dfe7
+# ╠═7cc03a60-3f21-4375-abb2-5810e6e71942
+# ╠═3767c9c6-51a6-44ef-b943-e7368c9144b5
+# ╠═832a435d-9582-4bdc-bc75-a8cbb53366e1
 # ╟─f24a3af4-a34e-4d44-96c8-13654e5c2db8
 # ╟─56d08cbd-8a11-4c07-98c3-6c5f83704c3b
 # ╟─00000000-0000-0000-0000-000000000001
