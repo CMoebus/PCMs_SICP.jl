@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210915\_SICP\_2.1.3\_What\_Is\_Meant\_by\_Data.jl
 
-###### code: Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2022/08/30 ***
+###### code: Julia/Pluto.jl-code (1.8.0/19.11) by PCM *** 2023/02/26 ***
 =====================================================================================
 "
 
@@ -43,26 +43,24 @@ $$cdr(cons(x, y)) == y$$
 md"
 ---
 ##### 2.1.3.3 SICP-Scheme-like *functional* Julia 
-##### 2.1.3.3.1 *Procedural* Representation of *Data*
+##### 2.1.3.3.1 *Procedural* Representation of *Data* (enables OOP)
 "
 
 # ╔═╡ 4ac4b9ce-a27b-40e5-84df-791c8b9ae748
 md"
-###### object $$cons$$ understands messages $$:car$$ and $$:cdr$$
+###### OOP: object $$cons$$ understands messages $$:car$$ and $$:cdr$$
 "
 
 # ╔═╡ a04adb02-f6c0-484d-b743-47424a2681a0
 function cons(x, y)
+	#-------------------------------------
 	function dispatch(message)
-		if ==(message, :car)
-			x
-		elseif ==(message, :cdr)
-			y
-		else 
-			"error not 0 or 1 but $message"
-		end # if
+		==(message, :car) ? x :
+		==(message, :cdr) ? y :
+		"error not 0 or 1 but $message"
 	end # function dispatch
-	dispatch # return a dispatch-function
+	#-------------------------------------
+	dispatch # return the dispatch-function
 end # function cons
 
 # ╔═╡ 2613f7e7-1070-47d1-8ef3-9dc7f2282881
@@ -98,6 +96,21 @@ car(z)
 # ╔═╡ 6c7b6bea-ba2a-419e-8304-d78cdf837386
 cdr(z)
 
+# ╔═╡ a99b80d7-5033-4f1d-8432-2bdc237aabe1
+md"
+###### OO-orientated Message Passing
+(s.a. Smalltalk or [Pharo](https://files.pharo.org/media/pharoCheatSheet.pdf))
+"
+
+# ╔═╡ 71a71be8-8b62-478b-abf8-8cae7b324420
+objAB = cons(:a, :b)
+
+# ╔═╡ a06a1086-b24b-4127-9096-412314c63a09
+objAB(:car) == :a  # ==> true --> :)      unary message ala Pharo or Smalltalk
+
+# ╔═╡ 8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
+objAB(:cdr) == :b  # ==> true --> :)      unary message ala Pharo or Smalltalk
+
 # ╔═╡ 6a50a311-6479-4334-80f5-820dc6600fcd
 md"
 ##### 2.1.3.3.3 Axioms
@@ -114,6 +127,8 @@ md"
 ---
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/30
+- **pharoCheatSheet**; [https://files.pharo.org/media/pharoCheatSheet.pdf](https://files.pharo.org/media/pharoCheatSheet.pdf); last visit 2023/02/26.
+
 "
 
 # ╔═╡ 911260a4-e5ca-42ac-9ed9-fb3cd068be01
@@ -136,7 +151,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.0"
+julia_version = "1.8.5"
 manifest_format = "2.0"
 project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
@@ -159,6 +174,10 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═881e3a90-8b68-47ed-9d79-d8ed5ab1faa6
 # ╠═301d3021-02d3-41cf-8ffa-026370af7e5f
 # ╠═6c7b6bea-ba2a-419e-8304-d78cdf837386
+# ╟─a99b80d7-5033-4f1d-8432-2bdc237aabe1
+# ╠═71a71be8-8b62-478b-abf8-8cae7b324420
+# ╠═a06a1086-b24b-4127-9096-412314c63a09
+# ╠═8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
 # ╟─6a50a311-6479-4334-80f5-820dc6600fcd
 # ╠═9e4a7729-3f1c-4be5-8a71-31f67685d3e6
 # ╠═150b7adc-aff4-4b87-8ac3-316657b1fd0e
