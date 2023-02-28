@@ -253,12 +253,14 @@ function listLength(x)
 	end # if
 end
 
-# ╔═╡ 73794a66-f670-42a0-a282-4d69bb6f1178
+# ╔═╡ c219beca-688b-4642-be6d-adefc1448e44
 # this method pretty-prints a latent hierarchical cons-structure as a nested 
-#    tuple structure which is similarity with a Lisp- or Scheme-list
+#    tuple structure which has similarity with a Lisp- or Scheme-list
+# also used in 3.3.1 and 3.3.2
 function pp(consList)
 	#-------------------------------------------------------------------------------
 	function pp_iter(arrayList, shortList)
+		# termination cases
 		if shortList == :nil
 			arrayList
 		elseif car(shortList) == :nil && cdr(shortList) == :nil
@@ -266,6 +268,9 @@ function pp(consList)
 		# one-element list
 		elseif (typeof(car(shortList)) <: Atom) && (cdr(shortList) == :nil)
 			push!(arrayList, car(shortList)) 
+		# => new !
+		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Atom) 
+			(car(shortList), cdr(shortList))  
 		# flat multi-element list
 		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Cons)
 			pp_iter(push!(arrayList, car(shortList)), cdr(shortList))
@@ -276,7 +281,7 @@ function pp(consList)
 		elseif (typeof(car(shortList)) <: Cons) && (typeof(cdr(shortList)) <: Cons)
 			pp_iter(push!(arrayList, pp(car(shortList))), cdr(shortList))
 		else
-			"unknown case"
+			error("==> unknown case")
 		end # if
 	end # pp_iter
 	#-------------------------------------------------------------------------------
@@ -510,6 +515,9 @@ pp(scale_tree(list(1, list(2, list(3, 4), 5), list(6, 7)), 10))
 
 # ╔═╡ a33ffcf7-7e38-49c9-83b7-64b1794d8bf8
 l3 = cons(:one, cons("two", []))
+
+# ╔═╡ e35dbec5-abbd-4604-8295-f33ac7e2a186
+pp(l3)   # ==> "unknown case" because l3 is an array
 
 # ╔═╡ 83b6eb9c-0e9d-4a4c-bc29-320ebf41ed35
 Tuple(l3)
@@ -791,7 +799,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b99a3642-466f-439e-928b-257a525a9e2b
 # ╠═fde686c0-6810-48ae-b55f-855d8e532908
 # ╟─4b8e1599-eccd-4831-a864-c5e5dadd63fa
-# ╠═73794a66-f670-42a0-a282-4d69bb6f1178
+# ╠═c219beca-688b-4642-be6d-adefc1448e44
 # ╠═7d470294-9c69-4ab8-82da-e8a2a7c5b576
 # ╠═171ab6fa-048e-4330-a506-045f1523dc8a
 # ╠═d1af268e-309d-49ba-a9f7-170f7be73669
@@ -822,6 +830,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─49c58521-2ca3-48ad-b3d3-ff6b66efad83
 # ╠═3444dab8-dd66-4bc3-bfb0-269ecd2f714a
 # ╠═a33ffcf7-7e38-49c9-83b7-64b1794d8bf8
+# ╠═e35dbec5-abbd-4604-8295-f33ac7e2a186
 # ╠═83b6eb9c-0e9d-4a4c-bc29-320ebf41ed35
 # ╠═1265e29f-5935-4d42-945c-39055ab96870
 # ╠═72c1a55e-0f01-467b-8dfb-d35bfabe2c3a
