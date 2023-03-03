@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: 3.3.1 [Mutable List Structure](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e1)
 ##### file: PCM20230219\_SICP\_3.3.1\_MutableListStructure.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/02/28 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/03/03 ***
 
 ====================================================================================
 "
@@ -42,40 +42,42 @@ car(cons::Cons) = cons.car
 # ╔═╡ 7178c3ce-411a-44d4-9d19-948fa0f87c84
 cdr(cons::Cons) = cons.cdr
 
-# ╔═╡ 958f5314-8e9f-4ae6-b8ab-1bf9b89fab7a
+# ╔═╡ 227bb641-e123-4683-8066-94c3a1445012
 # this method pretty-prints a latent hierarchical cons-structure as a nested 
 #    tuple structure which has similarity with a Lisp- or Scheme-list
-#    also used in ch.2.2.2
-function pp(consList)
+# also used in 2.2.2 and 3.3.2
+function pp(consStruct)
 	#-------------------------------------------------------------------------------
-	function pp_iter(arrayList, shortList)
-		# termination cases
-		if shortList == :nil
-			arrayList
-		elseif car(shortList) == :nil && cdr(shortList) == :nil
-			arrayList
-		# one-element list
-		elseif (typeof(car(shortList)) <: Atom) && (cdr(shortList) == :nil)
-			push!(arrayList, car(shortList)) 
-		# => new !
-		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Atom) 
-			(car(shortList), cdr(shortList))  
+	function pp_iter(consStruct, arrayList)
+		#------------------------------------------------------------------------
+		if consStruct == :nil                               # termination case 1 
+			()
+		elseif typeof(consStruct) <: Atom                   # termination case_2 
+			consStruct
+		#------------------------------------------------------------------------
+		# one-element list                                  # termination case_3 
+		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
+			Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
 		# flat multi-element list
-		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Cons)
-			pp_iter(push!(arrayList, car(shortList)), cdr(shortList))
-		# nested sublist as last element of multi-element list
-		elseif (typeof(car(shortList)) <: Cons) && (cdr(shortList) == :nil)
-			pp_iter(push!(arrayList, pp(car(shortList))), cdr(shortList))
+		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, car(consStruct)))
+		#----------------------------------------------------------------------
 		# nested sublist as first element of multi-element list
-		elseif (typeof(car(shortList)) <: Cons) && (typeof(cdr(shortList)) <: Cons)
-			pp_iter(push!(arrayList, pp(car(shortList))), cdr(shortList))
+			elseif (typeof(car(consStruct)) <: Cons) && (cdr(consStruct) == :nil)
+				Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
+		# nested sublist as first element of multi-element list
+		elseif (typeof(car(consStruct)) <: Cons) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
 		else
-			error("==> unknown case")
+			error("==> unknown case for: $consStruct")
 		end # if
 	end # pp_iter
 	#-------------------------------------------------------------------------------
-	Tuple(pp_iter([], consList))      # converts array to tuple
-end
+	pp_iter(consStruct, [])      
+end # function pp
 
 # ╔═╡ 64a572cf-a84c-4730-b1e3-96a592df7db0
 md"
@@ -168,10 +170,10 @@ let # this one layer on top of x and y (s.a. Fig. 3.12, SICP, 1996, p.253)
 end # let
 
 # ╔═╡ 0278613d-f097-4a27-949f-d04bd38523e5
-pp(cons(:a, :b)) 
+pp(cons(:a, :b))  # a dotted pair cannot be pretty-printed with pp
 
 # ╔═╡ 8bf38dfa-266b-4d18-a3b1-2ac2882344fd
-Tuple((:a, :b))
+Tuple((:a, :b))           # ==> dotted pair (:a, :b) -->  :)
 
 # ╔═╡ b03a3591-63d9-44e2-a3c8-38fa8eb164d3
 md"
@@ -402,7 +404,6 @@ md"
 
 # ╔═╡ 7dae5653-87f3-4961-aa15-14608dde8eea
 md"
----
 ###### Mutation of lists with *shared* pairs by $setToWow!(z1)$
 
 *Scheme*: 
@@ -646,14 +647,14 @@ end # let
 # ╔═╡ c6d01f37-03ab-42be-b757-5ce9fc350aa6
 function consWithMutators(car, cdr)
 	let 
-		new = Cons(nothing, nothing)
+		new = Cons(:nil, :nil)
 		setCar!(new, car)
 		setCdr!(new, cdr)
 	end # let
 end # function consWithMutators
 
 # ╔═╡ 7a88fbb8-9684-4d5d-a5f4-d0d7706b489f
-z11 = consWithMutators(:c, :d)
+z11 = consWithMutators(:c, :nil)
 
 # ╔═╡ b5af832f-d7f9-4d45-a3ee-5436090db99f
 pp(z11)
@@ -879,7 +880,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╔═╡ Cell order:
 # ╟─748d5b90-b040-11ed-0d1b-f962ab37133b
 # ╠═002152bc-c3d5-4622-a697-6992246b84c1
-# ╠═958f5314-8e9f-4ae6-b8ab-1bf9b89fab7a
+# ╠═227bb641-e123-4683-8066-94c3a1445012
 # ╟─1b26224f-e39b-4576-aef3-8c2ca50e3c2c
 # ╠═bd62ca5c-23d3-4a1f-844d-7280a79aadf8
 # ╠═73db0581-5f6a-41de-9740-4f143fc5826c
