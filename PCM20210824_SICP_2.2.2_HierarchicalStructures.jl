@@ -287,41 +287,46 @@ function listLength(x)
 end
 
 # ╔═╡ c219beca-688b-4642-be6d-adefc1448e44
+#------------------------------------------------------------------------------------
 # this method pretty-prints a latent hierarchical cons-structure as a nested 
 #    tuple structure which has similarity with a Lisp- or Scheme-list
-# also used in 3.3.1 and 3.3.2
+# also used in 3.3.1 and 3.3.2.1
+#------------------------------------------------------------------------------------
 function pp(consStruct)
-	#-------------------------------------------------------------------------------
+	#--------------------------------------------------------------------------------
 	function pp_iter(consStruct, arrayList)
-		#------------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		if consStruct == :nil                               # termination case 1 
 			()
 		elseif typeof(consStruct) <: Atom                   # termination case_2 
 			consStruct
-		#------------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		# one-element list                                  # termination case_3 
 		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
 			Tuple(push!(arrayList, pp(car(consStruct))))
-		#----------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		# flat multi-element list
+		elseif (car(consStruct) == :nil) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, ()))
 		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Cons)
 			pp_iter(cdr(consStruct), push!(arrayList, car(consStruct)))
-		#----------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		# nested sublist as first element of multi-element list
 			elseif (typeof(car(consStruct)) <: Cons) && (cdr(consStruct) == :nil)
 				Tuple(push!(arrayList, pp(car(consStruct))))
-		#----------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		# nested sublist as first element of multi-element list
 		elseif (typeof(car(consStruct)) <: Cons) && (typeof(cdr(consStruct)) <: Cons)
 			pp_iter(cdr(consStruct), push!(arrayList, pp(car(consStruct))))
-		#----------------------------------------------------------------------
+		#----------------------------------------------------------------------------
 		else
 			error("==> unknown case for: $consStruct")
 		end # if
 	end # pp_iter
-	#-------------------------------------------------------------------------------
+	#--------------------------------------------------------------------------------
 	pp_iter(consStruct, [])      
 end # function pp
+#------------------------------------------------------------------------------------
 
 # ╔═╡ 5f36dae2-253b-4d86-97d6-2acde397e463
 pp(:nil)                   # ==> () -->  :)
@@ -818,7 +823,7 @@ md"
 ##### end of ch. 2.2.2
 ====================================================================================
 
-This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International **(CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "
