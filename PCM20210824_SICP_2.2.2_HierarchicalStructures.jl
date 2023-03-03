@@ -61,6 +61,29 @@ md"
 # ╔═╡ 1fb40b33-47b7-4c26-ab58-1df36bbee490
 cdr(cell::Cons)::Any = cell.cdr
 
+# ╔═╡ 365e26e1-55fe-4633-a9c7-cb23759af772
+md"
+---
+###### Comparison of Types
+
+"
+
+# ╔═╡ 2a1c5fbb-aa49-4f21-b638-d5852d2f3172
+Atom <: Cons                         # ==> false -->  :)
+
+# ╔═╡ 9408a58f-cc11-4682-bd5f-395bf1bc7d60
+typeof(:nil) <: Atom                 # ==> true  -->  :)
+
+# ╔═╡ 08c26d41-cf4b-4094-84e0-efea7882cac7
+typeof(:nil) <: Cons                 # ==> false -->  :)
+
+# ╔═╡ 86579050-bc57-45cf-965f-affabc23c6e0
+md"
+---
+###### SICP-content in Julia
+
+"
+
 # ╔═╡ 8c38accf-8ca7-418e-aadb-f4c7aacc4eb4
 md"""
 ---
@@ -189,15 +212,6 @@ md"
 this method pretty-prints a *latent hierarchical* cons-structure as a *manifest nested* array structure
 "
 
-# ╔═╡ 2a1c5fbb-aa49-4f21-b638-d5852d2f3172
-Atom <: Cons                         # ==> false -->  :)
-
-# ╔═╡ 9408a58f-cc11-4682-bd5f-395bf1bc7d60
-typeof(:nil) <: Atom                 # ==> true  -->  :)
-
-# ╔═╡ 08c26d41-cf4b-4094-84e0-efea7882cac7
-typeof(:nil) <: Cons                 # ==> false -->  :)
-
 # ╔═╡ fbfcb81f-1741-4904-9b8e-c7890be30d71
 md"
 ASS (= Abelson, Sussman & Sussman) replace $nil$ by $'()$ (cf. SICP, 1996, p.101. So $'()$'s meaning is the empty list. 
@@ -308,31 +322,6 @@ function pp(consStruct)
 	#-------------------------------------------------------------------------------
 	pp_iter(consStruct, [])      
 end # function pp
-
-# ╔═╡ 078ad422-30f2-43d7-bb2a-83f68cb7fdc6
-function pp2(consStruct)
-	#-------------------------------------------------------------------------------
-	function pp_iter(consStruct, arrayList)
-		#------------------------------------------------------------------------
-		if consStruct == :nil                               # termination case 1 
-			()
-		elseif typeof(consStruct) <: Atom                   # termination case_2 
-			consStruct
-		#------------------------------------------------------------------------
-		# one-element list                                  # termination case_3 
-		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
-			Tuple(push!(arrayList, pp(car(consStruct))))
-		#----------------------------------------------------------------------
-		# flat multi-element list
-		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Cons)
-			pp_iter(cdr(consStruct), push!(arrayList, car(consStruct)))
-		else
-			error("==> unknown case for: $consStruct")
-		end # if
-	end # pp_iter
-	#-------------------------------------------------------------------------------
-	pp_iter(consStruct, [])      
-end # function pp2
 
 # ╔═╡ 5f36dae2-253b-4d86-97d6-2acde397e463
 pp(:nil)                   # ==> () -->  :)
@@ -862,6 +851,11 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═ca05de56-fb03-4cf2-86ec-f749028c7309
 # ╟─6ae69d96-8097-42ba-8e73-be9bc4015332
 # ╠═1fb40b33-47b7-4c26-ab58-1df36bbee490
+# ╟─365e26e1-55fe-4633-a9c7-cb23759af772
+# ╠═2a1c5fbb-aa49-4f21-b638-d5852d2f3172
+# ╠═9408a58f-cc11-4682-bd5f-395bf1bc7d60
+# ╠═08c26d41-cf4b-4094-84e0-efea7882cac7
+# ╟─86579050-bc57-45cf-965f-affabc23c6e0
 # ╟─8c38accf-8ca7-418e-aadb-f4c7aacc4eb4
 # ╠═786c0bd8-932f-46a3-9cd3-11a626f523fc
 # ╠═4c7e2d00-0f28-420f-9ae1-466fcce85cf3
@@ -904,10 +898,6 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b99a3642-466f-439e-928b-257a525a9e2b
 # ╠═fde686c0-6810-48ae-b55f-855d8e532908
 # ╟─4b8e1599-eccd-4831-a864-c5e5dadd63fa
-# ╠═078ad422-30f2-43d7-bb2a-83f68cb7fdc6
-# ╠═2a1c5fbb-aa49-4f21-b638-d5852d2f3172
-# ╠═9408a58f-cc11-4682-bd5f-395bf1bc7d60
-# ╠═08c26d41-cf4b-4094-84e0-efea7882cac7
 # ╠═c219beca-688b-4642-be6d-adefc1448e44
 # ╟─fbfcb81f-1741-4904-9b8e-c7890be30d71
 # ╠═5f36dae2-253b-4d86-97d6-2acde397e463
