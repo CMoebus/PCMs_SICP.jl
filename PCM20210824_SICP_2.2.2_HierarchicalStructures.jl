@@ -11,7 +11,7 @@ md"
 
 ###### file: PCM20210824\_SICP\_2.2.2\_HierarchicalStructures.jl
 
-###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/02/28 ***
+###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/03 ***
 ======================================================================================
 "
 
@@ -189,11 +189,29 @@ md"
 this method pretty-prints a *latent hierarchical* cons-structure as a *manifest nested* array structure
 "
 
+# ╔═╡ 2a1c5fbb-aa49-4f21-b638-d5852d2f3172
+Atom <: Cons                         # ==> false -->  :)
+
+# ╔═╡ 9408a58f-cc11-4682-bd5f-395bf1bc7d60
+typeof(:nil) <: Atom                 # ==> true  -->  :)
+
+# ╔═╡ 08c26d41-cf4b-4094-84e0-efea7882cac7
+typeof(:nil) <: Cons                 # ==> false -->  :)
+
+# ╔═╡ fbfcb81f-1741-4904-9b8e-c7890be30d71
+md"
+ASS (= Abelson, Sussman & Sussman) replace $nil$ by $'()$ (cf. SICP, 1996, p.101. So $'()$'s meaning is the empty list. 
+Similarly we mark the 'end-of-list' in the *storage* structure ($Cons$*-structure*) as '*:nil*' and in its *manifestation* (*print*-list) as $()$.
+"
+
 # ╔═╡ 887c2e8d-08fc-4dce-9e1f-0938dea1623b
 md"
 ---
 ##### Mapping over trees
 "
+
+# ╔═╡ 18c28f30-3a43-4041-82c7-421554469023
+# =====================================================
 
 # ╔═╡ 5e287813-4d57-48ad-a3e4-20247476512c
 md"
@@ -216,7 +234,8 @@ md"
 
 # ╔═╡ f7dabac5-0421-4581-8d87-00ce9d8eeeb1
 md"
-$\text{Here } cons \text{ constructs an array. So this *cannot* be pretty-printed by } pp$
+Now, *this* $cons$ constructs an array. This *cannot* be pretty-printed by $pp$
+
 "
 
 # ╔═╡ 41aef6dd-e5bd-44a7-9878-696a1a97e452
@@ -257,36 +276,69 @@ end
 # this method pretty-prints a latent hierarchical cons-structure as a nested 
 #    tuple structure which has similarity with a Lisp- or Scheme-list
 # also used in 3.3.1 and 3.3.2
-function pp(consList)
+function pp(consStruct)
 	#-------------------------------------------------------------------------------
-	function pp_iter(arrayList, shortList)
-		# termination cases
-		if shortList == :nil
-			arrayList
-		elseif car(shortList) == :nil && cdr(shortList) == :nil
-			arrayList
-		# one-element list
-		elseif (typeof(car(shortList)) <: Atom) && (cdr(shortList) == :nil)
-			push!(arrayList, car(shortList)) 
-		# => new !
-		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Atom) 
-			(car(shortList), cdr(shortList))  
+	function pp_iter(consStruct, arrayList)
+		#------------------------------------------------------------------------
+		if consStruct == :nil                               # termination case 1 
+			()
+		elseif typeof(consStruct) <: Atom                   # termination case_2 
+			consStruct
+		#------------------------------------------------------------------------
+		# one-element list                                  # termination case_3 
+		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
+			Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
 		# flat multi-element list
-		elseif (typeof(car(shortList)) <: Atom) && (typeof(cdr(shortList)) <: Cons)
-			pp_iter(push!(arrayList, car(shortList)), cdr(shortList))
-		# nested sublist as last element of multi-element list
-		elseif (typeof(car(shortList)) <: Cons) && (cdr(shortList) == :nil)
-			pp_iter(push!(arrayList, pp(car(shortList))), cdr(shortList))
+		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, car(consStruct)))
+		#----------------------------------------------------------------------
 		# nested sublist as first element of multi-element list
-		elseif (typeof(car(shortList)) <: Cons) && (typeof(cdr(shortList)) <: Cons)
-			pp_iter(push!(arrayList, pp(car(shortList))), cdr(shortList))
+			elseif (typeof(car(consStruct)) <: Cons) && (cdr(consStruct) == :nil)
+				Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
+		# nested sublist as first element of multi-element list
+		elseif (typeof(car(consStruct)) <: Cons) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
 		else
-			error("==> unknown case")
+			error("==> unknown case for: $consStruct")
 		end # if
 	end # pp_iter
 	#-------------------------------------------------------------------------------
-	Tuple(pp_iter([], consList))      # converts array to tuple
-end
+	pp_iter(consStruct, [])      
+end # function pp
+
+# ╔═╡ 078ad422-30f2-43d7-bb2a-83f68cb7fdc6
+function pp2(consStruct)
+	#-------------------------------------------------------------------------------
+	function pp_iter(consStruct, arrayList)
+		#------------------------------------------------------------------------
+		if consStruct == :nil                               # termination case 1 
+			()
+		elseif typeof(consStruct) <: Atom                   # termination case_2 
+			consStruct
+		#------------------------------------------------------------------------
+		# one-element list                                  # termination case_3 
+		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
+			Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------
+		# flat multi-element list
+		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Cons)
+			pp_iter(cdr(consStruct), push!(arrayList, car(consStruct)))
+		else
+			error("==> unknown case for: $consStruct")
+		end # if
+	end # pp_iter
+	#-------------------------------------------------------------------------------
+	pp_iter(consStruct, [])      
+end # function pp2
+
+# ╔═╡ 5f36dae2-253b-4d86-97d6-2acde397e463
+pp(:nil)                   # ==> () -->  :)
+
+# ╔═╡ 18fa2ee8-8fd3-498c-bf72-4cae930fb4cf
+pp(Cons(:one, :nil))       # ==>  (:one)
 
 # ╔═╡ 31cd0a63-70f5-425d-bd2e-df9243a3198a
 md"""
@@ -369,11 +421,17 @@ end
 # ╔═╡ 786c0bd8-932f-46a3-9cd3-11a626f523fc
 l1 = cons(:one, cons("two", :nil))
 
+# ╔═╡ 4c7e2d00-0f28-420f-9ae1-466fcce85cf3
+pp(l1)            # ==> (:one, "two") -->  :)
+
 # ╔═╡ 715f429d-7656-4014-aebf-974ed05f0cc1
 car(l1)
 
 # ╔═╡ a5ef6c4b-b6c5-4ad8-ac43-ea4a204deadd
-cdr(l1)
+cdr(l1)                # ==> Cons("two", :nil) -->   :)
+
+# ╔═╡ 76ca37f6-71ba-4320-aa19-1e73f53bb65d
+pp(cdr(l1))            # ==> ("two") -->   :)
 
 # ╔═╡ d046b762-098f-4c26-b57b-6f4ee7497032
 car(cdr(l1))
@@ -382,16 +440,22 @@ car(cdr(l1))
 l1
 
 # ╔═╡ 97b87ad4-f74c-483f-8777-690ebd82bdef
-pp(l1)
+pp(l1)                                 # ==> (:one, "two") -->  :)
 
 # ╔═╡ f5a5cb9b-5148-43e3-aea2-9e62a23ca471
-l2 = cons(3, cons(4.0, :nil))
+l2 = cons(3, cons(4.0, :nil))   # ==> Cons(3, Cons(4.0, :nil))
+
+# ╔═╡ 8550486d-a796-46d3-a8fd-07e0a7f294bd
+pp(l2)                          # ==> (3, 4.0) -->  :)
 
 # ╔═╡ 286754b5-505d-43a4-99b9-aa57f789dea4
 car(l2)
 
 # ╔═╡ a3571fdb-fa31-4db6-b6f3-c71d7f2e94e0
-cdr(l2)
+cdr(l2)                          # ==> Cons(4.0, :nil)
+
+# ╔═╡ b9a5c6e4-7f67-42e4-9380-6d999a3df17d
+pp(cdr(l2))                      # ==> Cons(4.0, :nil) ==> (4.0) -->  :)
 
 # ╔═╡ 88ee71e8-4b91-4a27-ab79-7dd6fbe49aa7
 car(cdr(l2))
@@ -400,17 +464,29 @@ car(cdr(l2))
 l1, l2                               # arguments are left intact !
 
 # ╔═╡ 4e37baa6-44e5-40ce-84e4-7ac943122bc5
-pp(l2)
+pp(l2)                                 # ==> (3, 4.0) -->  :)
 
 # ╔═╡ cc9478f7-5e21-4c2f-9569-56215f5f2565
 # works with 1st method of cons
 binaryTree1 = cons(l1, l2)           # similar to SICP, Fig. 2.5
 
+# ╔═╡ 882e4324-afd3-42a2-90a0-58da4a21fad9
+binaryTree1    # ==> Cons(Cons(:one, Cons("two", :nil)), Cons(3, Cons(4.0, :nil)))
+
+# ╔═╡ ad034edc-d673-40a0-82e7-35803a5ecffe
+pp(binaryTree1)                      # ==> ((:one, "two"), 3, 4.0)
+
 # ╔═╡ ad0ac826-330d-43bd-b86f-7a13d591057e
-car(binaryTree1)
+car(binaryTree1)                     # ==> Cons(:one, Cons("two", :nil))
+
+# ╔═╡ 1ce376af-a0c2-400f-a655-41ae0bdab251
+pp(car(binaryTree1))                 # ==> (:one, "two") -->  :)
 
 # ╔═╡ 73c07fcb-5aa3-45b7-abd1-50e2af4b095c
-cdr(binaryTree1)
+cdr(binaryTree1)                     # ==> Cons(3, Cons(4.0, :nil))
+
+# ╔═╡ 746146a0-10f1-44f1-a73b-92c62fe574b2
+pp(cdr(binaryTree1))                 # ==> (3, 4.0) -->  :)
 
 # ╔═╡ d9a102a8-99cb-42d4-b7f6-7b04b2eddd70
 car(car(binaryTree1))
@@ -425,7 +501,7 @@ car(cdr(binaryTree1))
 car(cdr(cdr(binaryTree1)))
 
 # ╔═╡ 38f2fe0a-901d-491d-8b49-8596cae6d8f5
-pp(binaryTree1)
+pp(binaryTree1)                        # ==> ((:one, "two"), 3, 4.0)
 
 # ╔═╡ 682249be-d6ea-4f86-9c52-d3931b7cb613
 list(elements...) = 
@@ -438,19 +514,43 @@ list(elements...) =
 	end #if
 
 # ╔═╡ 7d470294-9c69-4ab8-82da-e8a2a7c5b576
-list(())
+list(())                   # ==> Cons((), :nil)
 
 # ╔═╡ 171ab6fa-048e-4330-a506-045f1523dc8a
-pp(list())              # ==> () -->  empty list -->  :)
+pp(list())                 # ==> Cons((), :nil) ==> (()) -->  :)
+
+# ╔═╡ 803803c4-b675-4003-af82-bd017318bf81
+list(:one)                 # ==> Cons(:one, :nil) -->  :)
 
 # ╔═╡ d1af268e-309d-49ba-a9f7-170f7be73669
-pp(list(:one))          # ==> (:one) --> singleton list -->    :)
+pp(list(:one))             # ==> Cons(:one, :nil) ==> (:one)  -->    :) 
+
+# ╔═╡ fd74dd1e-c197-444f-9d3a-796426884648
+list(:one, "two")          # ==> Cons(:one, Cons("two", :nil))
 
 # ╔═╡ f9570f49-7923-469e-925c-9ed0f33bc163
-pp(list(list(:one, "two")))
+pp(list(:one, "two"))      # ==> (:one, "two") -->  :)
+
+# ╔═╡ 5758cda8-317f-41f7-87fc-bf53998d4fc6
+list(list(:one, "two"))                # ==> Cons(Cons(:one, Cons("two", :nil)), :nil)
+
+# ╔═╡ 2ab796bc-449d-4386-aaf2-20615bf1281e
+# ==> Cons(Cons(:one, Cons("two", :nil)), Cons(3, Cons(4.0, :nil)))  
+#      --> equivalent to binaryTree1
+list(list(:one, "two"), 3, 4.0) 
+
+# ╔═╡ ffbed260-a5e3-4906-85db-f6debea5b00d
+pp(list(list(:one, "two"), 3, 4.0))    # ==> ((:one, "two"), 3, 4.0) -->  :)
+
+# ╔═╡ ea483827-a735-4cfa-85fd-75cf2fe910f4
+pp(list(list(:one, "two")))            # ==> ((:one, "two")) -->  :)
 
 # ╔═╡ 7e4dad09-01ef-4bc6-8bdb-507ab580a2e7
-pp(list(list(list(:one, "two")), 3, 4.0))
+pp(list(list(list(:one, "two")), 3, 4.0)) 
+                                       # ==> (((:one, "two")), 3, 4.0) --> :)
+
+# ╔═╡ 60f45d12-55d9-4e07-b841-8e68f010428a
+list(list(list(:one, "two")), list(list(3), 4.0))
 
 # ╔═╡ ef0f3822-5ec3-4d54-a518-7100a2820d87
 pp(list(list(list(:one, "two")), list(list(3), 4.0)))
@@ -462,7 +562,7 @@ x = cons(list(:one, "two"), list(3, 4.0))  #  SICP, 1996, p. 108
 binaryTree1 == x                  # binaryTree1 and x are equal 
 
 # ╔═╡ 638ba491-dd79-43e2-a6de-46382d99e77f
-pp(x)
+pp(x)                             # ==> ((:one, "two"), 3, 4.0)
 
 # ╔═╡ b99a3642-466f-439e-928b-257a525a9e2b
 listLength(x)
@@ -473,23 +573,20 @@ x
 # ╔═╡ 0f45f9a6-6877-42fc-83e2-377d1758d401
 pp(x)
 
-# ╔═╡ 0f36caaf-08cd-4ecf-b326-d76443504f5b
-list(x)
-
-# ╔═╡ 98c16415-9792-4cbe-ab08-7a19fd09e86b
-pp(list(x))
-
-# ╔═╡ 28042bcc-0a69-4920-8365-a3054d74743e
-cdr(list(x))
-
 # ╔═╡ 8830c7df-e37c-4f81-879d-3ded6267e266
 list(x, x)
 
+# ╔═╡ f7797441-d376-4a56-b837-a488c3742ea5
+list(list(x, x), list(x, x))
+
 # ╔═╡ 3e662ba4-b303-4093-9d15-999140ff0d18
-pp(list(x, x))
+pp(list(list(x, x), list(x, x)))
 
 # ╔═╡ dd325dc8-884b-4c0f-9d55-45aa2cbf3a87
 listLength(list(x, x))
+
+# ╔═╡ be1f7a7f-618b-4525-b796-78a5d1d1e54a
+pp(cons(:nil, :nil))       # ==> (()) -->  :)
 
 # ╔═╡ 30e97964-4c4a-430a-afe5-46e6a387fd1f
 function scale_tree(tree, factor)
@@ -767,20 +864,28 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═1fb40b33-47b7-4c26-ab58-1df36bbee490
 # ╟─8c38accf-8ca7-418e-aadb-f4c7aacc4eb4
 # ╠═786c0bd8-932f-46a3-9cd3-11a626f523fc
+# ╠═4c7e2d00-0f28-420f-9ae1-466fcce85cf3
 # ╟─6388d4e9-38a1-4f00-bbf0-e1a903083460
 # ╠═715f429d-7656-4014-aebf-974ed05f0cc1
 # ╠═a5ef6c4b-b6c5-4ad8-ac43-ea4a204deadd
+# ╠═76ca37f6-71ba-4320-aa19-1e73f53bb65d
 # ╠═d046b762-098f-4c26-b57b-6f4ee7497032
 # ╟─538d762c-ae92-4f1f-b5c7-41c541dc626d
 # ╠═f5a5cb9b-5148-43e3-aea2-9e62a23ca471
+# ╠═8550486d-a796-46d3-a8fd-07e0a7f294bd
 # ╟─d3d2ae26-c985-4856-bbb8-983d09b594ee
 # ╠═286754b5-505d-43a4-99b9-aa57f789dea4
 # ╠═a3571fdb-fa31-4db6-b6f3-c71d7f2e94e0
+# ╠═b9a5c6e4-7f67-42e4-9380-6d999a3df17d
 # ╠═88ee71e8-4b91-4a27-ab79-7dd6fbe49aa7
 # ╟─1cfbab4a-c1a8-49e9-bcc4-79ee773ead30
 # ╠═cc9478f7-5e21-4c2f-9569-56215f5f2565
+# ╠═882e4324-afd3-42a2-90a0-58da4a21fad9
+# ╠═ad034edc-d673-40a0-82e7-35803a5ecffe
 # ╠═ad0ac826-330d-43bd-b86f-7a13d591057e
+# ╠═1ce376af-a0c2-400f-a655-41ae0bdab251
 # ╠═73c07fcb-5aa3-45b7-abd1-50e2af4b095c
+# ╠═746146a0-10f1-44f1-a73b-92c62fe574b2
 # ╠═d9a102a8-99cb-42d4-b7f6-7b04b2eddd70
 # ╠═0df51397-7df5-49a8-9fb1-c686a548546e
 # ╠═5e271af9-a6d5-4366-a8be-d29615a56990
@@ -799,24 +904,38 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═b99a3642-466f-439e-928b-257a525a9e2b
 # ╠═fde686c0-6810-48ae-b55f-855d8e532908
 # ╟─4b8e1599-eccd-4831-a864-c5e5dadd63fa
+# ╠═078ad422-30f2-43d7-bb2a-83f68cb7fdc6
+# ╠═2a1c5fbb-aa49-4f21-b638-d5852d2f3172
+# ╠═9408a58f-cc11-4682-bd5f-395bf1bc7d60
+# ╠═08c26d41-cf4b-4094-84e0-efea7882cac7
 # ╠═c219beca-688b-4642-be6d-adefc1448e44
+# ╟─fbfcb81f-1741-4904-9b8e-c7890be30d71
+# ╠═5f36dae2-253b-4d86-97d6-2acde397e463
+# ╠═be1f7a7f-618b-4525-b796-78a5d1d1e54a
 # ╠═7d470294-9c69-4ab8-82da-e8a2a7c5b576
 # ╠═171ab6fa-048e-4330-a506-045f1523dc8a
+# ╠═803803c4-b675-4003-af82-bd017318bf81
+# ╠═18fa2ee8-8fd3-498c-bf72-4cae930fb4cf
 # ╠═d1af268e-309d-49ba-a9f7-170f7be73669
+# ╠═fd74dd1e-c197-444f-9d3a-796426884648
 # ╠═f9570f49-7923-469e-925c-9ed0f33bc163
+# ╠═5758cda8-317f-41f7-87fc-bf53998d4fc6
+# ╠═2ab796bc-449d-4386-aaf2-20615bf1281e
+# ╠═ffbed260-a5e3-4906-85db-f6debea5b00d
+# ╠═ea483827-a735-4cfa-85fd-75cf2fe910f4
 # ╠═7e4dad09-01ef-4bc6-8bdb-507ab580a2e7
+# ╠═60f45d12-55d9-4e07-b841-8e68f010428a
 # ╠═ef0f3822-5ec3-4d54-a518-7100a2820d87
 # ╠═c9300481-e4be-4827-8f73-ac9a8fe406b5
 # ╠═0f45f9a6-6877-42fc-83e2-377d1758d401
-# ╠═0f36caaf-08cd-4ecf-b326-d76443504f5b
-# ╠═98c16415-9792-4cbe-ab08-7a19fd09e86b
-# ╠═28042bcc-0a69-4920-8365-a3054d74743e
 # ╠═8830c7df-e37c-4f81-879d-3ded6267e266
+# ╠═f7797441-d376-4a56-b837-a488c3742ea5
 # ╠═3e662ba4-b303-4093-9d15-999140ff0d18
 # ╠═dd325dc8-884b-4c0f-9d55-45aa2cbf3a87
 # ╠═db20e792-2252-4703-ae63-9fae428d6375
 # ╟─887c2e8d-08fc-4dce-9e1f-0938dea1623b
 # ╠═30e97964-4c4a-430a-afe5-46e6a387fd1f
+# ╠═18c28f30-3a43-4041-82c7-421554469023
 # ╠═c32f258c-1b0d-418f-b682-27566177b152
 # ╠═35e18b20-cc3c-49b2-8de4-60450163a772
 # ╟─5e287813-4d57-48ad-a3e4-20247476512c
