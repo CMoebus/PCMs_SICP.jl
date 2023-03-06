@@ -14,7 +14,7 @@ md"
 
 ###### file: PCM20210818\_SICP\_1.3.2\_Constructing\_Procedures\_Using\_Lambda.jl 
 
-###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/05 ***
+###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/06 ***
 =====================================================================================
 "
 
@@ -222,6 +222,121 @@ end # function f5
 # ╔═╡ 88b3c7e3-8633-4672-9177-079c7986f75a
 f5(1, 2)
 
+# ╔═╡ a94d20b9-cb98-4d06-8b69-7a572f2fb2e2
+md"
+---
+###### Nonterminating Lambda-Expression
+in Scheme with *tail-call optimization* this is 
+
+$((lambda (x))(x\; x))(lambda (x))(x\; x)))$
+
+"
+
+# ╔═╡ bf1c5385-777b-4c41-a2a3-eb6a1719ce2a
+try
+	(x -> x(x))(x -> x(x)) 
+catch
+    @warn "lambda-expression is not terminating, so stack overflow"
+end
+
+# ╔═╡ d2142d45-5fa8-422b-b355-1c2fec670e95
+md"
+---
+###### CPS (= [Continuation Passing Style](https://en.wikipedia.org/wiki/Continuation-passing_style))
+"
+
+# ╔═╡ 173bc4f6-bb07-4634-ab40-2ec1409382b3
+md"
+###### Pythagoras
+
+$c = \sqrt{a^2+b^2} = (a^2 + b^2)^{1/2}$
+"
+
+# ╔═╡ b9a2f4c9-622d-4197-a3c7-14e1094e0805
+md"
+---
+###### DSt (= Direct Style)
+"
+
+# ╔═╡ ec17018b-8127-43b7-a80c-1bbd4aa1db2e
+function pythagorasDSt(a, b)                 # DSt = Direct Style
+	^( +( *( a, a), *( b, b)), 1/2)
+end # function pythagorasDSt
+
+# ╔═╡ 0a432c52-cdaf-4493-b0d0-c7518648c28b
+let a = 3
+	b = 4
+	c = pythagorasDSt(a, b)
+end # let
+
+# ╔═╡ e10bcac7-c108-47cd-a0bd-0a4fc56fb099
+md"
+---
+###### ISS (= Imperative Sequential Style)
+"
+
+# ╔═╡ d3bea764-66a0-4eb0-9397-aa92773eca9c
+function pythagorasISS(a, b)                 # ISS = imperative Sequential Style
+	let bSquare = *(b, b)
+		aSquare = *(a, a)
+		cSquare = +(bSquare, aSquare)
+		c 		= ^(cSquare, 1/2)
+		print("c = sqrt(a^2 + b^2) = $c")
+	end # let
+end # function pythagorasDSt
+
+# ╔═╡ 6adfb3b0-3068-4fed-8225-ac00bcf62562
+pythagorasISS(3, 4)
+
+# ╔═╡ 4522db16-b698-4c88-904d-68d1b72b8cb9
+md"
+---
+###### CPS (= Continuation Passing Style)
+"
+
+# ╔═╡ cc51bdcd-8516-449a-bc01-aa3a9a38be72
+md"
+---
+###### CPS-Operators
+
+"
+
+# ╔═╡ b5773470-4973-46c6-9158-b4d91ca819e1
+cpsMult(x, y, k) = k(*(x, y))
+
+# ╔═╡ 3f0ef839-fb6b-4419-9eca-fbe24146c2ac
+cpsAdd(x, y, k)  = k(+(x, y))
+
+# ╔═╡ 873b0fe2-0464-49c2-b133-6d1af7133176
+cpsExp(x, y, k)  = k(^(x, y))
+
+# ╔═╡ db2b912f-2acc-4f1f-bd9c-660944a7e7a7
+function pythagorasCPS(a, b, k)             # CPS = Continuation Passing Style
+	cpsMult(b, b, bSquare -> 
+		cpsMult(a, a, aSquare -> 
+			cpsAdd(bSquare, aSquare, cSquare -> 
+				cpsExp(cSquare, 1/2, k))))
+end # function pythagorasCPS
+
+# ╔═╡ 84d97955-fcdd-4d83-82ee-11a57ae17d86
+let a = 3
+	b = 4
+	k = c -> print("c = sqrt(a^2 + b^2) = $c")
+	c = pythagorasCPS(a, b, k)
+end # let
+
+# ╔═╡ 78c66843-3489-4ce0-b1c5-983cccb33bd2
+pythagorasCPS(3, 4, c -> print("c = sqrt(a^2 + b^2) = $c"))
+
+# ╔═╡ d6a9411b-d99b-4919-b10f-c0754ea418fd
+cpsMult(3, 4, xMultY -> print("x * y is $xMultY"))
+
+# ╔═╡ cc6fb0b2-085e-4658-a825-90434854b82a
+cpsAdd(3, 4, xAddY -> print("x + y is $xAddY"))
+
+# ╔═╡ c6112eb3-a3f7-4aa1-b6d7-53a43c7acc31
+cpsExp(3, 4, xExpY -> print("x^y is $xExpY"))
+
 # ╔═╡ 8ad1748f-45fc-4a08-9e52-bf854868f886
 md"
 ---
@@ -286,24 +401,13 @@ $$\int_0^1 (6-6x^5)dx= \int_0^16dx -6\int_0^1x^5 dx=\left[6x - \frac{6x^6}{6}\ri
 # ╔═╡ 91049a2d-baf0-4e9c-98de-c1c0fa7fddcf
 integral2(x->-6x^5+6, 0.0, 1.0, 1.0E-4) # should be 5.0
 
-# ╔═╡ a94d20b9-cb98-4d06-8b69-7a572f2fb2e2
-md"
----
-###### Nonterminating Lambda-Expression
-in Scheme this is 
-
-$((lambda (x))(x\; x))(lambda (x))(x\; x)))$
-"
-
-# ╔═╡ a1a9c584-4d05-498f-9451-7cd64fb0aef8
-(x -> x(x))(x -> x(x))  # ==> Stockoverflow ! -->  :)
-
 # ╔═╡ e52fd6bc-ad02-457e-917e-8b627e9f0ccf
 md"
 ---
 ##### References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
-- **Stark, P.A.**, Introduction to Numerical Methods, NY: Macmillan Company, 1970
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
+- **Stark, P.A.**, *Introduction to Numerical Methods*, NY: Macmillan Company, 1970
+- **Wikipedia**, [*Continuation Passing Style*](https://en.wikipedia.org/wiki/Continuation-passing_style) - last visit 2023/03/06 -
 
 "
 
@@ -314,7 +418,8 @@ md"
 
 ====================================================================================
 
-This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) **(CC BY-NC-SA 4.0)** license.
+Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
 
 ====================================================================================
 "
@@ -1293,6 +1398,27 @@ version = "1.4.1+0"
 # ╠═df9fb799-8a0b-4aa3-9d2e-c4cb4ffc7642
 # ╠═776a146d-970d-4278-b608-4907cbc751af
 # ╠═88b3c7e3-8633-4672-9177-079c7986f75a
+# ╟─a94d20b9-cb98-4d06-8b69-7a572f2fb2e2
+# ╠═bf1c5385-777b-4c41-a2a3-eb6a1719ce2a
+# ╟─d2142d45-5fa8-422b-b355-1c2fec670e95
+# ╟─173bc4f6-bb07-4634-ab40-2ec1409382b3
+# ╟─b9a2f4c9-622d-4197-a3c7-14e1094e0805
+# ╠═ec17018b-8127-43b7-a80c-1bbd4aa1db2e
+# ╠═0a432c52-cdaf-4493-b0d0-c7518648c28b
+# ╟─e10bcac7-c108-47cd-a0bd-0a4fc56fb099
+# ╠═d3bea764-66a0-4eb0-9397-aa92773eca9c
+# ╠═6adfb3b0-3068-4fed-8225-ac00bcf62562
+# ╟─4522db16-b698-4c88-904d-68d1b72b8cb9
+# ╠═db2b912f-2acc-4f1f-bd9c-660944a7e7a7
+# ╠═84d97955-fcdd-4d83-82ee-11a57ae17d86
+# ╠═78c66843-3489-4ce0-b1c5-983cccb33bd2
+# ╟─cc51bdcd-8516-449a-bc01-aa3a9a38be72
+# ╠═b5773470-4973-46c6-9158-b4d91ca819e1
+# ╠═3f0ef839-fb6b-4419-9eca-fbe24146c2ac
+# ╠═873b0fe2-0464-49c2-b133-6d1af7133176
+# ╠═d6a9411b-d99b-4919-b10f-c0754ea418fd
+# ╠═cc6fb0b2-085e-4658-a825-90434854b82a
+# ╠═c6112eb3-a3f7-4aa1-b6d7-53a43c7acc31
 # ╟─8ad1748f-45fc-4a08-9e52-bf854868f886
 # ╠═086f84cb-66ce-4ea6-b033-75a6fbe87872
 # ╠═20b620c7-490c-432b-8b3a-41b0bc474c9b
@@ -1306,8 +1432,6 @@ version = "1.4.1+0"
 # ╟─4b8c866f-1ad3-4a12-88da-2626c09e195b
 # ╟─7667a5b8-9fbb-472d-9681-f779c9d6e44f
 # ╠═91049a2d-baf0-4e9c-98de-c1c0fa7fddcf
-# ╟─a94d20b9-cb98-4d06-8b69-7a572f2fb2e2
-# ╠═a1a9c584-4d05-498f-9451-7cd64fb0aef8
 # ╟─e52fd6bc-ad02-457e-917e-8b627e9f0ccf
 # ╟─af9b25f7-394e-4a1a-b1fb-0e61f6f77d55
 # ╟─00000000-0000-0000-0000-000000000001
