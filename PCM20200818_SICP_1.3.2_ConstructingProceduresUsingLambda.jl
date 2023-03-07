@@ -14,14 +14,14 @@ md"
 
 ###### file: PCM20210818\_SICP\_1.3.2\_Constructing\_Procedures\_Using\_Lambda.jl 
 
-###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/06 ***
+###### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/07 ***
 =====================================================================================
 "
 
 # ╔═╡ 16364c42-9e12-42b1-9f9e-1bc254223560
 md"
 #### 1.3.2.1 SICP-SCHEME-like *functional* Julia ...
-###### ... with anonomous functions '->', 'function'
+###### ... with anonomous $\lambda$-function '$\mapsto$'
 "
 
 # ╔═╡ a8b9b6a8-63e8-4562-9f21-7fc4f0e8abab
@@ -242,12 +242,12 @@ end
 # ╔═╡ d2142d45-5fa8-422b-b355-1c2fec670e95
 md"
 ---
-###### CPS (= [Continuation Passing Style](https://en.wikipedia.org/wiki/Continuation-passing_style))
+##### CPS (= [Continuation Passing Style](https://en.wikipedia.org/wiki/Continuation-passing_style))
 "
 
 # ╔═╡ 173bc4f6-bb07-4634-ab40-2ec1409382b3
 md"
-###### Pythagoras
+###### Nonrecursive Example: *Pythagoras*
 
 $c = \sqrt{a^2+b^2} = (a^2 + b^2)^{1/2}$
 "
@@ -255,49 +255,70 @@ $c = \sqrt{a^2+b^2} = (a^2 + b^2)^{1/2}$
 # ╔═╡ b9a2f4c9-622d-4197-a3c7-14e1094e0805
 md"
 ---
-###### DSt (= Direct Style)
+######  Nonrecursive *Pythagoras*: DST (= Direct STyle)
 "
 
 # ╔═╡ ec17018b-8127-43b7-a80c-1bbd4aa1db2e
-function pythagorasDSt(a, b)                 # DSt = Direct Style
+function pythagorasDST(a, b)                 # DSt = Direct Style
 	^( +( *( a, a), *( b, b)), 1/2)
 end # function pythagorasDSt
 
 # ╔═╡ 0a432c52-cdaf-4493-b0d0-c7518648c28b
 let a = 3
 	b = 4
-	c = pythagorasDSt(a, b)
+	c = pythagorasDST(a, b)
 end # let
 
 # ╔═╡ e10bcac7-c108-47cd-a0bd-0a4fc56fb099
 md"
 ---
-###### ISS (= Imperative Sequential Style)
+###### Nonrecursive *Pythagoras*: ISS (= Imperative Sequential Style)
 "
 
 # ╔═╡ d3bea764-66a0-4eb0-9397-aa92773eca9c
-function pythagorasISS(a, b)                 # ISS = imperative Sequential Style
+function pythagorasISS(a, b)                 # ISS = Imperative Sequential Style
 	let bSquare = *(b, b)
-		aSquare = *(a, a)
-		cSquare = +(bSquare, aSquare)
-		c 		= ^(cSquare, 1/2)
-		print("c = sqrt(a^2 + b^2) = $c")
+		let aSquare = *(a, a)
+			let cSquare = +(bSquare, aSquare)
+				let c 		= ^(cSquare, 1/2)
+					print("c = sqrt(a^2 + b^2) = $c")
+				end # let
+			end # let
+		end # let
 	end # let
 end # function pythagorasDSt
 
 # ╔═╡ 6adfb3b0-3068-4fed-8225-ac00bcf62562
 pythagorasISS(3, 4)
 
+# ╔═╡ 31738651-bf1f-4e84-926e-ed3889388c53
+md"
+---
+###### Nonrecursive *Pythagoras*: NLS (= Nested Lambdas Style)
+"
+
+# ╔═╡ 88a21bf7-2a27-4eac-be6b-3576e776c325
+function pythagorasNLS(a, b)                 # NLS = Nested Lambdas Style
+	(bSquare -> 
+		(aSquare ->
+			(cSquare ->
+				(c -> 
+					print("c = sqrt(a^2 + b^2) = $c"))(^(cSquare, 1/2)))(+(bSquare, aSquare)))(*(a, a)))(*(b, b))
+end # function pythagorasNLS
+
+# ╔═╡ 51855c1b-6b2a-48b7-8fc7-12b659c2579a
+pythagorasNLS(3, 4)
+
 # ╔═╡ 4522db16-b698-4c88-904d-68d1b72b8cb9
 md"
 ---
-###### CPS (= Continuation Passing Style)
+###### Nonrecursive *Pythagoras*: CPS (= [Continuation Passing Style](https://en.wikipedia.org/wiki/Continuation-passing_style))
 "
 
 # ╔═╡ cc51bdcd-8516-449a-bc01-aa3a9a38be72
 md"
 ---
-###### CPS-Operators
+###### Basic CPS-Operators
 
 "
 
@@ -328,6 +349,18 @@ end # let
 # ╔═╡ 78c66843-3489-4ce0-b1c5-983cccb33bd2
 pythagorasCPS(3, 4, c -> print("c = sqrt(a^2 + b^2) = $c"))
 
+# ╔═╡ 967034e7-c08c-4803-ae6b-915ecd635e05
+cpsEq(x, y, k)   = k(==(x, y))
+
+# ╔═╡ 7369fea1-43ba-4bd9-9e94-627e6d53b37a
+cpsSub(x, y, k)  = k(-(x, y))
+
+# ╔═╡ 4ab641d8-d858-41fe-b450-1e7e496e3c1f
+md"
+---
+###### Application of CPS-Operators
+"
+
 # ╔═╡ d6a9411b-d99b-4919-b10f-c0754ea418fd
 cpsMult(3, 4, xMultY -> print("x * y is $xMultY"))
 
@@ -336,6 +369,106 @@ cpsAdd(3, 4, xAddY -> print("x + y is $xAddY"))
 
 # ╔═╡ c6112eb3-a3f7-4aa1-b6d7-53a43c7acc31
 cpsExp(3, 4, xExpY -> print("x^y is $xExpY"))
+
+# ╔═╡ 40a81edd-2d13-4497-817b-6aa6957c46ee
+cpsEq(1, 1, xEqY -> print("x == y is $xEqY"))
+
+# ╔═╡ 6d5c8a37-52fb-46b0-ace5-52e90eb1f57a
+cpsEq(1, 2, xEqY -> print("x == y is $xEqY"))
+
+# ╔═╡ 3c87c5dd-1950-4f2a-a5fd-ebd411dc6b16
+cpsSub(1, 2, xSubY -> print("x == y is $xSubY"))
+
+# ╔═╡ 7d1bb137-2268-4106-8370-99364a9aac73
+md"
+---
+###### Recursive Example: *Factorial*
+
+$n! = \begin{cases}
+n=0,  & n! \mapsto 1 \\
+n>0,  & n! \mapsto n \cdot (n-1)!
+\end{cases}$
+"
+
+# ╔═╡ d0f09fde-9393-4a44-b77b-0acec6abe5ec
+md"
+---
+######  Recursive *Factorial*: DSt (= Direct Style)
+"
+
+# ╔═╡ d0af37d0-e19e-4e17-9031-2c101b94a2ad
+function factorialDST(n)
+	if ==(n, 0)
+		1
+	else 
+		*(n, factorialDST(-(n, 1)))
+	end # if
+end # function factorialDST
+
+# ╔═╡ 8bc0318c-e7ad-4a4b-853b-a2989bef2dd1
+factorialDST(5)
+
+# ╔═╡ a6f8c0cb-4a15-407a-982b-1441a05bbb20
+md"
+---
+###### Recursive *Factorial*: ISS (= Imperative Sequential Style)
+"
+
+# ╔═╡ c9a11787-6c5c-435a-9d6b-9a327f94e759
+function factorialISS(n)
+	let boolean = ==(n, 0)
+		if boolean
+			1
+		else
+			let nSub1 = -(n, 1)
+				let facValNSub1 = factorialISS(nSub1)
+					*(n, facValNSub1)
+				end # let
+			end # let
+		end # if
+	end # let
+end # function factorialCPS
+
+# ╔═╡ b47bae88-d165-4f7d-af20-f9aeaea4b84c
+factorialISS(0)
+
+# ╔═╡ 619c2643-45e9-41c6-9b55-c5bd684c414b
+factorialISS(1)
+
+# ╔═╡ ce3fc23b-43ac-44df-8a33-d504ba34d8d4
+factorialISS(5)
+
+# ╔═╡ 1bb17920-604e-4b94-b1bd-5c9cbb50578a
+
+
+# ╔═╡ 04e5450b-da29-4aae-aeda-35d4d600a6e3
+md"
+---
+######  Recursive *Factorial*: CPS (= [Continuation Passing Style](https://en.wikipedia.org/wiki/Continuation-passing_style))
+"
+
+# ╔═╡ 5d1b4cfb-9de7-4d14-aa58-37b44cff9dd8
+function factorialCPS(n, k)
+	cpsEq(n, 0, boolean -> 
+					if boolean
+						k(1) 
+					else
+						cpsSub(n, 1, nSub1 ->
+									factorialCPS(nSub1, 
+													facValNSub1 ->
+																	cpsMult(n, facValNSub1, k)))
+					end # if
+	) # end cpsEq
+end # function factorialCPS
+
+# ╔═╡ bee9e495-f3a8-4f2d-ab4c-a7b86d681982
+factorialCPS(0, result -> result)
+
+# ╔═╡ b805c8f6-a5fc-48ac-afa1-25e7b48f70b9
+factorialCPS(1, value -> value)
+
+# ╔═╡ 52245755-cb2c-4ade-817c-b45d686acafe
+factorialCPS(5, value -> value)
 
 # ╔═╡ 8ad1748f-45fc-4a08-9e52-bf854868f886
 md"
@@ -407,7 +540,7 @@ md"
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
 - **Stark, P.A.**, *Introduction to Numerical Methods*, NY: Macmillan Company, 1970
-- **Wikipedia**, [*Continuation Passing Style*](https://en.wikipedia.org/wiki/Continuation-passing_style) - last visit 2023/03/06 -
+- **Wikipedia**, [*Continuation Passing Style*](https://en.wikipedia.org/wiki/Continuation-passing_style) - last visit 2023/03/07 -
 
 "
 
@@ -1408,6 +1541,9 @@ version = "1.4.1+0"
 # ╟─e10bcac7-c108-47cd-a0bd-0a4fc56fb099
 # ╠═d3bea764-66a0-4eb0-9397-aa92773eca9c
 # ╠═6adfb3b0-3068-4fed-8225-ac00bcf62562
+# ╟─31738651-bf1f-4e84-926e-ed3889388c53
+# ╠═88a21bf7-2a27-4eac-be6b-3576e776c325
+# ╠═51855c1b-6b2a-48b7-8fc7-12b659c2579a
 # ╟─4522db16-b698-4c88-904d-68d1b72b8cb9
 # ╠═db2b912f-2acc-4f1f-bd9c-660944a7e7a7
 # ╠═84d97955-fcdd-4d83-82ee-11a57ae17d86
@@ -1416,9 +1552,30 @@ version = "1.4.1+0"
 # ╠═b5773470-4973-46c6-9158-b4d91ca819e1
 # ╠═3f0ef839-fb6b-4419-9eca-fbe24146c2ac
 # ╠═873b0fe2-0464-49c2-b133-6d1af7133176
+# ╠═967034e7-c08c-4803-ae6b-915ecd635e05
+# ╠═7369fea1-43ba-4bd9-9e94-627e6d53b37a
+# ╟─4ab641d8-d858-41fe-b450-1e7e496e3c1f
 # ╠═d6a9411b-d99b-4919-b10f-c0754ea418fd
 # ╠═cc6fb0b2-085e-4658-a825-90434854b82a
 # ╠═c6112eb3-a3f7-4aa1-b6d7-53a43c7acc31
+# ╠═40a81edd-2d13-4497-817b-6aa6957c46ee
+# ╠═6d5c8a37-52fb-46b0-ace5-52e90eb1f57a
+# ╠═3c87c5dd-1950-4f2a-a5fd-ebd411dc6b16
+# ╟─7d1bb137-2268-4106-8370-99364a9aac73
+# ╟─d0f09fde-9393-4a44-b77b-0acec6abe5ec
+# ╠═d0af37d0-e19e-4e17-9031-2c101b94a2ad
+# ╠═8bc0318c-e7ad-4a4b-853b-a2989bef2dd1
+# ╟─a6f8c0cb-4a15-407a-982b-1441a05bbb20
+# ╠═c9a11787-6c5c-435a-9d6b-9a327f94e759
+# ╠═b47bae88-d165-4f7d-af20-f9aeaea4b84c
+# ╠═619c2643-45e9-41c6-9b55-c5bd684c414b
+# ╠═ce3fc23b-43ac-44df-8a33-d504ba34d8d4
+# ╠═1bb17920-604e-4b94-b1bd-5c9cbb50578a
+# ╟─04e5450b-da29-4aae-aeda-35d4d600a6e3
+# ╠═5d1b4cfb-9de7-4d14-aa58-37b44cff9dd8
+# ╠═bee9e495-f3a8-4f2d-ab4c-a7b86d681982
+# ╠═b805c8f6-a5fc-48ac-afa1-25e7b48f70b9
+# ╠═52245755-cb2c-4ade-817c-b45d686acafe
 # ╟─8ad1748f-45fc-4a08-9e52-bf854868f886
 # ╠═086f84cb-66ce-4ea6-b033-75a6fbe87872
 # ╠═20b620c7-490c-432b-8b3a-41b0bc474c9b
