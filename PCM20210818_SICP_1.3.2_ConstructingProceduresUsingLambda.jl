@@ -12,7 +12,7 @@ md"
 =====================================================================================
 #### SICP: 1.3.2 Constructing Procedures Using Lambda
 ##### file: PCM20210818\_SICP\_1.3.2\_ConstructingProceduresUsingLambda.jl
-##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/09 ***
+##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/03/10 ***
 
 =====================================================================================
 "
@@ -374,7 +374,7 @@ pythagorasNLS(3, 4)
 # ╔═╡ 02dc74fa-d530-490e-ae86-b63da5466392
 md"
 ---
-###### CPS (= Continuation Passing Style)
+##### CPS (= Continuation Passing Style)
 "
 
 # ╔═╡ c8c956c6-0b86-4d97-9840-4252ae571523
@@ -395,7 +395,7 @@ end # let
 # ╔═╡ e03464fb-cfbe-402a-a6fc-1fa764fd20a3
 md"
 ---
-###### Recursive Example: Factorial
+##### Linear Recursive Example: Factorial
 "
 
 # ╔═╡ 3e7759d5-bbb1-473d-a775-5fcd406ad9b6
@@ -455,7 +455,7 @@ factorialISS(5)
 # ╔═╡ ebbcabe4-3ca7-456e-82e5-f93f816ecba2
 md"
 ---
-###### CPS (= Continuation Passing Style)
+###### CPS-(= Continuation Passing)-Style
 
 ###### $factorialCPS1$ is a mixture of *DST* and *CPS*-Style:
 The condition $if...then...else$ in $factorialCPS1$ is a relict of direct-style coding. This relict has to be removed to get a pure CPS-styled . This has been achieved in $factorialCPS2$. 
@@ -556,6 +556,126 @@ factorialCPS2(5, result -> result)
 # ╔═╡ a1910a28-207f-49dc-925e-9c61c1939304
 factorialCPS2(6, result -> result)
 
+# ╔═╡ c2c2b482-64ac-4306-94e2-1e79c82d9ac9
+md"
+---
+##### Linear Iterative Example: Tail-Recursive Factorial
+"
+
+# ╔═╡ 6e2d6f64-b00b-4c4b-8408-215c5d58628c
+md"
+$n!=
+\begin{cases}
+product, & \text{ if } n \lt counter \\
+iter(product, counter) ;= iter(counter * product, counter + 1), & \text{ if } n \ge counter \\
+\end{cases}$
+"
+
+# ╔═╡ 42da07de-5508-4757-8ced-39cb8e67950a
+md"
+---
+###### DST (=*Direct* STyle)
+"
+
+# ╔═╡ 48799cb6-d61c-4eda-aa29-c1e93c8a0302
+function factorial2DST(n)
+	function iter(product, counter)
+		if counter == 0
+			product
+		else
+			iter( product * counter, counter - 1)
+		end # if
+	end # function iter
+	iter(1, n)
+end # function factorial2DST
+
+# ╔═╡ 2113e9c5-c003-4980-a8bd-6af6b5ee37ed
+factorial2DST(0)
+
+# ╔═╡ 7c87a7c4-7451-4bdd-a73e-6cf7c0184a9d
+factorial2DST(1)
+
+# ╔═╡ e93267e3-da0b-4794-9d28-3f56d0524a57
+factorial2DST(5)
+
+# ╔═╡ 78353412-675f-424d-a476-85fd38ad4cf8
+factorial2DST(6)
+
+# ╔═╡ 7e622eec-37ac-43e9-9483-fc114fed1d9b
+md"
+---
+###### CPS-(= Continuation Passing)-Style
+
+###### $factorial2CPS1$ is a mixture of *DST* and *CPS*-Style:
+The condition $if...then...else$ in $factorial2CPS1$ is a relict of direct-style coding. This relict has to be removed to get a pure CPS-styled . This has been achieved in $factorial2CPS2$. 
+"
+
+# ╔═╡ 97eeed7e-34c2-40a4-bfae-bbb3c4f53638
+function factorial2CPS1(n, k)
+	function iter(product, counter, k)
+		cpsEq(counter, 0, isCounterZero -> 
+					if isCounterZero
+						k(product)       # unmodified continuation
+					else 
+						cpsSub(counter, 1, counterSub1 -> 
+								cpsMult(counter, product, countMultProd -> 					iter(countMultProd, counterSub1, k)))
+					end # if
+		)
+	end # function iter
+	iter(1, n, k)
+end # function factorial2CPS1
+
+# ╔═╡ 964dcb14-0373-4a15-a677-0e7cc683bf12
+factorial2CPS1(0, result -> result)
+
+# ╔═╡ 8ec93546-22c3-4cfa-933c-ffebec8917b4
+factorial2CPS1(1, result -> result)
+
+# ╔═╡ 319a46c2-f17b-4cb9-a581-48d33008e0d2
+factorial2CPS1(5, result -> result)
+
+# ╔═╡ 8ab5f711-7610-4d81-bb7a-fa218c0d9922
+factorial2CPS1(6, result -> result)
+
+# ╔═╡ c8a0352a-21b0-49e2-a0c6-857b06bcdf81
+md"
+---
+###### $factorial2CPS2$ is a *pure* CPS-styled Recursive Factorial
+The condition $if...then...else$ has been replaced by the function $cpsIfThenElse$ with Two Continuations
+
+$trueContinuation$
+and
+
+$falseContinuation.$
+
+"
+
+# ╔═╡ ae12f10b-623d-49f2-bfeb-c7e646db832f
+function factorial2CPS2(n, k)
+	function iter(product, counter, k)
+		cpsEq(counter, 0, isCounterZero -> 
+			cpsIfThenElse(product, counter, isCounterZero, 
+				product ->                               # true continuation
+					k(product),                   
+				counter ->                               # false continuation
+					cpsSub(counter, 1, counterSub1 ->    
+								cpsMult(counter, product, countMultProd -> 						iter(countMultProd, counterSub1, k)))))
+	end # function iter
+	iter(1, n, k)
+end # function factorial2CPS2
+
+# ╔═╡ dd3a3675-b32c-4f1c-ae82-16109218f6c1
+factorial2CPS2(0, result -> result)
+
+# ╔═╡ 80653648-c27a-455e-b736-3f1e5bd80b15
+factorial2CPS2(1, result -> result)
+
+# ╔═╡ c8cc03ec-ce99-479f-bc1c-0eaecccf1a8a
+factorial2CPS2(5, result -> result)
+
+# ╔═╡ 972d5841-5c9f-4f82-b921-0061411eb8d0
+factorial2CPS2(6, result -> result)
+
 # ╔═╡ 5f25a438-fadf-4e9c-8234-7d668e797298
 md"
 ---
@@ -645,7 +765,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "39d0d5866236472d6bc1a58c4e663ea8a2a2e057"
+project_hash = "d11d4fb0fd731734dc1c2ca399347ea5b41edbd7"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -1574,7 +1694,7 @@ version = "1.4.1+0"
 # ╠═a3e85937-1fd7-411b-b620-16ceb8d051af
 # ╠═313274ed-fb9b-48c5-8bee-a3db4df8d297
 # ╠═cb99f6fd-bb69-4e98-b379-48069e778f70
-# ╠═bb7e8e2f-94cf-4713-b36c-92e7816b6a34
+# ╟─bb7e8e2f-94cf-4713-b36c-92e7816b6a34
 # ╠═704e5679-36d6-43cf-9d5b-253d93aa29e2
 # ╠═e883c51e-1c3f-4d40-a13f-9af39d5e08e9
 # ╠═1ae10bc5-b8eb-41d0-89c7-d80c9cc598e8
@@ -1666,6 +1786,26 @@ version = "1.4.1+0"
 # ╠═4a912f72-0bd3-4678-819e-0ca3f34e7e59
 # ╠═83e548b4-7f37-46bc-9ab4-e935ce201e16
 # ╠═a1910a28-207f-49dc-925e-9c61c1939304
+# ╟─c2c2b482-64ac-4306-94e2-1e79c82d9ac9
+# ╟─6e2d6f64-b00b-4c4b-8408-215c5d58628c
+# ╟─42da07de-5508-4757-8ced-39cb8e67950a
+# ╠═48799cb6-d61c-4eda-aa29-c1e93c8a0302
+# ╠═2113e9c5-c003-4980-a8bd-6af6b5ee37ed
+# ╠═7c87a7c4-7451-4bdd-a73e-6cf7c0184a9d
+# ╠═e93267e3-da0b-4794-9d28-3f56d0524a57
+# ╠═78353412-675f-424d-a476-85fd38ad4cf8
+# ╟─7e622eec-37ac-43e9-9483-fc114fed1d9b
+# ╠═97eeed7e-34c2-40a4-bfae-bbb3c4f53638
+# ╠═964dcb14-0373-4a15-a677-0e7cc683bf12
+# ╠═8ec93546-22c3-4cfa-933c-ffebec8917b4
+# ╠═319a46c2-f17b-4cb9-a581-48d33008e0d2
+# ╠═8ab5f711-7610-4d81-bb7a-fa218c0d9922
+# ╟─c8a0352a-21b0-49e2-a0c6-857b06bcdf81
+# ╠═ae12f10b-623d-49f2-bfeb-c7e646db832f
+# ╠═dd3a3675-b32c-4f1c-ae82-16109218f6c1
+# ╠═80653648-c27a-455e-b736-3f1e5bd80b15
+# ╠═c8cc03ec-ce99-479f-bc1c-0eaecccf1a8a
+# ╠═972d5841-5c9f-4f82-b921-0061411eb8d0
 # ╟─5f25a438-fadf-4e9c-8234-7d668e797298
 # ╠═f179f2cd-bb71-49ca-a3a4-c3ee48ef28c3
 # ╠═13138a8d-f944-4941-9372-57c7cb5ae76d
