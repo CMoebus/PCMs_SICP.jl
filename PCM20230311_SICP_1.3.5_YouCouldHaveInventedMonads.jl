@@ -171,13 +171,41 @@ md"""
 
 """
 
+# ╔═╡ 461ce343-1a37-4242-b0aa-6959c299f2f4
+md"
+---
+###### Composition of *impure* functions, the Julian way with a *2-ary* $compose$
+"
+
+# ╔═╡ 94882499-3216-4a4c-80cd-fc4b6323238b
+let                                 
+	x = 3
+	++ = string   
+	#-----------------------------------------------
+	fQM(x::Real)::Tuple{Real, String} = 
+		let f(x::Real)::Real = x*2
+			(f(x), "1st, f was called with $x ++ ")
+		end # let
+	#-----------------------------------------------
+	gQM(x::Real)::Tuple{Real, String} = 
+		let g(x::Real)::Real = x*3
+			(g(x), "2nd, g was called with $x")
+		end # let
+	#-----------------------------------------------
+	function compose(gQM::Function, (y, s)::Tuple{Real, String})::Tuple{Real, String}
+		(z, t) = gQM(y)
+		(z, ts) = (z, ++(s, t))
+		(z, ts)
+	end # function compose
+	compose(gQM, fQM(3))
+end # let
+
 # ╔═╡ b375110f-3848-4e86-9eea-c8123a031936
 md"
 ---
-###### Composition of *impure* functions with $bind$-function
+###### Composition of *impure* functions, the Julian way with a *curryfied*  *1-ary* $bind$
+*bind* is a *curryfied* version of the *2-ary* function *compose*
 (close to Sigfe's *Haskell* proposal) 
-
-Sigfe proposes a Haskell-function $bind$ to manipulate *f'* and *g'* so that they can be composed:
 
 The *Haskell* declaration of $bind$ is:
 
@@ -199,27 +227,28 @@ Our proposal for $bind$ in Jula is below. Because in Haskell all functions are *
 
 "
 
-# ╔═╡ b9242e2d-51a2-4ee4-97d7-3e1e29ac9a38
-let
+# ╔═╡ bce7b530-774c-4ed2-a732-7017d522499a
+let                                 
 	x = 3
-	#------------------------------------------------------------------------------
-	++ = string                       # local definition of Haskell-like '++'
-	function bind(gQM::Function)::Function
-		valueOf_fQM::Tuple{Real, String} -> 			
-				let (fx, fs) = valueOf_fQM::Tuple{Real, String}
-					(gx, gs) = gQM(fx)::Tuple{Real, String}
-					(gx, ++(fs, gs))::Tuple{Real, String}
-				end # let
+	++ = string   
+	#-----------------------------------------------
+	fQM(x::Real)::Tuple{Real, String} = 
+		let f(x::Real)::Real = x*2
+			(f(x), "1st, f was called with $x ++ ")
+		end # let
+	#-----------------------------------------------
+	gQM(x::Real)::Tuple{Real, String} = 
+		let g(x::Real)::Real = x*3
+			(g(x), "2nd, g was called with $x")
+		end # let
+	#-----------------------------------------------
+	function bind(gQM::Function)::Function          # bind := curryfied compose !
+		(fx, fs)::Tuple{Real, String} ->            # (y, s) = fQM(3)
+			let (gx, gs) = gQM(fx)::Tuple{Real, String}
+				(gx, ++(fs, gs))::Tuple{Real, String}
+			end # let
 	end # function bind
-	#------------------------------------------------------------------------------
-	f(x::Real)::Real = x*2
-	g(x::Real)::Real = x*3
-	fQM(x::Real)::Tuple{Real, String} = (f(x), "1st, f was called with $x ++ ")
-	gQM(x::Real)::Tuple{Real, String} = (g(x), "2nd, g was called with $x")
-	# fQM(3)                       # ==> (6, "1st, f was called with 3 ++ ")
-	# fQM(3)[1]                    # ==> 6  
-    # gQM(fQM(3)[1])               # ==> (18, "2nd, g was called with 6")
-	# typeof(bind(gQM)(fQM(3)))    # ==> Tuple{Int, String}
+	#-----------------------------------------------
 	bind(gQM)(fQM(3))::Tuple{Real, String}
 end # let
 
@@ -232,7 +261,10 @@ md"""
 
 # ╔═╡ 9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 md"
-What is a resumee of the effect of $bind$ ? *Given a pair of debuggable functions, f' and g', we can now compose them together to make a new debuggable function bind f' . g'. Write this composition as f'*g'. Even though the output of g' is incompatible with the input of f' we still have a nice easy way to concatenate their operations. And this suggests another question: is there an 'identity' debuggable function.*(Sigfe, 2006)
+What is a resumee of the effect of $bind$ ? *Given a pair of debuggable functions,
+$f'$ and $g'$, we can now compose them together to make a new debuggable function
+bind $f' . g'$. Write this composition as $f'\cdot g'$. Even though the output of $g'$ is incompatible with the input of $f'$ we still have a nice easy way to concatenate their operations.*(Sigfe, 2006) 
+
 "
 
 # ╔═╡ 1fb51d85-8dff-40c3-8f51-158516255409
@@ -288,11 +320,13 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─9f239124-aae1-42be-af16-044d7e11e746
 # ╠═880c2599-0f86-41c0-b496-1635e1264e4a
 # ╟─f5b7cf8e-3127-4253-9ebb-62f7ae8fbc65
-# ╟─1ffaf5f9-5a1d-4a32-a259-31d43767c636
+# ╠═1ffaf5f9-5a1d-4a32-a259-31d43767c636
 # ╠═43a6ddf5-60ad-4fab-a3d3-a7a2e7bdafd4
 # ╟─f0f8e521-0fc5-496c-a53d-7a623dd24d21
+# ╟─461ce343-1a37-4242-b0aa-6959c299f2f4
+# ╠═94882499-3216-4a4c-80cd-fc4b6323238b
 # ╟─b375110f-3848-4e86-9eea-c8123a031936
-# ╠═b9242e2d-51a2-4ee4-97d7-3e1e29ac9a38
+# ╠═bce7b530-774c-4ed2-a732-7017d522499a
 # ╟─0d86a503-7060-4028-9e6a-fbe9b16a5bae
 # ╟─9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 # ╟─1fb51d85-8dff-40c3-8f51-158516255409
