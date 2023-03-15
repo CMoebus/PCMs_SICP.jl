@@ -9,7 +9,7 @@ md"
 =================================================================================
 ### NonSICP: 1.3.5 [You Could have Invented Monads !](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html)
 ##### file: PCM20230311\_SICP\_1.3.5\_YouCouldHaveInventedMonads.jl
-##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/14 ***
+##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/15 ***
 
 =================================================================================
 "
@@ -259,6 +259,61 @@ md"""
 ---
 """
 
+# ╔═╡ 87dc553a-86d4-425b-8ec8-cdd911b79e0b
+md"
+---
+###### Composition alternatives of *impure* functions with a *curryfied*  *1-ary* $bind$
+(this is an *extension* to Segfe's $bind$)
+
+"
+
+# ╔═╡ 31643b02-de5a-411a-af7c-a3e47123df4f
+let
+	 #------------------------------------------------------------------
+     x = 3
+     ++ = string
+     #------------------------------------------------------------------
+     fQM(x::Real)::Tuple{Real, String} =
+         let f(x::Real)::Real = x*2
+             (f(x), "1st, f was called with $x ++ ")
+         end # let
+     #------------------------------------------------------------------
+     gQM(x::Real)::Tuple{Real, String} =
+         let g(x::Real)::Real = x*3
+             (g(x), "2nd, g was called with $x")
+         end # let
+     #------------------------------------------------------------------
+	 # bind := curryfied compose !
+     function bind(gQM::Function)::Function  
+         fQM::Function ->
+             x::Real ->
+                 let (fx, fs) = fQM(x)::Tuple{Real, String}
+                     (gx, gs) = gQM(fx)::Tuple{Real, String}
+                     (gx, ++(fs, gs))::Tuple{Real, String}
+                 end # let
+     end # function bind
+     #------------------------------------------------------------------
+     # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
+     compose(g, f, x) = bind(g)(f)(x)
+     compose(gQM, fQM, x)
+     #------------------------------------------------------------------    		 	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
+     compose(g, f)    = bind(g)(f) 
+     compose(gQM, fQM)(x)
+     #------------------------------------------------------------------
+	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
+     compose(g)        = bind(g)
+     compose(gQM)(fQM)(x)
+     #------------------------------------------------------------------
+end # let
+
+
+# ╔═╡ 07e7e133-7076-47b9-a9ba-1db8305a6025
+md"""
+==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
+
+---
+"""
+
 # ╔═╡ 9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 md"
 What is a resumee of the effect of $bind$ ? *Given a pair of debuggable functions,
@@ -320,7 +375,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─9f239124-aae1-42be-af16-044d7e11e746
 # ╠═880c2599-0f86-41c0-b496-1635e1264e4a
 # ╟─f5b7cf8e-3127-4253-9ebb-62f7ae8fbc65
-# ╠═1ffaf5f9-5a1d-4a32-a259-31d43767c636
+# ╟─1ffaf5f9-5a1d-4a32-a259-31d43767c636
 # ╠═43a6ddf5-60ad-4fab-a3d3-a7a2e7bdafd4
 # ╟─f0f8e521-0fc5-496c-a53d-7a623dd24d21
 # ╟─461ce343-1a37-4242-b0aa-6959c299f2f4
@@ -328,6 +383,9 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─b375110f-3848-4e86-9eea-c8123a031936
 # ╠═bce7b530-774c-4ed2-a732-7017d522499a
 # ╟─0d86a503-7060-4028-9e6a-fbe9b16a5bae
+# ╟─87dc553a-86d4-425b-8ec8-cdd911b79e0b
+# ╠═31643b02-de5a-411a-af7c-a3e47123df4f
+# ╟─07e7e133-7076-47b9-a9ba-1db8305a6025
 # ╟─9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 # ╟─1fb51d85-8dff-40c3-8f51-158516255409
 # ╟─8826d494-fa7d-4882-be93-7d5069d245b3
