@@ -7,9 +7,9 @@ using InteractiveUtils
 # ╔═╡ ecfab450-c03b-11ed-2757-47f8cc23856a
 md"
 =================================================================================
-### NonSICP: 1.3.5 [You Could have Invented Monads !](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html)
+### NonSICP: 1.3.5 [You Could have Invented Monads ?!](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html)
 ##### file: PCM20230311\_SICP\_1.3.5\_YouCouldHaveInventedMonads.jl
-##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/15 ***
+##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/18 ***
 
 =================================================================================
 "
@@ -51,18 +51,15 @@ let
 	gf1(3), gf2(3), gf3(3)
 end # let
 
-# ╔═╡ 6deab13f-f9bd-4bde-be94-f78b8df1ce58
+# ╔═╡ 128e9c6d-8710-49ad-9739-c09805a2ea39
 md"
 ---
-##### 2. Introduction of side *effects* (='*debuggable*') to make functions *impure*
-
-###### Haskell : $f',g' :: Float \rightarrow (Float, String)$
-###### Julia   : $fQM, gQM : Real \rightarrow (Real, String)$
+##### 2. Introduction of *side effects* to make functions *impure*
+Sigfe calls *impure* functions in his example '*debuggable*'.
 "
 
 # ╔═╡ c1aa3a0b-2bbd-449d-adfd-3d22e1251aeb
 md"
----
 
                         x
                         |
@@ -78,10 +75,18 @@ md"
 **Fig. 1.3.5.1** Dataflow-diagram of *debuggable* function (adapted from [Sigfe](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html), 2023)
 "
 
+# ╔═╡ 6deab13f-f9bd-4bde-be94-f78b8df1ce58
+md"
+
+###### Haskell : $f',g' :: Float \rightarrow (Float, String)$
+To be precise *String* is in Haskell a *list* of *characters*
+###### Julia   : $fQM, gQM : Real \rightarrow (Real, String)$
+"
+
 # ╔═╡ 9f239124-aae1-42be-af16-044d7e11e746
 md"
 ---
-###### Simple function composition doesn't work with *impure* functions: 
+###### *Simple* function composition doesn't work with *impure* functions: 
 
 $gQM(fQM(3)) \mapsto \bot$
 "
@@ -99,131 +104,136 @@ end # let
 # ╔═╡ f5b7cf8e-3127-4253-9ebb-62f7ae8fbc65
 md"
 ---
-###### Composition of *impure* (=debuggable) functions 
+##### Elaborated composition of *impure* functions 
+Sigfe proposes a *handcoded* solution for function composition of *impure* functions. In his example the *impure* function is called *'debuggable'*.
+ 
+###### Dataflow Diagram of composition of *impure* functions
+(adapted from [Sigfe](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html), 2023)
 
-###### Haskell:
-(Sigfe's (slightly) *modified* Haskell [proposal](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html))
-
-       let (y,s) = f' x
-           (z,t) = g' y in (z,t++s)
-
-###### Julia (Dataflow Diagram and Code):
-
-                             x
-                             |
-                             |
-                          +-----+
-                          | fQM |    fQM = f-Quotation-Mark = f'
-                          +-----+
-					       /  \
-                        /       \ 
-                      /           \
-              (y, s) = (f(x), '1st, f was called')
-                    /                \
-                  /                    \
-               +-----+                   \
-               | gQM |                     \  
-               +-----+                       \
-				  |  \                         \
-                  |    \                         \
-                  |      \                        |
-        (z, t) = (g(f(x)), '2nd, g was called')   |
-                  |         \                     |
-                  |           \                  /
-                  |             \              /
-                  |               \          /
-                  |                 \      /
-                  |                   \  /
-                  |                 +------+
-                  |                 |  ++  |
-                  |                 +------+
-                  |                    |
-                  |                    |
+                                        x
+                                        |
+                                        |
+                                     +-----+
+                                     | fQM |    fQM (=f-Quotation-Mark) = f'
+                                     +-----+
+					                   / \
+                                     /     \ 
+                                   /         \
+                                 /             \
+                       (y, s) ==> (f(x),   '1st, f was called')
+                              /                    \
+                            /                        \
+                          /                            \
+                       +-----+                           \
+                       | gQM |                             \   
+                       +-----+                              |
+				         / \                                /  
+                       /     \                            /
+                     /         \                        / 
+                   /             \                    /
+       (z, t) ==> (g(f(x)),  '2nd, g was called')   /
+                  |                 \             /
+                  |                   \         /
+                  |                     \     /
+                  |                       \ /
+                  |                    +------+
+                  |                    |  ++  |
+                  |                    +------+
+                  |                       |
+                  |                       |
+                  |                       |
         (z, t++s) = (g(f(x)), '1st, f was called ++ 2nd,  gwas called')
 
-**Fig. 1.3.5.2** Dataflow-diagram of *composing* impure (debuggable) functions (adapted from [Sigfe](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html), 2023)
+
+**Fig. 1.3.5.2** Dataflow-diagram of composing *impure* ('*debuggable*') functions 
+
 "
 
 # ╔═╡ 1ffaf5f9-5a1d-4a32-a259-31d43767c636
 md"
 ---
-###### Composition of *impure* functions 
-(close to Sigfe's *Haskell* proposal) 
+###### *Handcoded* composition of *impure* functions in Haskell:
+We have Sigfe's Haskell [example](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html) slightly modified by renaming functions and local variables.
+
+       let (fx, fs) = f' x
+           (gfx, gs) = g' fx in (gfx, fs ++ gs)
+
+###### *Handcoded* composition of *impure* functions in Julia
+(code close to Sigfe's Haskell proposal) 
 "
 
 # ╔═╡ 43a6ddf5-60ad-4fab-a3d3-a7a2e7bdafd4
-let                                   # f and g are reversed to relation to Sigfe
+let                              
 	x = 3
-	++ = string                       # local definition of Haskell-like '++'
+	++ = string                   # local definition of Haskell-like '++'
 	f(x::Real)::Real = x*2
 	g(x::Real)::Real = x*3
-	fQM(x::Real)::Tuple{Real, String} = (f(x), "1st, f was called with $x ++ ")
+	fQM(x::Real)::Tuple{Real, String} = (f(x), "1st, f was called with $x")
 	gQM(x::Real)::Tuple{Real, String} = (g(x), "2nd, g was called with $x")
-	(y, s) = fQM(x)
-	(z, t) = gQM(y)
-	(z, ts) = (z, ++(s, t))
-	(y, s), (z, t), (z, ts)
+	(fx, fs) = fQM(x)::Tuple{Real, String}
+	(gfx, gs) = gQM(fx)::Tuple{Real, String}
+	(gfx, gfs) = (gfx, ++(gs, " ++ ", fs))::Tuple{Real, String}
+	(fx, fs), (gfx, gs), (gfx, gfs)::Tuple{Real, String}
 end # let
 
 # ╔═╡ f0f8e521-0fc5-496c-a53d-7a623dd24d21
 md"""
-==> *((6, "1st, f was called with 3 ++ "), (18, "2nd, g was called with 6"), (18, "1st, f was called with 3 ++ 2nd, g was called with 6"))*
+$(fx, fs), (gfx, gs), (gfx, gfs) \Rightarrow$ 
+=> *(6, "1st, f was called with 3"), (18, "2nd, g was called with 6"), (18, "2nd, g was called with 6 ++ 1st, f was called with 3"))*
 
 """
 
-# ╔═╡ 461ce343-1a37-4242-b0aa-6959c299f2f4
+# ╔═╡ 2e356840-cf1f-4014-9336-29bc28afd5c3
 md"
 ---
-###### Composition of *impure* functions, the Julian way with a *2-ary* $compose$
+##### *Mechanization* the composition of *impure* functions
+
+Sigfe wants to mechanize the composition of *impure* functions. To this end the 2nd function $g'$ (or our $gQM$) has to be *plumbed* from a *1-ary* $g'$ (or our $gQM$) to a *2-ary* $g''$ (or our $gQQM$) function so that is composable like in gQQM(fQM)(x). The signatures *before* and *after* plumbing are:
+
+*before* plumbing:
+
+$\text{Haskell: } g':: Float \rightarrow (Float, String)$
+
+$\text{Julia: } gQM :: Real \rightarrow (Real, String)$
+
+*after* plumbing:
+
+$\text{Haskell: } g'':: (Float, String) \rightarrow (Float, String)$
+
+$\text{Julia: } gQQM :: (Real, String) \rightarrow (Real, String)$
+
+Plumbing of the *2nd* function should be made by a *higher-order* function $bind$ so that the result is a modified function $g''$ with the signature
+
+$(bind\; g') \Rightarrow g'' :: (Float,String) \rightarrow (Float,String)$
+
+This implies a signature for $bind$:
+
+$bind :: typeof(g') \rightarrow typeof(g'')$ 
+
+and substituting signatures for $typeof(g')$ and $typeof(g'')$
+
+$bind :: (Float -> (Float,String)) \rightarrow ((Float,String) \rightarrow (Float,String))$
+
+*bind*'s purpose is twofold: *it must (1) apply g' to the correct part of f' x and (2) concatenate the string returned by f' with the string returned by g'* (Sigfe, 2006).
+
+As a reminder, the proposal for the *handcoded* composition was (s. above):
+
+       let (fx, fs) = f' x
+           (gfx, gs) = g' fx in (gfx, fs ++ gs)
+
+Sigfe (modified) proposal for implementing $bind$ is
+ 
+$bind\; g' \; (fx,fs) = let \; (gfx,gs) = g' \; fx \; in \; (gfx, fs\text{ ++ }gs)$
+
+
+
 "
 
-# ╔═╡ 94882499-3216-4a4c-80cd-fc4b6323238b
-let                                 
-	x = 3
-	++ = string   
-	#-----------------------------------------------
-	fQM(x::Real)::Tuple{Real, String} = 
-		let f(x::Real)::Real = x*2
-			(f(x), "1st, f was called with $x ++ ")
-		end # let
-	#-----------------------------------------------
-	gQM(x::Real)::Tuple{Real, String} = 
-		let g(x::Real)::Real = x*3
-			(g(x), "2nd, g was called with $x")
-		end # let
-	#-----------------------------------------------
-	function compose(gQM::Function, (y, s)::Tuple{Real, String})::Tuple{Real, String}
-		(z, t) = gQM(y)
-		(z, ts) = (z, ++(s, t))
-		(z, ts)
-	end # function compose
-	compose(gQM, fQM(3))
-end # let
-
-# ╔═╡ b375110f-3848-4e86-9eea-c8123a031936
+# ╔═╡ c84b120a-5d5f-4d25-b210-5e21e9f377e2
 md"
 ---
-###### Composition of *impure* functions, the Julian way with a *curryfied*  *1-ary* $bind$
-*bind* is a *curryfied* version of the *2-ary* function *compose*
-(close to Sigfe's *Haskell* proposal) 
-
-The *Haskell* declaration of $bind$ is:
-
-$bind :: (Float \rightarrow (Float,String)) \rightarrow ((Float,String) \rightarrow (Float,String)).$
-
-The meaning of this declaration is that $bind$ is a higher-order function, which maps a *1-ary* function $g'$ into a *2-ary* function $g''$.
-
-So when we *apply* $bind$ to g' the output type is a *2-ary* function g'':
-
-$bind\; g' :: (Float,String) \rightarrow (Float,String)$
-
-*bind* must serve two purposes: it must (1) apply $g'$ to the correct part of $f'\; x$ and (2) concatenate the string returned by $'$ with the string returned by $g'$. (Sigfe, 2006).
-
-Sigfe's proposal in Haskell is (slightly modified): 
-
-$bind\; g'\; (fx,fs) = let\; (gx,gs) = g'\; fx\ in\; (gx,fs\; \text{++}\;gs)$
-
-Our proposal for $bind$ in Jula is below. Because in Haskell all functions are *curryfied* so that the are *1-ary* (take only *one* parameter), we designed $bind$ as a higher order function returning an anonymous $\lambda$-function with parameter $valueOf\_fQM$. This parameter is bound to the value of the function application $fQM(3)$. The result of this application is a *tuple* with type $Tuple\{Real, String\}.$
+###### *Mechanizing* the composition of *impure* function with $bind$ in Julia
+The Julian code for $bind$ is below. It follows close Sigfe's Haskell proposal. Because in Haskell all functions are *curryfied* so that the are *1-ary* (take only *one* parameter), we designed $bind$ as a higher order function returning an anonymous $\lambda$-function with parameters $fx$ and $fs$. These parameters are bound to the values of the function application $fQM(3)$. The result of this application is a *tuple* with type $Tuple\{Real, String\}.$
 
 "
 
@@ -234,7 +244,7 @@ let
 	#-----------------------------------------------
 	fQM(x::Real)::Tuple{Real, String} = 
 		let f(x::Real)::Real = x*2
-			(f(x), "1st, f was called with $x ++ ")
+			(f(x), "1st, f was called with $x")
 		end # let
 	#-----------------------------------------------
 	gQM(x::Real)::Tuple{Real, String} = 
@@ -244,26 +254,68 @@ let
 	#-----------------------------------------------
 	function bind(gQM::Function)::Function          # bind := curryfied compose !
 		(fx, fs)::Tuple{Real, String} ->            # (y, s) = fQM(3)
-			let (gx, gs) = gQM(fx)::Tuple{Real, String}
-				(gx, ++(fs, gs))::Tuple{Real, String}
+			let (gfx, gs) = gQM(fx)::Tuple{Real, String}
+				(gfx, ++(gs, " ++ ", fs))::Tuple{Real, String}
 			end # let
 	end # function bind
 	#-----------------------------------------------
-	bind(gQM)(fQM(3))::Tuple{Real, String}
+	gQQM = bind(gQM)::Function
+	gQQM(fQM(x))::Tuple{Real, String}
 end # let
 
 # ╔═╡ 0d86a503-7060-4028-9e6a-fbe9b16a5bae
 md"""
-==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
 
----
+The signatures of our Julian $bind$ demonstrate the equivalence to Sigfe's Haskell proposal:
+
+$bind::typeof(gQM) \rightarrow typeof(qQQM)$
+
+and inserting signatures $typeof(gQM), typeof(qQQM)$:
+
+$bind:: (Real \rightarrow (Real, String)) \rightarrow ((Real, String) \rightarrow (Real, String))$
+
+This is the same signature as from Sigfe's proposal.
+
+Because
+
+$bind(gQM) \Rightarrow gQQN::(Real, String) \rightarrow (Real, String)$
+
+and
+
+$bind(gQM)((fQM(3)) \Rightarrow gQQM(fQM(3) :: (Real, String)$
+
+the end the result is:
+
+$bind(gQM)(fQM(3)) == gQQM(fQM(3)) \Rightarrow$
+
+=> *(18, "2nd, g was called with 6 ++ 1st, f was called with 3")*
+
 """
 
 # ╔═╡ 87dc553a-86d4-425b-8ec8-cdd911b79e0b
 md"
 ---
 ###### Composition alternatives of *impure* functions with a *curryfied*  *1-ary* $bind$
-(this is an *extension* to Segfe's $bind$)
+(this is an *extension* to Sigfe's $bind$)
+
+- The signature of the full *currified* call $bind(gQM)(fQM)(x)$ is:
+
+$bind :: Real \rightarrow typeof(fQM) \rightarrow typeof(gQM) \rightarrow (Real, String)$
+
+and inserting signatures $typeof(gQM), typeof(fQM)$:
+
+$bind :: Real \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real, String)$
+
+- The signature of $bind(gQM)(fQM)$ is:
+
+$bind :: typeof(fQM) \rightarrow typeof(gQM)$
+
+$bind :: (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String))$
+
+- The signature of $bind(gQM)$ is:
+
+$bind :: typeof(gQM)$
+$bind :: (Real \rightarrow (Real, String))$
 
 "
 
@@ -275,7 +327,7 @@ let
      #------------------------------------------------------------------
      fQM(x::Real)::Tuple{Real, String} =
          let f(x::Real)::Real = x*2
-             (f(x), "1st, f was called with $x ++ ")
+             (f(x), "1st, f was called with $x")
          end # let
      #------------------------------------------------------------------
      gQM(x::Real)::Tuple{Real, String} =
@@ -288,20 +340,20 @@ let
          fQM::Function ->
              x::Real ->
                  let (fx, fs) = fQM(x)::Tuple{Real, String}
-                     (gx, gs) = gQM(fx)::Tuple{Real, String}
-                     (gx, ++(fs, gs))::Tuple{Real, String}
+                     (gfx, gs) = gQM(fx)::Tuple{Real, String}
+                     (gfx, ++(gs, " ++ ", fs))::Tuple{Real, String}
                  end # let
      end # function bind
      #------------------------------------------------------------------
      # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(g, f, x) = bind(g)(f)(x)
+     compose(gQM, fQM, x) = bind(gQM)(fQM)(x)
      compose(gQM, fQM, x)
      #------------------------------------------------------------------    		 	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(g, f)    = bind(g)(f) 
+     compose(gQM, fQM)    = bind(gQM)(fQM) 
      compose(gQM, fQM)(x)
      #------------------------------------------------------------------
 	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(g)        = bind(g)
+     compose(gQM)        = bind(gQM)
      compose(gQM)(fQM)(x)
      #------------------------------------------------------------------
 end # let
@@ -309,14 +361,56 @@ end # let
 
 # ╔═╡ 07e7e133-7076-47b9-a9ba-1db8305a6025
 md"""
-==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
+The three alternatives using $bind$ are:
 
----
+- $compose(gQM, fQM, x) = bind(gQM)(fQM)(x) \Rightarrow$ => (18, "2nd, g was called with 6 ++ 1st, f was called with 3")
+
+- $compose(gQM, fQM) = bind(gQM)(fQM)$ 
+
+- $compose(gQM) = bind(gQM)$ 
+
+The last seems to be equivalent to Sigfe's proposal. But this is not true. Sigfe's $bind(gQM)$ expects a *tuple* $(Real, String)$, whereas the $bind(gQM)$ here expects a *function* $fQM$ with a different signature.
+
+This mismatch can be seen below, when we feed *our* full *curryfied* $bind$ with the application $fQM(x)$.
+
 """
+
+# ╔═╡ 521ea93c-5838-4782-ba6a-436ba900b6e8
+let
+	 #------------------------------------------------------------------
+     x = 3
+     ++ = string
+     #------------------------------------------------------------------
+     fQM(x::Real)::Tuple{Real, String} =
+         let f(x::Real)::Real = x*2
+             (f(x), "1st, f was called with $x")
+         end # let
+     #------------------------------------------------------------------
+     gQM(x::Real)::Tuple{Real, String} =
+         let g(x::Real)::Real = x*3
+             (g(x), "2nd, g was called with $x")
+         end # let
+     #------------------------------------------------------------------
+	 # bind := curryfied compose !
+     function bind(gQM::Function)::Function  
+         fQM::Function ->
+             x::Real ->
+                 let (fx, fs) = fQM(x)::Tuple{Real, String}
+                     (gfx, gs) = gQM(fx)::Tuple{Real, String}
+                     (gfx, ++(gs, " ++ ", fs))::Tuple{Real, String}
+                 end # let
+     end # function bind
+     #------------------------------------------------------------------
+     compose(gQM)        = bind(gQM)
+     compose(gQM)(fQM(x))         # <== our bind is applied in Sigfe style
+     #------------------------------------------------------------------
+end # let
 
 # ╔═╡ 9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 md"
-What is a resumee of the effect of $bind$ ? *Given a pair of debuggable functions,
+What is a resumee of the effect of $bind$ ? 
+
+*Given a pair of debuggable functions,
 $f'$ and $g'$, we can now compose them together to make a new debuggable function
 bind $f' . g'$. Write this composition as $f'\cdot g'$. Even though the output of $g'$ is incompatible with the input of $f'$ we still have a nice easy way to concatenate their operations.*(Sigfe, 2006) 
 
@@ -370,22 +464,23 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╠═ffa1ecb5-e06b-4544-a979-07c7efad81fc
 # ╟─86a75358-b058-4356-b4ed-e1bd0571f5ef
 # ╠═0ee558b6-e703-460e-8d88-fa276c6c2027
-# ╟─6deab13f-f9bd-4bde-be94-f78b8df1ce58
+# ╟─128e9c6d-8710-49ad-9739-c09805a2ea39
 # ╟─c1aa3a0b-2bbd-449d-adfd-3d22e1251aeb
+# ╟─6deab13f-f9bd-4bde-be94-f78b8df1ce58
 # ╟─9f239124-aae1-42be-af16-044d7e11e746
 # ╠═880c2599-0f86-41c0-b496-1635e1264e4a
 # ╟─f5b7cf8e-3127-4253-9ebb-62f7ae8fbc65
 # ╟─1ffaf5f9-5a1d-4a32-a259-31d43767c636
 # ╠═43a6ddf5-60ad-4fab-a3d3-a7a2e7bdafd4
 # ╟─f0f8e521-0fc5-496c-a53d-7a623dd24d21
-# ╟─461ce343-1a37-4242-b0aa-6959c299f2f4
-# ╠═94882499-3216-4a4c-80cd-fc4b6323238b
-# ╟─b375110f-3848-4e86-9eea-c8123a031936
+# ╟─2e356840-cf1f-4014-9336-29bc28afd5c3
+# ╟─c84b120a-5d5f-4d25-b210-5e21e9f377e2
 # ╠═bce7b530-774c-4ed2-a732-7017d522499a
 # ╟─0d86a503-7060-4028-9e6a-fbe9b16a5bae
 # ╟─87dc553a-86d4-425b-8ec8-cdd911b79e0b
 # ╠═31643b02-de5a-411a-af7c-a3e47123df4f
-# ╟─07e7e133-7076-47b9-a9ba-1db8305a6025
+# ╠═07e7e133-7076-47b9-a9ba-1db8305a6025
+# ╠═521ea93c-5838-4782-ba6a-436ba900b6e8
 # ╟─9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 # ╟─1fb51d85-8dff-40c3-8f51-158516255409
 # ╟─8826d494-fa7d-4882-be93-7d5069d245b3
