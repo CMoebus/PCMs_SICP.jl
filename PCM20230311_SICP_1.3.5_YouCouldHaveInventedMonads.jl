@@ -9,7 +9,7 @@ md"
 =================================================================================
 ### NonSICP: 1.3.5 [You Could have Invented Monads ?!](http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html)
 ##### file: PCM20230311\_SICP\_1.3.5\_YouCouldHaveInventedMonads.jl
-##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/18 ***
+##### Julia/Pluto-code (1.8.5/19...)  by *** PCM 2023/03/19 ***
 
 =================================================================================
 "
@@ -120,7 +120,7 @@ Sigfe proposes a *handcoded* solution for function composition of *impure* funct
                                      /     \ 
                                    /         \
                                  /             \
-                       (y, s) ==> (f(x),   '1st, f was called')
+                     (fx, fs) ==> (f(x),   '1st, f was called')
                               /                    \
                             /                        \
                           /                            \
@@ -131,7 +131,7 @@ Sigfe proposes a *handcoded* solution for function composition of *impure* funct
                        /     \                            /
                      /         \                        / 
                    /             \                    /
-       (z, t) ==> (g(f(x)),  '2nd, g was called')   /
+    (gfx, gs) ==> (g(f(x)),  '2nd, g was called')   /
                   |                 \             /
                   |                   \         /
                   |                     \     /
@@ -142,7 +142,7 @@ Sigfe proposes a *handcoded* solution for function composition of *impure* funct
                   |                       |
                   |                       |
                   |                       |
-        (z, t++s) = (g(f(x)), '1st, f was called ++ 2nd,  gwas called')
+    (gfx, fs++gs) = (g(f(x)),  '1st, f was called ++ 2nd,  gwas called')
 
 
 **Fig. 1.3.5.2** Dataflow-diagram of composing *impure* ('*debuggable*') functions 
@@ -186,7 +186,7 @@ $(fx, fs), (gfx, gs), (gfx, gfs) \Rightarrow$
 # ╔═╡ 2e356840-cf1f-4014-9336-29bc28afd5c3
 md"
 ---
-##### *Mechanization* the composition of *impure* functions
+##### *Mechanization* composition of *impure* functions with $bind$
 
 Sigfe wants to mechanize the composition of *impure* functions. To this end the 2nd function $g'$ (or our $gQM$) has to be *plumbed* from a *1-ary* $g'$ (or our $gQM$) to a *2-ary* $g''$ (or our $gQQM$) function so that is composable like in gQQM(fQM)(x). The signatures *before* and *after* plumbing are:
 
@@ -232,8 +232,8 @@ $bind\; g' \; (fx,fs) = let \; (gfx,gs) = g' \; fx \; in \; (gfx, fs\text{ ++ }g
 # ╔═╡ c84b120a-5d5f-4d25-b210-5e21e9f377e2
 md"
 ---
-###### *Mechanizing* the composition of *impure* function with $bind$ in Julia
-The Julian code for $bind$ is below. It follows close Sigfe's Haskell proposal. Because in Haskell all functions are *curryfied* so that the are *1-ary* (take only *one* parameter), we designed $bind$ as a higher order function returning an anonymous $\lambda$-function with parameters $fx$ and $fs$. These parameters are bound to the values of the function application $fQM(3)$. The result of this application is a *tuple* with type $Tuple\{Real, String\}.$
+###### Implementation of $bind$ in Julia
+The Julian code for $bind$ is below. It follows close Sigfe's Haskell proposal. We designed $bind$ as a higher order function returning an anonymous $\lambda$-function with parameters $fx$ and $fs$. These parameters are bound to the values of the function application $fQM(3)::(Real, String)$. The result of this application is a *tuple* with type $Tuple\{Real, String\}.$
 
 "
 
@@ -253,7 +253,7 @@ let
 		end # let
 	#-----------------------------------------------
 	function bind(gQM::Function)::Function          # bind := curryfied compose !
-		(fx, fs)::Tuple{Real, String} ->            # (y, s) = fQM(3)
+		(fx, fs)::Tuple{Real, String} ->            # (fx, fs) = fQM(3)
 			let (gfx, gs) = gQM(fx)::Tuple{Real, String}
 				(gfx, ++(gs, " ++ ", fs))::Tuple{Real, String}
 			end # let
@@ -266,7 +266,7 @@ end # let
 # ╔═╡ 0d86a503-7060-4028-9e6a-fbe9b16a5bae
 md"""
 
-The signatures of our Julian $bind$ demonstrate the equivalence to Sigfe's Haskell proposal:
+The signature of our Julian implementation of $bind$ demonstrates the equivalence to Sigfe's Haskell proposal. The signature of Julian $bind$ is:
 
 $bind::typeof(gQM) \rightarrow typeof(qQQM)$
 
@@ -276,46 +276,55 @@ $bind:: (Real \rightarrow (Real, String)) \rightarrow ((Real, String) \rightarro
 
 This is the same signature as from Sigfe's proposal.
 
-Because
+$bind :: typeof(g') \rightarrow typeof(g'')$ 
+
+and substituting signatures for $typeof(g')$ and $typeof(g'')$
+
+$bind :: (Float -> (Float,String)) \rightarrow ((Float,String) \rightarrow (Float,String)).$
+
+Application $bind(gQM)$ generates a *plumbed* version $gQQM$ of $gQM$ with signature
 
 $bind(gQM) \Rightarrow gQQN::(Real, String) \rightarrow (Real, String)$
 
-and
+and application to the result of $fQM(3)$ generates the desired tuple 
 
-$bind(gQM)((fQM(3)) \Rightarrow gQQM(fQM(3) :: (Real, String)$
+$(gfx, \text{++(gs, " ++ "}, fs)):: (Real, String)$
 
-the end the result is:
+or
+
+$bind(gQM)((fQM(3)) \Rightarrow gQQM(fQM(3) :: (Real, String).$
+
+The result is:
 
 $bind(gQM)(fQM(3)) == gQQM(fQM(3)) \Rightarrow$
 
-=> *(18, "2nd, g was called with 6 ++ 1st, f was called with 3")*
+=> *(18, "2nd, g was called with 6 ++ 1st, f was called with 3"*)
 
 """
 
 # ╔═╡ 87dc553a-86d4-425b-8ec8-cdd911b79e0b
 md"
 ---
-###### Composition alternatives of *impure* functions with a *curryfied*  *1-ary* $bind$
-(this is an *extension* to Sigfe's $bind$)
+###### Composition variants of *impure* functions with a *curryfied* $bindQM$
+($bindQM$ is an *extension* to Sigfe's $bind$)
 
-- The signature of the full *currified* call $bind(gQM)(fQM)(x)$ is:
+- The signature of the fully *currified* call $bindQM(gQM)(fQM)(x)$ is:
 
-$bind :: Real \rightarrow typeof(fQM) \rightarrow typeof(gQM) \rightarrow (Real, String)$
+$bindQM :: Real \rightarrow typeof(fQM) \rightarrow typeof(gQM) \rightarrow (Real, String)$
 
-and inserting signatures $typeof(gQM), typeof(fQM)$:
+$bindQM :: Real \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real, String)$
 
-$bind :: Real \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String)) \rightarrow (Real, String)$
+- The signature of the shortened call $bindQM(gQM)(fQM)$ is:
 
-- The signature of $bind(gQM)(fQM)$ is:
+$bindQM :: typeof(fQM) \rightarrow typeof(gQM)$
 
-$bind :: typeof(fQM) \rightarrow typeof(gQM)$
+$bindQM :: (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String))$
 
-$bind :: (Real \rightarrow (Real, String)) \rightarrow (Real \rightarrow (Real, String))$
+- The signature of $bindQM(gQM)$ is:
 
-- The signature of $bind(gQM)$ is:
+$bindQM :: typeof(gQM)$
 
-$bind :: typeof(gQM)$
-$bind :: (Real \rightarrow (Real, String))$
+$bindQM :: (Real \rightarrow (Real, String))$
 
 "
 
@@ -336,7 +345,7 @@ let
          end # let
      #------------------------------------------------------------------
 	 # bind := curryfied compose !
-     function bind(gQM::Function)::Function  
+     function bindQM(gQM::Function)::Function  
          fQM::Function ->
              x::Real ->
                  let (fx, fs) = fQM(x)::Tuple{Real, String}
@@ -346,15 +355,15 @@ let
      end # function bind
      #------------------------------------------------------------------
      # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(gQM, fQM, x) = bind(gQM)(fQM)(x)
-     compose(gQM, fQM, x)
+     bindQM(gQM, fQM, x) = bindQM(gQM)(fQM)(x)
+     bindQM(gQM, fQM, x)
      #------------------------------------------------------------------    		 	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(gQM, fQM)    = bind(gQM)(fQM) 
-     compose(gQM, fQM)(x)
+     bindQM(gQM, fQM)    = bindQM(gQM)(fQM) 
+     bindQM(gQM, fQM)(x)
      #------------------------------------------------------------------
 	 # ==> (18, "1st, f was called with 3 ++ 2nd, g was called with 6")
-     compose(gQM)        = bind(gQM)
-     compose(gQM)(fQM)(x)
+     bindQM(gQM)        = bindQM(gQM)
+     bindQM(gQM)(fQM)(x)
      #------------------------------------------------------------------
 end # let
 
@@ -363,15 +372,8 @@ end # let
 md"""
 The three alternatives using $bind$ are:
 
-- $compose(gQM, fQM, x) = bind(gQM)(fQM)(x) \Rightarrow$ => (18, "2nd, g was called with 6 ++ 1st, f was called with 3")
-
-- $compose(gQM, fQM) = bind(gQM)(fQM)$ 
-
-- $compose(gQM) = bind(gQM)$ 
-
-The last seems to be equivalent to Sigfe's proposal. But this is not true. Sigfe's $bind(gQM)$ expects a *tuple* $(Real, String)$, whereas the $bind(gQM)$ here expects a *function* $fQM$ with a different signature.
-
-This mismatch can be seen below, when we feed *our* full *curryfied* $bind$ with the application $fQM(x)$.
+The last variant is close but not identical to Sigfe's proposal. Sigfe's $bind(g')$ and our $bind(QM)$ expect a *tuple* $(Real, String)$, whereas the $bindQM(gQM)$ expects a *function* $fQM(x)$ with a different signature.
+This mismatch can be seen below, when we feed *our* full *curryfied* $bindQM$ with the application $fQM(x)$.
 
 """
 
@@ -392,7 +394,7 @@ let
          end # let
      #------------------------------------------------------------------
 	 # bind := curryfied compose !
-     function bind(gQM::Function)::Function  
+     function bindQM(gQM::Function)::Function  
          fQM::Function ->
              x::Real ->
                  let (fx, fs) = fQM(x)::Tuple{Real, String}
@@ -401,18 +403,13 @@ let
                  end # let
      end # function bind
      #------------------------------------------------------------------
-     compose(gQM)        = bind(gQM)
-     compose(gQM)(fQM(x))         # <== our bind is applied in Sigfe style
-     #------------------------------------------------------------------
+     bindQM(gQM)        = bindQM(gQM)
+     bindQM(gQM)(fQM(x))                 #  <==  error: mismatch !
 end # let
 
 # ╔═╡ 9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 md"
-What is a resumee of the effect of $bind$ ? 
-
-*Given a pair of debuggable functions,
-$f'$ and $g'$, we can now compose them together to make a new debuggable function
-bind $f' . g'$. Write this composition as $f'\cdot g'$. Even though the output of $g'$ is incompatible with the input of $f'$ we still have a nice easy way to concatenate their operations.*(Sigfe, 2006) 
+What is a resumee of the effect of $bind$ and $bindQM$ ? We have two alternatives $bind, bindQM$ in composing *impure* functions $f',g'$ or $fQM, gQM$. We have to see, what of both provides us more insight into the concept *monad*. 
 
 "
 
@@ -479,7 +476,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─0d86a503-7060-4028-9e6a-fbe9b16a5bae
 # ╟─87dc553a-86d4-425b-8ec8-cdd911b79e0b
 # ╠═31643b02-de5a-411a-af7c-a3e47123df4f
-# ╠═07e7e133-7076-47b9-a9ba-1db8305a6025
+# ╟─07e7e133-7076-47b9-a9ba-1db8305a6025
 # ╠═521ea93c-5838-4782-ba6a-436ba900b6e8
 # ╟─9f1a9576-4fa2-47d4-b9ae-11a136fa71b2
 # ╟─1fb51d85-8dff-40c3-8f51-158516255409
