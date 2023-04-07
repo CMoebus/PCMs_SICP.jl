@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### NonSICP: 1.3.5 Recursion by the *fixed-point* Operator Y
 ##### file: PCM20230324\_NonSICP\_1.3.5\_RemovingRecursionByYOperator.jl
-##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/05 ***
+##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/07 ***
 
 =====================================================================================
 "
@@ -534,7 +534,7 @@ end # let
 
 # ╔═╡ 904e5b90-c1b5-493e-859c-daf39a00ad42
 md"
-###### This finishes the constructive proof: $Y = Y2 \;\;\;\blacksquare$ 
+###### This finishes the constructive proof: $Y = Y2 = Y_{applicative_2} \;\;\;\blacksquare$ 
 "
 
 # ╔═╡ 837261b3-5ce7-49f1-9e8a-1367e6de98ac
@@ -1145,8 +1145,13 @@ end # let
 
 # ╔═╡ 1c84a53e-b8bd-429b-846f-4bf9193dd273
 md"
-###### The computation has finished with the result $5! = 120$
+###### The computation has finished with the result $5! = 120\;\;\blacksquare$
 ---
+"
+
+# ╔═╡ ec3f1a02-0b6e-42b1-84fc-28c93f95c2f4
+md"
+###### 3.6 $\lambda$-Abstraction of $h$ out of a $Y1$-trace expression
 "
 
 # ╔═╡ 3ee6f37b-e2a7-4deb-9aa9-2696359d695f
@@ -1189,31 +1194,79 @@ end # let
 # ╔═╡ 24c6a125-fac6-4766-9b24-a47013207658
 md"
 ---
-##### The *fix-point combinator* for the simple $cos$-function
-*h* is the $\lambda$-abstraction of $f:=cos$ with $g$ as a *dummy* parameter.
+##### 4 Examples: Applications of the *fix-point combinator* $Y1$
+###### 4.1 to simple nonrecursive $cos$-function
+
+In general $Y1$ computes values of the recursive function $f$ 
+
+$Y1(h) = f$ 
+
+and
+ 
+$Y1(h)(x) = f(x)$  
+
+where $h$ is the $\lambda$-abstraction of the body of function $f$. In $h$ for all recursive calls $f(x)$ $f$ is *not* looked up in an surrounding environment. Instead $f$ is *localized* by being bound to a new parameter $f$ of $h$. To make the distinction between $f$ as a function *symbol* in the environment and $f$ as a *parameter* of $h$ more clear we rename the parameter $f$ in $h$ as $g$
+
+$h[f:=g]$
+
+so that we start with the origininal recursive function $f$
+
+$f = ...f(...).$
+
+Then we make a $\lambda$-abstraction with replacement of $f$ by $g$
+
+$h[f:=g]$
+
+There is only a *fixed-point* iff
+
+$Y1(h)(x) = f(x) = x$. 
+
+E.g. ASS ([SICP, ch.1.2´3.3, 1996, p.69](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e3) demonstrate that 
+
+$fixedPoint(cos, 1.0) = 0.7390822985224023.$
+
+In contrast to that is
+
+$Y1(h)(1.0) = f(1.0) = cos(1.0) = 0.5403023058681398.$ 
+
+where
+
+$h = (g \rightarrow f) \text{ and } f = cos.$
+
+*h* is the $\lambda$-abstraction of $f:=cos$ with $g$ as a *dummy* parameter. $g$ is a dummy parameter, because $f$ is *non*recursive, so that in principle the application of $Y!$ is *not* necessary. It is made only for didactal purposes.
+
 "
+
+# ╔═╡ e46ae36e-d15d-4cb2-83bc-5eaca88b67b4
+cos(1.0)
 
 # ╔═╡ b7b741a2-d58a-45e3-baa7-57ab84e05743
 let
 	f = cos
-	h = (g -> f)        # lamda-abstraction of f
-	Y = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	(f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))(h)(0.5)   # ==>  0.87758....
+	h = (g -> f)                                            # lamda-abstraction of f
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	(f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))(h)(π/2)  # ==> 6.123234e-17
+	Y1(h)(1.0)                                              # ==> 0.5403023058681398
+	Y1(h)(0.7390822985224023)
 end # let
 
-# ╔═╡ 5e57bfe2-1e49-42cd-a1f3-4d454dbb5b3e
-let # chatGPT's modified proposal 2023/03/28 (but this relies on recursive Y)
-	Y = (f -> (x -> f(Y(f))(x)))
+# ╔═╡ 578ee2c9-cee4-4946-92d3-d2fbfd6f1e57
+cos(0.7390822985224023)   # this is the *fixed-point* of cos(x) = x
+
+# ╔═╡ 218c88cb-3246-46d6-b5ab-37dfbbb23549
+let # our nonrecursive Y1
 	f = cos
-	h = g -> cos
-	Y(h)(0.5)                        # ==> 0.8775825618903728
-	[(x, Y(h)(x)) for x = 0:π/4:π]   # ==> cos(0) ... cos(π)
+	h = (g -> f)
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	Y1(h)(0.5)                         # ==> 0.8775825618903728
+	[(x, Y1(h)(x)) for x = 0:π/4:π]    # ==> cos(0) ... cos(π)
 end # let
 
 # ╔═╡ f3a06797-8b04-4bd1-8cff-671212efd9a1
 md"
 ---
-##### The *fixed-point combinator* $Y$ for the simple $f := x = x^2 -2$
+###### 4.2 to the simple *non*recursive $f := x = x^2 -2$
+In princi
 
 $f := \lambda x . x^2-2$
 
@@ -1243,71 +1296,121 @@ end # let
 
 # ╔═╡ bfbf3220-e25d-4067-b4af-671323ebc8bf
 md"
-###### here, *with* the *applicative-order* $Y$-*operator*:
+###### then, *with* the *applicative-order* $Y$-*operator*:
 
-$Y_{applicative} := (f \rightarrow (x \rightarrow f(y \rightarrow x(x)(y)))(x \rightarrow f(y \rightarrow x(x)(y))))$
+$Y_{applicative_1} := (f \rightarrow (x \rightarrow f(y \rightarrow x(x)(y)))(x \rightarrow f(y \rightarrow x(x)(y))))$
 
 where the function $h$ to which $Y$ has to be applied has to be abstracted from $f$ by introducing a *dummy* parameter $g$
 
-$f := \lambda x . x^2-2$
+$f = x \rightarrow x^2-2$
 
-$h = (\lambda g. f)$
+$h = g \rightarrow f$
 
 and plugged into Julia
 
-$h = (g \rightarrow (x \rightarrow x*x - 2))$
+$h = (g \rightarrow (x \rightarrow x^2 - 2))$
 "
 
 # ╔═╡ 96940320-d80d-4e5a-ab3c-1386ca39aea6
 let
-	h = (g -> (x -> x*x - 2))              # g is a dummy parameter not reference in f
-	Y = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	isFixedPoint(h, n) = Y(h)(n) == n ? n : nothing     # Y(h)(n) is curryfied !
+	h = (g -> (x -> x^2 - 2))              # g is a dummy parameter not reference in f
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	isFixedPoint(h, n) = Y1(h)(n) == n ? n : nothing    # Y(h)(n) is curryfied !
 	resultArray = [isFixedPoint(h, n) for n = -10:10]   # fixed points are !== nothing
 	isFixedPoint(n) = n !== nothing ? true : false      # 2nd method 'isFixedPoint'
 	filter(isFixedPoint, resultArray)
 end # let
 
-# ╔═╡ 3bd31e72-f69a-41c6-bd1a-1040549d6e25
+# ╔═╡ d13998d7-db26-4177-aeb6-ee77e0468bb7
 md"
 ---
-###### $Y$ replaced by its $\lambda$-definition
+###### 4.3 to the recursive computation of $sqrt$
 "
 
-# ╔═╡ a88f39e6-f4d5-49bb-be83-f15275eafd6c
+# ╔═╡ dec2bd12-bcdc-4b16-9560-f1bff749bfa7
+function fixedPoint1(f, firstGuess)
+	tolerance = 1.0E-1
+	#----------------------------------------------
+	closeEnough(v1, v2) = abs(v1-v2) < tolerance
+	#----------------------------------------------
+	function myTry(guess)
+			let next = f(guess)
+				if closeEnough(guess, next)
+					next
+				else 
+					myTry(next)
+				end # if
+			end # let
+	end # function myTry
+	#-----------------------------------------------
+	myTry(firstGuess)
+	#-----------------------------------------------
+end # function fixedPoint1
+
+# ╔═╡ 316bfdb1-88a5-4290-ae10-cd9e4457c0eb
+function mySqrt1(x)
+	fixedPoint1(y->/(x, y), 1.0)
+end
+
+# ╔═╡ f16d490b-9045-4fcf-a01d-b5d726aaf6bd
+try
+	mySqrt1(2.0)
+catch
+    @warn "StackOverFlow because Julia has no TCO"
+end # try
+
+# ╔═╡ 5962e31b-3f92-491f-ab17-a354aea6d810
+sqrt(2.0)
+
+# ╔═╡ d5fbf26f-66ab-4db0-9d01-16f6cbc11dc5
+md"
+---
+###### Initial guess $y0 = 1.0 < sqrt(2.0) \text{ so that: } Y1(h)y0) = 1.4151976779972637$
+"
+
+# ╔═╡ a596ceb8-ade0-44b4-98b9-347648459712
 let
-	h = (g -> (x -> x*x - 2))              # g is a dummy parameter not reference in f
-	# Y = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	isFixedPoint(h, n) = # Y(h)(n) is curryfied !
-		(f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))(h)(n) == n ? n : nothing 
-	resultArray = [isFixedPoint(h, n) for n = -10:10]   # fixed points are !== nothing
-	isFixedPoint(n) = n !== nothing ? true : false      # 2nd method 'isFixedPoint'
-	filter(isFixedPoint, resultArray)
+	x   = 2.0       # sqrt(x) = y = 1.4151976779972637
+	eps = 0.003
+	y0  = 1.0       # y0 < x = initial guess
+	#--------------------------------------------------------------------------------
+	myTry(x) = (abs(x - y^2) < eps) ? y : myTry(y + 1/2(x - y^2))
+	f = (y -> (abs(x - y^2) < eps) ? y : f(y + 1/2(x - y^2)))
+	h = (f -> (y -> (abs(x -y^2) < eps) ? y : f(y + 1/2(x - y^2))))
+	#--------------------------------------------------------------------------------
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	#--------------------------------------------------------------------------------
+    Y1(h)(y0)
+	#--------------------------------------------------------------------------------
 end # let
 
-# ╔═╡ 218c88cb-3246-46d6-b5ab-37dfbbb23549
-let # our nonrecursive Y
-	Y = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	f = cos
-	h = g -> cos
-	Y(h)(0.5)                        # ==> 0.8775825618903728
-	[(x, Y(h)(x)) for x = 0:π/4:π]   # ==> cos(0) ... cos(π)
-end # let
+# ╔═╡ bc7e008e-e7fa-495e-9cd5-dc6a18901139
+md"
+---
+###### Initial guess $y0 = 1.0 > sqrt(2.0) \text{ so that: } Y1(h)y0) = 1.4054316549232007$
+"
 
-# ╔═╡ eb1ca968-12d4-4350-bf12-1175251e359d
-let # our nonrecursive Y 
-    # replaced by (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	Y = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
-	f = cos
-	h = g -> cos
-	(f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))(h)(0.5)                        # ==> 0.8775825618903728
-	[(x, (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))(h)(x)) for x = 0:π/4:π]   # ==> cos(0) ... cos(π)
+# ╔═╡ 9a47c946-b326-4777-bbcd-21c0cb026806
+let
+	x   = 2.0       # sqrt(x) = y = 1.4151976779972637
+	eps = 0.025
+	y0  = 1.8       # y0 < x = initial guess
+	#--------------------------------------------------------------------------------
+	myTry(x) = (abs(x - y^2) < eps) ? y : myTry(y + 1/2(x - y^2))
+	f = (y -> (abs(x - y^2) < eps) ? y : f(y + 1/2(x - y^2)))
+	h = (f -> (y -> (abs(x -y^2) < eps) ? y : f(y + 1/2(x - y^2))))
+	#--------------------------------------------------------------------------------
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	#--------------------------------------------------------------------------------
+    Y1(h)(y0)
+	#--------------------------------------------------------------------------------
 end # let
 
 # ╔═╡ 11dd007d-d463-405a-976c-b4c235333643
 md"
 ---
 ##### References
+- **Abelson, Sussman & Sussman** (**ASS**); *Structure and Interpretation of Computer Programs*, MIT Press, 1966, [https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e3](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e3), last visit 2023/04/07
 - **Barendregt, H. & Barendson, E.**; *Introduction to Lambda Calculus*, March, 2000, [https://repository.ubn.ru.nl/bitstream/handle/2066/17289/17289.pdf](https://repository.ubn.ru.nl/bitstream/handle/2066/17289/17289.pdf), last visit 2023/03/30
 - **Friedman, D.P. & Felleisen, M.**; *The Little Lisper*; Cambridge, Mass.: MIT Press, 1987
 - **Friedman, D.P. & Felleisen, M.**; *The Little Schemer*; Cambridge, Mass.: MIT Press, 1996, 4/e
@@ -1445,20 +1548,28 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─afa43125-5d1e-47a2-86c2-b763ab8ae89b
 # ╠═f489292a-e154-48d3-ac6c-309ed0718f01
 # ╟─1c84a53e-b8bd-429b-846f-4bf9193dd273
+# ╟─ec3f1a02-0b6e-42b1-84fc-28c93f95c2f4
 # ╟─3ee6f37b-e2a7-4deb-9aa9-2696359d695f
 # ╠═596db420-79bf-43fd-9c23-53212c901ace
 # ╟─24c6a125-fac6-4766-9b24-a47013207658
+# ╠═e46ae36e-d15d-4cb2-83bc-5eaca88b67b4
 # ╠═b7b741a2-d58a-45e3-baa7-57ab84e05743
-# ╠═5e57bfe2-1e49-42cd-a1f3-4d454dbb5b3e
+# ╠═578ee2c9-cee4-4946-92d3-d2fbfd6f1e57
+# ╠═218c88cb-3246-46d6-b5ab-37dfbbb23549
 # ╟─f3a06797-8b04-4bd1-8cff-671212efd9a1
 # ╟─3b1f3a8a-d63a-44ca-a60d-7e901a31ab20
 # ╠═884a9377-9d98-4642-b13d-e18f39ef0ecc
 # ╟─bfbf3220-e25d-4067-b4af-671323ebc8bf
 # ╠═96940320-d80d-4e5a-ab3c-1386ca39aea6
-# ╟─3bd31e72-f69a-41c6-bd1a-1040549d6e25
-# ╠═a88f39e6-f4d5-49bb-be83-f15275eafd6c
-# ╠═218c88cb-3246-46d6-b5ab-37dfbbb23549
-# ╠═eb1ca968-12d4-4350-bf12-1175251e359d
+# ╟─d13998d7-db26-4177-aeb6-ee77e0468bb7
+# ╠═dec2bd12-bcdc-4b16-9560-f1bff749bfa7
+# ╠═316bfdb1-88a5-4290-ae10-cd9e4457c0eb
+# ╠═f16d490b-9045-4fcf-a01d-b5d726aaf6bd
+# ╠═5962e31b-3f92-491f-ab17-a354aea6d810
+# ╟─d5fbf26f-66ab-4db0-9d01-16f6cbc11dc5
+# ╠═a596ceb8-ade0-44b4-98b9-347648459712
+# ╟─bc7e008e-e7fa-495e-9cd5-dc6a18901139
+# ╠═9a47c946-b326-4777-bbcd-21c0cb026806
 # ╟─11dd007d-d463-405a-976c-b4c235333643
 # ╟─aec03652-4ce4-45c4-8b80-4ba1c330e37d
 # ╟─50ab8a25-767f-4715-94a4-861f43f3d097
