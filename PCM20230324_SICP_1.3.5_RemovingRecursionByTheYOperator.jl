@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### NonSICP: 1.3.5 Recursion by the *fixed-point* Operator Y
 ##### file: PCM20230324\_NonSICP\_1.3.5\_RemovingRecursionByYOperator.jl
-##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/07 ***
+##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/08 ***
 
 =====================================================================================
 "
@@ -1327,82 +1327,122 @@ md"
 ###### 4.3 to the recursive computation of $sqrt$
 "
 
-# ╔═╡ dec2bd12-bcdc-4b16-9560-f1bff749bfa7
-function fixedPoint1(f, firstGuess)
-	tolerance = 1.0E-1
-	#----------------------------------------------
-	closeEnough(v1, v2) = abs(v1-v2) < tolerance
-	#----------------------------------------------
-	function myTry(guess)
-			let next = f(guess)
-				if closeEnough(guess, next)
-					next
-				else 
-					myTry(next)
-				end # if
-			end # let
-	end # function myTry
-	#-----------------------------------------------
-	myTry(firstGuess)
-	#-----------------------------------------------
-end # function fixedPoint1
-
-# ╔═╡ 316bfdb1-88a5-4290-ae10-cd9e4457c0eb
-function mySqrt1(x)
-	fixedPoint1(y->/(x, y), 1.0)
-end
-
-# ╔═╡ f16d490b-9045-4fcf-a01d-b5d726aaf6bd
-try
-	mySqrt1(2.0)
-catch
-    @warn "StackOverFlow because Julia has no TCO"
-end # try
-
-# ╔═╡ 5962e31b-3f92-491f-ab17-a354aea6d810
-sqrt(2.0)
-
 # ╔═╡ d5fbf26f-66ab-4db0-9d01-16f6cbc11dc5
 md"
----
-###### Initial guess $y0 = 1.0 < sqrt(2.0) \text{ so that: } Y1(h)y0) = 1.4151976779972637$
+###### 4.3.1 Initial guess 
+$x0 = 1.0 < sqrt(2.0) \text{ with }\; eps=0.003\; \text{; so that: } Y1(h)(x0) = 1.4151976779972637$
 "
 
 # ╔═╡ a596ceb8-ade0-44b4-98b9-347648459712
 let
-	x   = 2.0       # sqrt(x) = y = 1.4151976779972637
+	a   = 2.0       # sqrt(a) = x = 1.4142135623730951
 	eps = 0.003
-	y0  = 1.0       # y0 < x = initial guess
+	x0  = 1.0       # initial guess x0 < a 
 	#--------------------------------------------------------------------------------
-	myTry(x) = (abs(x - y^2) < eps) ? y : myTry(y + 1/2(x - y^2))
-	f = (y -> (abs(x - y^2) < eps) ? y : f(y + 1/2(x - y^2)))
-	h = (f -> (y -> (abs(x -y^2) < eps) ? y : f(y + 1/2(x - y^2))))
+	myTry(x) = (abs(a - x^2) < eps) ? x : myTry(x + 1/2(a - x^2))
+	f = (x -> (abs(a - x^2) < eps) ? x : f(x + 1/2(a - x^2)))
+    h = (f -> (x -> (abs(a - x^2) < eps) ? x : f(x + 1/2(a - x^2))))
 	#--------------------------------------------------------------------------------
 	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
 	#--------------------------------------------------------------------------------
-    Y1(h)(y0)
+	myTry(x0)        # ==> 1.4151976779972637 --> :)
+	f(x0)            # ==> 1.4151976779972637 --> :)
+    Y1(h)(x0)        # ==> 1.4151976779972637 --> :)
 	#--------------------------------------------------------------------------------
 end # let
 
 # ╔═╡ bc7e008e-e7fa-495e-9cd5-dc6a18901139
 md"
 ---
-###### Initial guess $y0 = 1.0 > sqrt(2.0) \text{ so that: } Y1(h)y0) = 1.4054316549232007$
+###### 4.3.2 Initial guess 
+$x0 = 1.8 > sqrt(2.0) \text{ with }\; eps=0.025\;  \text{; so that: } Y1(h)(x0) = 1.4054316549232007$
 "
 
 # ╔═╡ 9a47c946-b326-4777-bbcd-21c0cb026806
 let
-	x   = 2.0       # sqrt(x) = y = 1.4151976779972637
+	a   = 2.0       # sqrt(a) = x = 1.4142135623730951
 	eps = 0.025
-	y0  = 1.8       # y0 < x = initial guess
+	x0  = 1.8       # initial guess x0 > a 
 	#--------------------------------------------------------------------------------
-	myTry(x) = (abs(x - y^2) < eps) ? y : myTry(y + 1/2(x - y^2))
-	f = (y -> (abs(x - y^2) < eps) ? y : f(y + 1/2(x - y^2)))
-	h = (f -> (y -> (abs(x -y^2) < eps) ? y : f(y + 1/2(x - y^2))))
+	myTry(x) = (abs(a - x^2) < eps) ? x : myTry(x + 1/2(a - x^2))
+	f = (x -> (abs(a - x^2) < eps) ? x : f(x + 1/2(a - x^2)))
+    h = (f -> (x -> (abs(a - x^2) < eps) ? x : f(x + 1/2(a - x^2))))
 	#--------------------------------------------------------------------------------
 	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
 	#--------------------------------------------------------------------------------
-    Y1(h)(y0)
+	myTry(x0)       # ==> 1.4054316549232007 --> :)
+    Y1(h)(x0)       # ==> 1.4054316549232007 --> :)
+	#--------------------------------------------------------------------------------
+end # let
+
+# ╔═╡ 3500c231-151c-45fe-9258-8c89ee476b2c
+md"
+---
+###### 4.4 to [Heron's sqrt-algorithm](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method)can be derived from Newton's recursion formula to find roots of polynomials.
+
+The recursion formula of *Newton*'s root finding algorithm is
+
+$x_{n+1}= x_n - \frac{f(x_n)}{f'(x_n)}.$
+
+To obtain the special case of Heron's square root approximation method we have to define $f$ and $f'$ and substitute these into Newton's formula:
+
+$f = x^2 - a$
+$f' = 2x.$
+$x_{n+1}= x_n - \frac{f(x_n)}{f'(x_n)}[f := (x^2 - a); f' := 2x]$
+
+So *Heron*'s approximation algorithm gets
+
+$x_{n+1}= x_n - \frac{x^2_n-a}{2x_n} = \frac{2x^2_n - x^2_n +a}{2x_n}=\frac{x^2_n+a}{2x_n}= \frac{1}{2}\left(x_n+\frac{a}{x_n}\right).$
+"
+
+# ╔═╡ 25b8f677-bce4-4afe-9a81-a16f79abac51
+md"
+###### 4.4.1 Initial guess 
+$x0 = 1.0 < sqrt(2.0) \text{ with }\; eps=0.003\; \text{; so that: } Y1(h)(x0) = 1.4142156862745097$
+"
+
+# ╔═╡ 6c4767cb-2d0b-4cff-b25a-0452df23c215
+let
+	a   = 2.0       # sqrt(a) = x = 1.4142135623730951
+	eps = 0.003
+	x0  = 1.0       # initial guess x0 < a 
+	#--------------------------------------------------------------------------------
+	myTry(x) = (abs(a - x^2) < eps) ? x : myTry((x + a/x)/2)
+	f(x) = (abs(a - x^2) < eps) ? x : f((x + a/x)/2)
+    # h = (f -> (x -> (abs(a - x^2) < eps) ? x : f((x + a/x)/2)))
+	h = (myTry -> (x -> (abs(a - x^2) < eps) ? x : myTry((x + a/x)/2.0)))
+	#--------------------------------------------------------------------------------
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	#--------------------------------------------------------------------------------
+	myTry(x0)       # ==> 1.4142156862745097 --> :)
+	f(x0)           # ==> 1.4142156862745097 --> :)
+    Y1(h)(x0)       # ==> 1.4142156862745097 --> :)
+	#--------------------------------------------------------------------------------
+end # let
+
+# ╔═╡ acca444a-56cc-4d94-be41-07bfce0ffb13
+md"
+---
+###### 4.4.2 Initial guess 
+$x0 = 1.8 > sqrt(2.0) \text{ with }\; eps=0.0001\;  \text{; so that: } Y1(h)(x0) = 1.4142136841942816$
+"
+
+# ╔═╡ 2a262982-eb66-4ce4-8180-33915bebe3cb
+let
+	a   = 2.0       # sqrt(a) = x = 1.4142135623730951
+	eps = 0.0001
+	x0  = 1.8       # initial guess x0 > a 
+	#--------------------------------------------------------------------------------
+	myTry(x) = (abs(a - x^2) < eps) ? x : myTry((x + a/x)/2)
+	f(x) = (abs(a - x^2) < eps) ? x : f((x + a/x)/2)
+    # h = (f -> (x -> (abs(a - x^2) < eps) ? x : f((x + a/x)/2)))
+	h = (myTry -> (x -> (abs(a - x^2) < eps) ? x : myTry((x + a/x)/2.0)))
+	#--------------------------------------------------------------------------------
+	Y1 = (f -> (x -> f(y -> x(x)(y)))(x -> f(y -> x(x)(y))))
+	#--------------------------------------------------------------------------------
+	myTry(x0)       # ==> 1.4142136841942816 --> :)
+	f(x0)           # ==> 1.4142136841942816 --> :)
+    Y1(h)(x0)       # ==> 1.4142136841942816 --> :)
 	#--------------------------------------------------------------------------------
 end # let
 
@@ -1418,7 +1458,8 @@ md"
 - **Pearce, J.**; *Programming and Meta-Programming in Scheme*, Heidelberg: Springer, 1998
 - **Peyton-Jones, S.L.**; *The Implementation of Functional Programming Languages*, Hemel-Hempsteadt, Prentice-Hall, 1987
 - **Wagenknecht, Ch.**; Programmierparadigmen: Eine Einführung auf der Grundlage von Racket, Wiesbaden: Springer Vieweg, 2016, 
-- **Wikipedia**; *Lambda calculus definition*, [https://en.wikipedia.org/wiki/Lambda_calculus_definition}(https://en.wikipedia.org/wiki/Lambda_calculus_definition), last visit 2023/03/26
+- **Wikipedia**; *Heron's Method*; [https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method); last visit 2023/04/08
+- **Wikipedia**; *Lambda calculus definition*, [https://en.wikipedia.org/wiki/Lambda_calculus_definition](https://en.wikipedia.org/wiki/Lambda_calculus_definition); last visit 2023/03/26
 
 "
 
@@ -1562,14 +1603,15 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─bfbf3220-e25d-4067-b4af-671323ebc8bf
 # ╠═96940320-d80d-4e5a-ab3c-1386ca39aea6
 # ╟─d13998d7-db26-4177-aeb6-ee77e0468bb7
-# ╠═dec2bd12-bcdc-4b16-9560-f1bff749bfa7
-# ╠═316bfdb1-88a5-4290-ae10-cd9e4457c0eb
-# ╠═f16d490b-9045-4fcf-a01d-b5d726aaf6bd
-# ╠═5962e31b-3f92-491f-ab17-a354aea6d810
 # ╟─d5fbf26f-66ab-4db0-9d01-16f6cbc11dc5
 # ╠═a596ceb8-ade0-44b4-98b9-347648459712
 # ╟─bc7e008e-e7fa-495e-9cd5-dc6a18901139
 # ╠═9a47c946-b326-4777-bbcd-21c0cb026806
+# ╟─3500c231-151c-45fe-9258-8c89ee476b2c
+# ╟─25b8f677-bce4-4afe-9a81-a16f79abac51
+# ╠═6c4767cb-2d0b-4cff-b25a-0452df23c215
+# ╟─acca444a-56cc-4d94-be41-07bfce0ffb13
+# ╠═2a262982-eb66-4ce4-8180-33915bebe3cb
 # ╟─11dd007d-d463-405a-976c-b4c235333643
 # ╟─aec03652-4ce4-45c4-8b80-4ba1c330e37d
 # ╟─50ab8a25-767f-4715-94a4-861f43f3d097
