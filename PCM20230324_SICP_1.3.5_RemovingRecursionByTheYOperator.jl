@@ -9,7 +9,7 @@ md"
 =====================================================================================
 #### NonSICP: 1.3.5 Recursion by the *fixed-point* Operator Y
 ##### file: PCM20230324\_NonSICP\_1.3.5\_RemovingRecursionByYOperator.jl
-##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/08 ***
+##### Julia/Pluto.jl-code (1.8.5/19.11) by PCM *** 2023/04/09 ***
 
 =====================================================================================
 "
@@ -1378,19 +1378,29 @@ end # let
 # ╔═╡ 3500c231-151c-45fe-9258-8c89ee476b2c
 md"
 ---
-###### 4.4 to [Heron's sqrt-algorithm](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method)can be derived from Newton's recursion formula to find roots of polynomials.
+###### 4.4 to [Heron's sqrt-algorithm](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method) - derived from [Newton's method](https://en.wikipedia.org/wiki/Newton%27s_method).
 
 The recursion formula of *Newton*'s root finding algorithm is
 
-$x_{n+1}= x_n - \frac{f(x_n)}{f'(x_n)}.$
+$x_{n+1} = x_n - \Delta_n = x_n - \frac{1}{f'(x_n)}f(x_n) = x_n - \frac{f(x_n)}{f'(x_n)}.$
 
-To obtain the special case of Heron's square root approximation method we have to define $f$ and $f'$ and substitute these into Newton's formula:
+where $\Delta_n$ is the *step-width* between approximating steps $x_n$
+
+$\Delta_n = (x_n - x_{n+1}) = \frac{1}{f'(x_n)}f(x_n)$
+
+so that
+
+$\sqrt{a} = \lim_{n \to \infty} x_n.$
+
+The step-width $\Delta_n$ depends *inversely* on the steepness $f'(x_n)$ of $f$ at the point $x_n$. If the steepness is high the stepwidth is small and vice versa. Furthermore $\Delta_n$ depends proportionally on the function value $f(x_n).$
+
+To derive the special case of Heron's square root approximation method we have to define $f$ and $f'$ and substitute these definitions for the symbols $f$ and $f'$ into Newton's formula:
 
 $f = x^2 - a$
 $f' = 2x.$
 $x_{n+1}= x_n - \frac{f(x_n)}{f'(x_n)}[f := (x^2 - a); f' := 2x]$
 
-So *Heron*'s approximation algorithm gets
+So *Heron*'s approximation formula becomes
 
 $x_{n+1}= x_n - \frac{x^2_n-a}{2x_n} = \frac{2x^2_n - x^2_n +a}{2x_n}=\frac{x^2_n+a}{2x_n}= \frac{1}{2}\left(x_n+\frac{a}{x_n}\right).$
 "
@@ -1460,6 +1470,7 @@ md"
 - **Wagenknecht, Ch.**; Programmierparadigmen: Eine Einführung auf der Grundlage von Racket, Wiesbaden: Springer Vieweg, 2016, 
 - **Wikipedia**; *Heron's Method*; [https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Heron's_method); last visit 2023/04/08
 - **Wikipedia**; *Lambda calculus definition*, [https://en.wikipedia.org/wiki/Lambda_calculus_definition](https://en.wikipedia.org/wiki/Lambda_calculus_definition); last visit 2023/03/26
+- **Wikioedia**; *Newton's method*; [https://en.wikipedia.org/wiki/Newton%27s_method](https://en.wikipedia.org/wiki/Newton%27s_method); last visit 2023/04/09
 
 "
 
