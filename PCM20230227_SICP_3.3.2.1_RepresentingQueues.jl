@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: 3.3.2.1 [Representing Queues](https://sarabander.github.io/sicp/html/3_002e3.xhtml#g_t3_002e3_002e2) (FIFOs)
 ##### file: PCM20230227\_SICP\_3.3.2.1\_RepresentingQueues.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/03/03 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/04/10 ***
 
 ====================================================================================
 "
@@ -47,7 +47,8 @@ cdr(cons::Cons) = cons.cdr
 #------------------------------------------------------------------------------------
 # this method pretty-prints a latent hierarchical cons-structure as a nested 
 #    tuple structure which has similarity with a Lisp- or Scheme-list
-# also used in 2.2.2 and 3.3.1
+# also used in 3.3.1 and 3.3.2.1
+# case 4 (one-dotted-pair) is new here for ch-3.3.3.1
 #------------------------------------------------------------------------------------
 function pp(consStruct)
 	#--------------------------------------------------------------------------------
@@ -61,6 +62,10 @@ function pp(consStruct)
 		# one-element list                                  # termination case_3 
 		elseif (typeof(car(consStruct)) <: Atom) && (cdr(consStruct) == :nil)
 			Tuple(push!(arrayList, pp(car(consStruct))))
+		#----------------------------------------------------------------------------
+		# one-dotted-pair                                   # termination case_4
+		elseif (typeof(car(consStruct)) <: Atom) && (typeof(cdr(consStruct)) <: Atom)
+			Tuple(push!(arrayList, car(consStruct), cdr(consStruct)))
 		#----------------------------------------------------------------------------
 		# flat multi-element list
 		elseif (car(consStruct) == :nil) && (typeof(cdr(consStruct)) <: Cons)
