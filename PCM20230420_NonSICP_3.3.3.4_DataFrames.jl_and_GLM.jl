@@ -267,7 +267,7 @@ function my_F_Test(SSE_full, SSE_red, df_idiogr, df_full, df_red; SSE_idiogr=0.0
 	F_numerator = (SSE_red - SSE_full)/(df_full - df_red)
 	F_denominator = (SSE_full - SSE_idiogr)/(df_idiogr - df_full)
 	F_ratio = F_numerator/F_denominator
-	alpha = ccdf(FDist((df_full - df_reduced),(df_idiographic - df_full)), F_ratio)
+	alpha = ccdf(FDist((df_full - df_red),(df_idiogr - df_full)), F_ratio)
 	(F_ratio=F_ratio, alpha=alpha)
 end # function my_F_Test
 
