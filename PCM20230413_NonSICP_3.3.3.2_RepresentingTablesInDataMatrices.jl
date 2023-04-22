@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### NonSICP: 3.3.3.2 Representing Tables in Data Matrices
 ##### file: PCM20230413\_NonSICP\_3.3.3.2\_RepresentingTablesInDataMatrices.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/04/20 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/04/22 ***
 
 ====================================================================================
 
@@ -104,6 +104,17 @@ $F_{(df_{id}-df_{full}),(df_{full}-df_{red_{H0}})} = \frac{\Delta SSE_{red_{H0} 
 
 "
 
+# ╔═╡ 5f106781-9247-4b28-af48-bedb20c50cb5
+function my_F_Test(SSE_full, SSE_red, df_idiogr, df_full, df_red; SSE_idiogr=0.0)
+	F_numerator = (SSE_red - SSE_full)/(df_full - df_red)
+	F_denominator = (SSE_full - SSE_idiogr)/(df_idiogr - df_full)
+	F_ratio = F_numerator/F_denominator
+	alpha = ((df_full - df_red) > 0) && ((df_idiogr - df_full) > 0) ? 
+		ccdf(FDist((df_full - df_red),(df_idiogr - df_full)), F_ratio) : 
+		nothing
+	(F_ratio=F_ratio, alpha=alpha)
+end # function my_F_Test
+
 # ╔═╡ 62769eaa-6c4f-4d0e-b40c-aca6f176fcca
 function myRegression(X, y, b; myPlot=false)
 	n  = size(X, 1); m  = size(X, 2)
@@ -134,8 +145,10 @@ function myRegression(X, y, b; myPlot=false)
 	F1 = (n - p)/k * RSq1/(1.0 - RSq1)
 	F2_numerator   = (SSP/(df_full - df_reduced))  # slope from full to reduced model
 	F2_denominator = (SSE/(df_id - df_full))       # slope from idiogr to full model
-	F2 = F2_numerator / F2_denominator
-	prob = (k > 0) && ((n - p) > 0) ? ccdf(FDist(k, n-p), F2) : nothing
+	# F2 = F2_numerator / F2_denominator
+	result = my_F_Test(SSE, SST, n, df_full, df_reduced; SSE_idiogr=0.0)
+	F2    = result.F_ratio
+	prob  = result.alpha
 	#-------------------------------------------------------------------
 	if (F2 !== Inf) && (F2 !== NaN) && (F2 !== nothing) # && (1.0 ≤ F2)
 		F2_trunc    = round(F2;   digits=3)
@@ -1491,6 +1504,7 @@ version = "1.4.1+0"
 # ╟─bc5c51f0-e901-4c0d-bbea-befa07d850ab
 # ╟─3305cc85-54f5-48ef-8da8-27aa232fe028
 # ╟─ddcc1eb9-c838-4bc3-ad02-58a43808d4e7
+# ╠═5f106781-9247-4b28-af48-bedb20c50cb5
 # ╠═62769eaa-6c4f-4d0e-b40c-aca6f176fcca
 # ╠═5771dbf1-41a3-4895-b2e8-df62d0b56f22
 # ╠═f82a787e-d341-4152-9797-423e74c7f25d
