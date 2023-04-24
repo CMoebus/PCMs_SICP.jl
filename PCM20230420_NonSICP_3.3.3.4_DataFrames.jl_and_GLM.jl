@@ -13,21 +13,26 @@ md"
 
 #### NonSICP: 3.3.3.4 DataFrames.jl and GLM.jl
 ##### file: PCM20230420\_NonSICP\_3.3.3.4\_DataFrames.jl\_and\_GLM.jl
-##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/04/22 ***
+##### Julia/Pluto.jl-code (1.8.5/0.19.12) by PCM *** 2023/04/24 ***
 
 ====================================================================================
-"
 
+"
 
 # ╔═╡ 0f2f6abc-7e7f-491f-85d0-7ddd4d87fa4d
 md"
 ---
-##### 1. Condeptual Models 
+##### 1. Conceptual Models 
+
+These models are extreme models concerning the number of parameters. According to my teaching experience they are useful for the determination of *degrees of freedom* in hypothesis testing.
+
 ###### 1.1 Idiographic Model
 (Namboodiri et al, 1975, p.79f)
 
-###### $SSE_{idiographic} = 0$ 
-(= *error* sum of squares or *residual* sum of squares)
+The *idiographic* model is extreme in the sense that we assume that each of the $n$ observations stems from a different population. So we have $n$ parameters and $df_{idiographic}=n$ degrees of freedom. As a direct consequence is the *error* sum of squares or *residual* sum of squares equal zero: 
+
+$SSE_{idiographic} = 0.$ 
+
 "
 
 # ╔═╡ 17ef543a-8d6d-41a4-8e9d-c03ab891214a
@@ -68,6 +73,9 @@ SSE_idiograph = deviance(model_idiograph)
 md"
 ---
 ###### 1.2 Random-Variation Model (= $H_0$: Reduced model) 
+(Namboodiri et al, 1975, p.77f)
+
+The *random-variational* (= maximal *reduced*) model is extreme in the sense that we assume that all of the $n$ observations stems from one population. So we have $p=1$ parameter and $df_{reduced}=1$ degree of freedom. As a direct consequence is the *error* sum of squares or *residual* sum of squares maximal: 
 "
 
 # ╔═╡ 90c439a3-a24a-4e20-9fad-4913a21c0d6a
@@ -103,7 +111,7 @@ md"
 # ╔═╡ 24fd4728-87da-45ce-95f0-b2b4d5f85530
 md"
 ---
-##### 2. t-Test of two means 
+##### 2. Fixed-effects Classical Linear Model (= t-Test of two sample means) 
 (here by application of F-Test)
 "
 
@@ -113,7 +121,7 @@ datafr = DataFrame(Gr1=Int[], Gr2=Int[], Improvement=Real[]);
 # ╔═╡ 218cb2c7-9c99-45ba-84fb-09a9a0726aa0
 md"
 ---
-###### Data from Namboodiri et al. (Table 3.1, 1975, p.94)
+##### 2.1 Data from Namboodiri et al. (Table 3.1, 1975, p.94)
 
 "
 
@@ -169,8 +177,8 @@ Xy = Matrix(datafr)
 # ╔═╡ 5be4c7c3-52a5-4363-b030-0a22caa325fc
 md"
 ---
-##### Idiographic Model 
-(only conceptual relevant)
+##### 2.2 Idiographic Model 
+(only conceptually relevant)
 ###### $SSE_{idiographic} = 0$ 
 (= *error* sum of squares or *residual* sum of squares)
 "
@@ -184,7 +192,7 @@ df_idiographic = nrow(datafr)
 # ╔═╡ 4b2727dd-48bd-4c0a-aaab-0e07ef1304cd
 md"
 ---
-##### $H_1$: Full model
+##### 2.3 $H_1$: Full model
 "
 
 # ╔═╡ a0087a7b-41de-45b7-a03a-21aac280c20b
@@ -229,7 +237,7 @@ end
 # ╔═╡ ad52d876-86be-48cd-95f1-dcb024fb559e
 md"
 ---
-##### $H_0$: Reduced model 
+##### 2.4 $H_0$: Reduced model 
 "
 
 # ╔═╡ a14c7b4f-6159-4f91-911f-eef5737dacb7
@@ -259,7 +267,7 @@ end
 # ╔═╡ f76dafc9-d696-4dea-9648-1b9619e5e9b9
 md"
 ---
-##### F-Test
+##### 2.5 F-Test
 "
 
 # ╔═╡ fd10613b-e38f-4321-b605-d9782510eca4
@@ -1445,7 +1453,7 @@ version = "1.4.1+0"
 # ╟─2970a631-0153-464d-ae46-1d9ce5d80611
 # ╠═538b1dba-584e-42e8-89e6-e57c1ef32942
 # ╠═e6128e02-4a3f-4008-8bfc-4beba0a781bf
-# ╟─5dabc7e3-7e5d-4038-bfb0-64d567198bd8
+# ╠═5dabc7e3-7e5d-4038-bfb0-64d567198bd8
 # ╟─ad52d876-86be-48cd-95f1-dcb024fb559e
 # ╠═a14c7b4f-6159-4f91-911f-eef5737dacb7
 # ╟─f9ee228f-bba5-451b-800d-09744a7e156e
