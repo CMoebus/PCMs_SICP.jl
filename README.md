@@ -15,4 +15,4 @@ The time investment needed is not trivial. Of course this depends on the preknow
 
 C.M.
 
-P.S.: The electronic version of SICP can be found here (https://sarabander.github.io/sicp/html/Foreword.xhtml#Foreword) and here (https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html.
+P.S.: The electronic version of SICP can be found here (https://sarabander.github.io/sicp/html/Foreword.xhtml#Foreword) and here (https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html).
