@@ -1,0 +1,1168 @@
+### A Pluto.jl notebook ###
+# v0.19.26
+
+using Markdown
+using InteractiveUtils
+
+# ╔═╡ 4f6f054b-4d32-4e63-9551-b31557779b95
+using Test
+
+# ╔═╡ e7e0d520-14e2-11ee-015f-dbe97ba446e0
+md"
+====================================================================================
+#### SICP: [3.4.2 Mechanisms for Controlling Concurrency](https://sarabander.github.io/sicp/html/3_002e4.xhtml#g_t3_002e4_002e2)
+##### file: PCM20230627\_SICP\_3.4.2\_MechanismsControllingConcurrency.jl
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/07/17 ***
+====================================================================================
+"
+
+# ╔═╡ 46d8fcde-9f7d-40ba-a1e5-255dbecd7515
+md"
+---
+##### 3.4.2.1 Problematic *Interleaving* of Processes
+
+In SICP (p.304) we can read : '...*suppose that we have extended Scheme to include a procedure called parallel-execute* :
+
+$(parallel\text{-}execute\; ⟨p_₁⟩\; ⟨p_₂⟩ \;…\; ⟨p_ₖ⟩)$
+
+$\;$
+
+*Each $⟨p⟩$ must be a procedure of no arguments. Parallel-execute creates a separate process for each $⟨p⟩$, which applies $⟨p⟩$ (to no arguments). These processes all run concurrently.*'
+
+SICP suggests that e.g. $(parallel\text{-}execute\; ⟨p_₁⟩\; ⟨p_₂⟩)$ applied to $p_1 = (lambda\; ()\; (set! \; x\; (*\;x\; x)))$ and $p_2 = (lambda\; ()\; (set! \; x\; (+\; x\; 1)))$ creates two *concurrent* processes and generates depending on the *interleaving* of the events of $P_1$ and $P_2$ a set of five result possibilies:
+
+- '$101$': $P_1$  sets $x$ to $100$ and then $P_2$  increments
+     $x$ to $101$.
+- '$121$': $P_2$  increments $x$ to $11$ and then $P_1$  sets
+     $x$ to $x$ times $x$.
+- '$110$': $P_2$  changes $x$ from $10$ to $11$ between the 
+     two times that $P_1$  accesses the value of 
+     $x$ during the evaluation of $(*\, x\; x)$.
+- '$11$': $P_2$  accesses $x$, then $P_1$  sets $x$ to $100$, 
+     then $P_2$  sets $x$.
+- '$100$': $P_1$  accesses $x$ (twice), then $P_2$  sets
+     $x$ to $11$, then $P_1$  sets $x$.
+
+"
+
+# ╔═╡ fc5e191f-ea12-453c-80ad-96943e32ebe7
+md"
+To avoid undesired interleavings of processes SICP proposes *serialization* procedures. '*A serializer takes a procedure as argument and returns a serialized procedure that behaves like the original procedure.*'
+
+...
+
+'*Thus, in contrast to the example above, executing*
+
+(define x 10)
+
+(define s (make-serializer))
+
+(parallel-execute 
+
+_____(s (lambda () (set! x (* x x))))
+
+_____(s (lambda () (set! x (+ x 1)))))
+
+*can produce only two possible values for $x$, $101$ or $121$. The other possibilities are eliminated, because the execution of $P_1$ and $P_2$ cannot be interleaved.*'(SICP, p.305) 
+
+"
+
+# ╔═╡ 85b08ffe-904b-4395-b57b-04101617ec6d
+md"
+The authors of SICP do *not* report any Scheme code implementing $parallel-execute$. Instead they mention only the *possibility* of *extending* Scheme. This has not even been achieved in the [*R7RS*-standard](https://small.r7rs.org/attachment/r7rs.pdf). 
+
+As can be seen from our implementation of $parallel\text{-}execute$ in Julia we are able to reproduce 4 of 5 results. Only the value '$110$' is so twisted that we cannot generate it here with this code.  
+"
+
+# ╔═╡ cb58d01e-ca23-4fc3-83ae-e4202e0eb3d3
+md"
+---
+##### 3.4.2.2 Attempt to Implement $parallel-execute$ in Julia
+"
+
+# ╔═╡ 41f3e7e3-8a70-481a-b616-935140077fa5
+Threads.nthreads()
+
+# ╔═╡ 32aebbb0-7736-4273-942e-3a0a327ec822
+md"
+The values displayed can be reconstructed by *function applications* and *modifications* of the values a *shared* variable $x$. They are the result of *two serialized* applications of $P_1(x):=thunk1()$ and $P_2(x):=thunk2()$. $thunk1$ and $thunk2$ are not ordinary *functions* but *closures*:
+
+- '100': $P_1(x:=10)=100$
+- '011': $P_2(x:=10)=11$
+- '121': $P_1(x:=P_2(x:=10))=121$
+- '101': $P_2(x:=P_1(x:=10))=101$
+
+"
+
+# ╔═╡ 200ffa79-ce45-4697-8da3-f0c772bd6c26
+let values = []
+	#---------------------------------------------------------------------------
+	function parallelExecute(thunks::Function...)
+		Threads.@threads for thunk in thunks
+			value = thunk()
+			if !(value ∈ values)
+				prepend!(values, value)
+			end # if
+		end # for
+	end # function parallelExecute
+	#---------------------------------------------------------------------------
+	for i in 1:1E3                    # i in 1: 1000
+		x = 10                        # shared variable
+		# construction of two closures thunk1 and thunk2
+		thunk1  = () -> x = *(x, x)   # x is captured and set in closure thunk1
+		thunk2  = () -> x = +(x, 1)   # x is captured and set in closure thunk2
+ 		parallelExecute(thunk1, thunk2)	
+	end # for
+	#---------------------------------------------------------------------------
+	values
+end # let
+
+# ╔═╡ 10f742c5-f658-43be-ae52-c5e0cf73825a
+md"
+---
+###### *Locking* of threads make *no* difference
+*Locking* threads makes no difference. This is not astonishing because *interleaving* is only responsible for generating $110$. This value could not even be generated by *no* locking before.
+"
+
+# ╔═╡ 81e5b644-e055-470b-8a96-c087b4a95438
+let values = []
+	#---------------------------------------------------------------------------
+	function parallelExecute(thunks::Function...)
+		lk = ReentrantLock()
+		Threads.@threads for thunk in thunks
+			lock(lk)
+			try
+				begin
+					value = fetch(Threads.@spawn(thunk))()
+					if 	!(value ∈ values)
+						prepend!(values, value)
+					end # if
+				end # begin
+			finally
+				unlock(lk)
+			end # try
+		end # for
+	end # function parallelExecute
+	#---------------------------------------------------------------------------
+	for i in 1:1E3                    # i in 1: 1000
+		x = 10                        # shared variable
+		# construction of two closures thunk1 and thunk2
+		thunk1  = () -> x = *(x, x)   # x is captured and set in closure thunk1
+		thunk2  = () -> x = +(x, 1)   # x is captured and set in closure thunk2
+ 		parallelExecute(thunk1, thunk2)	
+	end # for
+	#---------------------------------------------------------------------------
+	values
+end # let
+
+# ╔═╡ 8beea081-7010-48ec-aa75-e400e4534c7d
+md"
+---
+##### 3.4.2.3 Serializers
+"
+
+# ╔═╡ 9e7959c9-ce56-4fd8-9930-645232193104
+md"
+---
+###### Tests of $apply$ and $s$
+"
+
+# ╔═╡ af1bd3b4-c2ef-4ebe-a4a9-ee4b612290a5
+md"
+---
+Here we must admit that our $parallelExecute$ is *not* sufficiently constrained to avoid the '*one-shot*' values $11$ and $100$. Both undesired values breach the requirement of SICP (p.305, middle).
+"
+
+# ╔═╡ 037b113a-13ed-4343-b307-659031c49235
+md"
+---
+Extending thunk1 and thunk2 to thunk3 and thunk4 by chaining the crossed bodies of the thunks introduces new problems with $parallelExecute$. Now, we get the desired values $101$ and $121$ as desired but at the cost of new unpleasant values $14642$ and $10404$.
+"
+
+# ╔═╡ 5ee8dd91-de5c-4da7-9852-ff8f132e0758
+md"
+---
+###### Serializing $makeAccount$ from SICP, ch.3.1.1
+"
+
+# ╔═╡ 94bd0392-afc9-4d00-8bc3-e0dcfdd3cf07
+md"
+---
+##### 3.4.2.4 Tasks (Toying with Julia)
+[https://docs.julialang.org/en/v1/base/parallel/#Base.schedule](https://docs.julialang.org/en/v1/base/parallel/#Base.schedule)
+"
+
+# ╔═╡ 657dd719-c308-403a-a39c-319aa8437f29
+md"
+We try to solve the *serialization* by arranging Julia *Tasks*.
+
+"
+
+# ╔═╡ 4cb31e2c-6742-4e4e-af6f-8b03382905ff
+md"
+---
+###### Constructor $Task(<thunk>)$ and $schedule(<task>)$
+"
+
+# ╔═╡ 121d6b08-2bdd-4bd3-a33a-e8dfe8cbce8a
+function parallelConstrainedExecute(thunks::Function...)
+	myRunnableTasks = map(thunk -> Task(thunk), thunks)            # Task(...)
+	myReadyTasks =                                                 # schedule
+		map(myRunnableTask -> schedule(myRunnableTask), myRunnableTasks)
+	values = map(myReadyTask -> fetch(myReadyTask), myReadyTasks)  # fetch
+	for value in values 
+		println("value = $value")
+	end # for
+	values
+end # function parallelConstrainedExecute
+
+# ╔═╡ f17cde97-0135-4aa7-a1dc-b9e69b26c69d
+function parallelConstrainedExecute2(thunks::Function...)  # line 2 - 4 compressed
+	values = map(thunk -> fetch(schedule(Task(thunk))), thunks)
+	for value in values 
+		println("value = $value")
+	end # for
+	values
+end # function parallelConstrainedExecute2
+
+# ╔═╡ 47822f31-42df-47dc-af25-802d589ee36d
+md"
+---
+###### Constructing *thunk-like closures* catching the nonlocal variable $x$ 
+"
+
+# ╔═╡ a4bedf08-a420-4d08-ab87-d1fd441aadf7
+x = 10
+
+# ╔═╡ 9429e681-9edb-44a6-80f0-e105656db73f
+thunk1  = () -> x = *(x, x)
+
+# ╔═╡ 60593143-4e61-4798-8082-9284f52ff776
+thunk2  = () -> x = +(x, 1)
+
+# ╔═╡ 2125629d-4544-4412-8012-17703f0eea1c
+md"
+---
+$\text{thunk 1: }\; x := 10; x := 10^2 = 100$
+$\text{thunk 2: }\; x := 10; x := 10+1 = 11$
+"
+
+# ╔═╡ b94c5caa-217a-4f85-a1ad-7196d17ff169
+parallelConstrainedExecute(thunk1, thunk2)
+
+# ╔═╡ a0713ccb-e2b0-4de2-8f76-215aff1e4eef
+thunk11 = () -> x = *(x, x)
+
+# ╔═╡ 26e74b60-3ff0-4726-bb7e-e26eac5d14f8
+thunk12 = () -> x = +(x, 1)
+
+# ╔═╡ 34365608-2bc7-46ba-b741-b8712e2a7a60
+parallelConstrainedExecute2(thunk11, thunk12)
+
+# ╔═╡ dead4116-02cf-4dc1-8c34-2570dc6d23ee
+md"
+---
+###### Resuming tasks $Task(thunk1)$ and $Task(thunk2)$
+$\text{thunk 2: }\; x := 11; x := 11+1 = 12$
+$\text{thunk 1: }\; x := 100; x := 100^2 = 10000$
+"
+
+# ╔═╡ 0ae5b1e8-c4ed-4612-94dd-5d318eab4592
+parallelConstrainedExecute(thunk2, thunk1)
+
+# ╔═╡ 49e42511-576c-4afb-9f85-d7b1cc47b34b
+md"
+---
+###### Thunk-like *closures* with *sequences* of statements
+"
+
+# ╔═╡ 9a4839df-9a5e-49a0-b562-f0588943a39f
+thunk3 = () -> begin x = *(x, x); x = +(x, 1) end
+
+# ╔═╡ ed1e8ee5-f799-4cee-bb4a-51ee0f1ff6c6
+# thunk3() ==> 101
+
+# ╔═╡ e8c47b01-8e91-4bce-943a-85523499b644
+thunk4 = () -> begin x = +(x, 1); x = *(x, x) end
+
+# ╔═╡ 03c8c4c0-e922-4dbc-a6be-3b95d2513f87
+# thunk4() ==> 121
+
+# ╔═╡ ca728375-b627-4793-b56b-7f2c86ddd31b
+md"
+---
+###### *Parallel Noninterleaved*  Execution of *Tasks*
+This generates the *same* result as is displayed on the middle of p.305 in SICP:
+
+$\text{thunk 3: }\; x := 10; x := 10^2 = 100; x:= 100 + 1 = 101$
+$\text{thunk 4: }\; x := 10; x := 10+1 = 11; x:= 11^2 = 121$
+"
+
+# ╔═╡ 16064ee9-b820-4073-b049-f95327d5c727
+parallelConstrainedExecute(thunk3, thunk4)
+
+# ╔═╡ 72b1bfaf-5412-4e39-9a9e-28c947b13e08
+x
+
+# ╔═╡ 7eba613f-1600-4289-84b3-7bb694cb4a31
+md"
+---
+###### *Resuming* Parallel *Noninterleaved*  Execution of *Tasks*
+$\text{thunk 4: }\; x := 121; x := 121+1 = 122; x:= 122^2 = 14884$
+$\text{thunk 3: }\; x := 101; x := 101^2 = 10201; x:= 10201 + 1 = 10202$
+"
+
+# ╔═╡ c964f9f8-0405-4c4c-a369-3241364d969b
+parallelConstrainedExecute(thunk4, thunk3)
+
+# ╔═╡ 43281024-364a-4233-a1dd-8466f473fb27
+x
+
+# ╔═╡ a326ece0-0bfd-4e18-9bfb-2e800ea99f6b
+md"
+---
+###### *Parametrizing* a Task
+*Embedding* a task into a function *with* parameter
+"
+
+# ╔═╡ 9d2ed08b-e611-4ac3-8a7b-3bf00657cca6
+mySquare1(x) = 
+	fetch(schedule(Task(() -> begin x = *(x, x); println("x^2 = $x"); x end)))
+
+# ╔═╡ 732f7bda-6401-456f-8ab6-465e89675463
+mySquare1(4)
+
+# ╔═╡ 52d3a3bc-34ea-4e43-a78a-5d9818127aa9
+mySquare2(x) = fetch(@async begin x = *(x, x); println("x^2 = $x"); x end)
+
+# ╔═╡ 180cd542-20d6-4b6f-87b0-d1572d0d3669
+mySquare2(5)
+
+# ╔═╡ 2d8e4f7c-323a-4507-be9b-a1b89faec202
+mySquare3(x) = fetch(@sync begin x = *(x, x); println("x^2 = $x"); x end)
+
+# ╔═╡ 7f7e26d3-44fd-4d0b-843c-e8cd3946fdab
+mySquare3(6)
+
+# ╔═╡ ea511510-2f47-4217-814f-31619fa59ae5
+mySquare4(x) = fetch(Threads.@spawn begin x = *(x, x); println("x^2 = $x"); x end)
+
+# ╔═╡ c2b9f0d8-7dca-4d32-a61e-5076f426a31b
+mySquare4(7)
+
+# ╔═╡ 73a59ed6-9e19-4256-a20e-647a9516c27d
+mySquare4(8)
+
+# ╔═╡ 97dee155-7cd9-4434-8226-ed142fb0d8d4
+x
+
+# ╔═╡ 1541a094-2a43-44aa-b992-9e1c228ac02f
+md"
+---
+###### Alternative version of $parallelExecute$
+
+ $Task$ and $schedule$ replaced by *macro @async*
+"
+
+# ╔═╡ 80058f4a-80ed-4e52-a57d-19d83e8da7a5
+function parallelConstrainedExecute3(thunks::Function...) 
+	values = map(thunk -> fetch(@async(thunk))(), thunks)     
+	for value in values                    #  ^^---- beware the '()' after fetch(...)
+		println("value = $value")
+	end # for
+	values
+end # function parallelConstrainedExecute3
+
+# ╔═╡ 053bc6f8-b984-4e40-92a7-53f36e78ec64
+function parallelConstrainedExecute4(thunks::Function...) 
+	threads = map(thunk -> Threads.@spawn(thunk), thunks)
+	values  = map(thread -> fetch(thread)(), threads)     
+	for value in values               #  ^^---- beware the '()' 
+		println("value = $value")
+	end # for
+	values
+end # function parallelConstrainedExecute4
+
+# ╔═╡ 473b1c93-e832-4a33-8e43-400734b97383
+x
+
+# ╔═╡ 60c142a3-2629-484c-a4e3-ec22241077fa
+parallelConstrainedExecute(() -> mySquare1(11), () -> mySquare1(12))
+
+# ╔═╡ bd7f7fbd-15c0-4861-bd92-394739dd1b29
+parallelConstrainedExecute2(() -> mySquare1(11), () -> mySquare1(12))
+
+# ╔═╡ aa2626c8-a946-479e-957d-51c9c3ee15ff
+parallelConstrainedExecute3(() -> mySquare1(11), () -> mySquare1(12))
+
+# ╔═╡ 43cdd518-9bcb-43b0-a284-14c462dd818b
+parallelConstrainedExecute4(() -> mySquare1(11), () -> mySquare1(12))
+
+# ╔═╡ 743ee039-dd02-4f89-9ca1-4c3c28015a7e
+md"
+---
+##### 3.4.2.5 Scheme-like Functions in Julia
+"
+
+# ╔═╡ 77690226-4848-4f56-9064-6e54e3e21bf1
+md"
+###### Scheme-like Constructors
+"
+
+# ╔═╡ e302e574-292a-4d32-acfa-5cdffe1c3f0c
+#----------------------------------------------
+# taken from 3.3.1
+#----------------------------------------------
+mutable struct Cons # 'mutable' is dangerous ! 
+	car
+	cdr
+end # struct Cons
+
+# ╔═╡ 46604c2b-1614-4e88-85f6-b83e931ccf36
+cons(car, cdr) = Cons(car, cdr)     # 'Cons' is a structure with 'car' and 'cdr'
+
+# ╔═╡ fe002b38-1bd4-4518-ab05-ee5d04052ae9
+#---------------------------------------------------
+# taken from ch. 2.2.1
+#---------------------------------------------------
+list(elements...) = 
+	if ==(elements, ())
+		cons(:nil, :nil)
+	elseif ==(lastindex(elements), 1)
+		cons(elements[1], :nil)
+	else
+		cons(elements[1], list(elements[2:end]...))
+	end #if
+
+# ╔═╡ 65c2d70d-4d17-43ba-8f81-61175820f082
+md"
+---
+###### Scheme-like Selectors
+"
+
+# ╔═╡ 241e2603-e722-4802-a542-df7b681eeb7c
+car(cons::Cons) = cons.car
+
+# ╔═╡ 4925d5a9-94fb-483f-8390-2597cb2bb8db
+cdr(cons::Cons) = cons.cdr
+
+# ╔═╡ 115ebd2c-be0a-4357-b13d-0ccf49a40f4a
+md"
+---
+###### Scheme-like Mutators
+"
+
+# ╔═╡ 44418d60-7667-4492-be74-cf663c9e0546
+# taken from 3.3.1
+#----------------------------------------------
+function setCar!(cons::Cons, car) 
+	cons.car = car
+	cons
+end # setCar!
+
+# ╔═╡ 52192c0d-c0f1-42e3-a74b-2b93a9261d6f
+function testAndSetTrue!(cell::Cons)
+	if 	car(cell)
+		true
+	else
+		begin  # atomic (?) expression
+			setCar!(cell, true)
+			false
+		end # begin
+	end # if
+end # function testAndSetTrue!
+
+# ╔═╡ ff391db3-78b6-4781-ac88-cf84b950715d
+begin
+	cellFalse = list(false)                        # ==> Cons(false, :nil)
+	@test testAndSetTrue!(cellFalse) == false      # ==> Passed  -->  :)
+end
+
+# ╔═╡ 3554efb4-afae-4786-9d65-7b193f0e1309
+begin 
+	cellTrue = list(true)                          #  ==> Cons(true, :nil)
+	@test testAndSetTrue!(cellFalse) == true       # ==> Passed  -->  :)
+end
+
+# ╔═╡ 0de8984e-66f0-4132-852c-616fb1185c25
+clear!(cell) = setCar!(cell, false)                # SICP, p.312
+
+# ╔═╡ 37060b03-3363-46bf-afc7-6de267dbd73e
+function makeMutex()                               # SICP, p.312
+	let cell = list(false)
+		function theMutex(message)
+			if  message == :acquire
+				if testAndSetTrue!(cell)
+					theMutex(:acquire)             # retry
+				end # if
+			elseif message == :release
+				clear!(cell)
+			elseif message == :content
+				println("content = $cell")
+			else 
+				error("unkonwn message = $message")
+			end # if
+		end # function theMutex
+		theMutex
+	end # let
+end # function makeMutex
+
+# ╔═╡ 03a1b0f3-b6b9-4bf8-9cec-4ade88cf9752
+myMutex = makeMutex()
+
+# ╔═╡ 63ca1337-d8f6-4874-a0f3-83f961a666dd
+myMutex(:content)
+
+# ╔═╡ 976e2284-ee31-4ae1-b5dc-09c332b4d4a2
+myMutex(:acquire)
+
+# ╔═╡ aebf48f1-0382-446c-b051-a514a1f0fb32
+myMutex(:release)
+
+# ╔═╡ 07da04ca-2b59-4ecd-a2c9-107a7e916db3
+# taken from 3.3.1
+#----------------------------------------------
+function setCdr!(cons::Cons, cdr) 
+	cons.cdr = cdr
+	cons
+end # setCdr!
+
+# ╔═╡ 9cc80c03-5dc9-40d4-8208-fa9de4a8ca3a
+md"
+---
+###### Scheme-like Predicates
+"
+
+# ╔═╡ 64a15081-ae29-40e9-9823-0c42a1ce5d3d
+function null(list)
+	list == ()   ? true :	
+	list == :nil ? true :
+	((car(list) == :nil) || car(list) == ()) && 
+		(cdr(list) == :nil ) ? true : false
+end # function
+
+# ╔═╡ 2a91210e-c352-47e7-907c-48898ef9d56a
+md"
+---
+###### Scheme-like Functions
+"
+
+# ╔═╡ da4c5a3f-cd3b-48fd-888c-4021bc8c6d45
+function listToArray(list; array=[])
+	if null(list) 
+		array
+	else 
+		push!(array, car(list))
+		listToArray(cdr(list); array)
+	end # if
+end # function listToTuple
+
+# ╔═╡ afca2da0-d2df-4c80-849c-f0d7891bc852
+function arrayToTuple(array::Array)
+	(array...,)
+end # function arrayToTuple
+
+# ╔═╡ 37f331bd-4cba-4a51-afb7-6dfbb27b9d99
+listToArray(list(1, 2, 3, 4))
+
+# ╔═╡ 166cb22a-30bc-4d6c-9b15-2ca7510756c3
+arrayToTuple(listToArray(list(1, 2, 3, 4)))
+
+# ╔═╡ 29af5a86-d9ea-4cef-a32c-20a0b26839f2
+myList = arrayToTuple(listToArray(list(1, 2, 3, 4)))
+
+# ╔═╡ b1b1f1ae-c18d-4758-8e8a-2f5a173aa931
+md"
+---
+For the definition of $apply$ in *Scheme* see [Revised$^7$ Report on the Algorithmic Language Scheme (R7RS), p.50](https://small.r7rs.org/attachment/r7rs.pdf)
+"
+
+# ╔═╡ ec05f441-cd7a-4983-8abf-3ff3bb09196e
+function apply(proc::Function, args...)
+	if args == ()
+		error("args == ()")
+	elseif proc ∈ (+, *, -, /) 
+		reduce(proc, args) 
+	else
+		proc(args...)
+	end # if
+end # function apply
+
+# ╔═╡ f0ee68aa-a538-4de1-97da-be3fd5ce34da
+function apply(thunk::Function)
+	thunk()
+end # function apply
+
+# ╔═╡ db347894-3e55-484e-a09e-7c60497035a5
+function makeSerializer()
+	let mutex = makeMutex()
+		proc ->
+			begin
+				function serializedProc(args...)
+					mutex(:acquire)
+					let val = apply(proc, args...)
+						mutex(:release)
+						val
+					end # let
+				end # function serializedProc
+				serializedProc
+			end # anonymous function
+	end # let
+end # function makeSerializer
+
+# ╔═╡ 451dd460-237c-4929-9f70-f2a225ef474f
+let values = []
+	s = makeSerializer()
+	#---------------------------------------------------------------------------
+	function parallelExecute(thunks::Function...)
+		Threads.@threads for thunk in thunks
+			value = thunk()
+			if !(value ∈ values)
+				prepend!(values, value)
+			end # if
+		end # for
+	end # function parallelExecute
+	#---------------------------------------------------------------------------
+	for i in 1:1E3                    # i in 1: 1000
+		x = 10                        # shared variable
+		# construction of two closures thunk1 and thunk2
+		thunk1  = () -> x = *(x, x)   # x is captured and set in closure thunk1
+		thunk2  = () -> x = +(x, 1)   # x is captured and set in closure thunk2
+ 		parallelExecute(s(thunk1), s(thunk2))	# with serialized thunks
+	end # for
+	#---------------------------------------------------------------------------
+	values
+end # let
+
+# ╔═╡ 563308fb-ae8e-41f5-ab99-3a1d87e80067
+let values = []
+	s = makeSerializer()
+	#---------------------------------------------------------------------------
+	function parallelExecute(thunks::Function...)
+		Threads.@threads for thunk in thunks
+			value = thunk()
+			objectId = objectid(thunk)
+			if !(value ∈ values)
+				prepend!(values, value)
+			end # if
+		end # for
+	end # function parallelExecute
+	#---------------------------------------------------------------------------
+	for i in 1:1E3                    # i in 1: 1000
+		x = 10                        # shared variable
+		# construction of two closures thunk3 and thunk4
+		thunk3 = () -> begin x = *(x, x); x = +(x, 1) end
+		thunk4 = () -> begin x = +(x, 1); x = *(x, x) end
+ 		parallelExecute(s(thunk3), s(thunk4))	
+	end # for
+	#---------------------------------------------------------------------------
+	values
+end # let
+
+# ╔═╡ 7f963c40-0b61-4b9d-b461-f4ca24c8ee33
+function makeAccount(balance4)
+	#-------------------------------------------------
+	function withdraw(amount)
+		if balance4 >= amount  
+			balance4 = balance4 - amount 
+		else
+			"Insufficient Funds"
+		end # if
+	end # function withdraw
+	#-------------------------------------------------
+	function deposit!(amount)
+		balance4 = balance4 + amount 
+	end # function deposit!
+	#-------------------------------------------------
+	function getBalance()
+		balance4
+	end # function getBalance
+	#-------------------------------------------------
+	let protected = makeSerializer()
+		function dispatch(message)
+			#---------------------------------------------
+			message == :withdraw ? withdraw :
+			#---------------------------------------------
+			message == :deposit! ? deposit! :
+			#---------------------------------------------
+			message == :getBalance ? getBalance() :
+				"Unknown request -- makeAccount $message"
+			#---------------------------------------------
+		end # function dispatch
+		#-------------------------------------------------
+		dispatch
+	end # let
+end # function makeAccount  
+
+# ╔═╡ 6911bdff-f497-459c-8d53-3095d19d1c75
+acc06 = makeAccount(100)           # make new account 'acc06'
+
+# ╔═╡ 3fc83580-5e19-45be-9cf1-ba9740d93add
+acc06(:getBalance)                 # ==> 100  -->  :)  
+
+# ╔═╡ 4a55799e-2538-423f-aaf3-884421cf2619
+acc06(:withdraw)(50)               # ==> 100 - 50 ==> 50  -->  :)
+
+# ╔═╡ 043af538-187b-4555-8ba0-9611681293f6
+acc06(:getBalance)                 # ==> 50
+
+# ╔═╡ e57c11b2-8a50-410e-8c53-41af34a1ce79
+acc06(:deposit!)(40)               # ==>  50 + 40 = 90  -->  :)
+
+# ╔═╡ 6edb392d-423c-4dc0-a1f3-421bf89c844b
+acc07 = makeAccount(200)           # make new account 'acc07'
+
+# ╔═╡ 42476841-2441-4af5-8b84-c858484f233e
+acc07(:getBalance)                 # ==> 200  -->  :) 
+
+# ╔═╡ 36bf8f15-0289-4bf2-ade8-f16eab496aa3
+let s = makeSerializer()
+	x = 10
+	mySquare(x) = x * x
+	apply(mySquare, x)                    # ==> 100  -->  :)
+	s(mySquare)(x)                        # ==> 100  -->  :)
+	thunk1  = () -> x = *(x, x)
+	thunk2  = () -> x = +(x, 1)
+	s(thunk1), s(thunk2)                  # ==> (serializedProc, serializedProc) 
+	s(thunk1)(), s(thunk2)()              # ==> (100, 101)
+end # let
+
+# ╔═╡ eefc19ca-b88e-49fb-aa24-3ddefcbce803
+md"
+---
+###### *Associative* Operators $+, *$
+"
+
+# ╔═╡ 0152f276-6076-46b3-9360-a397a624ee87
++(1, 2, 3, 4)
+
+# ╔═╡ 036507d2-938b-4474-b2e2-fe7bd9818aa8
+sum((1, 2, 3, 4))
+
+# ╔═╡ f8583558-b216-4cf7-ad22-77f0cd36be20
+apply(+, 1, 2, 3, 4)  # see [R7RS, p.50](https://small.r7rs.org/attachment/r7rs.pdf)
+
+# ╔═╡ f41674a3-b851-4e59-9ef3-c2b383f0f979
+apply(*, 1, 2, 3, 4)
+
+# ╔═╡ 430d53c9-fd8c-48e0-8248-5538ace7f500
+md"
+---
+###### *Left-associative* Operators $-, /$
+"
+
+# ╔═╡ c49b04bf-8066-4401-a3b1-94043407ae29
+apply(-, 1, 2, 3, 4) == ((1 - 2) - 3) -4 
+
+# ╔═╡ 0fdf6834-5779-4cbc-9748-489b084048bc
+apply(/, 1, 2, 3, 4) == ((1/2)/3)/4
+
+# ╔═╡ 4e43fa27-ae91-46e5-887e-6f518f3c698b
+apply(+)
+
+# ╔═╡ d8add106-75a0-4f98-a0f6-8146b1ad165f
+apply(sum)
+
+# ╔═╡ 9732eda7-ca99-46a5-b3b9-7fe22f528f18
+myList
+
+# ╔═╡ e490907c-63f9-496e-bf21-e9d789cc2dad
+apply(sum, myList)
+
+# ╔═╡ 9b741723-3b61-4ef4-b8a8-863dce9b6f44
+apply(sum, myList)
+
+# ╔═╡ 27e49e74-ba98-4672-8de6-19c55b5bb19e
+apply(sum, arrayToTuple(listToArray(list(1, 2, 3, 4))))
+
+# ╔═╡ 32b7dd57-d85a-4713-ab22-892e860956f0
+x
+
+# ╔═╡ 319b94d0-3ddc-4dc1-a465-3592c8f2589f
+apply(() -> x = x + 1)
+
+# ╔═╡ a993dc41-6304-4238-a275-83ec5c248b97
+let x = 10
+	thunk1() = *(x, x)
+	mySquare(x) = x^2
+	apply(+, 1, 2, 3, 4)   #  ==> 10
+	apply(*, 1, 2, 3, 4)   #  ==> 24
+    apply(thunk1)
+	apply(mySquare, 11)
+end # let
+
+# ╔═╡ fd00f627-6250-4db3-93ef-43a7e482e596
+function makeSerializer2()
+	let mutex = makeMutex()                       # ==> Cons(false, :nil)
+		proc -> begin 
+					function serializedProc(args...)
+						mutex(:acquire)
+						let 
+							if length(args) == 0 
+								val = apply(proc) 
+							else 
+								val = apply(proc, args...)
+						    end # if
+							mutex(:release)
+							val
+						end # let
+					end # function serializedProc
+					serializedProc
+				end # begin
+	end # let
+end # function makeSerializer2
+
+# ╔═╡ 68b1751f-0c72-4dd1-8b54-368808777932
+x
+
+# ╔═╡ 8736d1f5-cabf-4052-9be4-4ee61cf725c6
+apply(() -> x = *(x, x))
+
+# ╔═╡ 0092bb02-a1a6-40a4-b1b6-1fc1a9deacb1
+s = makeSerializer2()
+
+# ╔═╡ e9bf4628-28b8-4c96-9c3c-4979e6c6f44e
+typeof(s)
+
+# ╔═╡ 98c3fc01-4624-4610-a324-c69d3aee65a4
+s(() -> x = *(x, x))
+
+# ╔═╡ d4e88919-03cf-4dd7-8c90-9d24a99eef35
+s(() -> x = *(x, x))()
+
+# ╔═╡ 30f35160-0222-48b2-a148-c21c7023f664
+md"
+---
+##### 3.2.4.6 More Toying with Julia: Producer-Consumer
+"
+
+# ╔═╡ fb21096a-e8a8-48ab-bebd-cfdd5635c228
+function 
+	producer(c::Channel)
+        put!(c, "start")
+        for n=1:2
+            put!(c, 2n)
+        end
+        put!(c, "stop")
+end
+
+# ╔═╡ 790e78da-23dc-4d28-8e05-ced18c1d7444
+chnl = Channel(producer)
+
+# ╔═╡ aff27ecd-2e91-4db0-8e31-24bfa8cdc526
+take!(chnl)
+
+# ╔═╡ 2effcf99-d4cf-45f9-ab7c-b4c4bee4afe8
+take!(chnl)
+
+# ╔═╡ b32be782-ea3a-49a0-bae6-55965ff98946
+take!(chnl)
+
+# ╔═╡ f4b25dfd-f35f-4eaf-bf92-985960fc05ca
+take!(chnl)
+
+# ╔═╡ 0f0a8b69-fc89-4176-8b65-e8282e71e5f6
+for x in Channel(producer)
+    println(x)
+end # for
+
+# ╔═╡ e74d0f4d-8494-480f-b8b2-1b35c298ca88
+md"
+##### Generator Expressions
+"
+
+# ╔═╡ b7298673-cba3-4d32-948a-40be1939db13
+@test sum(1/n^2 for n=1:1000) ≈ 1.6439345666815615             # -->  :)
+
+# ╔═╡ a1f3c343-0703-41c9-8971-4816fb2a789d
+@test sum(1/n^2 for n=1:5)    ≈ 1.4636111111111112             # -->  :)
+
+# ╔═╡ c6513a1b-cc3c-4309-86f1-84b3f4009fba
+iterObject = (1/n^2 for n=1:5)
+
+# ╔═╡ f7e5f2b7-616f-45c3-addc-a2ec776e09a3
+@test arrayObject = [1/n^2 for n=1:5] ≈ [1.0, 0.25, 0.1111111, 0.0625, 0.04]
+
+# ╔═╡ d706c552-b07d-4126-b5aa-20029485dfe3
+@test sum([1/n^2 for n=1:5]) ≈ 1.4636111111111112              # -->  :)
+
+# ╔═╡ 8772b71f-a81e-4c84-989e-9907146a1adc
+@test sum(1/n^2 for n=1:10) ≈ sum([1/n^2 for n=1:10])          # -->  :)
+
+# ╔═╡ b99142b8-02fd-400b-b8db-80b888f06fcc
+for i in (1/n^2 for n=1:5)
+	println(i)
+end # for
+
+# ╔═╡ 72b45bd8-74cf-4e2c-959a-be7ad515f722
+enumerate(iterObject)
+
+# ╔═╡ 595c2c07-fec4-4a61-b3a0-8ace95868f9c
+for (index, value) in enumerate(iterObject)
+           println("$index $value")
+end
+
+# ╔═╡ 3d2790b0-1a1e-411a-87f3-237efbab0e64
+@test collect(Iterators.rest(iterObject, 4)) == [0.04]         # -->  :)
+
+# ╔═╡ 11ffd72c-afca-4c54-8e00-6b7d5d1e8217
+Base.Iterators.take(iterObject, 5)           # take atmost n elements of iterObject
+
+# ╔═╡ 9d51d9a3-d925-4f24-943b-313ccb28dc93
+# take n elements and collect them in an array
+@test collect(Iterators.take(iterObject, 5)) ≈ 
+	[1.0, 0.25, 0.1111111111111111, 0.0625, 0.04]               # -->  :)
+
+# ╔═╡ 1bd17c2d-2e1a-4156-8950-2f03cb47e7b5
+iterObject
+
+# ╔═╡ 759db3ae-a9ef-49ab-a87c-dd576af0c3d0
+(item1, state1) = iterate(iterObject)
+
+# ╔═╡ e10b4f37-a9f6-4053-b8df-4c1890cf841f
+(item2, state2) = iterate(iterObject, state1)
+
+# ╔═╡ d17629cc-4bbd-4330-b039-2ea671b2f706
+(item3, state3) = iterate(iterObject, state2)
+
+# ╔═╡ 05c5572f-b5e6-4f52-a0f5-027bb5c87b13
+(item4, state4) = iterate(iterObject, state3)
+
+# ╔═╡ 25ff2c2f-2da3-4329-8ab1-195b3e60143c
+(item5, state5) = iterate(iterObject, state4)
+
+# ╔═╡ 28e6d7e6-7592-4282-9eeb-eba92783d92f
+(item6, state6) = iterate(iterObject, state5)  # (item6, state6) don't exist
+
+# ╔═╡ 47ff6ba6-83f6-4a39-b3cd-69968545a05c
+md"
+---
+##### References
+
+- **Revised$^7$ Report on the Algorithmic Language Scheme (R7RS)**; July 6, 2013; [https://small.r7rs.org/attachment/r7rs.pdf](https://small.r7rs.org/attachment/r7rs.pdf); last visit 2023/07/10
+
+"
+
+# ╔═╡ d20b7580-4d5a-4bc0-85f2-0b676107ad22
+md"
+---
+##### end of Ch. 3.4.2
+
+"
+
+# ╔═╡ c2718560-fad8-4f2f-85a6-f186bd465ea6
+md"
+====================================================================================
+
+This is a **draft** under the Attribution-NonCommercial-ShareAlike 4.0 International **(CC BY-NC-SA 4.0)** license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+
+====================================================================================
+"
+
+# ╔═╡ 00000000-0000-0000-0000-000000000001
+PLUTO_PROJECT_TOML_CONTENTS = """
+[deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+"""
+
+# ╔═╡ 00000000-0000-0000-0000-000000000002
+PLUTO_MANIFEST_TOML_CONTENTS = """
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.9.2"
+manifest_format = "2.0"
+project_hash = "71d91126b5a1fb1020e1098d9d492de2a4438fd2"
+
+[[deps.Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[deps.InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+
+[[deps.Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[deps.Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[deps.Random]]
+deps = ["SHA", "Serialization"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
+
+[[deps.Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[[deps.Test]]
+deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+"""
+
+# ╔═╡ Cell order:
+# ╟─e7e0d520-14e2-11ee-015f-dbe97ba446e0
+# ╟─46d8fcde-9f7d-40ba-a1e5-255dbecd7515
+# ╟─fc5e191f-ea12-453c-80ad-96943e32ebe7
+# ╟─85b08ffe-904b-4395-b57b-04101617ec6d
+# ╟─cb58d01e-ca23-4fc3-83ae-e4202e0eb3d3
+# ╠═41f3e7e3-8a70-481a-b616-935140077fa5
+# ╟─32aebbb0-7736-4273-942e-3a0a327ec822
+# ╠═200ffa79-ce45-4697-8da3-f0c772bd6c26
+# ╟─10f742c5-f658-43be-ae52-c5e0cf73825a
+# ╠═81e5b644-e055-470b-8a96-c087b4a95438
+# ╟─8beea081-7010-48ec-aa75-e400e4534c7d
+# ╠═52192c0d-c0f1-42e3-a74b-2b93a9261d6f
+# ╠═3554efb4-afae-4786-9d65-7b193f0e1309
+# ╠═ff391db3-78b6-4781-ac88-cf84b950715d
+# ╠═0de8984e-66f0-4132-852c-616fb1185c25
+# ╠═37060b03-3363-46bf-afc7-6de267dbd73e
+# ╠═03a1b0f3-b6b9-4bf8-9cec-4ade88cf9752
+# ╠═63ca1337-d8f6-4874-a0f3-83f961a666dd
+# ╠═976e2284-ee31-4ae1-b5dc-09c332b4d4a2
+# ╠═aebf48f1-0382-446c-b051-a514a1f0fb32
+# ╠═db347894-3e55-484e-a09e-7c60497035a5
+# ╟─9e7959c9-ce56-4fd8-9930-645232193104
+# ╠═36bf8f15-0289-4bf2-ade8-f16eab496aa3
+# ╟─af1bd3b4-c2ef-4ebe-a4a9-ee4b612290a5
+# ╠═451dd460-237c-4929-9f70-f2a225ef474f
+# ╟─037b113a-13ed-4343-b307-659031c49235
+# ╠═563308fb-ae8e-41f5-ab99-3a1d87e80067
+# ╟─5ee8dd91-de5c-4da7-9852-ff8f132e0758
+# ╠═7f963c40-0b61-4b9d-b461-f4ca24c8ee33
+# ╠═6911bdff-f497-459c-8d53-3095d19d1c75
+# ╠═6edb392d-423c-4dc0-a1f3-421bf89c844b
+# ╠═3fc83580-5e19-45be-9cf1-ba9740d93add
+# ╠═42476841-2441-4af5-8b84-c858484f233e
+# ╠═4a55799e-2538-423f-aaf3-884421cf2619
+# ╠═043af538-187b-4555-8ba0-9611681293f6
+# ╠═e57c11b2-8a50-410e-8c53-41af34a1ce79
+# ╟─94bd0392-afc9-4d00-8bc3-e0dcfdd3cf07
+# ╟─657dd719-c308-403a-a39c-319aa8437f29
+# ╟─4cb31e2c-6742-4e4e-af6f-8b03382905ff
+# ╠═121d6b08-2bdd-4bd3-a33a-e8dfe8cbce8a
+# ╠═f17cde97-0135-4aa7-a1dc-b9e69b26c69d
+# ╟─47822f31-42df-47dc-af25-802d589ee36d
+# ╠═a4bedf08-a420-4d08-ab87-d1fd441aadf7
+# ╠═9429e681-9edb-44a6-80f0-e105656db73f
+# ╠═60593143-4e61-4798-8082-9284f52ff776
+# ╟─2125629d-4544-4412-8012-17703f0eea1c
+# ╠═b94c5caa-217a-4f85-a1ad-7196d17ff169
+# ╠═a0713ccb-e2b0-4de2-8f76-215aff1e4eef
+# ╠═26e74b60-3ff0-4726-bb7e-e26eac5d14f8
+# ╠═34365608-2bc7-46ba-b741-b8712e2a7a60
+# ╟─dead4116-02cf-4dc1-8c34-2570dc6d23ee
+# ╠═0ae5b1e8-c4ed-4612-94dd-5d318eab4592
+# ╟─49e42511-576c-4afb-9f85-d7b1cc47b34b
+# ╠═9a4839df-9a5e-49a0-b562-f0588943a39f
+# ╠═ed1e8ee5-f799-4cee-bb4a-51ee0f1ff6c6
+# ╠═e8c47b01-8e91-4bce-943a-85523499b644
+# ╠═03c8c4c0-e922-4dbc-a6be-3b95d2513f87
+# ╟─ca728375-b627-4793-b56b-7f2c86ddd31b
+# ╠═16064ee9-b820-4073-b049-f95327d5c727
+# ╠═72b1bfaf-5412-4e39-9a9e-28c947b13e08
+# ╟─7eba613f-1600-4289-84b3-7bb694cb4a31
+# ╠═c964f9f8-0405-4c4c-a369-3241364d969b
+# ╠═43281024-364a-4233-a1dd-8466f473fb27
+# ╟─a326ece0-0bfd-4e18-9bfb-2e800ea99f6b
+# ╠═9d2ed08b-e611-4ac3-8a7b-3bf00657cca6
+# ╠═732f7bda-6401-456f-8ab6-465e89675463
+# ╠═52d3a3bc-34ea-4e43-a78a-5d9818127aa9
+# ╠═180cd542-20d6-4b6f-87b0-d1572d0d3669
+# ╠═2d8e4f7c-323a-4507-be9b-a1b89faec202
+# ╠═7f7e26d3-44fd-4d0b-843c-e8cd3946fdab
+# ╠═ea511510-2f47-4217-814f-31619fa59ae5
+# ╠═c2b9f0d8-7dca-4d32-a61e-5076f426a31b
+# ╠═73a59ed6-9e19-4256-a20e-647a9516c27d
+# ╠═97dee155-7cd9-4434-8226-ed142fb0d8d4
+# ╟─1541a094-2a43-44aa-b992-9e1c228ac02f
+# ╠═80058f4a-80ed-4e52-a57d-19d83e8da7a5
+# ╠═053bc6f8-b984-4e40-92a7-53f36e78ec64
+# ╠═473b1c93-e832-4a33-8e43-400734b97383
+# ╠═60c142a3-2629-484c-a4e3-ec22241077fa
+# ╠═bd7f7fbd-15c0-4861-bd92-394739dd1b29
+# ╠═aa2626c8-a946-479e-957d-51c9c3ee15ff
+# ╠═43cdd518-9bcb-43b0-a284-14c462dd818b
+# ╟─743ee039-dd02-4f89-9ca1-4c3c28015a7e
+# ╟─77690226-4848-4f56-9064-6e54e3e21bf1
+# ╠═e302e574-292a-4d32-acfa-5cdffe1c3f0c
+# ╠═46604c2b-1614-4e88-85f6-b83e931ccf36
+# ╠═fe002b38-1bd4-4518-ab05-ee5d04052ae9
+# ╟─65c2d70d-4d17-43ba-8f81-61175820f082
+# ╠═241e2603-e722-4802-a542-df7b681eeb7c
+# ╠═4925d5a9-94fb-483f-8390-2597cb2bb8db
+# ╟─115ebd2c-be0a-4357-b13d-0ccf49a40f4a
+# ╠═44418d60-7667-4492-be74-cf663c9e0546
+# ╠═07da04ca-2b59-4ecd-a2c9-107a7e916db3
+# ╟─9cc80c03-5dc9-40d4-8208-fa9de4a8ca3a
+# ╠═64a15081-ae29-40e9-9823-0c42a1ce5d3d
+# ╟─2a91210e-c352-47e7-907c-48898ef9d56a
+# ╠═da4c5a3f-cd3b-48fd-888c-4021bc8c6d45
+# ╠═afca2da0-d2df-4c80-849c-f0d7891bc852
+# ╠═37f331bd-4cba-4a51-afb7-6dfbb27b9d99
+# ╠═166cb22a-30bc-4d6c-9b15-2ca7510756c3
+# ╠═29af5a86-d9ea-4cef-a32c-20a0b26839f2
+# ╟─b1b1f1ae-c18d-4758-8e8a-2f5a173aa931
+# ╠═ec05f441-cd7a-4983-8abf-3ff3bb09196e
+# ╠═f0ee68aa-a538-4de1-97da-be3fd5ce34da
+# ╟─eefc19ca-b88e-49fb-aa24-3ddefcbce803
+# ╠═0152f276-6076-46b3-9360-a397a624ee87
+# ╠═036507d2-938b-4474-b2e2-fe7bd9818aa8
+# ╠═f8583558-b216-4cf7-ad22-77f0cd36be20
+# ╠═f41674a3-b851-4e59-9ef3-c2b383f0f979
+# ╟─430d53c9-fd8c-48e0-8248-5538ace7f500
+# ╠═c49b04bf-8066-4401-a3b1-94043407ae29
+# ╠═0fdf6834-5779-4cbc-9748-489b084048bc
+# ╠═4e43fa27-ae91-46e5-887e-6f518f3c698b
+# ╠═d8add106-75a0-4f98-a0f6-8146b1ad165f
+# ╠═9732eda7-ca99-46a5-b3b9-7fe22f528f18
+# ╠═e490907c-63f9-496e-bf21-e9d789cc2dad
+# ╠═9b741723-3b61-4ef4-b8a8-863dce9b6f44
+# ╠═27e49e74-ba98-4672-8de6-19c55b5bb19e
+# ╠═32b7dd57-d85a-4713-ab22-892e860956f0
+# ╠═319b94d0-3ddc-4dc1-a465-3592c8f2589f
+# ╠═a993dc41-6304-4238-a275-83ec5c248b97
+# ╠═fd00f627-6250-4db3-93ef-43a7e482e596
+# ╠═68b1751f-0c72-4dd1-8b54-368808777932
+# ╠═8736d1f5-cabf-4052-9be4-4ee61cf725c6
+# ╠═0092bb02-a1a6-40a4-b1b6-1fc1a9deacb1
+# ╠═e9bf4628-28b8-4c96-9c3c-4979e6c6f44e
+# ╠═98c3fc01-4624-4610-a324-c69d3aee65a4
+# ╠═d4e88919-03cf-4dd7-8c90-9d24a99eef35
+# ╟─30f35160-0222-48b2-a148-c21c7023f664
+# ╠═fb21096a-e8a8-48ab-bebd-cfdd5635c228
+# ╠═790e78da-23dc-4d28-8e05-ced18c1d7444
+# ╠═aff27ecd-2e91-4db0-8e31-24bfa8cdc526
+# ╠═2effcf99-d4cf-45f9-ab7c-b4c4bee4afe8
+# ╠═b32be782-ea3a-49a0-bae6-55965ff98946
+# ╠═f4b25dfd-f35f-4eaf-bf92-985960fc05ca
+# ╠═0f0a8b69-fc89-4176-8b65-e8282e71e5f6
+# ╟─e74d0f4d-8494-480f-b8b2-1b35c298ca88
+# ╠═4f6f054b-4d32-4e63-9551-b31557779b95
+# ╠═b7298673-cba3-4d32-948a-40be1939db13
+# ╠═a1f3c343-0703-41c9-8971-4816fb2a789d
+# ╠═c6513a1b-cc3c-4309-86f1-84b3f4009fba
+# ╠═f7e5f2b7-616f-45c3-addc-a2ec776e09a3
+# ╠═d706c552-b07d-4126-b5aa-20029485dfe3
+# ╠═8772b71f-a81e-4c84-989e-9907146a1adc
+# ╠═b99142b8-02fd-400b-b8db-80b888f06fcc
+# ╠═72b45bd8-74cf-4e2c-959a-be7ad515f722
+# ╠═595c2c07-fec4-4a61-b3a0-8ace95868f9c
+# ╠═3d2790b0-1a1e-411a-87f3-237efbab0e64
+# ╠═11ffd72c-afca-4c54-8e00-6b7d5d1e8217
+# ╠═9d51d9a3-d925-4f24-943b-313ccb28dc93
+# ╠═1bd17c2d-2e1a-4156-8950-2f03cb47e7b5
+# ╠═759db3ae-a9ef-49ab-a87c-dd576af0c3d0
+# ╠═e10b4f37-a9f6-4053-b8df-4c1890cf841f
+# ╠═d17629cc-4bbd-4330-b039-2ea671b2f706
+# ╠═05c5572f-b5e6-4f52-a0f5-027bb5c87b13
+# ╠═25ff2c2f-2da3-4329-8ab1-195b3e60143c
+# ╠═28e6d7e6-7592-4282-9eeb-eba92783d92f
+# ╟─47ff6ba6-83f6-4a39-b3cd-69968545a05c
+# ╟─d20b7580-4d5a-4bc0-85f2-0b676107ad22
+# ╟─c2718560-fad8-4f2f-85a6-f186bd465ea6
+# ╟─00000000-0000-0000-0000-000000000001
+# ╟─00000000-0000-0000-0000-000000000002
