@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.5.1 Streams Are Delayed Lists](https://web.mit.edu/6.001/6.037/sicp.pdf)
 ##### file: PCM20230718\_SICP\_3.5.1\_Streams\_Are\_Delayed\_Lists.jl
-##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/07/24 ***
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/07/27 ***
 
 ====================================================================================
 "
@@ -45,6 +45,7 @@ end
 cons(car, cdr) = Cons(car, cdr)     # 'Cons' is a structure with 'car' and 'cdr'
 
 # ╔═╡ 93fc8894-5a52-45a3-9676-d6f2a815fad6
+#=
 #----------------------------------------------
 # taken from 3.3.1
 #----------------------------------------------
@@ -52,6 +53,7 @@ mutable struct mCons # 'mutable' is dangerous !
 	car
 	cdr
 end # struct mCons
+=#
 
 # ╔═╡ 76005389-4410-41b9-a26d-82ffe7f21ed9
 #---------------------------------------------------
@@ -168,10 +170,10 @@ function null(list)
 end # function null
 
 # ╔═╡ 01a523e6-7da8-476a-9bf8-ca2f84511f96
-#----------------------------------------------------------
+#------------------------------------------------------------
 # taken from ch. 2.2.3
 #   'accumulate' (without postfix '2') is Julia's accumulate
-#----------------------------------------------------------
+#------------------------------------------------------------
 function accumulate2(op, initial, sequence)  
 	if null(sequence)
 		initial
@@ -193,7 +195,9 @@ function filter2(predicate, sequence)
 	if null(sequence)
 		:nil
 	elseif predicate(car(sequence))
-		cons(car(sequence), filter2(predicate, cdr(sequence)))
+		cons(
+			car(sequence), 
+			filter2(predicate, cdr(sequence)))
 	else
 		filter2(predicate, cdr(sequence))
 	end # if
@@ -206,7 +210,7 @@ pp(filter2(isodd, list(1, 2, 3, 4, 5)))
 md"
 ---
 ###### [*Sum of Primes*](https://web.mit.edu/6.001/6.037/sicp.pdf) in an Interval $[a, b]$: Standard Iterative Style by Tail-Recursion
-(SICP, p.318(print), [p.431(pdf)](https://web.mit.edu/6.001/6.037/sicp.pdf))
+(SICP, p.318(print, [html](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-24.html#%_sec_3.5.1)), [p.431(pdf)](https://web.mit.edu/6.001/6.037/sicp.pdf))
 "
 
 # ╔═╡ b4ec578a-07db-49cd-8a5b-c3bc4a8ea80f
@@ -286,7 +290,7 @@ sumPrimes3(0, 1000)                        # ==> 76127  -->  :)
 # ╔═╡ 3ea6e3c8-eece-4e1d-a9a7-052bb8331036
 md"
 ---
-###### Compute the 2nd Prime in the Interval $[a, b]$ by Function Composition
+###### Compute the *2nd Prime* in the Interval $[a, b]$ by Function Composition
 "
 
 # ╔═╡ 4e8e8ac8-baa1-490d-9ae7-fb509c46e27f
@@ -304,7 +308,7 @@ convert(Int, 1E4)
 md"
 ---
 The task $(car(cdr(filter prime? (enumerate-interval 10000 1000000))))$ (SICP, p.318)
-leads by direct transpilation of SICP-Scheme into Julia to a 'StackOverflowError'. So we switch later to Julia's *generators* which leads to success.
+leads by direct transpilation of SICP-Scheme into Julia to a 'StackOverflowError'. So we switch later to Julia's *generators* which does avoid that error.
 "
 
 # ╔═╡ 37d3791d-28fe-4092-b674-51d7c910b897
@@ -323,7 +327,6 @@ md"
 md"
 ---
 ###### 3.5.1.2.1 Basic Stream Functions
-(SICP, p.323f)
 "
 
 # ╔═╡ 222f7053-7d27-459e-bf37-9267dc0f41cb
@@ -332,23 +335,51 @@ md"
 (SICP, p.323f)
 "
 
+# ╔═╡ d198f25a-3cb7-422d-96a7-34a9deaef218
+md"
+SICP-authors (p.321, footnote 56) write, that $delay$ and $consStream$ should be *special forms* which do *not* evaluate some of its arguments. This is called *call-by-need* or *lazy-evaluation*. So $delay$ delays its only and $consStream$ its second argument. Because Julia does not offer *call-by-need* we have to simulate that by embedding *arguments* of function calls into the *body* of anonymous *closures*.
+
+"
+
 # ╔═╡ 953de913-31fa-4834-90a8-113a9d7b8331
-delay(expr) = () -> expr
+# should be called with an anonymous closure
+begin
+	delay(closure::Function) = closure                 # SICP, p.323
+	delay(arg) = 
+		println("arg of 'delay' should be embedded in the body of the closure '()->arg'")
+end # begin
 
-# ╔═╡ 8e02ce54-105e-4800-8f03-cfa4d56e350a
-delayedExpr = delay(2+3)
+# ╔═╡ cfdd912c-8a18-4438-b215-58195da4b6bf
+md"
+###### *Delaying* evaluation of *argument* by embedding in an anonymous function
+"
 
-# ╔═╡ 0e4da2d9-4895-4e9a-acbb-935dbda33ee6
-delayedExpr
+# ╔═╡ 12a2f481-6dfb-475b-a173-b7738eaf6a9b
+delay(2+3)
 
-# ╔═╡ aa77b3b3-86ca-4634-928e-cd252dcc0683
-delayedExpr()
+# ╔═╡ 740d54d6-6b95-405a-a2a1-ede8fb1b12aa
+delayedExpr5 = delay(() -> 2+3)                         # call with closure
+
+# ╔═╡ 7e3882a8-a13e-4ea8-a33f-adb0e38253e9
+delayedExpr5                                            # ==> ()-> 2+3
+
+# ╔═╡ 1bb7b41e-23c7-4e14-95c3-c1ac7c4d3955
+delayedExpr5()
 
 # ╔═╡ fe07ce11-1755-4495-aec2-b57ff49d4738
-force(expr) = expr()
+begin
+	force(delayedObject::Function) = delayedObject()    # SICP, p.323
+    force(argument) = println("argument of force should be an anonymous closure '()->...'")
+end # begin
+
+# ╔═╡ a3993473-692f-493c-a2a8-2855d1dcf281
+force(3+5)
 
 # ╔═╡ ae86a9e4-ec64-4c16-8cc5-077a95cdc891
-force(delayedExpr)
+force(delayedExpr5)                                     # ==> 5  -->  :)
+
+# ╔═╡ 489e7fad-3d9e-4ec5-a3bd-cbf4823c0432
+force(delay(() -> 2+3))                                 # ==> 5  -->  :)
 
 # ╔═╡ 2c94b8c6-2e70-4bc8-82cd-bca7369dbc76
 md"
@@ -357,12 +388,26 @@ md"
 "
 
 # ╔═╡ a4387001-2617-48a3-b1f9-7c4003935906
-theEmptyStream = list(:nil)
+theEmptyStream = list(:nil)                             # SICP, p.319, footnote 54
 
 # ╔═╡ 4c93bba9-5fa2-47cf-863a-2fe7b84200a0
-function consStream(x, y)
-	cons(x, delay(y))
-end # function consStream
+begin
+	#------------------------------------------------------------------------------
+	function consStream(x, arg::Function)               # SICP, p.321, footnote 56
+		cons(x, delay(arg))
+	end # function consStream
+	#------------------------------------------------------------------------------
+	function consStream(x, arg)                         # SICP, p.321, footnote 56
+		println("the 2nd arg of consStream should be an anonymous closure ()->arg")
+	end # function consStream
+	#------------------------------------------------------------------------------
+end # begin
+
+# ╔═╡ cf2330fc-42e4-4712-8c16-5250703781f4
+consStream((), theEmptyStream)
+
+# ╔═╡ 7acf7a35-0440-49c5-80dc-4d9866084412
+emptyStream = consStream(:nil, () -> theEmptyStream)
 
 # ╔═╡ 6975833d-5ee6-49ed-8f3f-efe4336e3a23
 md"
@@ -371,10 +416,10 @@ md"
 "
 
 # ╔═╡ fc8a51ea-16e4-4186-9e3b-66dca96de452
-streamCar(x) = car(x)                         #  SICP, p.319
+streamCar(stream) = car(stream)                      #  SICP, p.319
 
 # ╔═╡ 4c278fc7-ddd3-4898-95d2-51400f0c7319
-streamCdr(x) = force(cdr(x))                  #  SICP, p.319
+streamCdr(stream) = cdr(stream)                      #  SICP, p.319
 
 # ╔═╡ be5515a4-7590-4686-b94c-4a8dcd805dd5
 md"
@@ -383,7 +428,19 @@ md"
 "
 
 # ╔═╡ 3990f7d2-b9fb-478b-abef-bd8fdc7546f4
-streamNull = null                             #  SICP, p.319, ref 54
+streamNull = null                                    #  SICP, p.319, footnote 54
+
+# ╔═╡ b4b97dd2-4324-46fb-8d97-f1cca1d73754
+streamNull(emptyStream)
+
+# ╔═╡ 0cd51fd5-c0e2-4722-9ae3-da4c5c1b9c1f
+function streamRef(stream::Function, n)                        #  SICP, p.319
+	if ==(n, 0)
+		streamCar(stream())
+	else
+		streamRef(streamCdr(stream()), -(n, 1))
+	end # if
+end # function streamRef
 
 # ╔═╡ 4522244e-cbd5-4da2-963e-0ec76a4476df
 md"
@@ -391,40 +448,33 @@ md"
 ###### Basic Stream Functions
 "
 
-# ╔═╡ 0cd51fd5-c0e2-4722-9ae3-da4c5c1b9c1f
-function streamRef(s, n)                      #  SICP, p.319
-	if ==(n, 0)
-		streamCar(s)
-	else
-		streamRef(streamCdr(s), -(n, 1))
-	end # if
-end # function streamRef
-
 # ╔═╡ 8c8e31af-f95e-4426-84c0-0d3405410962
-function streamEnumerateInterval(low, high)   #  SICP, p.321
+function streamEnumerateInterval(low, high)          #  SICP, p.321
 	if !(low < high)
 		theEmptyStream
 	else
-		consStream(low, streamEnumerateInterval(+(low, 1), high))
+		consStream(low, () -> streamEnumerateInterval(+(low, 1), high))
 	end # if
 end # function streamEnumerateInterval
-
-# ╔═╡ 57b98ae5-1e50-481c-8a8a-017fc41eebdc
-function streamFilter(pred, stream)           #  SICP, p.322
-	if streamNull(stream)
-		theEmptyStream
-	elseif pred(streamCar(stream))
-		consStream(streamCar(stream), streamFilter(pred, streamCdr(stream)))
-	else 
-		streamFilter(pred, streamCdr(stream))
-	end # if
-end # function streamFilter
 
 # ╔═╡ 59f38885-326a-41d8-a5f5-17aaee0d4a67
 streamEnumerateInterval(0, 0)
 
 # ╔═╡ 2cfe5b8d-5a27-45d0-bb13-6272023535ff
 streamNull(streamEnumerateInterval(0, 0))
+
+# ╔═╡ 57b98ae5-1e50-481c-8a8a-017fc41eebdc
+function streamFilter(pred, stream::Function)        #  SICP, p.322
+	if streamNull(stream())
+		theEmptyStream                               #  ==> Cons(:nil, :nil)  -->  :)
+	elseif pred(streamCar(stream()))
+		consStream(
+			streamCar(stream()), 
+			() -> streamFilter(pred, streamCdr(stream())))
+	else 
+		streamFilter(pred, streamCdr(stream()))
+	end # if
+end # function streamFilter
 
 # ╔═╡ e60ed676-fb04-49ee-9fe7-62def4722a66
 isprime(0)
@@ -438,20 +488,17 @@ isprime(2)
 # ╔═╡ a8672aa1-9734-4d07-a47b-0a895b8857dc
 isprime(3)
 
+# ╔═╡ 8a0f9abc-21dd-46bb-b08e-ab20619b25c1
+streamNull((() -> streamEnumerateInterval(0, 0))())
+
 # ╔═╡ 79ee2d96-203a-4fc2-b0a0-c01bc57bda46
-streamFilter(isprime, streamEnumerateInterval(0, 0))
+streamFilter(isprime, () -> streamEnumerateInterval(0, 0))
 
-# ╔═╡ caed01e3-6d21-4d64-ac31-5fad146fa763
-streamEnumerateInterval(0, 10)
+# ╔═╡ c90e9a6c-fdfa-40ac-8e9d-0822a4ac29a7
+streamFilter(isprime, () -> streamEnumerateInterval(0, 1))
 
-# ╔═╡ 565c7b4c-70ba-4539-ad16-9dec50deb87a
-streamCar(streamFilter(isprime, streamEnumerateInterval(0, 15)))
-
-# ╔═╡ 051fc52e-fe3c-4be5-b87a-7fbfe73047fc
-streamCar(streamFilter(isprime, streamEnumerateInterval(8, 15)))
-
-# ╔═╡ 00f3952e-b4b8-4233-8da8-72e1063a211b
-streamCar(streamFilter(isprime, streamEnumerateInterval(14, 15)))
+# ╔═╡ bf83b37a-8f27-416e-b413-90b3182e1598
+streamFilter(isprime, () -> streamEnumerateInterval(0, 3))
 
 # ╔═╡ 58c46f3c-a428-4d97-89e7-0d7ed3b96839
 md"
@@ -460,85 +507,67 @@ md"
 (SICP, p.321ff)
 "
 
-# ╔═╡ dfff1b94-e10e-4397-9439-da8a7f6aa44f
-md"
-###### Testing $streamEnumerateInterval, -Car, -Cdr, -Ref, -Filter, isprime$
-(SICP, p.321-323)
-"
-
-# ╔═╡ 72c6452c-84f0-45f7-b77a-cda752a7dd8a
-stream0 = streamEnumerateInterval(0, 0)
-
-# ╔═╡ cac61cc7-161b-483a-ae35-1b69d230f938
-streamCar(stream0)                          #  ==> 0  -->  :)
-
-# ╔═╡ 1e81849a-5019-4919-94d2-692a6bc69f10
-stream1 = streamEnumerateInterval(0, 1)
-
-# ╔═╡ 54b6c566-85b2-4bea-babd-ae9ed9cc71cb
-streamCar(stream1)                          #  ==> 0  -->  :)
-
-# ╔═╡ d3455fcf-dd01-4ede-ac3c-691316379b7f
-streamCar(streamCdr(stream1))               #  ==> 1  -->  :)
-
-# ╔═╡ e5f4a2d2-b3a2-4603-a403-68f7f3753d40
-convert(Int, 1E4)
-
-# ╔═╡ d72fd2dd-2ba8-4bc9-b95e-f3850aa5a3ec
-convert(Int, 1E5)
-
-# ╔═╡ e4adee0f-ced1-4391-bc11-28589bbd289b
-stream10 = streamEnumerateInterval(0, 10)
-
-# ╔═╡ 09a04c4e-fc84-402e-ba6a-8726ba58a3a2
-streamRef(stream10, 9)
-
-# ╔═╡ e6e072bc-ac04-4356-860e-0adb1f52329a
-stream1E4 = streamEnumerateInterval(0, convert(Int, 1E4))
+# ╔═╡ 882e76d3-ec46-4aaa-83ad-eb3a46f24760
+stream1E5 = () -> streamEnumerateInterval(0, convert(Int, 1E5))
 
 # ╔═╡ cfd7f42f-0c7a-46ac-9999-90f072b2df8f
-streamRef(stream1E4, 9999)
-
-# ╔═╡ 882e76d3-ec46-4aaa-83ad-eb3a46f24760
-stream1E5 = streamEnumerateInterval(0, convert(Int, 1E5))
+streamRef(stream1E5, 9999)
 
 # ╔═╡ 00558f9f-aae3-4c15-9db2-f61880a7a661
-streamCar(streamCdr(stream1E4))
+streamCar(force(streamCdr(stream1E5())))
 
-# ╔═╡ dd8167fe-5c6f-452c-b2dd-701312a6fd59
-streamCdr(
-	streamFilter(
-		isprime, streamEnumerateInterval(convert(Int, 1E2), convert(Int, 1E3))))
+# ╔═╡ 48756b2c-e02b-44f1-8bb4-3241d95ea9bf
+md"
+---
+###### 1st prime in the interval $low, high$
+"
 
-# ╔═╡ 0e67f984-79d2-4ba5-bd14-56aa8f2a8a2a
-streamCar(
-	streamFilter(
-		isprime, streamEnumerateInterval(convert(Int, 1E2), convert(Int, 1E3))))
+# ╔═╡ 565c7b4c-70ba-4539-ad16-9dec50deb87a
+streamCar(streamFilter(isprime, () -> streamEnumerateInterval(0, 15)))
 
-# ╔═╡ 4bef8f2d-703b-4123-a37e-5235ca333ef6
-streamCar(
-	streamFilter(
-		isprime, streamEnumerateInterval(convert(Int, 1E3), convert(Int, 1E4))))
+# ╔═╡ fdc6dc94-d863-4b08-b30a-752b82c1e393
+streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(0, 15)))
+
+# ╔═╡ 46bdac59-d64f-43f1-831e-513868f89196
+md"
+---
+###### 2nd prime in the interval $low, high$
+"
+
+# ╔═╡ 5dbe7e39-c16a-424e-a126-9c3601545b22
+streamCar(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(0, 15)))())
+
+# ╔═╡ 4f5205e4-44a0-4ff6-a3ba-bf5e03dc3ab2
+streamCar(force(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(0, 15)))))
+
+# ╔═╡ ff22ed83-77fc-4647-9a81-acc9934895d5
+streamCar(force(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(100, 1000)))))
+
+# ╔═╡ 98b97d1e-d8e4-4990-8240-ab7740e91c93
+streamCar(force(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(convert(Int, 1E2), convert(Int, 1E3))))))   #  SICP, p.321
 
 # ╔═╡ 27e0a31e-83e8-413c-90f7-6be46a58def8
-isprime(1001), isprime(1003), isprime(1005), isprime(1007), isprime(1009), isprime(1011), isprime(1013)
+isprime(1001), isprime(1003), isprime(1005), isprime(1007), isprime(1009), isprime(1011), isprime(1013), isprime(1019), isprime(1021)
 
-# ╔═╡ 32edcd58-5f2f-4a04-9ecf-1735030cce41
-streamCar(
-	streamCdr(
-		streamFilter(
-			isprime, streamEnumerateInterval(convert(Int, 1E3), convert(Int, 1E4)))))
+# ╔═╡ dfe8a34f-ec71-480a-bb40-361dc201d4a3
+streamCar(force(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(convert(Int, 1E3), convert(Int, 1E4))))))   #  SICP, p.321
+
+# ╔═╡ 71e19cfa-99d2-475d-be44-7c602fe16bdb
+streamCar(force(streamCdr(streamFilter(isprime, () -> streamEnumerateInterval(convert(Int, 1E4), convert(Int, 1E5))))))   #  SICP, p.321
+
+# ╔═╡ 5374e515-5e45-4355-9b2f-1e6f5d292728
+streamCar(force(streamCdr(streamFilter(isprime, () ->     streamEnumerateInterval(convert(Int, 1E4), convert(Int, 1E6))))))   #  SICP, p.321
+
+# ╔═╡ fd277186-3980-4541-a557-03c96251377e
+md"
+---
++++++++
+"
 
 # ╔═╡ 651d91cb-f88e-4efe-aed1-04f1fd99e394
 md"
 The example on SICP(p.321) cannot be replicated in Julia with the interval $streamEnumerateInterval(10000, 1000000)$ because of the StackOverFlowError. So we have to reimplement that in idiomatic Julia with *generators*.
 "
-
-# ╔═╡ 3570adfe-541f-4600-a098-bea8f754bc93
-streamCar(
-	streamCdr(
-		streamFilter(
-			isprime, streamEnumerateInterval(convert(Int, 1E4), convert(Int, 1E6)))))
 
 # ╔═╡ 843c8285-8fd8-4515-89bf-9cfa38cc081a
 md"
@@ -723,57 +752,60 @@ version = "0.5.3"
 # ╟─e040af07-3e93-493d-95c7-b7711a4019cd
 # ╟─2a5befc0-667f-4aad-859d-d55f4479b7b8
 # ╟─222f7053-7d27-459e-bf37-9267dc0f41cb
+# ╟─d198f25a-3cb7-422d-96a7-34a9deaef218
 # ╠═953de913-31fa-4834-90a8-113a9d7b8331
-# ╠═8e02ce54-105e-4800-8f03-cfa4d56e350a
-# ╠═0e4da2d9-4895-4e9a-acbb-935dbda33ee6
-# ╠═aa77b3b3-86ca-4634-928e-cd252dcc0683
+# ╟─cfdd912c-8a18-4438-b215-58195da4b6bf
+# ╠═12a2f481-6dfb-475b-a173-b7738eaf6a9b
+# ╠═740d54d6-6b95-405a-a2a1-ede8fb1b12aa
+# ╠═7e3882a8-a13e-4ea8-a33f-adb0e38253e9
+# ╠═1bb7b41e-23c7-4e14-95c3-c1ac7c4d3955
 # ╠═fe07ce11-1755-4495-aec2-b57ff49d4738
+# ╠═a3993473-692f-493c-a2a8-2855d1dcf281
 # ╠═ae86a9e4-ec64-4c16-8cc5-077a95cdc891
+# ╠═489e7fad-3d9e-4ec5-a3bd-cbf4823c0432
 # ╟─2c94b8c6-2e70-4bc8-82cd-bca7369dbc76
 # ╠═a4387001-2617-48a3-b1f9-7c4003935906
 # ╠═4c93bba9-5fa2-47cf-863a-2fe7b84200a0
+# ╠═cf2330fc-42e4-4712-8c16-5250703781f4
+# ╠═7acf7a35-0440-49c5-80dc-4d9866084412
+# ╠═b4b97dd2-4324-46fb-8d97-f1cca1d73754
 # ╟─6975833d-5ee6-49ed-8f3f-efe4336e3a23
 # ╠═fc8a51ea-16e4-4186-9e3b-66dca96de452
 # ╠═4c278fc7-ddd3-4898-95d2-51400f0c7319
 # ╟─be5515a4-7590-4686-b94c-4a8dcd805dd5
 # ╠═3990f7d2-b9fb-478b-abef-bd8fdc7546f4
-# ╟─4522244e-cbd5-4da2-963e-0ec76a4476df
 # ╠═0cd51fd5-c0e2-4722-9ae3-da4c5c1b9c1f
+# ╟─4522244e-cbd5-4da2-963e-0ec76a4476df
 # ╠═8c8e31af-f95e-4426-84c0-0d3405410962
-# ╠═57b98ae5-1e50-481c-8a8a-017fc41eebdc
 # ╠═59f38885-326a-41d8-a5f5-17aaee0d4a67
 # ╠═2cfe5b8d-5a27-45d0-bb13-6272023535ff
+# ╠═57b98ae5-1e50-481c-8a8a-017fc41eebdc
 # ╠═e60ed676-fb04-49ee-9fe7-62def4722a66
 # ╠═43d77dde-55a3-4a1d-a02f-0c5b7bb480ee
 # ╠═599dbc6d-5e4f-4662-94b6-fb5aae84e813
 # ╠═a8672aa1-9734-4d07-a47b-0a895b8857dc
+# ╠═8a0f9abc-21dd-46bb-b08e-ab20619b25c1
 # ╠═79ee2d96-203a-4fc2-b0a0-c01bc57bda46
-# ╠═caed01e3-6d21-4d64-ac31-5fad146fa763
-# ╠═565c7b4c-70ba-4539-ad16-9dec50deb87a
-# ╠═051fc52e-fe3c-4be5-b87a-7fbfe73047fc
-# ╠═00f3952e-b4b8-4233-8da8-72e1063a211b
+# ╠═c90e9a6c-fdfa-40ac-8e9d-0822a4ac29a7
+# ╠═bf83b37a-8f27-416e-b413-90b3182e1598
 # ╟─58c46f3c-a428-4d97-89e7-0d7ed3b96839
-# ╟─dfff1b94-e10e-4397-9439-da8a7f6aa44f
-# ╠═72c6452c-84f0-45f7-b77a-cda752a7dd8a
-# ╠═cac61cc7-161b-483a-ae35-1b69d230f938
-# ╠═1e81849a-5019-4919-94d2-692a6bc69f10
-# ╠═54b6c566-85b2-4bea-babd-ae9ed9cc71cb
-# ╠═d3455fcf-dd01-4ede-ac3c-691316379b7f
-# ╠═e5f4a2d2-b3a2-4603-a403-68f7f3753d40
-# ╠═d72fd2dd-2ba8-4bc9-b95e-f3850aa5a3ec
-# ╠═e4adee0f-ced1-4391-bc11-28589bbd289b
-# ╠═09a04c4e-fc84-402e-ba6a-8726ba58a3a2
-# ╠═e6e072bc-ac04-4356-860e-0adb1f52329a
-# ╠═cfd7f42f-0c7a-46ac-9999-90f072b2df8f
 # ╠═882e76d3-ec46-4aaa-83ad-eb3a46f24760
+# ╠═cfd7f42f-0c7a-46ac-9999-90f072b2df8f
 # ╠═00558f9f-aae3-4c15-9db2-f61880a7a661
-# ╠═dd8167fe-5c6f-452c-b2dd-701312a6fd59
-# ╠═0e67f984-79d2-4ba5-bd14-56aa8f2a8a2a
-# ╠═4bef8f2d-703b-4123-a37e-5235ca333ef6
+# ╟─48756b2c-e02b-44f1-8bb4-3241d95ea9bf
+# ╠═565c7b4c-70ba-4539-ad16-9dec50deb87a
+# ╠═fdc6dc94-d863-4b08-b30a-752b82c1e393
+# ╟─46bdac59-d64f-43f1-831e-513868f89196
+# ╠═5dbe7e39-c16a-424e-a126-9c3601545b22
+# ╠═4f5205e4-44a0-4ff6-a3ba-bf5e03dc3ab2
+# ╠═ff22ed83-77fc-4647-9a81-acc9934895d5
+# ╠═98b97d1e-d8e4-4990-8240-ab7740e91c93
 # ╠═27e0a31e-83e8-413c-90f7-6be46a58def8
-# ╠═32edcd58-5f2f-4a04-9ecf-1735030cce41
+# ╠═dfe8a34f-ec71-480a-bb40-361dc201d4a3
+# ╠═71e19cfa-99d2-475d-be44-7c602fe16bdb
+# ╠═5374e515-5e45-4355-9b2f-1e6f5d292728
+# ╟─fd277186-3980-4541-a557-03c96251377e
 # ╟─651d91cb-f88e-4efe-aed1-04f1fd99e394
-# ╠═3570adfe-541f-4600-a098-bea8f754bc93
 # ╟─843c8285-8fd8-4515-89bf-9cfa38cc081a
 # ╟─fd9cb7a3-190f-4a14-bd81-373a11ff205a
 # ╠═6404417e-ee27-422e-b894-430b0484ecb5
