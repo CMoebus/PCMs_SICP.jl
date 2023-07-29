@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: [3.5.1 Streams Are Delayed Lists](https://web.mit.edu/6.001/6.037/sicp.pdf)
 ##### file: PCM20230718\_SICP\_3.5.1\_Streams\_Are\_Delayed\_Lists.jl
-##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/07/28 ***
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/07/29 ***
 
 ====================================================================================
 "
@@ -25,6 +25,11 @@ Atom = Union{Number, Symbol, Char, String}
 md"
 ---
 ##### 3.5.1.1 SICP-Scheme like functional Julia
+"
+
+# ╔═╡ 829476c1-d4e3-4a5e-a909-02a6478a0d8a
+md"
+##### Basic Scheme-like Functions
 "
 
 # ╔═╡ 6fd11c30-0eec-4fb8-a34d-06df24bec5c1
@@ -159,23 +164,6 @@ function null(list)
 		(cdr(list) == :nil ) ? true : false
 end # function null
 
-# ╔═╡ 01a523e6-7da8-476a-9bf8-ca2f84511f96
-#------------------------------------------------------------
-# from ch. 2.2.3
-#   'accumulate' (without postfix '2') is Julia's accumulate
-#------------------------------------------------------------
-function accumulate2(op, initial, sequence)  
-	if null(sequence)
-		initial
-	else
-		op(car(sequence), 
-			accumulate2(op, initial, cdr(sequence)))
-	end # if
-end # function accumulate
-
-# ╔═╡ 7fcaa7ea-52e3-42be-b494-4ecc318379aa
-accumulate2(+, 0, list(0, 1, 2, 3, 4, 5))
-
 # ╔═╡ 81d9dda8-3cb2-4ab1-96fa-19f28d8a879c
 #--------------------------------------------------------
 # from ch. 2.2.3
@@ -195,6 +183,29 @@ end # function filter2
 
 # ╔═╡ 0c47d0eb-db60-4ca7-b5ca-7a1e86d579d4
 pp(filter2(isodd, list(1, 2, 3, 4, 5)))
+
+# ╔═╡ 817e7871-915c-4801-9ac7-b95927f6059c
+md"
+---
+###### Basic Reduction Functions
+"
+
+# ╔═╡ 01a523e6-7da8-476a-9bf8-ca2f84511f96
+#------------------------------------------------------------
+# from ch. 2.2.3
+#   'accumulate' (without postfix '2') is Julia's accumulate
+#------------------------------------------------------------
+function accumulate2(op, initial, sequence)  
+	if null(sequence)
+		initial
+	else
+		op(car(sequence), 
+			accumulate2(op, initial, cdr(sequence)))
+	end # if
+end # function accumulate
+
+# ╔═╡ 7fcaa7ea-52e3-42be-b494-4ecc318379aa
+accumulate2(+, 0, list(0, 1, 2, 3, 4, 5))
 
 # ╔═╡ b6b51c96-9c21-4b4e-9e29-24d42c0ad75b
 md"
@@ -420,11 +431,12 @@ streamCdr(stream) = cdr(stream)                      #  SICP, p.319
 
 # ╔═╡ 0cd51fd5-c0e2-4722-9ae3-da4c5c1b9c1f
 begin
+	#----------------------------------------------
 	function streamRef(stream::Function, n)          #  SICP, p.319
 		if ==(n, 0)
-			streamCar(stream())                      # new: '()'
+			streamCar(force(stream))                 #  new: 'force'
 		else
-			streamRef(streamCdr(stream()), -(n, 1))  # new: '()'
+			streamRef(streamCdr(force(stream)), -(n, 1)) # new: 'force'
 		end # if
 	end # function streamRef
 	#----------------------------------------------
@@ -433,11 +445,8 @@ begin
 	end # function streamRef
 end # begin
 
-# ╔═╡ 09c0de6b-ea23-4d17-85dd-b17d30decacd
-streamRef(()->streamEnumerateInterval(0, 100), 99)
-
 # ╔═╡ fb310f33-bdc2-4427-88f9-9eab691ebdb6
-streamRef(streamEnumerateInterval(0, 100), 99)
+streamRef(()->streamEnumerateInterval(0, 100), 99)
 
 # ╔═╡ be5515a4-7590-4686-b94c-4a8dcd805dd5
 md"
@@ -743,6 +752,7 @@ version = "0.5.3"
 # ╠═f58ce280-421a-447a-83ce-b87d3f53e58d
 # ╟─24f150d3-7e00-41fa-bc7c-5c85077431ed
 # ╟─0b528dd5-6118-42aa-8a2e-a6ca1753aec9
+# ╟─829476c1-d4e3-4a5e-a909-02a6478a0d8a
 # ╟─6fd11c30-0eec-4fb8-a34d-06df24bec5c1
 # ╠═aaefe422-444e-44fc-8dbd-e39dd89eb398
 # ╠═45545028-cab7-4742-8fd7-07ca5e091d96
@@ -750,8 +760,6 @@ version = "0.5.3"
 # ╠═28d427d3-75c9-4a51-b461-1b27ea560fca
 # ╠═6404d550-b7c1-4edb-930d-97290775c66e
 # ╠═103f5491-0deb-4fbf-b3d8-76a4286ce815
-# ╠═01a523e6-7da8-476a-9bf8-ca2f84511f96
-# ╠═7fcaa7ea-52e3-42be-b494-4ecc318379aa
 # ╟─bfab936d-9e01-45ac-a2f7-4bd4bd35e153
 # ╠═c1976f25-450f-42f7-ab66-49a5e56546f8
 # ╠═faeede4e-ccf3-4128-b118-5db0f1308351
@@ -759,6 +767,9 @@ version = "0.5.3"
 # ╠═0c47d0eb-db60-4ca7-b5ca-7a1e86d579d4
 # ╟─c2f636d5-5b07-4cf9-a25a-c8560170c103
 # ╠═4c5af6e4-195d-40af-b9cf-c741b9e0d7d8
+# ╟─817e7871-915c-4801-9ac7-b95927f6059c
+# ╠═01a523e6-7da8-476a-9bf8-ca2f84511f96
+# ╠═7fcaa7ea-52e3-42be-b494-4ecc318379aa
 # ╟─b6b51c96-9c21-4b4e-9e29-24d42c0ad75b
 # ╠═b4ec578a-07db-49cd-8a5b-c3bc4a8ea80f
 # ╠═34524b57-c71d-4718-93db-68f9278ab3ea
@@ -805,7 +816,6 @@ version = "0.5.3"
 # ╠═fc8a51ea-16e4-4186-9e3b-66dca96de452
 # ╠═4c278fc7-ddd3-4898-95d2-51400f0c7319
 # ╠═0cd51fd5-c0e2-4722-9ae3-da4c5c1b9c1f
-# ╠═09c0de6b-ea23-4d17-85dd-b17d30decacd
 # ╠═fb310f33-bdc2-4427-88f9-9eab691ebdb6
 # ╟─be5515a4-7590-4686-b94c-4a8dcd805dd5
 # ╠═3990f7d2-b9fb-478b-abef-bd8fdc7546f4
