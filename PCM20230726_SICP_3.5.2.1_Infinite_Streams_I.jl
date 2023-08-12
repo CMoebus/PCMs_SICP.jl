@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: 3.5.2.1 Infinite Streams I
 ##### file: PCM20230726\_SICP\_3.5.2.1\_Infinite\_Streams\_I.jl
-##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/09 ***
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/12 ***
 
 ====================================================================================
 "
@@ -87,6 +87,9 @@ function null(list)
 		(cdr(list) == :nil ) ? true : false
 end # function null
 
+# ╔═╡ 692df292-5ed0-46cc-b301-758341785b93
+streamNull = null                                             #  SICP, p.319, ref 54
+
 # ╔═╡ d3dd7622-6a82-4ea2-a88f-45b1a7ced016
 md"
 ---
@@ -143,20 +146,26 @@ md"
 "
 
 # ╔═╡ 2614347f-4772-48b9-9926-b6e58e8752dc
-theEmptyStream = list(:nil)::Cons                       # SICP, p.319, footnote 54
+theEmptyStream = list(:nil)::Cons                         # SICP, p.319, footnote 54
 
 # ╔═╡ 14b3cd5a-60a3-478d-9169-07dec0188fff
 begin
+	#===============================================================================#
+	# method 1: Function -> Cons
 	#--------------------------------------------------------------------------------
-	function streamCons(x, closure::Function)::Cons     # SICP, p.321, footnote 56
+	function streamCons(x, closure::Function)::Cons       # SICP, p.321, footnote 56
 		cons(x, delay(closure))
 	end # function streamCons
+	#===============================================================================#
+	# method 2: UnitRange{Int64}Function -> Cons
 	#--------------------------------------------------------------------------------
-	function streamCons(x, range::UnitRange{Int64})::Cons  # SICP, p.321, footnote 56
+	function streamCons(x, range::UnitRange{Int64})::Cons # SICP, p.321, footnote 56
 		cons(x, range)
 	end # function streamCons
+	#===============================================================================#
+	# method 3: UnitRange{Int64}Function -> Cons
 	#--------------------------------------------------------------------------------
-	function streamCons(x, arg)                         # SICP, p.321, footnote 56
+	function streamCons(args...)                          # SICP, p.321, footnote 56
 		println("the 2nd argument of streamCons should be either an anonymous closure () -> arg...")
 		println("... or an unit range 'n:m' of type 'UnitRange{Int64}'")
 	end # function streamCons
@@ -164,7 +173,7 @@ begin
 end # begin
 
 # ╔═╡ c7a89432-4ad7-4694-ac9d-b1e4d3215bdb
-#----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 # stream analog of enumerate-interval (ch. 2.2.3) 
 #-----------------------------------------------------------------------------------
 function streamEnumerateInterval(low::Integer, high::Integer)::Cons   #  SICP, p.321
@@ -190,32 +199,11 @@ streamCar(stream::Cons) = car(stream)                    #  SICP, p.319
 # ╔═╡ 9c99dbdd-094b-48e3-aed1-d04b378645b7
 streamCdr(stream::Cons) = cdr(stream)                    #  SICP, p.319
 
-# ╔═╡ db18ae0e-b60d-4604-bebc-6b085f2b8e4d
-UofUVWXYZ = Union{Function, UnitRange{Int64}, Base.Iterators.Take, 					   			Base.Iterators.Filter, Base.Iterators.Drop{UnitRange{Int64}}}
-
-# ╔═╡ 62e64949-3739-494f-a9d0-d4a062b0b631
-supertype(Function)
-
-# ╔═╡ 236ec613-efb4-4854-b1e8-992554160dbb
-supertype(UnitRange{Int64})
-
-# ╔═╡ 0423152f-1d87-45c5-be21-d6880bb25b4a
-supertype(Base.Iterators.Take)
-
-# ╔═╡ 3c33fc61-5ff0-402c-b042-c21eea449b7e
-supertype(Base.Iterators.Filter)
-
-# ╔═╡ ef9374d4-74b2-4be1-a9fe-08da1ac1b37e
-supertype(Base.Iterators.Drop{UnitRange{Int64}})
-
 # ╔═╡ 8f734bd2-e460-4de2-8bac-12c065376c04
 md"
 ---
 ###### Stream Predicates
 "
-
-# ╔═╡ 692df292-5ed0-46cc-b301-758341785b93
-streamNull = null                                             #  SICP, p.319, ref 54
 
 # ╔═╡ 8c7d7ccf-6d60-4fff-a089-c03ebe9f0858
 streamNull(streamEnumerateInterval(0, 0))
@@ -244,7 +232,7 @@ function integersStartingFrom(
 	#--------------------------------------------------------------------------
 	elseif outputType == :UnitRange
 		let maxInt = typemax(Int)
-			iter::UnitRange{Int64} = n:maxInt
+			iter::UnitRange{Int64} = (n:maxInt)::UnitRange{Int64}
 		end # let
 	#--------------------------------------------------------------------------
 	else
@@ -310,6 +298,9 @@ md"
 ###### 1st Scheme-like Functional *Method* of Function $sieve$
 "
 
+# ╔═╡ 5812f40b-bfeb-4dfd-87ba-d5d0eb65c743
+# prim12 = @time streamRef(primesClosure, 11)
+
 # ╔═╡ b86a4021-b75e-42c5-a6e6-41bdd6c1e6b2
 # prim13 = @time streamRef(primesClosure, 12)      #  ==>  41  -->  :)
 
@@ -324,7 +315,7 @@ allocsM1Array = [ 0.0,     0.000012,   0.000101, 0.000575,  0.0036,
 			     62.61,  316.69,    1590.0]
 
 # ╔═╡ 80fdf4bf-832d-4e05-b68f-a1d965b54169
-primesArray = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]     # = input length
+primesArray = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]  # input length = 13
 
 # ╔═╡ ff06c74e-581c-42b5-938e-99bdfd0e36e3
 length(secs1Array)
@@ -337,12 +328,12 @@ length(allocsM1Array)
 
 # ╔═╡ 227e7d7e-f868-419a-ba1b-c91425db0c9e
 let
-	plot(primesArray, secs1Array, label="secs1", xlabel="input length", ylabel="secs1", linewidth=1, line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Runtimes of Sieve-Of-Erathostenes 1")
+	plot(primesArray[1:13], secs1Array[1:13], label="secs1", xlabel="input length", ylabel="secs1", linewidth=1, line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Runtimes of Sieve-Of-Erathostenes 1")
 end # let
 
 # ╔═╡ bf6e3ff6-f824-45f3-8d92-49a1e03d6e0f
 let
-	plot(primesArray, allocsM1Array, label="allocsM1", 
+	plot(primesArray[1:13], allocsM1Array[1:13], label="allocsM1", 
 		xlabel="no of primes ps > 1 found", ylabel="allocsM1", linewidth=1, line=:darkblue, fill=(0, :lightblue), framestyle=:semi, 
 		title="Storage Needs of Sieve-Of-Erathostenes 1")
 end # let
@@ -353,13 +344,42 @@ md"
 ##### 3.5.2.2 Idiomatic Julia: [Generator Expressions](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions) and [Iterators](https://docs.julialang.org/en/v1/base/iterators/#Iteration-utilities)
 "
 
+# ╔═╡ db18ae0e-b60d-4604-bebc-6b085f2b8e4d
+UnOfUnRaTaFiDro = Union{UnitRange{Int64}, Base.Iterators.Take, 					   			Base.Iterators.Filter, Base.Iterators.Drop{UnitRange{Int64}}}
+
+# ╔═╡ 0188c7f8-65e8-4c6b-83b0-bd88a41787dc
+begin
+	#--------------------------------------------------------------------------------
+	function streamRef2(stream::UnOfUnRaTaFiDro, n::Integer)      #  SICP, p.319
+        Iterators.first(Iterators.take(Iterators.drop(stream, -(n, 1)), 1)) 
+	end # function streamRef2
+	#---------------------------------------------------------------------------------
+	function streamRef2(args...) 
+		println("1st arg should be either an anonymous closure with stream as body '() -> stream'...")
+		println("... or should be of type UnOfUnRaTaFiDro = Union{UnitRange{Int64}, Base.Iterators.Take, Base.Iterators.Filter, Base.Iterators.Drop{UnitRange{Int64}}}")
+	end # function streamRef2
+#------------------------------------------------------------------------------------
+end
+
+# ╔═╡ 62e64949-3739-494f-a9d0-d4a062b0b631
+supertype(Function)
+
+# ╔═╡ 236ec613-efb4-4854-b1e8-992554160dbb
+supertype(UnitRange{Int64})
+
+# ╔═╡ 0423152f-1d87-45c5-be21-d6880bb25b4a
+supertype(Base.Iterators.Take)
+
+# ╔═╡ 3c33fc61-5ff0-402c-b042-c21eea449b7e
+supertype(Base.Iterators.Filter)
+
+# ╔═╡ ef9374d4-74b2-4be1-a9fe-08da1ac1b37e
+supertype(Base.Iterators.Drop{UnitRange{Int64}})
+
 # ╔═╡ 4bac2130-9a3c-4f54-b0c4-251b9729cd50
 let maxInt = typemax(Int)
 	(i for i in 1:maxInt)
 end # let
-
-# ╔═╡ c7b45efc-8a2c-42cd-b9c4-cfa7a5c2fcdd
-typeof(1:10)
 
 # ╔═╡ b8425ebe-6fc9-4ba1-a1d8-335a1dfd330d
 md"
@@ -368,7 +388,7 @@ md"
 "
 
 # ╔═╡ d6175151-c72e-475a-88b8-82a777227bb7
-streamCar(iter::UofUVWXYZ) = Iterators.first(iter)
+streamCar(iter::UnOfUnRaTaFiDro) = Iterators.first(iter)
 
 # ╔═╡ 44b89b7d-a800-4a0f-8af1-a99e1d8dcfb8
 streamCar(integers::Cons)
@@ -380,31 +400,34 @@ md"
 "
 
 # ╔═╡ c5130a74-7a54-4ef6-b19f-73bfb992e0aa
-streamCdr(iter::UofUVWXYZ) = Iterators.drop(iter, 1)
+streamCdr(iter::UnOfUnRaTaFiDro) = Iterators.drop(iter, 1)
 
 # ╔═╡ c82706be-e538-4757-99c4-41bbfa2de5a3
 begin
 	#--------------------------------------------------------------------------------
-	function streamFilter(pred, stream::Function)::Cons  #  SICP, p.322
+	function streamFilter(pred, stream::Function)::Cons  # SICP, p.322
 		if  streamNull(force(stream))                    # new: 'force'
 			theEmptyStream::Cons                         # ==> Cons(:nil, :nil) --> :)
 		#-----------------------------------------------------------------------------
-		elseif pred(streamCar(force(stream)))            # new: 'force'
+		elseif pred(streamCar(force(stream)))            # if pred == true
 			streamCons(
 				streamCar(force(stream)),                # new: 'force'
-				() -> 
-					streamFilter(pred, streamCdr(force(stream))))::Cons # new: 'force'
+				() -> streamFilter(pred, 
+						streamCdr(force(stream))))::Cons # new: 'force'
 		#-----------------------------------------------------------------------------
-		else 
-			streamFilter(pred, streamCdr(force(stream))) # new: 'force'
+		else                                             # if not(pred)
+			streamFilter(pred, streamCdr(force(stream))) # if pred == false
 		end # if
 	end # function streamFilter
 	#--------------------------------------------------------------------------------
-	function streamFilter(pred, stream) 
+	function streamFilter(args...) 
 		println("2nd argument should be closure with stream embedded in body '() -> stream'")
 	end # function streamFilter
 	#--------------------------------------------------------------------------------
 end # begin
+
+# ╔═╡ b7e0835b-415b-473f-abe4-710dfd16891d
+streamFilter(iseven, () -> streamEnumerateInterval(0, 21))
 
 # ╔═╡ de2bcf75-0ecf-404c-bd0a-3811ea156baf
 noSevens =                                                    # SICP, p.326
@@ -416,38 +439,34 @@ noSevensClosure = () -> noSevens
 # ╔═╡ f031c6c8-df9e-4c66-ab6b-e42696ab0f66
 typeof(noSevensClosure) <: Function
 
-# ╔═╡ 0188c7f8-65e8-4c6b-83b0-bd88a41787dc
+# ╔═╡ b455b2e3-454f-4299-b671-29ab381be71f
 begin
-#------------------------------------------------------------------------------------
-function streamRef(stream::UofUVWXYZ, n::Integer)            #  SICP, p.319
-	if typeof(stream) <: Function
+	#-------------------------------------------------------------------------------
+	function streamRef(stream::Function, n::Integer)         #  SICP, p.319
 		if ==(n, 0)
 			streamCar(force(stream))                         #  new: 'force'
 		else
 			streamRef(streamCdr(force(stream)), -(n, 1))     #  new: 'force'
 		end # if
-	#--------------------------------------------------------------------------------
-	elseif typeof(stream) <: UofUVWXYZ 
-        Iterators.first(Iterators.take(Iterators.drop(stream, -(n, 1)), 1)) 
-	end # if
-end # function streamRef
-#------------------------------------------------------------------------------------
-function streamRef(args...) 
-	println("1st arg should be either an anonymous closure with stream as body '() -> stream'...")
-	println("... or should be of type UofUVWXYZ = Union{Function, UnitRange{Int64}, Base.Iterators.Take, Base.Iterators.Filter, Base.Iterators.Drop{UnitRange{Int64}}}")
-end # function streamRef
-#------------------------------------------------------------------------------------
-end
+	end # function streamRef
+	#-------------------------------------------------------------------------------
+ 	function streamRef(args...) 
+		println("1st arg should be an anonymous closure with stream as body '() -> stream'...")
+	end # function streamRef
+	#-------------------------------------------------------------------------------
+end # begin
 
 # ╔═╡ d1af551b-4c48-475a-9463-b9c062623852
 [streamRef(
-	()->streamFilter(iseven,() -> streamEnumerateInterval(0, 21)), i) for i in 1:10]
+	() -> streamFilter(
+		iseven, 
+		() -> streamEnumerateInterval(0, 21)), i) for i in 1:10]
 
 # ╔═╡ e891841c-d1a2-44cc-aeae-3c03bfec142e
 streamRef(streamEnumerateInterval(0, 100), 99) # test call with wrong argument
 
 # ╔═╡ f4ea8760-9077-4231-bb1f-01b95e8a14f6
-streamRef(() -> streamEnumerateInterval(0, 100), 99)
+streamRef(() -> streamEnumerateInterval(0, 100), 99) # syntax correct argument
 
 # ╔═╡ 034b21ab-f8cd-47cd-8b1d-c8498162b124
 streamRef(integersClosure, 1)
@@ -473,7 +492,7 @@ end # function function fib
 [fib(i) for i in 0:20]                                 # SICP, p.327
 
 # ╔═╡ 358306a8-da75-45cf-8ab4-7882f80b943f
-[streamRef(integersStartingFrom2Closure, i) for i in 0:20]    # SICP, p.327
+@time [streamRef(integersStartingFrom2Closure, i) for i in 0:20]    # SICP, p.327
 
 # ╔═╡ c6ae9a79-0773-464a-9f7c-22a0d261cace
 begin
@@ -487,7 +506,7 @@ function sieve(stream::Function)::Cons                        # SICP, p.327
 					streamCdr(force(stream)))))               # shortened stream
 end # function sieve
 #----------------------------------------------------------------------------------
-function sieve(arg)
+function sieve(args...)
 	println("the arg of sieve has to be an anonymous closure")
 end # function sieve
 #----------------------------------------------------------------------------------
@@ -538,9 +557,6 @@ prim10 = @time streamRef(primesClosure, 9)
 # ╔═╡ 6321ff6a-a5c3-4e99-86c0-03525742d9e3
 prim11 = @time streamRef(primesClosure, 10)
 
-# ╔═╡ 5812f40b-bfeb-4dfd-87ba-d5d0eb65c743
-prim12 = @time streamRef(primesClosure, 11)
-
 # ╔═╡ 0bc660ec-6df9-46df-8939-79636b05bb13
 streamCar(primes)                                              # 1st prime
 
@@ -575,7 +591,7 @@ streamCdr(integersFrom1)
 typeof(streamCdr(integersFrom1))
 
 # ╔═╡ 417c3e91-7300-41f5-b099-44ad139d098f
-typeof(streamCdr(integersFrom1)) <: UofUVWXYZ
+typeof(streamCdr(integersFrom1)) <: UnOfUnRaTaFiDro
 
 # ╔═╡ a98defe8-630d-49f6-a913-7ca9f81f7b8b
 streamCar(streamCdr(integersFrom1))                # ==>  2  -->  :)
@@ -596,16 +612,16 @@ md"
 Iterators.take(integersFrom5, 10)
 
 # ╔═╡ 349d7bac-9d99-42d5-af76-0f5c13a3de54
-typeof(Iterators.take(integersFrom5, 10))
+typeof(Iterators.take(integersFrom5, 10)) 
 
 # ╔═╡ 0af82e2f-3b3c-47a1-9353-27ba95376a53
-typeof(Iterators.take(integersFrom5, 10)) <: UofUVWXYZ
+typeof(Iterators.take(integersFrom5, 10)) <: UnOfUnRaTaFiDro
 
 # ╔═╡ 951884b8-6d58-4016-b0f6-1c5a9f5aa107
 Iterators.take(integersFrom5, 10)::Iterators.Take{UnitRange{Int64}}
 
 # ╔═╡ 2cbd1448-5afa-4ca4-b38c-6479b44d603a
-typeof(Iterators.take(integersFrom5, 10)) <: UofUVWXYZ
+typeof(Iterators.take(integersFrom5, 10)) <: UnOfUnRaTaFiDro
 
 # ╔═╡ 5ae16a69-e233-4614-9d4f-44cb61fafb4b
 collect(Iterators.take(integersFrom5, 10))
@@ -617,10 +633,10 @@ typeof(collect(Iterators.take(integersFrom5, 10))) <: Vector <: Array
 Iterators.drop(integersFrom5, 4)
 
 # ╔═╡ 436975dd-1225-4707-8e77-59a1852eb37f
-typeof(Iterators.drop(integersFrom5, 4))
+typeof(Iterators.drop(integersFrom5, 4)) 
 
 # ╔═╡ 07f20823-4478-40cd-abb5-3d8a83947d26
-typeof(Iterators.drop(integersFrom5, 4)) <: UofUVWXYZ
+typeof(Iterators.drop(integersFrom5, 4)) <: UnOfUnRaTaFiDro
 
 # ╔═╡ 6018a7b2-2f8d-4823-8f13-96ce59f6859f
 streamCar(Iterators.drop(integersFrom5, 4))        # ==>  9  -->  :)
@@ -634,6 +650,9 @@ md"
 
 # ╔═╡ 0b6aad89-9b6b-4528-8b54-d059fe80c8da
 filter(x -> !(divisible(x, 7)), collect(Iterators.take(integersFrom5, 20)))
+
+# ╔═╡ ab05aff1-9c25-46ae-8a4f-513d204abc92
+typeof(filter(x -> !(divisible(x, 7)), collect(Iterators.take(integersFrom5, 20))))
 
 # ╔═╡ c2805c10-87c5-401b-a668-c2e21a47d334
 md"
@@ -658,6 +677,15 @@ This function is *lazy*; that is, it is guaranteed to return in *Θ(1)* time and
 # ╔═╡ 849a7a65-9b4e-4d99-9828-1a4828723d15
 Iterators.filter(x -> !(divisible(x, 7)), Iterators.take(integersFrom5, 20))
 
+# ╔═╡ 73205c79-d093-4d39-94b0-fa81994b9be5
+typeof(Iterators.filter(x -> !(divisible(x, 7)), Iterators.take(integersFrom5, 20)))
+
+# ╔═╡ eb9a6526-a290-41b3-8b06-c2f4fd07ed9e
+typeof(
+	Iterators.filter(
+		x -> !(divisible(x, 7)), 
+		Iterators.take(integersFrom5, 20))) <: UnOfUnRaTaFiDro
+
 # ╔═╡ 68114b3e-5348-4d02-b288-ac08bf344624
 collect(Iterators.filter(x -> !(divisible(x, 7)), Iterators.take(integersFrom5, 20)))
 
@@ -669,7 +697,7 @@ noSevens_V2 =                                                       # SICP, p.32
 typeof(noSevens_V2) 
 
 # ╔═╡ 774dec49-dc11-482f-a786-cbc98f64c3ed
-typeof(noSevens_V2) <: Base.Iterators.Filter <: UofUVWXYZ
+typeof(noSevens_V2) <: Base.Iterators.Filter <: UnOfUnRaTaFiDro
 
 # ╔═╡ 65b08e54-bc56-4277-b7ab-83bc15b036cb
 collect(Iterators.take(Iterators.drop(noSevens_V2, 5), 20))
@@ -678,16 +706,16 @@ collect(Iterators.take(Iterators.drop(noSevens_V2, 5), 20))
 collect(Iterators.take(Iterators.drop(noSevens_V2, 5), 20))[10] # 10th element
 
 # ╔═╡ ae100ce2-f235-487b-9783-fa36c520307e
-streamRef(noSevens_V2, 1)              #  ==>  1  -->  :)
+streamRef2(noSevens_V2, 1)              #  ==>  1  -->  :)
 
 # ╔═╡ 5317eed5-8102-4e1d-b26e-383eb214fd80
-streamRef(noSevens_V2, 6)              #  ==>  6  -->  :)
+streamRef2(noSevens_V2, 6)              #  ==>  6  -->  :)
 
 # ╔═╡ ad285d2a-05a8-4081-a4bf-a130991ecd80
-streamRef(noSevens_V2, 7)              #  ==>  8  -->  :)
+streamRef2(noSevens_V2, 7)              #  ==>  8  -->  :)
 
 # ╔═╡ 227521b9-2b15-4464-9a1e-4cd98f824fd1
-streamRef(noSevens_V2, 101)            #  ==>  117  -->  :)   SICP, p.326     
+streamRef2(noSevens_V2, 101)            #  ==>  117  -->  :)   SICP, p.326     
 
 # ╔═╡ 5f85bd19-8e21-4a6c-98c2-df41e8f1290d
 md"
@@ -699,19 +727,19 @@ md"
 maxInt = typemax(Int)
 
 # ╔═╡ 8f783495-2be3-46af-8a7d-8f6c2fcec055
-streamRef(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 1)
+streamRef2(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 1)
 
 # ╔═╡ 751a7f65-a352-4541-9a48-cf794123fafb
-streamRef(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 2)
+streamRef2(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 2)
 
 # ╔═╡ f57a119a-c27b-4a99-aa3f-faf6f392ffcf
-streamRef(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 3)
+streamRef2(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 3)
 
 # ╔═╡ 8db31663-503e-40aa-8926-1d713d00f587
-streamRef(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 4)
+streamRef2(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 4)
 
 # ╔═╡ 2b6b7be7-bf11-424e-9e14-8532ef644a9c
-streamRef(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 5)
+streamRef2(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 5), 5)
 
 # ╔═╡ 6fa7bcf6-30ec-451e-9e68-8c05e959f273
 Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 2)
@@ -720,7 +748,9 @@ Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 2)
 typeof(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 2))
 
 # ╔═╡ 86de31dc-d2eb-40cb-a281-d9fb62fcad30
-typeof(Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 2)) <: UofUVWXYZ
+typeof(
+	Iterators.take(
+		Iterators.accumulate(+, 0:1:maxInt; init=0), 2)) <: UnOfUnRaTaFiDro
 
 # ╔═╡ 30f0b494-c962-4dcc-9f8a-75ecc99cf989
 Iterators.take(Iterators.accumulate(+, 0:1:maxInt; init=0), 2).xs     # field 'xs'
@@ -751,9 +781,9 @@ md"
 "
 
 # ╔═╡ 83820d03-3d3f-4db1-a16c-e9910eb99bb5
-begin        # 2nd variant of 'sieve' for input type 'UofUVWXYZ'
+begin        # 2nd variant of 'sieve' for input type 'UnOfUnRaTaFiDro'
 	#-------------------------------------------------------------------------------
-	function sieve2(stream::UofUVWXYZ)::Cons
+	function sieve2(stream::UnOfUnRaTaFiDro)::Cons
 		streamCons(
 			# Iterators.first(stream),
 			streamCar(stream),
@@ -765,7 +795,7 @@ begin        # 2nd variant of 'sieve' for input type 'UofUVWXYZ'
 					streamCdr(stream))))
 	end # function sieve2
 	#-------------------------------------------------------------------------------
-	function sieve2(arg)
+	function sieve2(args...)
 		println("arg should be either an anonymous closure with stream as body '() -> stream'...")
 		println("... where 'stream' should be generated by 'streamCons' with a delayed 2nd arg")
 		println("...or an UnitRange")
@@ -857,14 +887,14 @@ length(mib2)
 # ╔═╡ a07ee1ce-587d-4cd9-a0c6-79c7027cfac6
 let
 	plot(primes2Array, secs2Array, label="secs2", xlabel="no of primes ps > 1 found",
-		ylabel="secs", linewidth=2, line=:red, framestyle=:semi, title="Runtimes of Stream-Sieve-Of-Erathostenes 2")
+		ylabel="secs", linewidth=1, line=:red, framestyle=:semi, title="Runtimes of Stream-Sieve-Of-Erathostenes 2")
 end # let
 
 # ╔═╡ ca2ccffe-985d-4937-bfdb-181b2c43d586
 let
 	secs1ArrayEX = append!(secs1Array, [298.892458,298.892458,298.892458])
 	plot(primes2Array, secs1ArrayEX[1:16], label="secs1", xlabel="no of primes ps > 1 found", ylabel="secs", linewidth=1, line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Runtimes of Stream-Sieve-Of-Erathostenes 2")
-	plot!(primes2Array, secs2Array, label="secs2", linewidth=3)
+	plot!(primes2Array, secs2Array, label="secs2", linewidth=2)
 end # let
 
 # ╔═╡ 45f135dc-9d75-4f07-bbae-4dd8cdef8820
@@ -874,7 +904,7 @@ The *2nd* method is far more *time-efficient* than the *1st*, but we suffer a *s
 
 # ╔═╡ 515badcb-1370-4d5a-afbb-417e66e0f900
 let
-	plot(primes2Array, mib2, label="MiB 2", xlabel="no of primes ps > 1 found", 			ylabel="MiB", linewidth=2, line=:red, 
+	plot(primes2Array, mib2, label="MiB 2", xlabel="no of primes ps > 1 found", 			ylabel="MiB", linewidth=1, line=:red, 
 		framestyle=:semi, title="Storage of Sieve-Of-Erathostenes 2")
 end # let
 
@@ -883,14 +913,14 @@ let
 	plot(primes2Array, append!(allocsM1Array,[1590.0, 1590.0, 1590.0])[1:16], 
 		label="MiB 1", xlabel="no of primes ps > 1 found", ylabel="MiB", linewidth=1, line=:darkblue, fill=(0, :lightblue), 
 		framestyle=:semi, title="Storage of Sieve-Of-Erathostenes 2")
-	plot!(primes2Array, mib2, label="MiB 2", linewidth=3)
+	plot!(primes2Array, mib2, label="MiB 2", linewidth=2)
 end # let
 
 # ╔═╡ 3446b2f6-4cc0-49d7-b766-e10630893928
 md"
 ---
 ##### Summary ##### 
-The 2nd implementation with Julia *iterator* is far more *time-* and *storage-efficient* though it suffers from *stack-overflow*. We shall try to fix that with *tail-call-optimization (tco)* by *trampolining*.
+Though the 2nd implementation with Julia *iterator* is far more *time-* and *storage-efficient* than the 1st it suffers from *stack-overflow*. We shall try to fix that with *tail-call-optimization (tco)* by detouring with *trampolining*.
 "
 
 # ╔═╡ 144250e1-e73e-4fe7-b0e5-68f19d4be28c
@@ -1919,6 +1949,7 @@ version = "1.4.1+0"
 # ╠═08c2c8e9-490f-48d9-b681-38354373cc51
 # ╟─2c643f4a-e1df-48dd-b772-a10d028d6d27
 # ╠═7303b132-17bf-435c-8e93-a546d7989d3f
+# ╠═692df292-5ed0-46cc-b301-758341785b93
 # ╟─d3dd7622-6a82-4ea2-a88f-45b1a7ced016
 # ╟─9de5244b-1437-4369-b877-17703ebffe5b
 # ╠═15c00413-400a-4140-a994-2c79f592794f
@@ -1933,18 +1964,12 @@ version = "1.4.1+0"
 # ╠═753f86e9-3ed4-4fba-b325-07a76316eee7
 # ╠═9c99dbdd-094b-48e3-aed1-d04b378645b7
 # ╠═c82706be-e538-4757-99c4-41bbfa2de5a3
+# ╠═b7e0835b-415b-473f-abe4-710dfd16891d
+# ╠═b455b2e3-454f-4299-b671-29ab381be71f
 # ╠═d1af551b-4c48-475a-9463-b9c062623852
-# ╠═db18ae0e-b60d-4604-bebc-6b085f2b8e4d
-# ╠═62e64949-3739-494f-a9d0-d4a062b0b631
-# ╠═236ec613-efb4-4854-b1e8-992554160dbb
-# ╠═0423152f-1d87-45c5-be21-d6880bb25b4a
-# ╠═3c33fc61-5ff0-402c-b042-c21eea449b7e
-# ╠═ef9374d4-74b2-4be1-a9fe-08da1ac1b37e
-# ╠═0188c7f8-65e8-4c6b-83b0-bd88a41787dc
 # ╠═e891841c-d1a2-44cc-aeae-3c03bfec142e
 # ╠═f4ea8760-9077-4231-bb1f-01b95e8a14f6
 # ╟─8f734bd2-e460-4de2-8bac-12c065376c04
-# ╠═692df292-5ed0-46cc-b301-758341785b93
 # ╠═8c7d7ccf-6d60-4fff-a089-c03ebe9f0858
 # ╟─484b328a-f060-4d31-b9e4-c70f4f155a1b
 # ╟─aebb3512-3d4b-47d7-8035-013f59960de7
@@ -2003,8 +2028,14 @@ version = "1.4.1+0"
 # ╠═227e7d7e-f868-419a-ba1b-c91425db0c9e
 # ╠═bf6e3ff6-f824-45f3-8d92-49a1e03d6e0f
 # ╟─a5b8d317-8b91-4637-8cac-4fa9390a8e3e
+# ╠═db18ae0e-b60d-4604-bebc-6b085f2b8e4d
+# ╠═0188c7f8-65e8-4c6b-83b0-bd88a41787dc
+# ╠═62e64949-3739-494f-a9d0-d4a062b0b631
+# ╠═236ec613-efb4-4854-b1e8-992554160dbb
+# ╠═0423152f-1d87-45c5-be21-d6880bb25b4a
+# ╠═3c33fc61-5ff0-402c-b042-c21eea449b7e
+# ╠═ef9374d4-74b2-4be1-a9fe-08da1ac1b37e
 # ╠═4bac2130-9a3c-4f54-b0c4-251b9729cd50
-# ╠═c7b45efc-8a2c-42cd-b9c4-cfa7a5c2fcdd
 # ╟─b8425ebe-6fc9-4ba1-a1d8-335a1dfd330d
 # ╠═d6175151-c72e-475a-88b8-82a777227bb7
 # ╟─4c90852b-a23f-4b7e-b15d-ea1673806b49
@@ -2034,10 +2065,13 @@ version = "1.4.1+0"
 # ╠═6018a7b2-2f8d-4823-8f13-96ce59f6859f
 # ╟─2ef4c71f-0aca-4246-ae49-87986dadcc36
 # ╠═0b6aad89-9b6b-4528-8b54-d059fe80c8da
+# ╠═ab05aff1-9c25-46ae-8a4f-513d204abc92
 # ╟─c2805c10-87c5-401b-a668-c2e21a47d334
 # ╠═e0d6f2b4-8a2e-4bac-af8c-f62a4e63bdd4
 # ╟─26ef08b8-9e5a-45ca-8e72-6910b42f0f6c
 # ╠═849a7a65-9b4e-4d99-9828-1a4828723d15
+# ╠═73205c79-d093-4d39-94b0-fa81994b9be5
+# ╠═eb9a6526-a290-41b3-8b06-c2f4fd07ed9e
 # ╠═68114b3e-5348-4d02-b288-ac08bf344624
 # ╠═3aaa324e-8c5e-404f-b84e-1aee4ae264d6
 # ╠═aa33e4ae-7e35-44d5-a893-f9455a0fca29
