@@ -9,7 +9,7 @@ md"
 ====================================================================================
 #### SICP: 3.5.2.2 Infinite Streams II: Trampoline and Iterators
 ##### file: PCM20230809\_SICP\_3.5.2.2\_Infinite\_Streams\_II.jl
-##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/18 ***
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/19 ***
 
 ====================================================================================
 "
@@ -630,28 +630,39 @@ md"
 
 The goal of evaluating the *Scheme* expression $(stream\text{-}ref\; primes\; 50) \Rightarrow 233$ within reasonable runtime (SICP, p.327) can only be achieved by this variant of $sieve$ by including a *sequence* of $50$ *iteration steps* in the body of the function: 
 
-$(head_{i+1}, rest_{i+1}) = Iterators.peel(Iterators.filter(x \rightarrow !(divisible(x, head_i)), rest_i))$
+$(head_{i+1}, rest_{i+1}) = unCons(Iterators.filter(x \rightarrow !(divisible(x, head_i)), rest_i))$
 $\;$
 
 $\text{ ;; where: } i=0,1,,...$
 .
 "
 
+# ╔═╡ 35516203-34c0-4079-9e68-811ae0e09251
+md"
+The function $unCons$ is proposed in SICP and used in the so called 'Henderson diagram' [Figure 3.31](https://sarabander.github.io/sicp/html/3_002e5.xhtml#g_t3_002e5_002e2) (SICP, p. 328). SICP's Fig. 3.31 is inspired by Henderson's Fig. 8.17 (Henderson, 1980, p.238).
+
+We define $unCons$ here with Julia's $Iterators.peel$-function:
+
+$unCons = Iterators.peel$
+"
+
+# ╔═╡ 6f668654-5b13-4ee2-a61b-3ed143f76970
+unCons(stream::UnOfUnRaTaFiDroRes) = Iterators.peel(stream::UnOfUnRaTaFiDroRes)
+
 # ╔═╡ 2ff3f0ba-1119-4108-80be-32976dec5f7a
 begin        # 2nd variant of 'sieve' for input type 'UnOfUnRaTaFiDroRes'
 	#-------------------------------------------------------------------------------
 	function sieve2(stream::UnOfUnRaTaFiDroRes)  
-		let (head0, rest0) = Iterators.peel(stream)
-			(head1, rest1) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head0)), rest0))
-			(head2, rest2) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head1)), rest1))
-			(head3, rest3) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head2)), rest2))
-			(head4, rest4) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head3)), rest3))			
-			(head5, rest5) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head4)), rest4))
-			(head6, rest6) = Iterators.peel(Iterators.filter(x -> !(divisible(x, head5)), rest5))
+		let (head0, rest0) = unCons(stream)
+			(head1, rest1) = unCons(Iterators.filter(x -> !(divisible(x, head0)), rest0))
+			(head2, rest2) = unCons(Iterators.filter(x -> !(divisible(x, head1)), rest1))
+			(head3, rest3) = unCons(Iterators.filter(x -> !(divisible(x, head2)), rest2))
+			(head4, rest4) = unCons(Iterators.filter(x -> !(divisible(x, head3)), rest3))			
+			(head5, rest5) = unCons(Iterators.filter(x -> !(divisible(x, head4)), rest4))
+			(head6, rest6) = unCons(Iterators.filter(x -> !(divisible(x, head5)), rest5))
 			# ......
 		end # let
 	end # function sieve2
-	#-------------------------------------------------------------------------------
 end # begin
 
 # ╔═╡ 5d279d06-9fb6-4aa3-aa66-b58768c63641
@@ -672,7 +683,7 @@ The goal of evaluating the *Scheme* expression $(stream\text{-}ref\; primes\; 50
 begin        # 3rd variant of 'sieve' for input type 'UnOfUnRaTaFiDroRes'
 	#-------------------------------------------------------------------------------
 	function sieve3(stream::UnOfUnRaTaFiDroRes)::Cons
-		let (head0, rest0) = Iterators.peel(stream)
+		let (head0, rest0) = unCons(stream)
 			streamCons(
 				head0, 
 				() -> sieve3(Iterators.filter(x -> !(divisible(x, head0)), rest0)))
@@ -751,6 +762,7 @@ md"
 ---
 ##### References
 
+- Henderson, P.; *Functional Programming: Application and Implementation*: Englewood, Cliffs, N.J., 1980, ISBN 0-13-331579-7
 - Kereki, F.; *Mastering JavaScripts Functional Programming*; Birmingham-Mumbai: Packt, 2017
 - Mehnert, H., Ohlig, J. & Schirmer, St.; *Das Curry-Buch: Funktional programmieren lernen mit JavaScript*; Köln: O'Reilly, 2013, ISBN 978-3-86899-369-1
 
@@ -875,6 +887,8 @@ This is a **draft** under the Attribution-NonCommercial-ShareAlike 4.0 Internati
 # ╠═ed41bb38-6cf5-4a32-bc17-7c4ef96a43ef
 # ╠═c65ca425-18f1-45a1-96e4-84db9303959b
 # ╟─23d9e59c-6196-46ee-a09c-e36c97e8572c
+# ╟─35516203-34c0-4079-9e68-811ae0e09251
+# ╠═6f668654-5b13-4ee2-a61b-3ed143f76970
 # ╠═2ff3f0ba-1119-4108-80be-32976dec5f7a
 # ╠═5d279d06-9fb6-4aa3-aa66-b58768c63641
 # ╠═f4da3587-b312-447c-8cf8-584055de77f3
