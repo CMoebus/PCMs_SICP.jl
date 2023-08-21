@@ -188,33 +188,32 @@ begin                                                            # from 3.5.2.1
 end # begin
 
 # ╔═╡ 2f8ed6bb-2c23-43c3-9dcd-507bb731871a
-#--------------------------------------------------------------------------------
-# streamMap1 deviates considerably from SICP's stream-map on p.325
-#--------------------------------------------------------------------------------
-function streamsMap1(proc, stream; factor=1) 
-	if streamNull(stream)
-		theEmptyStream
-	else
-		streamCons(
-			proc(streamCar(stream), factor),
-			() -> streamsMap1(proc, force(streamCdr(stream)), factor=factor))
-	end # if
-end # function streamsMap1
-
-# ╔═╡ 09a2256c-8c29-454a-b8ac-44fe64336705
-#--------------------------------------------------------------------------------
-# streamMap2 deviates considerably from SICP's stream-map on p.325
-#--------------------------------------------------------------------------------
-function streamsMap2(proc, stream1, stream2)             
-	if (streamNull(stream1) || streamNull(stream2))
-		theEmptyStream
-	else
-		streamCons(
-			proc(streamCar(stream1), streamCar(stream2)),
-			() -> streamsMap2(
-				proc, force(streamCdr(stream1)), force(streamCdr(stream2))))
-	end # if
-end # function streamsMap2
+begin
+	#--------------------------------------------------------------------------------
+	# streamMap deviates considerably from SICP's stream-map on p.325
+	#--------------------------------------------------------------------------------
+	function streamsMap(proc::Function, stream::Cons; factor::Int64=1)::Cons 
+		if streamNull(stream)
+			theEmptyStream
+		else
+			streamCons(
+				proc(streamCar(stream), factor),
+				() -> streamsMap(proc, force(streamCdr(stream)), factor=factor))
+		end # if
+	end # method streamsMap
+	#--------------------------------------------------------------------------------
+	function streamsMap(proc::Function, stream1::Cons, stream2::Cons)::Cons          
+		if (streamNull(stream1) || streamNull(stream2))
+			theEmptyStream
+		else
+			streamCons(
+				proc(streamCar(stream1), streamCar(stream2)),
+					() -> streamsMap(
+					proc, force(streamCdr(stream1)), force(streamCdr(stream2))))
+		end # if
+	end # method streamsMap
+	#--------------------------------------------------------------------------------
+end
 
 # ╔═╡ a7b44e7c-b515-4f5d-bed0-2a2819881800
 begin
@@ -301,11 +300,8 @@ md"
 
 # ╔═╡ d9ccf775-9566-4e0f-8bde-7f1e1a3b6ca0
 function streamsAdd(stream1, stream2)
-	streamsMap2(+, stream1, stream2)
+	streamsMap(+, stream1, stream2)
 end # function streamsAdd
-
-# ╔═╡ bb1bd551-ba87-4402-b8a9-3edd6be1d249
-
 
 # ╔═╡ 2593e03a-a5d1-438c-a67f-dd76e4a97d30
 streamsAdd(myOnes, myOnes)
@@ -351,17 +347,17 @@ myFibsClosure = () -> myFibs
 collect(streamRef(myFibsClosure, i) for i in 0:20)
 
 # ╔═╡ d745ef82-fd53-4d10-89b1-64c41f5dcf1e
-streamsMap1(+, myOnes; factor=3)
+streamsMap(+, myOnes; factor=3)
 
 # ╔═╡ aacba8db-c079-4265-a811-43aad4c4ebbd
-[streamRef(streamsMap1(+, myOnes; factor=3), i) for i in 0:20]
+[streamRef(streamsMap(+, myOnes; factor=3), i) for i in 0:20]
 
 # ╔═╡ bf7f0c8c-ad27-4c78-b5f2-e758c54dd9e9
-[streamRef(streamsMap2(+, myOnes, myOnes), i) for i in 0:20]
+[streamRef(streamsMap(+, myOnes, myOnes), i) for i in 0:20]
 
 # ╔═╡ 0c25cfbb-b9b0-4167-8a4a-747ddca287dc
 function streamScale(stream, scaleFactor)                # SICP, p.329
-	streamsMap1(*, stream; factor=scaleFactor)
+	streamsMap(*, stream; factor=scaleFactor)
 end # function streamScale
 
 # ╔═╡ f56d03f8-3940-4b64-b00f-21c67eed17da
@@ -452,7 +448,6 @@ version = "0.5.4"
 # ╠═b5e05044-77fe-48b9-9b74-77c2405ffd3b
 # ╠═76166193-b15a-49d9-8005-375f2d955732
 # ╠═2f8ed6bb-2c23-43c3-9dcd-507bb731871a
-# ╠═09a2256c-8c29-454a-b8ac-44fe64336705
 # ╠═08b8bec1-24bf-4d10-9514-1f34560ec4f0
 # ╟─792b612c-5851-40bf-af06-53f5311a4108
 # ╠═6a863d44-f6f9-4a27-b5cd-28b2e123e601
@@ -474,7 +469,6 @@ version = "0.5.4"
 # ╠═d27f1a73-f8fa-4904-b01d-c9d7e6f6430f
 # ╟─724645bc-0462-4c41-acfd-35ecbbd55494
 # ╠═d9ccf775-9566-4e0f-8bde-7f1e1a3b6ca0
-# ╠═bb1bd551-ba87-4402-b8a9-3edd6be1d249
 # ╠═2593e03a-a5d1-438c-a67f-dd76e4a97d30
 # ╠═d03ca7eb-c511-4c96-bbeb-0ffc5e3ec6dc
 # ╠═ef660098-d0e5-41ae-ac77-a916a868e6f9
