@@ -12,7 +12,7 @@ md"
 ====================================================================================
 #### SICP: 3.5.2.3 Infinite Streams III: Defining Streams Implicitly
 ##### file: PCM20230819\_SICP\_3.5.2.3\_Infinite\_Streams\_III.jl
-##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/21 ***
+##### Julia/Pluto.jl-code (1.9.2/0.19.26) by PCM *** 2023/08/23 ***
 
 ====================================================================================
 "
@@ -133,16 +133,22 @@ begin                                                            # from 3.5.2.1
 	#-------------------------------------------------------------------------------
 end # begin
 
-# ╔═╡ b5e05044-77fe-48b9-9b74-77c2405ffd3b
+# ╔═╡ b1f9ca69-a21f-448f-a68f-15151224a4ad
 begin
 	#===============================================================================#
-	# method 1: Function -> Cons
+	# method 1: (Real, Function) -> Cons
 	#--------------------------------------------------------------------------------
-	function streamCons(x::Int64, closure::Function)::Cons # SICP, p.321, footnote 56
+	function streamCons(x::Real, closure::Function)::Cons # SICP, p.321, footnote 56
 		cons(x, delay(closure))
 	end # function streamCons
 	#===============================================================================#
-	# method 2: UnOfUnRaTaFiDro -> Cons                   # SICP, p.321, footnote 56
+	# method 2: (Cons, Function) -> Cons
+	#--------------------------------------------------------------------------------
+	function streamCons(x::Cons, closure::Function)::Cons # SICP, p.321, footnote 56
+		cons(x, delay(closure))
+	end # function streamCons
+	#===============================================================================#
+	# method 2: (Int64, UnOfUnRaTaFiDro) -> Cons                   # SICP, p.321, footnote 56
 	#--------------------------------------------------------------------------------
 	function streamCons(x::Int64, range::UnOfUnRaTaFiDroRes)::Cons 
 		cons(x, range)
@@ -187,31 +193,31 @@ begin                                                            # from 3.5.2.1
 	#-------------------------------------------------------------------------------
 end # begin
 
-# ╔═╡ 2f8ed6bb-2c23-43c3-9dcd-507bb731871a
+# ╔═╡ 76ee9e04-cfdd-4584-9914-6c3d48fdc16b
 begin
 	#--------------------------------------------------------------------------------
-	# streamMap deviates considerably from SICP's stream-map on p.325
-	#--------------------------------------------------------------------------------
-	function streamsMap(proc::Function, stream::Cons; factor::Int64=1)::Cons 
+	function streamMap(proc::Function, stream::Cons)::Cons          # SICP, p.320
 		if streamNull(stream)
 			theEmptyStream
 		else
 			streamCons(
-				proc(streamCar(stream), factor),
-				() -> streamsMap(proc, force(streamCdr(stream)), factor=factor))
+				proc(streamCar(stream)),
+				() -> streamMap(proc, force(streamCdr(stream))))
 		end # if
 	end # method streamsMap
 	#--------------------------------------------------------------------------------
-	function streamsMap(proc::Function, stream1::Cons, stream2::Cons)::Cons          
+	# streamMap deviates considerably from SICP's stream-map on p.325
+	#--------------------------------------------------------------------------------
+	function streamMap(proc::Function, stream1::Cons, stream2::Cons)::Cons          
 		if (streamNull(stream1) || streamNull(stream2))
 			theEmptyStream
 		else
 			streamCons(
 				proc(streamCar(stream1), streamCar(stream2)),
-					() -> streamsMap(
+					() -> streamMap(
 					proc, force(streamCdr(stream1)), force(streamCdr(stream2))))
 		end # if
-	end # method streamsMap
+	end # method streamMap
 	#--------------------------------------------------------------------------------
 end
 
@@ -300,7 +306,7 @@ md"
 
 # ╔═╡ d9ccf775-9566-4e0f-8bde-7f1e1a3b6ca0
 function streamsAdd(stream1, stream2)
-	streamsMap(+, stream1, stream2)
+	streamMap(+, stream1, stream2)
 end # function streamsAdd
 
 # ╔═╡ 2593e03a-a5d1-438c-a67f-dd76e4a97d30
@@ -347,17 +353,17 @@ myFibsClosure = () -> myFibs
 collect(streamRef(myFibsClosure, i) for i in 0:20)
 
 # ╔═╡ d745ef82-fd53-4d10-89b1-64c41f5dcf1e
-streamsMap(+, myOnes; factor=3)
+streamMap(x -> x + 3, myOnes)
 
 # ╔═╡ aacba8db-c079-4265-a811-43aad4c4ebbd
-[streamRef(streamsMap(+, myOnes; factor=3), i) for i in 0:20]
+[streamRef(streamMap(x -> x + 3, myOnes), i) for i in 0:20]
 
 # ╔═╡ bf7f0c8c-ad27-4c78-b5f2-e758c54dd9e9
-[streamRef(streamsMap(+, myOnes, myOnes), i) for i in 0:20]
+[streamRef(streamMap(x -> x + 3, myOnes), i) for i in 0:20]
 
 # ╔═╡ 0c25cfbb-b9b0-4167-8a4a-747ddca287dc
 function streamScale(stream, scaleFactor)                # SICP, p.329
-	streamsMap(*, stream; factor=scaleFactor)
+	streamMap(x -> x * scaleFactor, stream)
 end # function streamScale
 
 # ╔═╡ f56d03f8-3940-4b64-b00f-21c67eed17da
@@ -445,9 +451,9 @@ version = "0.5.4"
 # ╠═e206b659-6f6a-4bb6-bde0-3d23623580e7
 # ╠═9b701972-4a50-4966-ba4d-34fbceaefca9
 # ╠═81db4020-f7e5-491f-a099-79fc7f0b9ba4
-# ╠═b5e05044-77fe-48b9-9b74-77c2405ffd3b
+# ╠═b1f9ca69-a21f-448f-a68f-15151224a4ad
 # ╠═76166193-b15a-49d9-8005-375f2d955732
-# ╠═2f8ed6bb-2c23-43c3-9dcd-507bb731871a
+# ╠═76ee9e04-cfdd-4584-9914-6c3d48fdc16b
 # ╠═08b8bec1-24bf-4d10-9514-1f34560ec4f0
 # ╟─792b612c-5851-40bf-af06-53f5311a4108
 # ╠═6a863d44-f6f9-4a27-b5cd-28b2e123e601
