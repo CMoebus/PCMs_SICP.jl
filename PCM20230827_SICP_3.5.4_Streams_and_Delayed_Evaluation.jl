@@ -8,9 +8,9 @@ using InteractiveUtils
 
 md"
 ====================================================================================
-#### SICP: 3.5.4 Streams and Delayed Evaluation
+#### SICP: 3.5.4 [Streams and Delayed Evaluation](https://sarabander.github.io/sicp/html/3_002e5.xhtml#g_t3_002e5_002e4)
 ##### file: PCM20230827\_SICP\_3.5.4\_Streams\_and\_Delayed\_Evaluation.jl
-##### Julia/Pluto.jl-code (1.9.3/0.19.27) by PCM *** 2023/08/28 ***
+##### Julia/Pluto.jl-code (1.9.3/0.19.27) by PCM *** 2023/08/29 ***
 
 ====================================================================================
 "
