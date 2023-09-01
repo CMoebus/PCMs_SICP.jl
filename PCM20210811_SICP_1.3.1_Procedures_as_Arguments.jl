@@ -4,6 +4,9 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ f1c1495e-4203-4d73-a96b-f47e3e54d865
+using QuadGK
+
 # ╔═╡ 9f3abf80-5f73-417c-a6a5-c787f4519eb6
 using Plots
 
@@ -13,7 +16,7 @@ md"
 #### SICP: [1.3.1 Procedures as Arguments](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1)
 ##### file: PCM20210811\_SICP\_1.3.1\_Procedures\_as\_Arguments.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/08/31 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/01 ***
 ===================================================================================
 "
 
@@ -25,7 +28,7 @@ md"
 # ╔═╡ e3414514-9956-416e-ad41-503795d32556
 md"""
 ---
-$cube: \mathbb N \cup \mathbb R \times \mathbb N \cup \mathbb R \rightarrow \mathbb N \cup \mathbb R$
+$cube: (\mathbb N \cup \mathbb R) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
 $\;$
 
 $x \mapsto cube(x)$
@@ -50,7 +53,7 @@ cube(3.)                          # result is Float
 # ╔═╡ 6414c834-cfe4-4208-a4b1-7fbf3ced47df
 md"
 ---
-$sumIntegers : \mathbb N \cup \mathbb R \times \mathbb N \cup \mathbb R \rightarrow \mathbb N \cup \mathbb R$
+$sumIntegers : (\mathbb N \cup \mathbb R) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
 
 $\;$
 
@@ -99,7 +102,7 @@ sumIntegers1(2., 5.)                         # result is Float
 # ╔═╡ 0f94752d-afc7-4c19-96b8-f0e40edd8f6f
 md"
 ---
-$sumCubes : \mathbb N \cup \mathbb R \times \mathbb N \cup \mathbb R \rightarrow \mathbb N \cup \mathbb R$
+$sumCubes : (\mathbb N \cup \mathbb R) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
 $\;$
 $(a, b) \mapsto sumCubes(a, b)$
 $\;$
@@ -116,81 +119,121 @@ sumCubes1(a, b) =                            # (SICP, p.57)
 		+(cube(a), sumCubes1(+(a, 1), b))
 
 # ╔═╡ a8fbd1f3-9994-4e68-83e1-5272aa85f52f
-sumCubes1(0, 1)
+sumCubes1(0, 1)                              # result is Integer
 
 # ╔═╡ ce73399c-aa70-4116-beb2-4f861fc01031
-sumCubes1(0, 3)       #  0 + 1 + 2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
+sumCubes1(0, 3)                              #  0+1+2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
 
 # ╔═╡ a890a15b-e0ac-4336-b666-17389f7bae8a
-sumCubes1(1, 4)       #  36 + 4*4*4 = 36 + 64 = 100
+sumCubes1(1, 4)                              #  36 + 4*4*4 = 36 + 64 = 100
 
 # ╔═╡ 43ca7083-657d-499e-b273-0da40720342a
-sumCubes1(1., 4)
+sumCubes1(1., 4)                             # result is Float
 
 # ╔═╡ fe6b263c-a804-4e64-9f19-78fe146abc5b
-sumCubes1(1, 4.)
+sumCubes1(1, 4.)                             # result is Integer
 
 # ╔═╡ f33b6724-4bad-4b46-aff7-2763f51fb1a8
-sumCubes1(1., 4.)
+sumCubes1(1., 4.)                            # result is Float
+
+# ╔═╡ 0c1a55e9-5c9f-4613-bc04-8a9959450a9b
+md"
+---
+$\pi_{Sum}: (\mathbb N \cup \mathbb R) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
+$\;$
+$\pi_{Sum}: (a, b) \mapsto \pi_{Sum}(a, b)$
+
+$\;$
+
+$\pi_{Sum}(a=1, b) := \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+... \approx \frac{\pi}{8}$
+
+$\;$
+$\;$
+"
 
 # ╔═╡ ac7668db-45f4-456c-a55b-b9106555fca4
 md"
 ---
-$\pi_{Sum}: \mathbb N \cup \mathbb R \times \mathbb N \cup \mathbb R \rightarrow \mathbb N \cup \mathbb R$
+
+The well known but slow converging [*Leibniz* formula](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80) for determining $\pi$ is :
+
+$\frac{\pi}{4} = \sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)} = 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \frac{1}{9} - \frac{1}{11} + ...$
+
 $\;$
-$\pi_{Sum}: (a, b) \mapsto \pi_{Sum}(a, b)$
-$\;$
-$\pi_{Sum}(a, b) := \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+... \approx \frac{\pi}{8}$
 $\;$
 $\;$
-see [here](https://en.wikipedia.org/wiki/List_of_formulae_involving_%CF%80) the list of formulae  involving π.
+We partition the series into a sum of pairs:
+$\;$
+
+$\frac{\pi}{4} = \sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)} = \left(1 - \frac{1}{3} \right) + \left(\frac{1}{5} - \frac{1}{7}\right) + \left(\frac{1}{9} - \frac{1}{11}\right) + ...$
+
+$\;$
+$\;$
+$\;$
+$\frac{\pi}{4} = \sum_{k=0,2,4,...}^\infty \left(\frac{1}{(2k+1)}-\frac{1}{2(k+1+1)} \right) = \sum_{k=0,2,4,...}^\infty \frac{2}{(2k+1)(2k+3)}$
+$\;$
+$\;$
+$\;$
+Divison by $2$ simplifies the numerator:
+$\;$
+
+$\frac{\pi}{8} = \sum_{k=0,2,4,...}^\infty \frac{1}{(2k+1)(2k+3)} = \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+...$
+
+$\;$
+$\;$
 $\;$
 
 "
 
 # ╔═╡ fb0e59f2-a9c5-44c3-9d41-7cb8c0347bfb
-piSum1(a, b) = 
+piSum1(;a=1, b=1) =                                     # keyword parameters
 	>(a, b) ? 
 		0 : 
-		+(/(1.0, *(a, +(a, 2))), piSum1(+(a, 4), b))
+		+(/(1.0, *(a, +(a, 2))), piSum1(a=+(a+4), b=b)) # keyword parameters
 
 # ╔═╡ 2b2937e1-dba3-462c-a769-60804d676bf5
-*(8, piSum1(1, 1))
+*(8, piSum1(b=1))                                       # keyword arguments
 
 # ╔═╡ e25a03e0-886c-4862-badb-bcb5be6f477a
 myError(approxPi) = abs(pi - approxPi)
 
 # ╔═╡ 31ea7745-7d46-4ade-97d1-41ce15f970f7
-myError(*(8, piSum1(1, 1)))                                 # error
+myError(*(8, piSum1(b=1)))                             # error 0.4749259869231266
 
 # ╔═╡ eb647d89-bbc8-42db-9265-5cfc9ad8a03c
-*(8, piSum1(1, 10))
+*(8, piSum1(b=10))
 
 # ╔═╡ ba2a843a-a31a-4232-8c94-3893ec0ec760
-myError(*(8, piSum1(1, 10)))                                # error
+myError(*(8, piSum1(a=1, b=10)))                       # error 0.16554647754361707
 
 # ╔═╡ b6caf296-0dea-4572-9043-d515f71d6f93
-myError(*(8, piSum1(1, 10^2)))                              # error
+myError(*(8, piSum1(a=1, b=10^2)))                     # error 0.019998000998782572
 
 # ╔═╡ d6144688-4c14-4db3-8c49-65c9eaf7c30b
-myError(*(8, piSum1(1, 10^3)))                              # error
+myError(*(8, piSum1(a=1, b=10^3)))                     # error 0.0019999980000102724
 
 # ╔═╡ 54b81d43-1219-45e9-abaa-805311268810
-myError(*(8, piSum1(1, 10^4)))                              # error
+myError(*(8, piSum1(a=1, b=10^4)))                     # error 0.00019999999800024426    
 
 # ╔═╡ 1745d75d-dcc8-4a32-b9a8-607f5da744d9
-*(8, piSum1(1, ^(10, 5)))
+*(8, piSum1(a=1, b=^(10, 5)))                           # stack overflow
 
 # ╔═╡ ddae764c-b5c0-4eda-8c80-4f57fbeac486
-myError(*(8, piSum1(1, ^(10, 5))))                          # error
-
-# ╔═╡ e3c095b9-fc89-4b15-92e5-eb536d612e10
-myError(*(8, piSum1(1, ^(10, 6))))   # StackOverflowError due to recursion !
+myError(*(8, piSum1(a=1, b=^(10, 5))))                   # stack overflow
 
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
 ---
-$\sum_{i=a}^b f(i) = f(a) + ... + f(b)$
+$sum : (\mathbb N \rightarrow \mathbb N) \times (\mathbb N \cup \mathbb R) \times (\mathbb N \rightarrow \mathbb N) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
+
+$\;$
+$\;$
+
+$(f, a, succ, b) \mapsto sum(f, a, succ, b)$
+
+$\;$
+
+$sum(f, a, succ, b) := \sum_{i=a}^b f(i) = f(a) + f(succ(a)) + ... + f(b)$
 
 $\;$
 $\;$
@@ -198,11 +241,11 @@ $\;$
 "
 
 # ╔═╡ da24559b-1937-4258-847d-e0f7b7a7c293
-function sum1(term, a, next, b)                             # SICP, p.58
+function sum1(f, a, succ, b)                                # SICP, p.58
 	if >(a, b)
 		0
 	else
-		+(term(a), sum1(term, next(a), next, b))
+		+(f(a), sum1(f, succ(a), succ, b))
 	end # if
 end # function sum1
 
@@ -341,11 +384,11 @@ subtypes(Function)
 
 # ╔═╡ d4290924-cbe3-4f51-88f7-3aaacdfd6b4f
 # idiomatic Julia-code with 'Function', 'Real', 'while', '+='
-function sum2(term::Function, a::Real, next::Function, b::Real)::Real
+function sum2(f::Function, a::Real, succ::Function, b::Real)::Real
 	sum = 0
 	while !(a > b)
-		sum += term(a)
-		a = next(a)
+		sum += f(a)
+		a = succ(a)
 	end # while
 	sum
 end # function sum2
@@ -384,9 +427,9 @@ $\;$
 "
 
 # ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
-function integral1(f, a, b, dx)
-	add_dx(x) = x + dx
-	sum1(f, a + dx/2.0, add_dx, b) * dx
+function integral1(f, a, b, Δx)
+	add_Δx(x) = x + Δx
+	sum1(f, a + Δx/2.0, add_Δx, b) * Δx
 end
 
 # ╔═╡ cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
@@ -427,9 +470,9 @@ sum_cubes4(1, 2)
 sum_cubes4(1, 10)
 
 # ╔═╡ 13f1da45-78ce-4ee9-86ed-0bdb4e592f1c
-function integral2(f::Function, a::Real, b::Real, dx::Real)::Real
-	add_dx(x) = x + dx
-	sum2(f::Function, (a + dx/2.0), add_dx, b) * dx
+function integral2(f::Function, a::Real, b::Real, Δx::Real)::Real
+	add_Δx(x) = x + Δx
+	sum2(f::Function, (a + Δx/2.0), add_Δx, b) * Δx
 end
 
 # ╔═╡ 43b2d09b-8822-46bc-9372-6ee4b9f1141a
@@ -499,9 +542,11 @@ let xs1 = [x=1 for x in 0:0.01:gaussianDensity(1.0)]
 	ys1 = [y for y in 0:0.01:gaussianDensity(1.0)]
 	xs2 = [x=-1 for x in 0:0.01:gaussianDensity(1.0)]
 	ys2 = [y for y in 0:0.01:gaussianDensity(1.0)]
-	plot(gaussianDensity, -3.0, 3.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="p(-1.0 < X < +1.0) for X ~ N(X|μ=0.0, σ=1.0)", xlabel="X", ylabel="f(X)", label="f(X)")
-	plot!(xs1, ys1, color=:red, label="σ=+1.0")
-	plot!(xs2, ys2, color=:red, label="σ=-1.0")
+	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="p(-1.0 < X < +1.0) for X ~ N(X|μ=0.0, σ=1.0)", xlabel="X", ylabel="f(X)", label="f(X)")
+	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label="f(X)")
+	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label="f(X)")
+	plot!(xs1, ys1, color=:red, label="x=+1.0=σ")
+	plot!(xs2, ys2, color=:red, label="x=-1.0=-σ")
 end # let
 
 # ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
@@ -516,12 +561,51 @@ integral2(gaussianDensity, -1.0, 1.0, 1.0E-3)      # ==> p = 0.682
 # ╔═╡ 63991eb0-ef07-471e-89df-97b9e5b95b19
 integral2(gaussianDensity, -1.0, 1.0, 1.0E-5)      # ==> p = 0.682
 
+# ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
+md"
+---
+##### 1.3.1.3 Using the Package [QuadGK.jl](https://juliapackages.com/p/quadgk)
+"
+
+# ╔═╡ 12103e5c-658a-43fa-b904-d83e3d610a63
+md"
+---
+###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
+$\;$
+"
+
+# ╔═╡ 12a0d4d6-e259-4711-ba11-05649af921ee
+let f(x) = halfParabola(x)
+	a=0.0
+	b=+1.0
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
+md"
+---
+###### Standard Normal (= Gaussian) Distribution
+$Prob(- \sigma \le X \le +\sigma) \text{ when } X \sim N(X|\mu = 0; \sigma=1)$
+
+$\;$
+"
+
+# ╔═╡ 8f884ca3-790c-42fd-8bcb-8476012d4ee1
+let f(x) = gaussianDensity(x)
+	a=-1.0
+	b=+1.0
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
 # ╔═╡ 84667282-7410-4c19-b227-1a2bc8bf88ee
 md"
 ---
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
+- **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
+- **Wikipedia**; *Leibnitz'* Formula for $\pi$; [https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
 - **Wikipedia**; *Normal Distribution*; [https://en.wikipedia.org/wiki/Normal_distribution](https://en.wikipedia.org/wiki/Normal_distribution); last visit: 2023/08/31
+
 "
 
 # ╔═╡ 9c61b414-134f-4924-87b8-8e761e5816ed
@@ -540,9 +624,11 @@ This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 Internat
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 
 [compat]
 Plots = "~1.39.0"
+QuadGK = "~2.8.2"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -551,7 +637,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "bacb5e85b3a6ee88193a36efc3b98cb30f016166"
+project_hash = "d8507b211a174ea8fb448b3551ae3d54ed0e4958"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -1128,6 +1214,12 @@ git-tree-sha1 = "364898e8f13f7eaaceec55fd3d08680498c0aa6e"
 uuid = "c0090381-4147-56d7-9ebc-da0b1113ec56"
 version = "6.4.2+3"
 
+[[deps.QuadGK]]
+deps = ["DataStructures", "LinearAlgebra"]
+git-tree-sha1 = "6ec7ac8412e83d57e313393220879ede1740f9ee"
+uuid = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+version = "2.8.2"
+
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
@@ -1532,6 +1624,7 @@ version = "1.4.1+0"
 
 # ╔═╡ Cell order:
 # ╟─015f86b0-fa99-11eb-0a32-5bee9e7368fb
+# ╠═f1c1495e-4203-4d73-a96b-f47e3e54d865
 # ╟─acd01166-5258-4012-a6f4-e4f05b49dce3
 # ╟─e3414514-9956-416e-ad41-503795d32556
 # ╠═f63fda47-0ee7-4fac-b90c-b4bd893daa7d
@@ -1555,6 +1648,7 @@ version = "1.4.1+0"
 # ╠═43ca7083-657d-499e-b273-0da40720342a
 # ╠═fe6b263c-a804-4e64-9f19-78fe146abc5b
 # ╠═f33b6724-4bad-4b46-aff7-2763f51fb1a8
+# ╟─0c1a55e9-5c9f-4613-bc04-8a9959450a9b
 # ╟─ac7668db-45f4-456c-a55b-b9106555fca4
 # ╠═fb0e59f2-a9c5-44c3-9d41-7cb8c0347bfb
 # ╠═2b2937e1-dba3-462c-a769-60804d676bf5
@@ -1567,7 +1661,6 @@ version = "1.4.1+0"
 # ╠═54b81d43-1219-45e9-abaa-805311268810
 # ╠═1745d75d-dcc8-4a32-b9a8-607f5da744d9
 # ╠═ddae764c-b5c0-4eda-8c80-4f57fbeac486
-# ╠═e3c095b9-fc89-4b15-92e5-eb536d612e10
 # ╟─fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 # ╠═da24559b-1937-4258-847d-e0f7b7a7c293
 # ╠═b9c17500-0301-4a9f-8707-c18fda55261c
@@ -1638,11 +1731,16 @@ version = "1.4.1+0"
 # ╠═bc194820-97b7-4836-bc48-340e637e7f0d
 # ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
 # ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
-# ╠═bd63330c-e1f8-4f4e-836f-b1285539a0c1
+# ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
 # ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
 # ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
 # ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
 # ╠═63991eb0-ef07-471e-89df-97b9e5b95b19
+# ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
+# ╟─12103e5c-658a-43fa-b904-d83e3d610a63
+# ╠═12a0d4d6-e259-4711-ba11-05649af921ee
+# ╟─7c734d5f-ac3d-4bbd-99b3-68c31aae6508
+# ╠═8f884ca3-790c-42fd-8bcb-8476012d4ee1
 # ╟─84667282-7410-4c19-b227-1a2bc8bf88ee
 # ╟─9c61b414-134f-4924-87b8-8e761e5816ed
 # ╟─00000000-0000-0000-0000-000000000001
