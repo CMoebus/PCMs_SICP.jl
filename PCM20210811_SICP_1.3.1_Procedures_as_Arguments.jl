@@ -16,7 +16,7 @@ md"
 #### SICP: [1.3.1 Procedures as Arguments](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1)
 ##### file: PCM20210811\_SICP\_1.3.1\_Procedures\_as\_Arguments.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/01 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/02 ***
 ===================================================================================
 "
 
@@ -186,7 +186,7 @@ $\;$
 "
 
 # ╔═╡ fb0e59f2-a9c5-44c3-9d41-7cb8c0347bfb
-piSum1(;a=1, b=1) =                                     # keyword parameters
+piSum1(;a=1, b=1) =                                     # SICP, p.57, keyword parms
 	>(a, b) ? 
 		0 : 
 		+(/(1.0, *(a, +(a, 2))), piSum1(a=+(a+4), b=b)) # keyword parameters
@@ -274,7 +274,61 @@ sum_integers2(a, b) = sum1(identity, a, inc, b)             # SICP, p.59
 sum_integers2(0, 6)
 
 # ╔═╡ 33ea2359-475f-42ca-8de4-5f4e91148529
-sum_integers2(1, 10)                                         # SICP, p.59
+sum_integers2(1, 10)                                        # SICP, p.59
+
+# ╔═╡ 99baa676-35fc-4bcb-bd81-9f86b154c307
+md"
+---
+###### Alternative $\pi_{sum_2}$ with functional arguments $term$ and $next$ 
+(SICP, p.59)
+"
+
+# ╔═╡ 2a14bebd-8b53-442a-965f-983f040eeea3
+md"
+---
+###### Riemann Integration by the [Trapezoidal Method](https://en.wikipedia.org/wiki/Trapezoidal_rule)
+(SICP, p.59)
+$\;$
+
+$\int_a^b f dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]Δx$
+$\;$
+$\;$
+$\;$
+$=\left[\sum_{i=0}^{b/Δx}f\left(a + i \cdot Δx + \frac{dx}{2}\right)\right]Δx$
+
+$\;$
+$\;$
+$\;$
+
+"
+
+# ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
+function integral1(f, a, b, Δx)                               # SICP, p.60
+	add_Δx(x) = x + Δx
+	sum1(f, a + Δx/2.0, add_Δx, b) * Δx
+end
+
+# ╔═╡ cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
+md"
+---
+$$\int_0^1 x^3 dx= \left.\frac{x^4}{4}\right|_0^1=\frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
+$\;$
+$\;$
+$\;$
+$\;$
+"
+
+# ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
+plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title="x->x^3", framestyle=:semi)
+
+# ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
+integral1(cube, 0, 1, 0.01)                         # SICP, p.60
+
+# ╔═╡ dc5ec344-9513-4cda-b97f-511a7449cb6d
+integral1(cube, 0, 1, 0.001)                        # SICP, p.60
+
+# ╔═╡ 71319af0-3051-41c8-8c12-20c142901c11
+integral1(cube, 0, 1, 1.0E-4)
 
 # ╔═╡ ae961cd1-bab0-41e2-9bc5-918d7346f82d
 md"
@@ -346,29 +400,29 @@ sumCubes1(1, 4)       #  36 + 4^3 = 36 + 64 = 100
 
 # ╔═╡ 69618ff5-44f5-4d60-8297-cc15457a2ed8
 # idiomatic Julia-code with 'Real','while', '+='
-function piSum2(a::Real, b::Real)::Real
+function piSum3(a::Real, b::Real)::Real
 	sum = 0
 	while !(a > b)
 		sum += 1.0 / (a * (a + 2))  
 		a += 4
 	end # while
 	sum
-end # function piSum2
+end # function piSum3
 
 # ╔═╡ 3127686e-0c30-48e2-8c73-e7563ee60124
-8 * piSum2(1, 10^5)
+8 * piSum3(1, 10^5)
 
 # ╔═╡ 5a847c91-d008-434c-98de-90a74335012c
-myError(8 * piSum2(1, 10^5))
+myError(8 * piSum3(1, 10^5))
 
 # ╔═╡ 9fbc3781-1cf3-4b94-bc93-b5d8c7e0ad24
-myError(8 * piSum2(1, 10^8))
+myError(8 * piSum3(1, 10^8))
 
 # ╔═╡ 23cf565a-21a1-407d-981d-1ddc433327a8
-8 * piSum2(1, 10^10)
+8 * piSum3(1, 10^10)
 
 # ╔═╡ 5b4e0581-36b1-47d3-be06-a84cfee8788f
-myError(8 * piSum2(1, 10^10))
+myError(8 * piSum3(1, 10^10))
 
 # ╔═╡ 3a72d464-a12c-4de5-8c8c-7768c60bec3c
 typeof(Function)
@@ -394,68 +448,25 @@ function sum2(f::Function, a::Real, succ::Function, b::Real)::Real
 end # function sum2
 
 # ╔═╡ 7dc42461-ba3a-4837-ba37-e91920c8dc66
-function piSum3(a::Real, b::Real)::Real
-	#----------------------------------------------------------------
+function piSum2(a::Real, b::Real)::Real                     # SICP, p.59
+	#---------------------------------------------------------------------
 	piTerm(x) = 1.0 / (x * (x + 2))
 	piNext(x) = x + 4
-	#----------------------------------------------------------------
+	#---------------------------------------------------------------------
 	sum2(piTerm::Function, a::Real, piNext::Function, b::Real)
-end
+end # unction piSum2
+
+# ╔═╡ 7fcba949-68ad-4622-8492-a21c21c81d56
+8 * piSum2(1, 10^3)                                         # SICP, p.59
+
+# ╔═╡ 254b9112-0f77-4919-9fdb-1e8d4785187b
+8 * piSum2(1, 10^6)
 
 # ╔═╡ 5967b1d1-0990-4ebc-ae8b-6e6ec00b4f5d
-8 * piSum3(1, 10^6)
+8 * piSum2(1, 10^6)
 
 # ╔═╡ ba73b5bb-e803-4e5a-91d9-9c93da299930
-8 * piSum3(1.0, 10.0^6)
-
-# ╔═╡ 2a14bebd-8b53-442a-965f-983f040eeea3
-md"
----
-###### Integration by the [Trapezoidal Method](https://en.wikipedia.org/wiki/Trapezoidal_rule) 
-$\;$
-
-$\int_a^b f := \left[f\left(a+\frac{dx}{2}\right)+f\left(a+dx+\frac{dx}{2}\right)+f\left(a+2dx+\frac{dx}{2}\right)...\right]dx$
-$\;$
-$\;$
-$\;$
-$=\left[\sum_{i=0}^{b/dx}f\left(a + i \cdot dx + \frac{dx}{2}\right)\right]dx$
-
-$\;$
-$\;$
-$\;$
-
-"
-
-# ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
-function integral1(f, a, b, Δx)
-	add_Δx(x) = x + Δx
-	sum1(f, a + Δx/2.0, add_Δx, b) * Δx
-end
-
-# ╔═╡ cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
-md"
----
-$$\int_0^1 x^3 dx= \left.\frac{x^4}{4}\right|_0^1=\frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
-$\;$
-$\;$
-$\;$
-$\;$
-"
-
-# ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
-plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title="x->x^3", framestyle=:semi)
-
-# ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
-integral1(cube, 0, 1, 0.01)
-
-# ╔═╡ dc5ec344-9513-4cda-b97f-511a7449cb6d
-integral1(cube, 0, 1, 0.001)
-
-# ╔═╡ 927400e1-d3a9-4acd-b061-a7fbe765f8d4
-integral1(cube, 0, 1, 1.0E-3)
-
-# ╔═╡ 71319af0-3051-41c8-8c12-20c142901c11
-integral1(cube, 0, 1, 1.0E-4)
+8 * piSum2(1.0, 10.0^6)
 
 # ╔═╡ 0ad7a6d9-1d24-41dc-a573-a8856dfef417
 sum_cubes4(a, b) = sum2(cube, a, inc, b)
@@ -1672,6 +1683,39 @@ version = "1.4.1+0"
 # ╠═d14308c5-374a-495d-8865-1f52e198fb5e
 # ╠═d195654c-302f-4c80-9d4b-0d95978b6a7c
 # ╠═33ea2359-475f-42ca-8de4-5f4e91148529
+# ╟─99baa676-35fc-4bcb-bd81-9f86b154c307
+# ╠═7dc42461-ba3a-4837-ba37-e91920c8dc66
+# ╠═7fcba949-68ad-4622-8492-a21c21c81d56
+# ╠═254b9112-0f77-4919-9fdb-1e8d4785187b
+# ╠═5967b1d1-0990-4ebc-ae8b-6e6ec00b4f5d
+# ╠═ba73b5bb-e803-4e5a-91d9-9c93da299930
+# ╟─2a14bebd-8b53-442a-965f-983f040eeea3
+# ╠═d0c513b0-e921-45b2-a12b-1ad41a1e902e
+# ╟─cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
+# ╠═02bf20ff-0e44-40bc-bd6a-1e55e2086571
+# ╠═bf281edd-d933-446b-8b54-903e52c4505b
+# ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
+# ╠═71319af0-3051-41c8-8c12-20c142901c11
+# ╟─7dffb4c0-1820-46c4-8676-f327de55048e
+# ╠═9f3abf80-5f73-417c-a6a5-c787f4519eb6
+# ╠═08e42781-ef22-483c-baa4-6bbf6e4b110a
+# ╠═76170408-797d-451b-bcf6-b69fec927085
+# ╠═b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
+# ╠═73a0deb5-6dc3-41d8-b810-5553c74455ed
+# ╠═08f1b671-dc0a-4b7a-92ce-4568c24589f1
+# ╠═7174bf72-b914-4944-95ac-a47cc7ddbfef
+# ╠═90d3e292-ecdf-459f-b451-a5fabc6fe755
+# ╠═b94bf716-f77f-4127-aaa8-2b2f52fab923
+# ╠═df78019b-24be-48d2-b675-d656447a1c0d
+# ╠═9cf19259-52ce-46a7-8a27-89e26c7d5ca4
+# ╠═bc194820-97b7-4836-bc48-340e637e7f0d
+# ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
+# ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
+# ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
+# ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
+# ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
+# ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
+# ╠═63991eb0-ef07-471e-89df-97b9e5b95b19
 # ╟─ae961cd1-bab0-41e2-9bc5-918d7346f82d
 # ╠═cb1cbf7f-98e0-49d4-b12e-ee8b8808d316
 # ╠═d0ea0cc2-fdc3-4055-a651-946a66cb7db0
@@ -1698,17 +1742,6 @@ version = "1.4.1+0"
 # ╠═82a083c1-2637-49cc-ada1-2c006c26b39f
 # ╠═a9f09569-210d-4bbd-8b81-556f628d9220
 # ╠═d4290924-cbe3-4f51-88f7-3aaacdfd6b4f
-# ╠═7dc42461-ba3a-4837-ba37-e91920c8dc66
-# ╠═5967b1d1-0990-4ebc-ae8b-6e6ec00b4f5d
-# ╠═ba73b5bb-e803-4e5a-91d9-9c93da299930
-# ╟─2a14bebd-8b53-442a-965f-983f040eeea3
-# ╠═d0c513b0-e921-45b2-a12b-1ad41a1e902e
-# ╟─cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
-# ╠═02bf20ff-0e44-40bc-bd6a-1e55e2086571
-# ╠═bf281edd-d933-446b-8b54-903e52c4505b
-# ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
-# ╠═927400e1-d3a9-4acd-b061-a7fbe765f8d4
-# ╠═71319af0-3051-41c8-8c12-20c142901c11
 # ╠═0ad7a6d9-1d24-41dc-a573-a8856dfef417
 # ╠═f2d4ee8f-a71e-4370-845f-ac3d37cb4a51
 # ╠═fd9dadfb-e205-4016-9bad-ceb7fcc1f417
@@ -1716,26 +1749,6 @@ version = "1.4.1+0"
 # ╠═13f1da45-78ce-4ee9-86ed-0bdb4e592f1c
 # ╠═43b2d09b-8822-46bc-9372-6ee4b9f1141a
 # ╠═fba935d4-ee66-44b8-8e5b-bf14a8c08810
-# ╟─7dffb4c0-1820-46c4-8676-f327de55048e
-# ╠═9f3abf80-5f73-417c-a6a5-c787f4519eb6
-# ╠═08e42781-ef22-483c-baa4-6bbf6e4b110a
-# ╠═76170408-797d-451b-bcf6-b69fec927085
-# ╠═b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
-# ╠═73a0deb5-6dc3-41d8-b810-5553c74455ed
-# ╠═08f1b671-dc0a-4b7a-92ce-4568c24589f1
-# ╠═7174bf72-b914-4944-95ac-a47cc7ddbfef
-# ╠═90d3e292-ecdf-459f-b451-a5fabc6fe755
-# ╠═b94bf716-f77f-4127-aaa8-2b2f52fab923
-# ╠═df78019b-24be-48d2-b675-d656447a1c0d
-# ╠═9cf19259-52ce-46a7-8a27-89e26c7d5ca4
-# ╠═bc194820-97b7-4836-bc48-340e637e7f0d
-# ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
-# ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
-# ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
-# ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
-# ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
-# ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
-# ╠═63991eb0-ef07-471e-89df-97b9e5b95b19
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
