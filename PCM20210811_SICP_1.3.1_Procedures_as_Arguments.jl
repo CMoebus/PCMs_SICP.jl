@@ -5,10 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ f1c1495e-4203-4d73-a96b-f47e3e54d865
-using QuadGK
-
-# ╔═╡ 9f3abf80-5f73-417c-a6a5-c787f4519eb6
-using Plots
+using Plots, QuadGK
 
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
 md"
@@ -16,7 +13,7 @@ md"
 #### SICP: [1.3.1 Procedures as Arguments](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1)
 ##### file: PCM20210811\_SICP\_1.3.1\_Procedures\_as\_Arguments.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/02 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/04 ***
 ===================================================================================
 "
 
@@ -290,7 +287,7 @@ md"
 (SICP, p.59)
 $\;$
 
-$\int_a^b f dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]Δx$
+$\int_a^b f(x) dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]Δx$
 $\;$
 $\;$
 $\;$
@@ -306,11 +303,14 @@ $\;$
 function integral1(f, a, b, Δx)                               # SICP, p.60
 	add_Δx(x) = x + Δx
 	sum1(f, a + Δx/2.0, add_Δx, b) * Δx
-end
+end # function integral1
 
 # ╔═╡ cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
 md"
 ---
+###### Cubic function 
+(SICP, p.60)
+
 $$\int_0^1 x^3 dx= \left.\frac{x^4}{4}\right|_0^1=\frac{1^4}{4}-\frac{0^4}{4}=\frac{1}{4}$$
 $\;$
 $\;$
@@ -330,6 +330,59 @@ integral1(cube, 0, 1, 0.001)                        # SICP, p.60
 # ╔═╡ 71319af0-3051-41c8-8c12-20c142901c11
 integral1(cube, 0, 1, 1.0E-4)
 
+# ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
+md"""
+---
+###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
+$\;$
+
+$\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1=(6-1)=5$
+$\;$
+$\;$
+$\;$
+$\;$
+
+"""
+
+# ╔═╡ 76170408-797d-451b-bcf6-b69fec927085
+halfParabola(x) =  -6x^5 + 6 # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
+
+# ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
+plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="x->-6x^5 + 6")
+
+# ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
+integral1(halfParabola, 0.0, 1.0, 0.1)          # should be 5.0
+
+# ╔═╡ 08f1b671-dc0a-4b7a-92ce-4568c24589f1
+integral1(halfParabola, 0.0, 1.0, 0.01)         # should be 5.0
+
+# ╔═╡ 2cf94a78-f3ea-4e02-b417-aaa6510ff328
+md"
+---
+###### [Standard Normal (= Gaussian) Distribution](https://en.wikipedia.org/wiki/Normal_distribution)
+"
+
+# ╔═╡ b2e9582d-bf46-486b-b7fb-1e3a68e77efe
+gaussianDensity(x; μ=0.0, σ=1.0) = 1/(σ*sqrt(2π))*exp(-(1/2)*((x-μ)/σ)^2)
+
+# ╔═╡ bd63330c-e1f8-4f4e-836f-b1285539a0c1
+let x1 = +1.0
+	x2 = -1.0
+	y1 = gaussianDensity(+1.0)
+	y2 = gaussianDensity(-1.0)
+	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="p(-1.0 < X < +1.0) for X ~ N(X|μ=0.0, σ=1.0)", xlabel="X", ylabel="f(X)", label="f(X)")
+	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label="f(X)")
+	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label="f(X)")
+	plot!([x1, x1], [0, y1], color=:red, label="x=+1.0=σ")
+	plot!([x2, x2], [0, y2], color=:red, label="x=-1.0=-σ")
+end # let
+
+# ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
+integral1(gaussianDensity, -1.0, 1.0, 0.1)         # ==> p = 0.682
+
+# ╔═╡ 23824efd-d3d8-4e02-8ddd-5e20da7e99a4
+integral1(gaussianDensity, -1.0, 1.0, 0.01)        # ==> p = 0.682
+
 # ╔═╡ ae961cd1-bab0-41e2-9bc5-918d7346f82d
 md"
 ---
@@ -348,6 +401,7 @@ subtypes(Real)
 
 # ╔═╡ 890ab8e8-12df-4975-90a4-fda312d60ba2
 # idiomatic Julia-code with 'Real', 'while', '+='
+#-----------------------------------------------------
 function sumIntegers2(a::Real, b::Real)::Real
 	sum = 0
 	while !(a > b)
@@ -374,10 +428,11 @@ sumIntegers2(2., 10.)
 
 # ╔═╡ 81c0cc23-68f9-4d91-af01-38898e6d50af
 # idiomatic Julia-code with 'Real, 'while', '+='
+#---------------------------------------------------
 function sumCubes3(a::Real, b::Real)::Real
-	#-------------------------------------------
+	#-----------------------------------------------
 	cube(x) = x^3
-	#-------------------------------------------
+	#-----------------------------------------------
 	sum = 0
 	while !(a > b)
 		sum += cube(a)
@@ -400,6 +455,7 @@ sumCubes1(1, 4)       #  36 + 4^3 = 36 + 64 = 100
 
 # ╔═╡ 69618ff5-44f5-4d60-8297-cc15457a2ed8
 # idiomatic Julia-code with 'Real','while', '+='
+#-------------------------------------------------------
 function piSum3(a::Real, b::Real)::Real
 	sum = 0
 	while !(a > b)
@@ -438,6 +494,7 @@ subtypes(Function)
 
 # ╔═╡ d4290924-cbe3-4f51-88f7-3aaacdfd6b4f
 # idiomatic Julia-code with 'Function', 'Real', 'while', '+='
+#------------------------------------------------------------------
 function sum2(f::Function, a::Real, succ::Function, b::Real)::Real
 	sum = 0
 	while !(a > b)
@@ -486,41 +543,6 @@ function integral2(f::Function, a::Real, b::Real, Δx::Real)::Real
 	sum2(f::Function, (a + Δx/2.0), add_Δx, b) * Δx
 end
 
-# ╔═╡ 43b2d09b-8822-46bc-9372-6ee4b9f1141a
-integral2(cube, 0, 1, 0.01)
-
-# ╔═╡ fba935d4-ee66-44b8-8e5b-bf14a8c08810
-integral2(cube, 0.0, 1.0, 1.0E-4)
-
-# ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
-md"""
----
-###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
-$\;$
-
-$\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1=(6-1)=5$
-$\;$
-$\;$
-$\;$
-$\;$
-
-"""
-
-# ╔═╡ 08e42781-ef22-483c-baa4-6bbf6e4b110a
-# Plots.PlotlyBackend()
-
-# ╔═╡ 76170408-797d-451b-bcf6-b69fec927085
-halfParabola(x) =  -6x^5 + 6 # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
-
-# ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
-plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="x->-6x^5 + 6")
-
-# ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
-integral1(halfParabola, 0.0, 1.0, 0.1)          # should be 5.0
-
-# ╔═╡ 08f1b671-dc0a-4b7a-92ce-4568c24589f1
-integral1(halfParabola, 0.0, 1.0, 0.01)         # should be 5.0
-
 # ╔═╡ 7174bf72-b914-4944-95ac-a47cc7ddbfef
 integral2(halfParabola, 0, 1, 0.01)             # should be 5.0
 
@@ -539,38 +561,160 @@ integral2(halfParabola, 0, 1, 1.0E-4)           # should be 5.0
 # ╔═╡ bc194820-97b7-4836-bc48-340e637e7f0d
 5.0 -integral2(halfParabola, 0.0, 1.0, 1.0E-7)  # should be 5.0
 
-# ╔═╡ 2cf94a78-f3ea-4e02-b417-aaa6510ff328
-md"
----
-###### [Standard Normal (= Gaussian) Distribution](https://en.wikipedia.org/wiki/Normal_distribution)
-"
-
-# ╔═╡ b2e9582d-bf46-486b-b7fb-1e3a68e77efe
-gaussianDensity(x, μ=0.0, σ=1.0) = 1/(σ*sqrt(2π))*exp(-(1/2)*((x-μ)/σ)^2)
-
-# ╔═╡ bd63330c-e1f8-4f4e-836f-b1285539a0c1
-let xs1 = [x=1 for x in 0:0.01:gaussianDensity(1.0)]
-	ys1 = [y for y in 0:0.01:gaussianDensity(1.0)]
-	xs2 = [x=-1 for x in 0:0.01:gaussianDensity(1.0)]
-	ys2 = [y for y in 0:0.01:gaussianDensity(1.0)]
-	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="p(-1.0 < X < +1.0) for X ~ N(X|μ=0.0, σ=1.0)", xlabel="X", ylabel="f(X)", label="f(X)")
-	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label="f(X)")
-	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label="f(X)")
-	plot!(xs1, ys1, color=:red, label="x=+1.0=σ")
-	plot!(xs2, ys2, color=:red, label="x=-1.0=-σ")
-end # let
-
-# ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
-integral1(gaussianDensity, -1.0, 1.0, 0.1)         # ==> p = 0.682
-
-# ╔═╡ 23824efd-d3d8-4e02-8ddd-5e20da7e99a4
-integral1(gaussianDensity, -1.0, 1.0, 0.01)        # ==> p = 0.682
-
 # ╔═╡ 40e24f4d-9966-4984-b255-34c6cd3e0d7e
 integral2(gaussianDensity, -1.0, 1.0, 1.0E-3)      # ==> p = 0.682
 
 # ╔═╡ 63991eb0-ef07-471e-89df-97b9e5b95b19
 integral2(gaussianDensity, -1.0, 1.0, 1.0E-5)      # ==> p = 0.682
+
+# ╔═╡ 43b2d09b-8822-46bc-9372-6ee4b9f1141a
+integral2(cube, 0, 1, 0.01)
+
+# ╔═╡ fba935d4-ee66-44b8-8e5b-bf14a8c08810
+integral2(cube, 0.0, 1.0, 1.0E-4)
+
+# ╔═╡ f7839cb5-a075-4e70-9cca-96dd760d356f
+md"
+---
+###### Lebesgue Integration
+This section containing a Julia-script is not contained in SICP or elsewhere. The reason for this may be the fact that for most practical applications numerical integration a la *Riemann* is simple and gives the same results as integration a la *Lebesgue* would do. The superiority of Lebesgue integration shines in more theoretical contexts; e.g. integrating the [Dirichlet function](https://en.wikipedia.org/wiki/Dirichlet_function).
+
+What is in simple words the difference between both integration methods ? Here we quote an expert in stochastics:
+'...is the fact that the Riemann sums partition the domain of the function without taking into account the shape of the function, thus slicing up the area under the function *vertically*. Lebesgue's approach is exactly the opposite: the domain is partitioned according to the values of the function at hand, leading to a *horizontal* decomposition of the aera' (Schilling, 2005, p.94).
+
+Our Julia script is an implementation of the discrete sum on the right side of the next formula:
+
+$\;$
+
+$\int_a^b f(x) dx \approx \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > y\})\right]Δy$
+
+$\;$
+$\;$
+$\;$
+In comparison to solving Riemanm integrals numerically our implementation lacks efficiency. This is due to the many calls of function $f(x)$ in each summand. We can improve efficiency slightly by caching function calls.
+"
+
+# ╔═╡ 1f222db6-67c7-4413-b127-fd6a91a2e390
+function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.1) 
+	#--------------------------------------------------------------------------------
+	Δy = Δx
+	add_Δx(x) = x + Δx
+	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
+	function μ(y)
+		let μΔx(x) = (f(x) > y) ? Δy : 0
+			sum(μΔx(x) for x in a:Δx:b)
+		end # let
+	end # function μ
+	#--------------------------------------------------------------------------------
+	function searchForMax(f, fmax, x, b) 
+		if x + Δx > b
+			fmax
+		else
+			let fnew = f(add_Δx(x))                # new tentative maximum
+				if fmax < fnew 
+					begin
+						fmax = fnew
+						searchForMax(f, fmax, add_Δx(x), b)
+					end
+				else
+					searchForMax(f, fmax, add_Δx(x), b)
+				end # if
+			end # let
+		end # if
+	end # function lookForMax
+	#--------------------------------------------------------------------------------
+	fmax = searchForMax(f, f(a), a, b)   # the search for maximum of function f
+	# vertical sum of measures μ of horizontal slabs
+	sum2(μ::Function, 0::Real, add_Δy::Function, (fmax-Δy)::Real) * Δy 
+	#--------------------------------------------------------------------------------
+end # function lebesgueIntegral1
+
+# ╔═╡ a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
+unit(x) = 1
+
+# ╔═╡ fe0a3f76-e7e6-4573-b52b-7851a2a6c8f8
+unitRamp(x) = x
+
+# ╔═╡ 010ca46b-f127-4b26-99e4-e96f5f4d7c6e
+lebesgueIntegral1(unit, b=1.0, Δx=0.0001)
+
+# ╔═╡ f73d60b3-d5c4-4aa0-8581-4d8e49043899
+lebesgueIntegral1(unitRamp, b=1.0, Δx=0.0001)
+
+# ╔═╡ 2897cda1-e00b-4bbc-bed3-fcc3e01e5203
+lebesgueIntegral1(halfParabola, Δx=0.0001)  
+
+# ╔═╡ 9c86d18f-5a34-4c2c-8290-cd9b33cb887d
+lebesgueIntegral1(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.001)
+
+# ╔═╡ 20c24717-7b58-4f0c-9d97-236460ee6442
+md"
+---
+###### Mixed Gaussians
+In *empirical* research mixed Gaussians are rather seldom used to describe real data [Schilling, et al. (2002)](http://dbsi.org/dist/00031300265.pdf). In contrast to their role in data analysis mixed Gaussians are rather often used to represent prior beliefs in *Bayesian* modeling (Wikipedia, [*Mixture Model*](https://en.wikipedia.org/wiki/Mixture_model)).
+"
+
+# ╔═╡ ebdd80ce-c7b5-4e3a-92df-0b9424371805
+function mixedGaussianDensity(x; μ1=0.0, μ2=0.0, σ1=1.0, σ2=1.0, w1=0.5, w2=0.5)
+	w1*gaussianDensity(x, μ=μ1, σ=σ1) + w2*gaussianDensity(x, μ=μ2, σ=σ2)
+end # function mixedGaussianDensity
+
+# ╔═╡ bf8476db-30aa-4c86-a9d7-28f1e7c81663
+mixedGaussianDensity(-3.0, μ1=-3.0, μ2=+3.0)
+
+# ╔═╡ eddd8561-c278-4c00-9609-26e82c113f27
+mixedGaussianDensity(+3.0, μ1=-3.0, μ2=+3.0)
+
+# ╔═╡ 2fd2285a-4695-4802-8125-1b81e007a0da
+mixedDensity(x) = mixedGaussianDensity(x, μ1=-3.0, μ2=+3.0, σ1=0.5, σ2=2.0)
+
+# ╔═╡ 3ef10af4-d6c0-4979-814b-c3674746e8ad
+mixedDensity(-3.5)
+
+# ╔═╡ c7e33dd3-3e37-44b3-a154-4fc2caec15de
+let x1 = -4.0
+	x2 = +6.5
+	plot(mixedDensity, -4.0, 6.5, size=(700, 500), xlim=(-6.0, 10.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Mixed Gaussians", xlabel="X", ylabel="f(X)", label="f(X)")
+	#-------------------------------------------------------------------------------
+	plot!(mixedDensity, -6.0, -4.0,  line=:darkblue, label="f(X)")
+	plot!(mixedDensity, 6.5, 10.0,  line=:darkblue, label="f(X)")
+	plot!([x1, x1], [0, mixedDensity(x1)], seriestype=:line, color=:red,  label="x1=-4.0")
+	plot!([x2, x2], [0, mixedDensity(x2)], seriestype=:line, color=:red,  label="x2=+5.5")
+end # let
+
+# ╔═╡ c1d70fd3-5b7f-4e88-95a1-38778629d190
+lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+
+# ╔═╡ 8a138046-c27b-452e-8302-326a769b3591
+lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+
+# ╔═╡ b95e2161-5543-4387-892e-b05870cadd4c
+function mySpikeDensity(x; Δx=0.01) 
+	((1.0-Δx) <= x <= (1.0+Δx)) ? 0.5 : 
+	((2.0-Δx) <= x <= (2.0+Δx)) ? 0.5 : 0.0
+end # function mySpikeDensity
+
+# ╔═╡ fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
+spikeDensity(x) = mySpikeDensity(x, Δx=0.001)
+
+# ╔═╡ 44c2253e-aa15-46be-9b63-4c23c798f58e
+spikeDensity(0.9), spikeDensity(1.0), spikeDensity(1.1)
+
+# ╔═╡ b4196d8c-9a61-4ac3-9509-89a2cb1c8774
+spikeDensity(1.9), spikeDensity(2.0), spikeDensity(2.1)
+
+# ╔═╡ 76341ce7-168b-4ec6-ae98-f3ad62713082
+spikeDensities = [mySpikeDensity(x, Δx=0.001) for x in 0.0:0.01:3.0]
+
+# ╔═╡ d7412a44-26c8-468d-b52d-e30d0ae56930
+let xs = [x for x in 0.0:0.01:3.0]
+	plot(xs, spikeDensities, size=(700, 500), xlim=(.0, 3.0), ylim=(0, 0.6), 
+	line=:darkblue, # seriestype=:scatter,
+	fill=(0, :lightblue), framestyle=:semi, title="Density of Spike Function", xlabel="X", ylabel="f(X)", label="f(X)")
+end # let
+
+# ╔═╡ 03f2bef6-8b0f-476a-ad4b-f186c60e1e94
+lebesgueIntegral1(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
 
 # ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
 md"
@@ -582,7 +726,7 @@ md"
 md"
 ---
 ###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
-$\;$
+
 "
 
 # ╔═╡ 12a0d4d6-e259-4711-ba11-05649af921ee
@@ -595,7 +739,7 @@ end # let
 # ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 md"
 ---
-###### Standard Normal (= Gaussian) Distribution
+###### Standard Normal (= Gaussian) Distribution using $QuadGK$
 $Prob(- \sigma \le X \le +\sigma) \text{ when } X \sim N(X|\mu = 0; \sigma=1)$
 
 $\;$
@@ -614,9 +758,13 @@ md"
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
+- **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
+- **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
+- **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
 - **Wikipedia**; *Leibnitz'* Formula for $\pi$; [https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
+- **Wikipedia**; [*Lebesgue-Integration*](https://en.wikipedia.org/wiki/Lebesgue_integration); last visit 2023/09/03
+- **Wikipedia**; [*Mixture Model*](https://en.wikipedia.org/wiki/Mixture_model); last visit 2023/09/04
 - **Wikipedia**; *Normal Distribution*; [https://en.wikipedia.org/wiki/Normal_distribution](https://en.wikipedia.org/wiki/Normal_distribution); last visit: 2023/08/31
-
 "
 
 # ╔═╡ 9c61b414-134f-4924-87b8-8e761e5816ed
@@ -1697,8 +1845,6 @@ version = "1.4.1+0"
 # ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
 # ╠═71319af0-3051-41c8-8c12-20c142901c11
 # ╟─7dffb4c0-1820-46c4-8676-f327de55048e
-# ╠═9f3abf80-5f73-417c-a6a5-c787f4519eb6
-# ╠═08e42781-ef22-483c-baa4-6bbf6e4b110a
 # ╠═76170408-797d-451b-bcf6-b69fec927085
 # ╠═b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
 # ╠═73a0deb5-6dc3-41d8-b810-5553c74455ed
@@ -1711,7 +1857,7 @@ version = "1.4.1+0"
 # ╠═bc194820-97b7-4836-bc48-340e637e7f0d
 # ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
 # ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
-# ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
+# ╠═bd63330c-e1f8-4f4e-836f-b1285539a0c1
 # ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
 # ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
 # ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
@@ -1749,6 +1895,30 @@ version = "1.4.1+0"
 # ╠═13f1da45-78ce-4ee9-86ed-0bdb4e592f1c
 # ╠═43b2d09b-8822-46bc-9372-6ee4b9f1141a
 # ╠═fba935d4-ee66-44b8-8e5b-bf14a8c08810
+# ╟─f7839cb5-a075-4e70-9cca-96dd760d356f
+# ╠═1f222db6-67c7-4413-b127-fd6a91a2e390
+# ╠═a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
+# ╠═fe0a3f76-e7e6-4573-b52b-7851a2a6c8f8
+# ╠═010ca46b-f127-4b26-99e4-e96f5f4d7c6e
+# ╠═f73d60b3-d5c4-4aa0-8581-4d8e49043899
+# ╠═2897cda1-e00b-4bbc-bed3-fcc3e01e5203
+# ╠═9c86d18f-5a34-4c2c-8290-cd9b33cb887d
+# ╟─20c24717-7b58-4f0c-9d97-236460ee6442
+# ╠═ebdd80ce-c7b5-4e3a-92df-0b9424371805
+# ╠═bf8476db-30aa-4c86-a9d7-28f1e7c81663
+# ╠═eddd8561-c278-4c00-9609-26e82c113f27
+# ╠═2fd2285a-4695-4802-8125-1b81e007a0da
+# ╠═3ef10af4-d6c0-4979-814b-c3674746e8ad
+# ╠═c7e33dd3-3e37-44b3-a154-4fc2caec15de
+# ╠═c1d70fd3-5b7f-4e88-95a1-38778629d190
+# ╠═8a138046-c27b-452e-8302-326a769b3591
+# ╠═b95e2161-5543-4387-892e-b05870cadd4c
+# ╠═fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
+# ╠═44c2253e-aa15-46be-9b63-4c23c798f58e
+# ╠═b4196d8c-9a61-4ac3-9509-89a2cb1c8774
+# ╟─76341ce7-168b-4ec6-ae98-f3ad62713082
+# ╠═d7412a44-26c8-468d-b52d-e30d0ae56930
+# ╠═03f2bef6-8b0f-476a-ad4b-f186c60e1e94
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
