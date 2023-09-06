@@ -13,7 +13,7 @@ md"
 #### SICP: [1.3.1 Procedures as Arguments](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1)
 ##### file: PCM20210811\_SICP\_1.3.1\_Procedures\_as\_Arguments.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/04 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/06 ***
 ===================================================================================
 "
 
@@ -213,10 +213,10 @@ myError(*(8, piSum1(a=1, b=10^3)))                     # error 0.001999998000010
 myError(*(8, piSum1(a=1, b=10^4)))                     # error 0.00019999999800024426    
 
 # ╔═╡ 1745d75d-dcc8-4a32-b9a8-607f5da744d9
-*(8, piSum1(a=1, b=^(10, 5)))                           # stack overflow
+*(8, piSum1(a=1, b=^(10, 5)))                          # stack overflow, as expected
 
 # ╔═╡ ddae764c-b5c0-4eda-8c80-4f57fbeac486
-myError(*(8, piSum1(a=1, b=^(10, 5))))                   # stack overflow
+myError(*(8, piSum1(a=1, b=^(10, 5))))                 # stack overflow, as expected
 
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
@@ -256,7 +256,8 @@ sumCubes2(a, b) = sum1(cube, a, inc, b)                     # SICP, p.59
 sumCubes2(0, 1) 
 
 # ╔═╡ 39a8a3f7-391d-4adf-a217-9ce1db164099
-sumCubes2(0, 3)                        #  0 + 1 + 2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
+# 0 + 1 + 2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
+sumCubes2(0, 3)                        
 
 # ╔═╡ eb294e7b-3eb4-4038-bf10-3870819dd2ae
 sumCubes1(1, 10)                                            # SICP, p.59
@@ -300,7 +301,7 @@ $\;$
 "
 
 # ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
-function integral1(f, a, b, Δx)                               # SICP, p.60
+function integral1(f, a, b; Δx=0.01)                               # SICP, p.60
 	add_Δx(x) = x + Δx
 	sum1(f, a + Δx/2.0, add_Δx, b) * Δx
 end # function integral1
@@ -322,13 +323,13 @@ $\;$
 plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title="x->x^3", framestyle=:semi)
 
 # ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
-integral1(cube, 0, 1, 0.01)                         # SICP, p.60
+integral1(cube, 0, 1)                                  # SICP, p.60
 
 # ╔═╡ dc5ec344-9513-4cda-b97f-511a7449cb6d
-integral1(cube, 0, 1, 0.001)                        # SICP, p.60
+integral1(cube, 0, 1, Δx=0.001)                        # SICP, p.60
 
 # ╔═╡ 71319af0-3051-41c8-8c12-20c142901c11
-integral1(cube, 0, 1, 1.0E-4)
+integral1(cube, 0, 1, Δx=1.0E-4)
 
 # ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
 md"""
@@ -351,10 +352,10 @@ halfParabola(x) =  -6x^5 + 6 # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
 plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="x->-6x^5 + 6")
 
 # ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
-integral1(halfParabola, 0.0, 1.0, 0.1)          # should be 5.0
+integral1(halfParabola, 0.0, 1.0, Δx=0.1)          # should be 5.0
 
 # ╔═╡ 08f1b671-dc0a-4b7a-92ce-4568c24589f1
-integral1(halfParabola, 0.0, 1.0, 0.01)         # should be 5.0
+integral1(halfParabola, 0.0, 1.0, Δx=0.01)         # should be 5.0
 
 # ╔═╡ 2cf94a78-f3ea-4e02-b417-aaa6510ff328
 md"
@@ -378,10 +379,10 @@ let x1 = +1.0
 end # let
 
 # ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
-integral1(gaussianDensity, -1.0, 1.0, 0.1)         # ==> p = 0.682
+integral1(gaussianDensity, -1.0, 1.0, Δx=0.1)         # ==> p = 0.682
 
 # ╔═╡ 23824efd-d3d8-4e02-8ddd-5e20da7e99a4
-integral1(gaussianDensity, -1.0, 1.0, 0.01)        # ==> p = 0.682
+integral1(gaussianDensity, -1.0, 1.0)                 # ==> p = 0.682
 
 # ╔═╡ ae961cd1-bab0-41e2-9bc5-918d7346f82d
 md"
@@ -445,13 +446,13 @@ end # function sumCubes3
 sumCubes3(0, 1)
 
 # ╔═╡ 39c2206d-8a4d-49d0-a8d5-c7a744443000
-sumCubes3(0, 3)       #  0 + 1 + 2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
+sumCubes3(0, 3)                            # 0 + 1 + 2*2*2 + 3*3*3 = 1 + 8 + 27 = 36
 
 # ╔═╡ 4d0c6403-7588-4971-8046-1f99e3a421a6
-sumCubes3(0, 4)       #  sumCubes3(0, 3) + 4^3 = 36 + 64 = 100
+sumCubes3(0, 4)                            # sumCubes3(0, 3) + 4^3 = 36 + 64 = 100
 
 # ╔═╡ 1e034229-e2a0-420e-97e7-8a02a577fe5a
-sumCubes1(1, 4)       #  36 + 4^3 = 36 + 64 = 100
+sumCubes1(1, 4)                            # 36 + 4^3 = 36 + 64 = 100
 
 # ╔═╡ 69618ff5-44f5-4d60-8297-cc15457a2ed8
 # idiomatic Julia-code with 'Real','while', '+='
@@ -538,40 +539,40 @@ sum_cubes4(1, 2)
 sum_cubes4(1, 10)
 
 # ╔═╡ 13f1da45-78ce-4ee9-86ed-0bdb4e592f1c
-function integral2(f::Function, a::Real, b::Real, Δx::Real)::Real
+function integral2(f::Function, a::Real, b::Real; Δx::Real=0.01)::Real
 	add_Δx(x) = x + Δx
 	sum2(f::Function, (a + Δx/2.0), add_Δx, b) * Δx
 end
 
 # ╔═╡ 7174bf72-b914-4944-95ac-a47cc7ddbfef
-integral2(halfParabola, 0, 1, 0.01)             # should be 5.0
+integral2(halfParabola, 0, 1, Δx=0.01)             # should be 5.0
 
 # ╔═╡ 90d3e292-ecdf-459f-b451-a5fabc6fe755
-integral2(halfParabola, 0, 1, 1.0E-3)           # should be 5.0
+integral2(halfParabola, 0, 1, Δx=1.0E-3)           # should be 5.0
 
 # ╔═╡ b94bf716-f77f-4127-aaa8-2b2f52fab923
-integral2(halfParabola, 0, 1, 1.0E-4)           # should be 5.0
+integral2(halfParabola, 0, 1, Δx=1.0E-4)           # should be 5.0
 
 # ╔═╡ df78019b-24be-48d2-b675-d656447a1c0d
-5.0 - integral2(halfParabola, 0.0, 1.0, 1.0E-5) # should be 5.0
+5.0 - integral2(halfParabola, 0.0, 1.0, Δx=1.0E-5) # should be 5.0
 
 # ╔═╡ 9cf19259-52ce-46a7-8a27-89e26c7d5ca4
-5.0 -integral2(halfParabola, 0.0, 1.0, 1.0E-6)  # should be 5.0
+5.0 -integral2(halfParabola, 0.0, 1.0, Δx=1.0E-6)  # should be 5.0
 
 # ╔═╡ bc194820-97b7-4836-bc48-340e637e7f0d
-5.0 -integral2(halfParabola, 0.0, 1.0, 1.0E-7)  # should be 5.0
+5.0 -integral2(halfParabola, 0.0, 1.0, Δx=1.0E-7)  # should be 5.0
 
 # ╔═╡ 40e24f4d-9966-4984-b255-34c6cd3e0d7e
-integral2(gaussianDensity, -1.0, 1.0, 1.0E-3)      # ==> p = 0.682
+integral2(gaussianDensity, -1.0, 1.0, Δx=1.0E-3)      # ==> p = 0.682
 
 # ╔═╡ 63991eb0-ef07-471e-89df-97b9e5b95b19
-integral2(gaussianDensity, -1.0, 1.0, 1.0E-5)      # ==> p = 0.682
+integral2(gaussianDensity, -1.0, 1.0, Δx=1.0E-5)      # ==> p = 0.682
 
 # ╔═╡ 43b2d09b-8822-46bc-9372-6ee4b9f1141a
-integral2(cube, 0, 1, 0.01)
+integral2(cube, 0, 1)
 
 # ╔═╡ fba935d4-ee66-44b8-8e5b-bf14a8c08810
-integral2(cube, 0.0, 1.0, 1.0E-4)
+integral2(cube, 0.0, 1.0, Δx=1.0E-4)
 
 # ╔═╡ f7839cb5-a075-4e70-9cca-96dd760d356f
 md"
@@ -638,14 +639,85 @@ unitRamp(x) = x
 # ╔═╡ 010ca46b-f127-4b26-99e4-e96f5f4d7c6e
 lebesgueIntegral1(unit, b=1.0, Δx=0.0001)
 
+# ╔═╡ b8ed62d0-1e0b-478e-8034-7d06e3d41db1
+lebesgueIntegral1(unit, b=1.0, Δx=0.00001)
+
 # ╔═╡ f73d60b3-d5c4-4aa0-8581-4d8e49043899
 lebesgueIntegral1(unitRamp, b=1.0, Δx=0.0001)
+
+# ╔═╡ f2b81dfd-caa8-4d22-ac4a-662694b093a8
+lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)
 
 # ╔═╡ 2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 lebesgueIntegral1(halfParabola, Δx=0.0001)  
 
 # ╔═╡ 9c86d18f-5a34-4c2c-8290-cd9b33cb887d
 lebesgueIntegral1(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.001)
+
+# ╔═╡ 5efe1b56-4f21-4c3c-8b27-fdaaa90a558a
+md"
+---
+###### Lebesgue Integration with $while$-Loops
+"
+
+# ╔═╡ 680bef65-3d43-4f11-b56c-442f7a16d158
+function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.1) 
+	#--------------------------------------------------------------------------------
+	Δy = Δx
+	add_Δx(x) = x + Δx
+	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
+	function μ(y)
+		let μΔx(x) = (f(x) > y) ? Δy : 0
+			sum(μΔx(x) for x in a:Δx:b)
+		end # let
+	end # function μ
+	#--------------------------------------------------------------------------------
+	function searchForMax(f, fmax, x, b) 
+		while !(x + Δx > b)
+			fnew = f(add_Δx(x))                       # new tentative maximum
+			if fmax < fnew 
+				# searchForMax(f, fmax, add_Δx(x)						
+				fmax = fnew
+			else
+				fmax = fmax
+				# searchForMax(f, fmax, add_Δx(x), b)
+			end # if
+			x = add_Δx(x)
+		end # while
+		fmax
+	end # function lookForMax
+	#--------------------------------------------------------------------------------
+	fmax = searchForMax(f, f(a), a, b)   # the search for maximum of function f
+	# vertical sum of measures μ of horizontal slabs
+	sum2(μ::Function, 0::Real, add_Δy::Function, (fmax-Δy)::Real) * Δy 
+	#--------------------------------------------------------------------------------
+end # function lebesgueIntegral2
+
+# ╔═╡ a5150024-f84e-4aca-8890-7d1f5867fdc0
+lebesgueIntegral2(unit, b=1.0, Δx=0.0001)
+
+# ╔═╡ 35f636f2-fc3f-4d96-bcb5-25dcffc54605
+# no stack overflow as above with version 1
+lebesgueIntegral2(unit, b=1.0, Δx=0.00001) 
+
+# ╔═╡ 6e2925da-ea7c-4edd-8020-560555d6bb5b
+lebesgueIntegral2(unitRamp, b=1.0, Δx=0.0001)
+
+# ╔═╡ 03b2d053-0516-4dcb-984d-ec942ce56286
+# no stack overflow as above with version 1
+lebesgueIntegral2(unitRamp, b=1.0, Δx=0.00001) 
+
+# ╔═╡ 9760429d-d67e-4806-bd29-429d4f5df92f
+lebesgueIntegral2(halfParabola, Δx=0.001)
+
+# ╔═╡ 6717a98c-3f97-41c2-a18b-8c2df3587bb3
+lebesgueIntegral2(halfParabola, Δx=0.0001)
+
+# ╔═╡ 42d4bd93-d513-4348-a410-4b00c02e1a6c
+lebesgueIntegral2(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.001)
+
+# ╔═╡ 57b1b4d4-97b5-4a07-918b-61e5f7c54e63
+lebesgueIntegral2(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.0001)
 
 # ╔═╡ 20c24717-7b58-4f0c-9d97-236460ee6442
 md"
@@ -685,11 +757,24 @@ end # let
 # ╔═╡ c1d70fd3-5b7f-4e88-95a1-38778629d190
 lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
 
+# ╔═╡ 45294c5a-f803-49af-bad3-43c382429392
+lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
+
 # ╔═╡ 8a138046-c27b-452e-8302-326a769b3591
-lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+
+# ╔═╡ 48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
+# no stack overflow as above with version 1
+lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
+
+# ╔═╡ 26ba2cbd-bbac-45fe-91c3-df257cde2db0
+md"
+---
+###### Lebesgue Integration of Spike Densities
+"
 
 # ╔═╡ b95e2161-5543-4387-892e-b05870cadd4c
-function mySpikeDensity(x; Δx=0.01) 
+function mySpikeDensity(x; Δx=0.001) 
 	((1.0-Δx) <= x <= (1.0+Δx)) ? 0.5 : 
 	((2.0-Δx) <= x <= (2.0+Δx)) ? 0.5 : 0.0
 end # function mySpikeDensity
@@ -706,6 +791,9 @@ spikeDensity(1.9), spikeDensity(2.0), spikeDensity(2.1)
 # ╔═╡ 76341ce7-168b-4ec6-ae98-f3ad62713082
 spikeDensities = [mySpikeDensity(x, Δx=0.001) for x in 0.0:0.01:3.0]
 
+# ╔═╡ cea8d4a3-6033-452c-968f-dfff00f85f8e
+length(spikeDensities)
+
 # ╔═╡ d7412a44-26c8-468d-b52d-e30d0ae56930
 let xs = [x for x in 0.0:0.01:3.0]
 	plot(xs, spikeDensities, size=(700, 500), xlim=(.0, 3.0), ylim=(0, 0.6), 
@@ -715,6 +803,112 @@ end # let
 
 # ╔═╡ 03f2bef6-8b0f-476a-ad4b-f186c60e1e94
 lebesgueIntegral1(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
+
+# ╔═╡ 0fe0dc04-91fe-4656-b128-c2d40a8be217
+lebesgueIntegral1(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)         # as feared
+
+# ╔═╡ ff7860ed-a4b1-4118-a834-daeead70c70f
+lebesgueIntegral2(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
+
+# ╔═╡ e9946a66-9727-44ba-9df8-b40e78292899
+# no stack overflow as above with version 1
+lebesgueIntegral2(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)
+
+# ╔═╡ f112fe98-f26b-4ed9-9aaa-a43eee16c057
+md"
+---
+###### Family of Gaussians
+
+A *family* of Gaussians was proposed by [*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) and [Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf), as a stochastic model for choice predictions. Predictions in various contexts can be made with this model on the basis of measurements of sensations, attitudes, utility, moral or aestetic values, and preferences).
+"
+
+# ╔═╡ 86443238-eb2c-4fc1-99db-e4e85aa9dc4c
+begin
+	gaussianDensity1(x) = gaussianDensity(x; μ=-1.0, σ=3.0)
+	gaussianDensity2(x) = gaussianDensity(x; μ=1.0, σ=1.0)
+	gaussianDensity3(x) = gaussianDensity(x; μ=3.0, σ=2.0)
+end # begin
+
+# ╔═╡ a91b7727-4991-45eb-9ab8-fe5f1c9d615e
+let x = -0.3
+	plot(gaussianDensity1, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model", xlabel="X", ylabel="f(X)", label="f1(X)")
+	plot!(gaussianDensity1, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label="f1(X)")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensity2, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label="f2(X)")
+	plot!(gaussianDensity2, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label="f2(X)")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensity3, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label="f3(X)")
+	plot!(gaussianDensity3, x, +10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label="f3(X)")
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensity2(x)], seriestype=:line, color=:red,  label="f2(x=-0.3)")
+end # let
+
+# ╔═╡ d40affb0-d347-466f-a885-b49e02049147
+md"
+---
+###### Thurstone's Choice Model
+"
+
+# ╔═╡ 05b3b7a4-faa7-442f-8527-0f3b442f1ad5
+function thurstoneChoiceModel(;a=-10.0, b=+10.0, Δx=0.001)
+	prefProbs = [0.0, 0.0, 0.0]
+	#------------------------------------------------------------------------------
+	preferenceDensityForS1(x) = gaussianDensity1(x) * integral2(gaussianDensity2, -10.0, x, Δx=Δx) * integral2(gaussianDensity3, -10.0, x, Δx=Δx)
+	preferenceDensityForS2(x) = gaussianDensity2(x) * integral2(gaussianDensity1, -10.0, x, Δx=Δx) * integral2(gaussianDensity3, -10.0, x, Δx=Δx)
+	preferenceDensityForS3(x) = gaussianDensity3(x) * integral2(gaussianDensity1, -10.0, x, Δx=Δx) * integral2(gaussianDensity2, -10.0, x, Δx=Δx)
+	#------------------------------------------------------------------------------
+	# preference probability ...
+	prefProbs[1] = integral2(preferenceDensityForS1, -10, +10, Δx=Δx) # ... for S1
+	prefProbs[2] = integral2(preferenceDensityForS2, -10, +10, Δx=Δx) # ... for S2
+	prefProbs[3] = integral2(preferenceDensityForS3, -10, +10, Δx=Δx) # ... for S3
+	#------------------------------------------------------------------------------
+	(prefProbS1=prefProbs[1], prefProbS2=prefProbs[2], prefProbS3=prefProbs[3], sum=sum(prefProbs))
+end # function thurstoneChoiceModel
+
+# ╔═╡ 7d95a45b-b87c-4f16-8b86-b1383024abc9
+thurstoneChoiceModel(Δx=0.001)
+
+# ╔═╡ aaf2f367-9b58-4609-866a-ba837c7615ba
+md"
+---
+###### Our Voting Choice Model
+"
+
+# ╔═╡ 6f2f4569-c409-401a-b810-5cb5900d88d0
+let x = 2.015
+	#--------------------------------------------------------------------------------
+	plot(gaussianDensity3, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label="f3(X)")
+	plot!(gaussianDensity3, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label="f3(X)")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensity1, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, title="Discriminal Dispersions of Voting Choice model", xlabel="X", ylabel="f(X)", label="f1(X)")
+	plot!(gaussianDensity1, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label="f1(X)")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensity2, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label="f2(X)")
+	plot!(gaussianDensity2, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label="f2(X)")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensity1, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label="f1(X)")
+	plot!(gaussianDensity3, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label="f3(X)")
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensity2(x)], seriestype=:line, color=:red,  label="f2(x=-2.015)")
+	#--------------------------------------------------------------------------------
+end # let
+
+# ╔═╡ 82d1800f-4158-440a-892e-b80fb846ba5d
+function myChoiceModel(;b=+10.0, Δx=0.001)
+	votingProb = [0.0, 0.0, 0.0]
+	sumProbs = 0.0
+	x = b
+	while !(1.0 < sum(votingProb))
+		votingProb[1] = integral2(gaussianDensity1, x, b, Δx=Δx)
+		votingProb[2] = integral2(gaussianDensity2, x, b, Δx=Δx)
+		votingProb[3] = integral2(gaussianDensity3, x, b, Δx=Δx)
+		x = x - Δx
+	end # while
+	(votingForS1=votingProb[1], votingForS2=votingProb[2], votingForS3=votingProb[3], sum=sum(votingProb), x=x)
+end # function myChoiceModel
+
+# ╔═╡ af437b70-6771-4517-b075-d5ec6f9adb21
+myChoiceModel()
 
 # ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
 md"
@@ -756,10 +950,12 @@ end # let
 md"
 ---
 ##### References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
+- **Ahrens, H.J. & Möbus, C.**; *Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*;  Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; [http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf); last visit: 2023/09/05
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
 - **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
+- **Thurstone, L.L.**; *The Prediction of Choice*; Psychometrika 10.4 (1945): 237-253; [https://link.springer.com/content/pdf/10.1007/BF02288891.pdf](https://link.springer.com/content/pdf/10.1007/BF02288891.pdf); last visit 2023/09/05
 - **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
 - **Wikipedia**; *Leibnitz'* Formula for $\pi$; [https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
 - **Wikipedia**; [*Lebesgue-Integration*](https://en.wikipedia.org/wiki/Lebesgue_integration); last visit 2023/09/03
@@ -1900,9 +2096,21 @@ version = "1.4.1+0"
 # ╠═a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
 # ╠═fe0a3f76-e7e6-4573-b52b-7851a2a6c8f8
 # ╠═010ca46b-f127-4b26-99e4-e96f5f4d7c6e
+# ╠═b8ed62d0-1e0b-478e-8034-7d06e3d41db1
 # ╠═f73d60b3-d5c4-4aa0-8581-4d8e49043899
+# ╠═f2b81dfd-caa8-4d22-ac4a-662694b093a8
 # ╠═2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 # ╠═9c86d18f-5a34-4c2c-8290-cd9b33cb887d
+# ╟─5efe1b56-4f21-4c3c-8b27-fdaaa90a558a
+# ╠═680bef65-3d43-4f11-b56c-442f7a16d158
+# ╠═a5150024-f84e-4aca-8890-7d1f5867fdc0
+# ╠═35f636f2-fc3f-4d96-bcb5-25dcffc54605
+# ╠═6e2925da-ea7c-4edd-8020-560555d6bb5b
+# ╠═03b2d053-0516-4dcb-984d-ec942ce56286
+# ╠═9760429d-d67e-4806-bd29-429d4f5df92f
+# ╠═6717a98c-3f97-41c2-a18b-8c2df3587bb3
+# ╠═42d4bd93-d513-4348-a410-4b00c02e1a6c
+# ╠═57b1b4d4-97b5-4a07-918b-61e5f7c54e63
 # ╟─20c24717-7b58-4f0c-9d97-236460ee6442
 # ╠═ebdd80ce-c7b5-4e3a-92df-0b9424371805
 # ╠═bf8476db-30aa-4c86-a9d7-28f1e7c81663
@@ -1911,14 +2119,31 @@ version = "1.4.1+0"
 # ╠═3ef10af4-d6c0-4979-814b-c3674746e8ad
 # ╠═c7e33dd3-3e37-44b3-a154-4fc2caec15de
 # ╠═c1d70fd3-5b7f-4e88-95a1-38778629d190
+# ╠═45294c5a-f803-49af-bad3-43c382429392
 # ╠═8a138046-c27b-452e-8302-326a769b3591
+# ╠═48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
+# ╟─26ba2cbd-bbac-45fe-91c3-df257cde2db0
 # ╠═b95e2161-5543-4387-892e-b05870cadd4c
 # ╠═fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
 # ╠═44c2253e-aa15-46be-9b63-4c23c798f58e
 # ╠═b4196d8c-9a61-4ac3-9509-89a2cb1c8774
-# ╟─76341ce7-168b-4ec6-ae98-f3ad62713082
+# ╠═76341ce7-168b-4ec6-ae98-f3ad62713082
+# ╠═cea8d4a3-6033-452c-968f-dfff00f85f8e
 # ╠═d7412a44-26c8-468d-b52d-e30d0ae56930
 # ╠═03f2bef6-8b0f-476a-ad4b-f186c60e1e94
+# ╠═0fe0dc04-91fe-4656-b128-c2d40a8be217
+# ╠═ff7860ed-a4b1-4118-a834-daeead70c70f
+# ╠═e9946a66-9727-44ba-9df8-b40e78292899
+# ╟─f112fe98-f26b-4ed9-9aaa-a43eee16c057
+# ╠═86443238-eb2c-4fc1-99db-e4e85aa9dc4c
+# ╟─a91b7727-4991-45eb-9ab8-fe5f1c9d615e
+# ╟─d40affb0-d347-466f-a885-b49e02049147
+# ╠═05b3b7a4-faa7-442f-8527-0f3b442f1ad5
+# ╠═7d95a45b-b87c-4f16-8b86-b1383024abc9
+# ╟─aaf2f367-9b58-4609-866a-ba837c7615ba
+# ╟─6f2f4569-c409-401a-b810-5cb5900d88d0
+# ╠═82d1800f-4158-440a-892e-b80fb846ba5d
+# ╠═af437b70-6771-4517-b075-d5ec6f9adb21
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
