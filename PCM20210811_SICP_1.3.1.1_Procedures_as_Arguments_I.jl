@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ f1c1495e-4203-4d73-a96b-f47e3e54d865
-using Plots, QuadGK, LaTeXStrings
+using Plots, QuadGK, LaTeXStrings, Statistics
 
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
 md"
@@ -13,7 +13,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/07 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/08 ***
 ===================================================================================
 "
 
@@ -288,16 +288,16 @@ md"
 (SICP, p.59)
 $\;$
 
-$\int_a^b f(x) dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]Δx$
+$\int_a^b f(x)\; dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]\;Δx$
 $\;$
 $\;$
 $\;$
-$=\left[\sum_{i=0}^{b/Δx}f\left(a + i \cdot Δx + \frac{dx}{2}\right)\right]Δx$
+$=\left[\sum_{i=0}^{b/Δx}f\left(a + i \cdot Δx + \frac{dx}{2}\right)\right]\;Δx$
 
 $\;$
 $\;$
 $\;$
-
+;
 "
 
 # ╔═╡ d0c513b0-e921-45b2-a12b-1ad41a1e902e
@@ -587,7 +587,7 @@ Our Julia script is an implementation of the discrete sum on the right side of t
 
 $\;$
 
-$\int_a^b f(x) dx \approx \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > y\})\right]Δy$
+$\int_a^b f(x)\;dx \approx \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > y\})\right]\;Δy$
 
 $\;$
 $\;$
@@ -596,7 +596,7 @@ In comparison to solving Riemanm integrals numerically our implementation lacks 
 "
 
 # ╔═╡ 1f222db6-67c7-4413-b127-fd6a91a2e390
-function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.1) 
+function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01) 
 	#--------------------------------------------------------------------------------
 	Δy = Δx
 	add_Δx(x) = x + Δx
@@ -640,13 +640,13 @@ unitRamp(x) = x
 lebesgueIntegral1(unit, b=1.0, Δx=0.0001)
 
 # ╔═╡ b8ed62d0-1e0b-478e-8034-7d06e3d41db1
-lebesgueIntegral1(unit, b=1.0, Δx=0.00001)
+lebesgueIntegral1(unit, b=1.0, Δx=0.00001)            # stack overflow, as expected
 
 # ╔═╡ f73d60b3-d5c4-4aa0-8581-4d8e49043899
 lebesgueIntegral1(unitRamp, b=1.0, Δx=0.0001)
 
 # ╔═╡ f2b81dfd-caa8-4d22-ac4a-662694b093a8
-lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)
+lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)       # stack overflow, as expected
 
 # ╔═╡ 2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 lebesgueIntegral1(halfParabola, Δx=0.0001)  
@@ -661,7 +661,7 @@ md"
 "
 
 # ╔═╡ 680bef65-3d43-4f11-b56c-442f7a16d158
-function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.1) 
+function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01) 
 	#--------------------------------------------------------------------------------
 	Δy = Δx
 	add_Δx(x) = x + Δx
@@ -758,6 +758,7 @@ end # let
 lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
 
 # ╔═╡ 45294c5a-f803-49af-bad3-43c382429392
+# stack overflow, as expected
 lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
 
 # ╔═╡ 8a138046-c27b-452e-8302-326a769b3591
@@ -770,49 +771,82 @@ lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
 # ╔═╡ 26ba2cbd-bbac-45fe-91c3-df257cde2db0
 md"
 ---
-###### Lebesgue Integration of Spike Densities
+###### Lebesgue Integration of Stick Densities
+
+The *Lebesgue measure* (= area) unter this density is $f(x)\cdot 2\Delta x$.
 "
 
 # ╔═╡ b95e2161-5543-4387-892e-b05870cadd4c
-function mySpikeDensity(x; Δx=0.001) 
+function myStickDensity(x; Δx=0.001) 
 	((1.0-Δx) <= x <= (1.0+Δx)) ? 0.5 : 
 	((2.0-Δx) <= x <= (2.0+Δx)) ? 0.5 : 0.0
-end # function mySpikeDensity
+end # function myStickDensity
+
+# ╔═╡ aa84697c-b915-46b6-bba4-3fa5488429db
+function trueValueOfStickIntegral(f, x; Δx=0.001)
+	f(x)*2*Δx
+end # function trueValueOfStickIntegral
 
 # ╔═╡ fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
-spikeDensity(x) = mySpikeDensity(x, Δx=0.001)
+stickDensity(x) = myStickDensity(x, Δx=0.001)
+
+# ╔═╡ 1ef5978e-ab58-4d22-8a16-fcb353bf9864
+trueArea1 = trueValueOfStickIntegral(stickDensity, 1.0)
+
+# ╔═╡ fc9e15a0-7c51-427a-bfdf-bb4f1a1a9f3d
+trueArea2 = trueValueOfStickIntegral(stickDensity, 2.0)
 
 # ╔═╡ 44c2253e-aa15-46be-9b63-4c23c798f58e
-spikeDensity(0.9), spikeDensity(1.0), spikeDensity(1.1)
+stickDensity(0.99), stickDensity(1.0), stickDensity(1.01)
 
 # ╔═╡ b4196d8c-9a61-4ac3-9509-89a2cb1c8774
-spikeDensity(1.9), spikeDensity(2.0), spikeDensity(2.1)
+stickDensity(1.99), stickDensity(2.0), stickDensity(2.01)
 
 # ╔═╡ 76341ce7-168b-4ec6-ae98-f3ad62713082
-spikeDensities = [mySpikeDensity(x, Δx=0.001) for x in 0.0:0.01:3.0]
+stickDensities = [myStickDensity(x, Δx=0.001) for x in 0.0:0.01:3.0]
 
 # ╔═╡ cea8d4a3-6033-452c-968f-dfff00f85f8e
-length(spikeDensities)
+length(stickDensities)
 
 # ╔═╡ d7412a44-26c8-468d-b52d-e30d0ae56930
 let xs = [x for x in 0.0:0.01:3.0]
-	plot(xs, spikeDensities, size=(700, 500), xlim=(.0, 3.0), ylim=(0, 0.6), 
-	line=:darkblue, # seriestype=:scatter,
-	fill=(0, :lightblue), framestyle=:semi, title="Density of Spike Function", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	#-----------------------------------------------------------------------------
+	plot(xs, stickDensities, size=(700, 500), xlim=(.0, 3.0), ylim=(0, 0.6), 
+	line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Stick Function", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	#-----------------------------------------------------------------------------
+	annotate!([(2.49, 0.03, L"Area = $0.5\cdot2\Delta x$")])
 end # let
 
+# ╔═╡ 2a963e1d-247d-48cd-a064-f2827a1a92d6
+md"
+The plot program distorts $stickDensities$. It should display *sticks* and not *spikes*.
+"
+
+# ╔═╡ b409618c-3709-4ab8-824c-2010871790cc
+md"
+---
+The estimated area is $0.0029939999999999654$ and the *true* area is $0.001$
+"
+
 # ╔═╡ 03f2bef6-8b0f-476a-ad4b-f186c60e1e94
-lebesgueIntegral1(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
+approximateArea1 = lebesgueIntegral1(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.001) 
+
+# ╔═╡ 2f92b01a-d5d7-4ece-9a0e-011220570446
+abs(approximateArea1 - 0.001)                         # error = 0.0019939999999999654
+
+# ╔═╡ beac0bc8-5c3b-4c1e-8274-b6ad5d023a0e
+lebesgueIntegral2(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
 
 # ╔═╡ 0fe0dc04-91fe-4656-b128-c2d40a8be217
-lebesgueIntegral1(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)         # as feared
+# stack overflow, as expected
+lebesgueIntegral1(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)        
 
 # ╔═╡ ff7860ed-a4b1-4118-a834-daeead70c70f
-lebesgueIntegral2(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
+approximateArea2 = lebesgueIntegral2(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)
 
-# ╔═╡ e9946a66-9727-44ba-9df8-b40e78292899
-# no stack overflow as above with version 1
-lebesgueIntegral2(spikeDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)
+# ╔═╡ 73f17ff3-41cb-4e1a-8183-c32d53db82ea
+# the error is smaller than with approximateArea1
+abs(approximateArea2 - 0.001)                        # error = 0.0011000000000002657
 
 # ╔═╡ f112fe98-f26b-4ed9-9aaa-a43eee16c057
 md"
@@ -875,10 +909,18 @@ $\;$
 $\;$
 $\;$
 
-The model's meaning is that for any sensation $x$ the preference probability $P(i > j; j\neq i)$ for $S_i$ is the product of the density for $S_i(=f_i(x)$ (vertical *red* line in the graphic above) and the probability that alternative $j$ get a lower affective value than $x \;(= p_j(x))$. The probabilities $p_j(x)$ are marked by *blue* shaded areas left of the vertical *red* line in the above graphic.
+The model's meaning is that the strength of preference at the point of *sensation intensity* $x$ for the stimulus $S_i$ momentary attended is the product of the density $f_i(x)$ for $S_i$ (vertical *red* line in the graphic above) and the probabilities $p_j(x)$ that *all* alternatives $j$ get a *lower* affective value than $x$. The probabilities $p_j(x)$ are marked by *blue* shaded areas left of the vertical *red* line in the above graphic.
 
-The assumptions of the model are rather demanding. We'll present below a model alternative with less demanding assumptions concerningt the conitive votin process. We call this model *Voting Choice Model*.
+The *total* preference strength or probability $P_i(i > j = 1, ..., k; j\neq i)$  is the integral over the total range of sensations.
+
 " 
+
+# ╔═╡ 62ef2cd9-c68d-4b43-933e-a45831db061b
+md"
+The assumptions of the model are rather demanding. There is the hypothesis that there exists a cognitive mechanism which computes for stimulus $S_i$ under attentention for *each* point of sensation $x$ the preference strength of $S_i$ in relation to all alternatives. Furthermore the mechanism integrates these preference strengths not only over the *total* range of $X_i$ but also for *all* stimuli. This is necessary because the *total* probabilty of preference has to be calculated this way for the total set of stimuli $\{S_i\;|\;i = 1,...,k\}$.
+
+We'll present below a model alternative with less demanding assumptions concerningt the conitive votin process. We call this model *Voting Choice Model*.
+"
 
 # ╔═╡ 05b3b7a4-faa7-442f-8527-0f3b442f1ad5
 function thurstoneChoiceModel(;a=-10.0, b=+10.0, Δx=0.001)
@@ -960,16 +1002,25 @@ end # function ourVotingChoiceModel
 ourVotingChoiceModel()
 
 # ╔═╡ 50c35292-5f72-4b27-9c7b-d421ff22d249
-let x = [0.109514, 0.14831,  0.74062]    # probs Thurstone model
-	y = [0.157245, 0.154815, 0.688408]   # probs voting model
-	xs = [0, 1]; ys = [0, 1]
-	plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
-	plot!(xs, ys, label="line of perfect model agreement")
-end # let
+function modelComparison()
+	let x = [0.109514, 0.14831,  0.74062]    # probs Thurstone model
+		y = [0.157245, 0.154815, 0.688408]   # probs voting model
+		rxy = trunc(Statistics.cor(x, y), digits=4)
+		xs = [0, 1]; ys = [0, 1]
+		#---------------------------------------------------------------------------
+		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
+		plot!(xs, ys, label="line of perfect model agreement")
+		#---------------------------------------------------------------------------
+		annotate!([(0.7, 0.1, "r(model1, model2) = $rxy")])
+	end # let
+end # function modelComparison
+
+# ╔═╡ 786b7748-839b-40a4-93c0-1fbb1277a20e
+modelComparison()
 
 # ╔═╡ 788bbcdc-ca72-455c-b18a-e04a149b523d
 md"
-Both models show strong agreement in predicting first choices at least for this example. Empirical Studies have to demonstrate what model is more useful: The simpler Voting Model or the more demanding Thurstone model.
+Both models show strong agreement in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is nearly 1.00 (!). Empirical Studies have to demonstrate what model is more useful: The simpler Voting Model or the more demanding Thurstone model.
 "
 
 # ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
@@ -993,7 +1044,7 @@ let f(x) = halfParabola(x)
 end # let
 
 # ╔═╡ fa6643ce-8d9a-4525-825d-8a8d915118c0
-let f(x) = spikeDensity(x)
+let f(x) = stickDensity(x)
 	a= 0.0
 	b=+3.0
 	Integral, est = quadgk(f, a, b, rtol=1e-6)
@@ -1022,6 +1073,7 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
 - **Ahrens, H.J. & Möbus, C.**; [*Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf);  Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; last visit: 2023/09/05
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
+- **Nazarathy, Y. & Klok, H.**; *Statistics with Julia*; Cham, Switzland: Springer, 2021
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
 - **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
 - **Thurstone, L.L.**; *The Prediction of Choice*; Psychometrika 10.4 (1945): 237-253; [https://link.springer.com/content/pdf/10.1007/BF02288891.pdf](https://link.springer.com/content/pdf/10.1007/BF02288891.pdf); last visit 2023/09/05
@@ -1050,6 +1102,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 LaTeXStrings = "~1.3.0"
@@ -1063,7 +1116,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "22a4326707a6eceaa8fb1d953d8f8cd368367f32"
+project_hash = "426dbbef72c2ce15ccdc3b143b3e37b73493958a"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -2195,20 +2248,28 @@ version = "1.4.1+0"
 # ╠═48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
 # ╟─26ba2cbd-bbac-45fe-91c3-df257cde2db0
 # ╠═b95e2161-5543-4387-892e-b05870cadd4c
+# ╠═aa84697c-b915-46b6-bba4-3fa5488429db
+# ╠═1ef5978e-ab58-4d22-8a16-fcb353bf9864
+# ╠═fc9e15a0-7c51-427a-bfdf-bb4f1a1a9f3d
 # ╠═fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
 # ╠═44c2253e-aa15-46be-9b63-4c23c798f58e
 # ╠═b4196d8c-9a61-4ac3-9509-89a2cb1c8774
 # ╠═76341ce7-168b-4ec6-ae98-f3ad62713082
 # ╠═cea8d4a3-6033-452c-968f-dfff00f85f8e
-# ╠═d7412a44-26c8-468d-b52d-e30d0ae56930
+# ╟─d7412a44-26c8-468d-b52d-e30d0ae56930
+# ╟─2a963e1d-247d-48cd-a064-f2827a1a92d6
+# ╟─b409618c-3709-4ab8-824c-2010871790cc
 # ╠═03f2bef6-8b0f-476a-ad4b-f186c60e1e94
+# ╠═2f92b01a-d5d7-4ece-9a0e-011220570446
+# ╠═beac0bc8-5c3b-4c1e-8274-b6ad5d023a0e
 # ╠═0fe0dc04-91fe-4656-b128-c2d40a8be217
 # ╠═ff7860ed-a4b1-4118-a834-daeead70c70f
-# ╠═e9946a66-9727-44ba-9df8-b40e78292899
+# ╠═73f17ff3-41cb-4e1a-8183-c32d53db82ea
 # ╟─f112fe98-f26b-4ed9-9aaa-a43eee16c057
 # ╠═86443238-eb2c-4fc1-99db-e4e85aa9dc4c
 # ╟─a91b7727-4991-45eb-9ab8-fe5f1c9d615e
 # ╟─d40affb0-d347-466f-a885-b49e02049147
+# ╟─62ef2cd9-c68d-4b43-933e-a45831db061b
 # ╠═05b3b7a4-faa7-442f-8527-0f3b442f1ad5
 # ╠═7d95a45b-b87c-4f16-8b86-b1383024abc9
 # ╟─aaf2f367-9b58-4609-866a-ba837c7615ba
@@ -2216,7 +2277,8 @@ version = "1.4.1+0"
 # ╟─6f2f4569-c409-401a-b810-5cb5900d88d0
 # ╠═82d1800f-4158-440a-892e-b80fb846ba5d
 # ╠═af437b70-6771-4517-b075-d5ec6f9adb21
-# ╟─50c35292-5f72-4b27-9c7b-d421ff22d249
+# ╠═50c35292-5f72-4b27-9c7b-d421ff22d249
+# ╠═786b7748-839b-40a4-93c0-1fbb1277a20e
 # ╟─788bbcdc-ca72-455c-b18a-e04a149b523d
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
