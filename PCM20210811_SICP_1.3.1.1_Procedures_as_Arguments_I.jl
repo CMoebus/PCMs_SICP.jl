@@ -13,7 +13,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/08 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/12 ***
 ===================================================================================
 "
 
@@ -213,10 +213,12 @@ myError(*(8, piSum1(a=1, b=10^3)))                     # error 0.001999998000010
 myError(*(8, piSum1(a=1, b=10^4)))                     # error 0.00019999999800024426    
 
 # ╔═╡ 1745d75d-dcc8-4a32-b9a8-607f5da744d9
-*(8, piSum1(a=1, b=^(10, 5)))                          # stack overflow, as expected
+# stack overflow, as expected
+*(8, piSum1(a=1, b=^(10, 5)))                          
 
 # ╔═╡ ddae764c-b5c0-4eda-8c80-4f57fbeac486
-myError(*(8, piSum1(a=1, b=^(10, 5))))                 # stack overflow, as expected
+# stack overflow, as expected
+myError(*(8, piSum1(a=1, b=^(10, 5))))                 
 
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
@@ -539,7 +541,7 @@ sum_cubes4(1, 2)
 sum_cubes4(1, 10)
 
 # ╔═╡ 13f1da45-78ce-4ee9-86ed-0bdb4e592f1c
-function integral2(f::Function, a::Real, b::Real; Δx::Real=0.01)::Real
+function integral2(f, a, b; Δx=0.01) 
 	add_Δx(x) = x + Δx
 	sum2(f::Function, (a + Δx/2.0), add_Δx, b) * Δx
 end
@@ -640,13 +642,15 @@ unitRamp(x) = x
 lebesgueIntegral1(unit, b=1.0, Δx=0.0001)
 
 # ╔═╡ b8ed62d0-1e0b-478e-8034-7d06e3d41db1
-lebesgueIntegral1(unit, b=1.0, Δx=0.00001)            # stack overflow, as expected
+ # stack overflow, as expected
+lebesgueIntegral1(unit, b=1.0, Δx=0.00001)           
 
 # ╔═╡ f73d60b3-d5c4-4aa0-8581-4d8e49043899
 lebesgueIntegral1(unitRamp, b=1.0, Δx=0.0001)
 
 # ╔═╡ f2b81dfd-caa8-4d22-ac4a-662694b093a8
-lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)       # stack overflow, as expected
+# stack overflow, as expected
+lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)       
 
 # ╔═╡ 2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 lebesgueIntegral1(halfParabola, Δx=0.0001)  
@@ -697,14 +701,14 @@ end # function lebesgueIntegral2
 lebesgueIntegral2(unit, b=1.0, Δx=0.0001)
 
 # ╔═╡ 35f636f2-fc3f-4d96-bcb5-25dcffc54605
-# no stack overflow as above with version 1
+# *no* stack overflow as above with version 1
 lebesgueIntegral2(unit, b=1.0, Δx=0.00001) 
 
 # ╔═╡ 6e2925da-ea7c-4edd-8020-560555d6bb5b
 lebesgueIntegral2(unitRamp, b=1.0, Δx=0.0001)
 
 # ╔═╡ 03b2d053-0516-4dcb-984d-ec942ce56286
-# no stack overflow as above with version 1
+# *no* stack overflow as above with version 1
 lebesgueIntegral2(unitRamp, b=1.0, Δx=0.00001) 
 
 # ╔═╡ 9760429d-d67e-4806-bd29-429d4f5df92f
@@ -765,7 +769,7 @@ lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
 lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
 
 # ╔═╡ 48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
-# no stack overflow as above with version 1
+# *no* stack overflow as above with version 1
 lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
 
 # ╔═╡ 26ba2cbd-bbac-45fe-91c3-df257cde2db0
@@ -853,32 +857,41 @@ md"
 ---
 ###### Family of Gaussians as Components of Cognitive Choice Models
 
-A *family* of Gaussians was proposed by [*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) and [Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf), as a component of a *cognitive stochastic* model for choice predictions. With this model predictions of *first* choices can be made on the empirical basis of measurements of sensation, attitude, subjective utility, moral or aestetic values, and general preferences.
+A *family* of Gaussians was proposed by [*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) and [Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf), as a component of a *cognitive stochastic* model for choice predictions. Each distribution of this family represents subjective *latent* affects related to one stimulus in a set of alternatives. The  model predicts the percentage of *first* choice for each stimulus in the set of alternatives. The latent affect dispersions (= *discriminal dispersions* in Thurstone's own words) are supposed to be measured by psychological scaling methods (e.g. rating scales) to get empirical data for affect values (for e.g. sensations, attitudes, subjective utility, moral or aestetic sentiments).
 "
 
 # ╔═╡ 86443238-eb2c-4fc1-99db-e4e85aa9dc4c
 begin
-	gaussianDensityi(x) = gaussianDensity(x; μ=-1.0, σ=3.0)
-	gaussianDensityj(x) = gaussianDensity(x; μ=1.0, σ=1.0)
-	gaussianDensityk(x) = gaussianDensity(x; μ=3.0, σ=2.0)
+	gaussianDensityI(x) = gaussianDensity(x; μ=-1.0, σ=3.0)
+	gaussianDensityJ(x) = gaussianDensity(x; μ=+1.0, σ=1.0)
+	gaussianDensityK(x) = gaussianDensity(x; μ=+3.0, σ=2.0)
+	uniformDensityL(x; a=-10, b=+10) = 1/(b - a)
+	#-------------------------------------------------------
+	density = Array{Function, 1}(undef, 4)
+	density[1] = gaussianDensityI
+	density[2] = gaussianDensityJ
+	density[3] = gaussianDensityK
+	density[4] = uniformDensityL
+	density
 end # begin
 
 # ╔═╡ a91b7727-4991-45eb-9ab8-fe5f1c9d615e
 let x = -0.3
-	plot(gaussianDensityi, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model", xlabel=L"Latent Affective Variable $X$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
-	plot!(gaussianDensityi, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
+	plot(gaussianDensityI, -11.0, x, size=(700, 500), xlim=(-11.0, 11.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model", xlabel=L"Latent Affective Variable $S:\;(\mu(S_i)=-1.0)<(\mu(S_j)=+1.0)<(\mu(S_k)=+3.0)$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, +11, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
 	#--------------------------------------------------------------------------------
-	plot!(gaussianDensityj, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label=L"$f_j(X)$")
-	plot!(gaussianDensityj, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, +11, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
 	#--------------------------------------------------------------------------------
-	plot!(gaussianDensityk, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
-	plot!(gaussianDensityk, x, +10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	plot!(gaussianDensityK, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, +11.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
 	#------------------------------------------------------------------------------
-	annotate!([(-4.8, 0.08, text(L"Stimulus $S_i$", 12, :darkblue))])
+	annotate!([(-4.0, 0.09, text(L"Stimulus $S_i$", 12, :darkblue))])
 	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
 	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
 	#--------------------------------------------------------------------------------
-	plot!([x, x], [0, gaussianDensityj(x)], seriestype=:line, color=:red,  label=L"$f_j(X)= -0.3$")
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(X=-0.3)$")
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), line=:darkblue, label=L"$f_i(X)$")
 end # let
 
 # ╔═╡ d40affb0-d347-466f-a885-b49e02049147
@@ -909,37 +922,133 @@ $\;$
 $\;$
 $\;$
 
-The model's meaning is that the strength of preference at the point of *sensation intensity* $x$ for the stimulus $S_i$ momentary attended is the product of the density $f_i(x)$ for $S_i$ (vertical *red* line in the graphic above) and the probabilities $p_j(x)$ that *all* alternatives $j$ get a *lower* affective value than $x$. The probabilities $p_j(x)$ are marked by *blue* shaded areas left of the vertical *red* line in the above graphic.
-
-The *total* preference strength or probability $P_i(i > j = 1, ..., k; j\neq i)$  is the integral over the total range of sensations.
-
 " 
 
 # ╔═╡ 62ef2cd9-c68d-4b43-933e-a45831db061b
 md"
-The assumptions of the model are rather demanding. There is the hypothesis that there exists a cognitive mechanism which computes for stimulus $S_i$ under attentention for *each* point of sensation $x$ the preference strength of $S_i$ in relation to all alternatives. Furthermore the mechanism integrates these preference strengths not only over the *total* range of $X_i$ but also for *all* stimuli. This is necessary because the *total* probabilty of preference has to be calculated this way for the total set of stimuli $\{S_i\;|\;i = 1,...,k\}$.
+The *informal* meaning is that the strength of preference for stimulus $S_i$ at the point of affect strength $x$ is the product of the density $f_i(x)$ (vertical *red* line in the graphic above) and the probabilities $p_{j=1,...,k; j \ne i}(x)$ (marked by *blue* shaded areas left of the vertical *red* line in the above graphic). 
 
-We'll present below a model alternative with less demanding assumptions concerningt the conitive votin process. We call this model *Voting Choice Model*.
+The product $\prod_{j=1,...,k; j \ne i}^k p_j(x)$ is the probability that *all* alternatives $S_j$ of $S_i$ stimulate a *lower* affective value than $x$. 
+
+The *total* preference strength or probability $P_i(i > j = 1, ..., k; j\neq i)$  is the integral over the total range of sensations.
+
+The *formal* meaning of $P_i(i > j = 1, ..., k; j\neq i)$ is that of a conditional *expected value*. It is the expectation for $S_i$ that the alternative set $S_{j = 1, ..., k; j\neq i}$ stimulates lower affects.
+
+$\;$
+
+$\mathbb E(p_j(x)|i) = P_i(i > j = 1, ..., k; j\neq i)$
+
+$\;$
+
+Because of its characteristic as an *expectation* we expect that the model favors stimuli with large variance. This can lead to various interesting and surprising effects as are discussed by Thurstone.
+
+The assumptions of the model are rather demanding. There is the hypothesis that there exists a cognitive mechanism which computes for stimulus $S_i$ for *each* point of affect $x$ the preference strength of $S_i$ in relation to all alternatives. Furthermore the mechanism integrates these preference strengths not only over the *total* range of $X_i$ but also for *all* stimuli. 
+
 "
 
-# ╔═╡ 05b3b7a4-faa7-442f-8527-0f3b442f1ad5
-function thurstoneChoiceModel(;a=-10.0, b=+10.0, Δx=0.001)
-	prefProbs = [0.0, 0.0, 0.0]
-	#------------------------------------------------------------------------------
-	preferenceDensityForSi(x) = gaussianDensityi(x) * integral2(gaussianDensityj, -10.0, x, Δx=Δx) * integral2(gaussianDensityk, -10.0, x, Δx=Δx)
-	preferenceDensityForSj(x) = gaussianDensityj(x) * integral2(gaussianDensityi, -10.0, x, Δx=Δx) * integral2(gaussianDensityk, -10.0, x, Δx=Δx)
-	preferenceDensityForSk(x) = gaussianDensityk(x) * integral2(gaussianDensityi, -10.0, x, Δx=Δx) * integral2(gaussianDensityj, -10.0, x, Δx=Δx)
-	#------------------------------------------------------------------------------
-	# preference probability ...
-	prefProbs[1] = integral2(preferenceDensityForSi, -10, +10, Δx=Δx) # ... for S1
-	prefProbs[2] = integral2(preferenceDensityForSj, -10, +10, Δx=Δx) # ... for S2
-	prefProbs[3] = integral2(preferenceDensityForSk, -10, +10, Δx=Δx) # ... for S3
-	#------------------------------------------------------------------------------
-	(prefProbSi=prefProbs[1], prefProbSj=prefProbs[2], prefProbSk=prefProbs[3], sum=sum(prefProbs))
+# ╔═╡ f50a70de-cb5a-479f-a30c-25b7406f5bbc
+md"
+We'll present below an alternative model with less demanding assumptions. We call this model *Voting Choice Model*. According to this model the probability of preference mass (PoPM) is distributed across all discriminal dispersions starting from the most positive affect $x$ walking down to least positive affect till the PoPM is exhausted. 
+"
+
+# ╔═╡ e61d0197-902d-4173-80f8-3e4b64badde3
+function thurstoneChoiceModel(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
+	prefProbs = zeros(Float64, kS)                         # initalization to 0.0
+	preferenceDensity = Array{Function, 1}(undef, 4)
+	for i in 1:kS
+		for j in 1:kS
+			if !(j == i)
+				for k in 1:kS
+					if !((k == i) || (k == j))
+						#-----------------------------------------------
+						if kS == 3
+							preferenceDensity[i] = x -> density[i](x) * integral2(density[j], -10.0, x, Δx=Δx) * integral2(density[k], -10.0, x, Δx=Δx)
+						end # if kS == 3
+						#-----------------------------------------------
+						if kS == 4
+							for l in 1:kS
+								if !((l == i) || (l == j) || (l == k))
+									preferenceDensity[i] = x -> density[i](x) * integral2(density[j], -10.0, x, Δx=Δx) * integral2(density[k], -10.0, x, Δx=Δx) * integral2(density[l], -10.0, x, Δx=Δx)
+								end # if 
+							end # for l
+						end # if kS == 4
+						#-----------------------------------------------
+					end # if k
+				end # for k
+			end # if j
+		end # for j
+		prefProbs[i] = integral2(preferenceDensity[i], -10, +10, Δx=Δx) # Si
+	end # for i
+	prefProbs, sum(prefProbs)
 end # function thurstoneChoiceModel
+
+# ╔═╡ 557adf8b-8c11-448e-9452-c49664cee73c
+md"
+$P(S_i > S_j, S_k) = 0.109514$
+$P(S_j > S_i, S_K) = 0.14831$
+$P(S_k > S_i, S_j) = 0.74062$
+
+$\;$
+
+"
 
 # ╔═╡ 7d95a45b-b87c-4f16-8b86-b1383024abc9
 thurstoneChoiceModel(Δx=0.001)
+
+# ╔═╡ 52b96af4-9919-44e3-b65e-6705346bbd39
+md"
+---
+###### Introduction of a Controversial Candidate $S_l$
+The introduction of a *controversial* candidate $S_l$ will distract preference from a more favorable *non*controversial candidate $S_k$.
+"
+
+# ╔═╡ ad5cb66f-2cdf-423c-b009-a8a149868886
+uniformDensityl(x; a=-10.0, b=10.0) = 1/(b - a)
+
+# ╔═╡ 2cf90372-57d6-46a7-b0fa-c9ba40dc9c7a
+integral2(uniformDensityl, -10.0, 10.0, Δx=0.1)            # test integral2
+
+# ╔═╡ 289fa9b2-c6b9-43dc-811c-f16abfd1ce37
+let x = -0.3
+	#--------------------------------------------------------------------------------
+	plot(uniformDensityL, -10.0, x, size=(700, 500), line=:orange, framestyle=:semi, fill=(0, :lightblue), label=L"$f_l(X)$")
+	plot!(uniformDensityL, x, +10.0, size=(700, 500), line=:orange, label=L"$f_l(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), xlim=(-11.0, 11.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model",xlabel=L"Latent Affective Variable $S:\;(\mu(S_i)=-1.)<(\mu(S_l)=0.)<(\mu(S_j)=1.)<(\mu(S_k)=3.)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityJ, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityK, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, +10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	#------------------------------------------------------------------------------
+	annotate!([(-4.0, 0.09, text(L"Stimulus $S_i$", 12, :darkblue))])
+	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
+	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
+	annotate!([(+8.5, 0.06, text(L"Stimulus $S_l$", 12, :darkblue))])
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(X=-0.3)$")
+	plot!(uniformDensityL, -10.0, x, size=(700, 500), line=:orange, label=L"$f_l(X)$")
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), line=:darkblue, label=L"$f_i(X)$")
+end # let
+
+# ╔═╡ 784aaf2b-59eb-484f-afac-7782b1af61ed
+md"
+Facit: The introduction of a *controversial* candidate $S_l$ will distract preference from the most favorable but *less* controversial candidate $S_k$:
+
+$\;$
+
+$P(S_i > S_j, S_k) = 0.109514 > P(S_i > S_j, S_k, S_l) = 0.0742588$
+$P(S_j > S_i, S_K) = 0.14831 > P(S_j > S_i, S_k, S_l) = 0.0870487$
+$P(S_k > S_i, S_j) = 0.74062 >> P(S_k > S_i, S_j, S_l) = 0.507737$
+$P(S_l > S_i, S_j, S_k) = 0.329387$
+$\;$
+
+"
+
+# ╔═╡ c457e22c-4844-46d8-9834-fba397e70a52
+thurstoneChoiceModel(kS=4, Δx=0.001)
 
 # ╔═╡ aaf2f367-9b58-4609-866a-ba837c7615ba
 md"
@@ -964,51 +1073,64 @@ $\;$
 # ╔═╡ 6f2f4569-c409-401a-b810-5cb5900d88d0
 let x = 2.015
 	#--------------------------------------------------------------------------------
-	plot(gaussianDensityk, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
-	plot!(gaussianDensityk, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	plot(gaussianDensityK, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
 	#--------------------------------------------------------------------------------
-	plot!(gaussianDensityi, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, title="Discriminal Dispersions of Voting Choice model", xlabel=L"Latent Affective Variable $X$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
-	plot!(gaussianDensityi, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_i(X)$")
+	plot!(gaussianDensityI, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, title="Discriminal Dispersions of Voting Choice model", xlabel=L"Latent Affective Variable $X$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_i(X)$")
 	#--------------------------------------------------------------------------------
-	plot!(gaussianDensityj, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
-	plot!(gaussianDensityj, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_j(X)$")
 	#--------------------------------------------------------------------------------
-	plot!(gaussianDensityi, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
-	plot!(gaussianDensityk, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	plot!(gaussianDensityI, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
+	plot!(gaussianDensityK, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
 	#------------------------------------------------------------------------------
 	annotate!([(-4.8, 0.08, text(L"Stimulus $S_i$", 12, :darkblue))])
 	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
 	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
 	#--------------------------------------------------------------------------------
-	plot!([x, x], [0, gaussianDensityj(x)], seriestype=:line, color=:red,  label=L"$f_j(x=-2.015)$")
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(x=-2.015)$")
 	#--------------------------------------------------------------------------------
 end # let
 
-# ╔═╡ 82d1800f-4158-440a-892e-b80fb846ba5d
-function ourVotingChoiceModel(;b=+10.0, Δx=0.001)
-	votingProb = [0.0, 0.0, 0.0]
-	sumProbs = 0.0
+# ╔═╡ 6bfaad4f-98ea-4983-bd1b-3e4e0d9e7c2a
+function votingChoiceModel(;kS=3, b=+10.0, Δx=0.001)
+	votingProb = zeros(Float64, kS)                         # initalization to 0.0
 	x = b
 	while !(1.0 < sum(votingProb))
-		votingProb[1] = integral2(gaussianDensityi, x, b, Δx=Δx)
-		votingProb[2] = integral2(gaussianDensityj, x, b, Δx=Δx)
-		votingProb[3] = integral2(gaussianDensityk, x, b, Δx=Δx)
+		for i in 1:kS
+			votingProb[i] = integral2(density[i], x, b, Δx=Δx)
+		end # for i
 		x = x - Δx
 	end # while
-	(probForSi=votingProb[1], probForS2=votingProb[2], probForS3=votingProb[3], sum=sum(votingProb), x=x)
-end # function ourVotingChoiceModel
+	votingProb, sum(votingProb)
+end # function votingChoiceModel
 
 # ╔═╡ af437b70-6771-4517-b075-d5ec6f9adb21
-ourVotingChoiceModel()
+votingChoiceModel()
+
+# ╔═╡ 8f6942f2-fd3a-4a3f-8366-a37b0bc22c72
+md"
+Facit: Similar to Thurstone's model the introduction of a controversial candidate $S_l$ will distract preference away from the most favorable but less controversal candidate $Sk_l$. But in contrast to Thurstone's approach the distraction effect is diminished here.
+$\;$
+
+$P(S_i > S_j, S_k) = 0.157245 > P(S_i > S_j, S_k, S_l) = 0.0966776$
+$P(S_j > S_i, S_K) = 0.154815 > P(S_j > S_i, S_k, S_l) = 0.0287166$
+$P(S_k > S_i, S_j) = 0.688408 >> P(S_k > S_i, S_j, S_l) = 0.519706$
+$P(S_l > S_i, S_j, S_k) = 0.355$
+$\;$
+
+"
+
+# ╔═╡ 54dfd67a-558a-4cf3-b9a6-6846a7bcec07
+votingChoiceModel(kS=4)                     # including contoversial candidate
 
 # ╔═╡ 50c35292-5f72-4b27-9c7b-d421ff22d249
-function modelComparison()
-	let x = [0.109514, 0.14831,  0.74062]    # probs Thurstone model
-		y = [0.157245, 0.154815, 0.688408]   # probs voting model
-		rxy = trunc(Statistics.cor(x, y), digits=4)
+function modelComparison(title, x, y)
+	let rxy = trunc(Statistics.cor(x, y), digits=4)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
+		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), title=title, seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
 		plot!(xs, ys, label="line of perfect model agreement")
 		#---------------------------------------------------------------------------
 		annotate!([(0.7, 0.1, "r(model1, model2) = $rxy")])
@@ -1016,11 +1138,18 @@ function modelComparison()
 end # function modelComparison
 
 # ╔═╡ 786b7748-839b-40a4-93c0-1fbb1277a20e
-modelComparison()
+modelComparison("Voting vs. Thurstone's Model (3 Stimuli)", 
+	[0.109514, 0.14831,  0.74062],                  # Thurstone's model predictions
+	[0.157245, 0.154815, 0.688408])                 # voting model predictions
+
+# ╔═╡ ceaf7ab2-621e-4bc2-a880-3bea18e45018
+modelComparison("Voting vs. Thurstone's Model (4 Stimuli)", 
+	[0.0742588, 0.0870487, 0.507737, 0.329387],       # Thurstone's model predictions
+	[0.0966776, 0.0287166, 0.519706, 0.355])          # voting model predictions
 
 # ╔═╡ 788bbcdc-ca72-455c-b18a-e04a149b523d
 md"
-Both models show strong agreement in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is nearly 1.00 (!). Empirical Studies have to demonstrate what model is more useful: The simpler Voting Model or the more demanding Thurstone model.
+Both models show strong agreement in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is near 1.00 (!). Empirical Studies have to demonstrate what model is more useful: The simpler Voting Model or the more demanding Thurstone model.
 "
 
 # ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
@@ -1087,7 +1216,7 @@ md"
 # ╔═╡ 9c61b414-134f-4924-87b8-8e761e5816ed
 md"
 ---
-###### end of ch. 1.3.1
+###### end of ch. 1.3.1.1
 
 ====================================================================================
 
@@ -2270,15 +2399,26 @@ version = "1.4.1+0"
 # ╟─a91b7727-4991-45eb-9ab8-fe5f1c9d615e
 # ╟─d40affb0-d347-466f-a885-b49e02049147
 # ╟─62ef2cd9-c68d-4b43-933e-a45831db061b
-# ╠═05b3b7a4-faa7-442f-8527-0f3b442f1ad5
+# ╟─f50a70de-cb5a-479f-a30c-25b7406f5bbc
+# ╠═2cf90372-57d6-46a7-b0fa-c9ba40dc9c7a
+# ╠═e61d0197-902d-4173-80f8-3e4b64badde3
+# ╟─557adf8b-8c11-448e-9452-c49664cee73c
 # ╠═7d95a45b-b87c-4f16-8b86-b1383024abc9
+# ╟─52b96af4-9919-44e3-b65e-6705346bbd39
+# ╠═ad5cb66f-2cdf-423c-b009-a8a149868886
+# ╟─289fa9b2-c6b9-43dc-811c-f16abfd1ce37
+# ╟─784aaf2b-59eb-484f-afac-7782b1af61ed
+# ╠═c457e22c-4844-46d8-9834-fba397e70a52
 # ╟─aaf2f367-9b58-4609-866a-ba837c7615ba
 # ╟─1e4f63f4-c311-4d05-a70f-54e3aefc4043
 # ╟─6f2f4569-c409-401a-b810-5cb5900d88d0
-# ╠═82d1800f-4158-440a-892e-b80fb846ba5d
+# ╠═6bfaad4f-98ea-4983-bd1b-3e4e0d9e7c2a
 # ╠═af437b70-6771-4517-b075-d5ec6f9adb21
+# ╟─8f6942f2-fd3a-4a3f-8366-a37b0bc22c72
+# ╠═54dfd67a-558a-4cf3-b9a6-6846a7bcec07
 # ╠═50c35292-5f72-4b27-9c7b-d421ff22d249
 # ╠═786b7748-839b-40a4-93c0-1fbb1277a20e
+# ╠═ceaf7ab2-621e-4bc2-a880-3bea18e45018
 # ╟─788bbcdc-ca72-455c-b18a-e04a149b523d
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
