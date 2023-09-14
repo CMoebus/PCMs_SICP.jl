@@ -12,7 +12,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.1.2 Procedures as Arguments II: Nonparametric Voting Model
 ##### file: PCM20210908\_SICP\_1.3.1.2\_Procedures\_as\_Arguments\_II.jl
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/13 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/14 ***
 
 ===================================================================================
 "
@@ -41,53 +41,54 @@ We apply here the *nonparametric* version of our *voting model* to Thurstone fir
 
 # ╔═╡ b14d83b4-0dc3-4893-a645-fd69d9fb15e6
 begin                                         # Thurstone, 1945, p.245, Table 1
-	x = Array{Real, 2}(undef, (9, 3))
+	x1 = Array{Real, 2}(undef, (9, 3))
 	#------------------------------------------------------------------------------
-	x[1,:] = [.04, .03, .00]
-	x[2,:] = [.16, .13, .02]
-	x[3,:] = [.13, .18, .14]
-	x[4,:] = [.11, .17, .34]
-	x[5,:] = [.08, .15, .34]
-	x[6,:] = [.06, .12, .14]
-	x[7,:] = [.11, .10, .02]
-	x[8,:] = [.19, .08, .00]
-	x[9,:] = [.12, .04, .00]
- 	size(x)
+	x1[1,:] = [.04, .03, .00]
+	x1[2,:] = [.16, .13, .02]
+	x1[3,:] = [.13, .18, .14]
+	x1[4,:] = [.11, .17, .34]
+	x1[5,:] = [.08, .15, .34]
+	x1[6,:] = [.06, .12, .14]
+	x1[7,:] = [.11, .10, .02]
+	x1[8,:] = [.19, .08, .00]
+	x1[9,:] = [.12, .04, .00]
+ 	size(x1)
 end # begin
 
 # ╔═╡ f2f78b7e-6a68-4fa3-846d-95bb979794c2
-function plotRatingDistributions1(x::Array)
-	let (nRows, nCols) = size(x)
-		nCats = nRows              # number of rating categories
-		nStims = nCols             # number of stimuli
-		xs = 1:1:nCats
-		#----------------------------------------------------------------------------
-		plot(xs,  x[:, 1], title="Discriminal Dispersions (Thurstone's 1st Example)", xlimits=(0.5, 9.5), xticks=:1:1:nCats, ylimits=(-0.05, 0.40), seriestype=:scatter, colour=:blue, label="S1", xlabel=L"positive affect rating category $m$", ylabel = L"P(m)")
-		#----------------------------------------------------------------------------
-		if nStims == 3
-			plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
-			plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
-			#--------------------------------------------------------------
-			plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
-			plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
-			plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
-			#------------------------------------------------------------------------
-		elseif nStims == 4
-			plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
-			plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
-			plot!(xs, x[:, 4], seriestype=:scatter, colour=:orange, label="S4")
-			#--------------------------------------------------------------
-			plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
-			plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
-			plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
-			plot!(xs, x[:, 4], seriestype=:line, colour=:orange, label="S4")
-		end # if
-		#----------------------------------------------------------------------------
-	end # let
+function plotRatingDistributions1(x::Array, title; maxY=0.4)
+	(nRows, nCols) = size(x)
+	nCats = nRows              # number of rating categories
+	nStims = nCols             # number of stimuli
+	xs = 1:1:nCats
+	#----------------------------------------------------------------------------
+	plot(xs,  x[:, 1], title=title, xlimits=(0.5, nCats+.5), xticks=:1:1:nCats, ylimits=(-0.05, maxY), seriestype=:scatter, colour=:blue, label="S1", xlabel=L"positive affect rating category $m$", ylabel = L"P(m)")
+	if nStims == 3
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
+		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+	elseif nStims == 4 
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
+		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 4], seriestype=:scatter, colour=:orange, label="S4")
+		plot!(xs, x[:, 4], seriestype=:line, colour=:orange, label="S4")
+	end # if
+	#----------------------------------------------------------------------------
 end # function plotRatingDistributions1
 
 # ╔═╡ f5aabcd1-58af-418d-82f1-f25bfa171b3f
-plotRatingDistributions1(x)
+plotRatingDistributions1(x1,"Thurstone's 1st Ex.(p.245, tab.1, without Controv. S4) ")
 
 # ╔═╡ 3832f1e1-ee46-4a64-9d56-d9698ffc5b20
 function discreteVotingModel(x::Array, title; plimit=1.0)
@@ -107,7 +108,7 @@ function discreteVotingModel(x::Array, title; plimit=1.0)
 end # function discreteVotingModel
 
 # ╔═╡ 71d9d34c-c674-4168-9ecb-52a42c45684d
-discreteVotingModel(x, "Voting Model: Thurstone's 1st data set")
+discreteVotingModel(x1, "Voting Model: Thurstone's 1st data set")
 
 # ╔═╡ e9c53501-7ba2-4393-bdee-f609e371a5ac
 function modelComparison1(title, x, y ; xlabel="VotingModel", ylabel="Thurstone Model")
@@ -165,7 +166,7 @@ begin
 end # begin
 
 # ╔═╡ 3b5f6d28-7fde-4492-aa10-da11539a1b77
-plotRatingDistributions1(x2)
+plotRatingDistributions1(x2, "Thurstone's 1st Ex.(p.245, tab.1, incl. Controv. S4)")
 
 # ╔═╡ 9d3e5de5-d489-4bea-af40-d55d3ce076fd
 discreteVotingModel(x2, "Voting Model: Thurstone's 1st augmented data set") 
@@ -192,7 +193,9 @@ $\;$
 # ╔═╡ bac5626f-f5a5-4077-a42a-db1b768754c5
 modelComparison1("Voting Model: S3 vs S4", 
 	[0.36129, 0.316129, 0.322581], #, 0.0000],      # voting model for S3
-	[0.336973, 0.23869, 0.112324]) #, 0.31201])     # voting model for S4
+	[0.336973, 0.23869, 0.112324], #, 0.31201])     # voting model for S4
+	xlabel="Voting Model for S4",
+    ylabel="Voting Model for S3") 
 
 # ╔═╡ 45815157-d41f-4c1a-b08d-8a511aacc420
 md"
@@ -200,6 +203,99 @@ md"
 ##### 1.3.1.2.2 Nonparametric Voting Model: *Thurstone*'s 2nd Numerical Example
 
 Now, we apply the *nonparametric* version of our voting model to Thurstone's second set of articial data. He motivates the characterics of his dataset as: *... we have a numerical example of the theorem that when two psychological objects are tied in average popularity, as measured by the mean scale positions $S_i$ and $S_j$, then the more variable of them can win election for first choice by the introduction of a third competing object of lower average popularity. Here we used 24 successive intervals. All three of these affective distributions were made Gaussian, and it is here assumed that the distributions are at least roughly symmetric. The first two candidates are the leading ones that are tied. The third candidate has a lower average popularity* ...(Thurstone, 1945, p.247)
+"
+
+# ╔═╡ f447a7ca-ec7d-4584-ad15-1ee482186e61
+begin
+	x31 = Array{Real, 2}(undef, (24, 3))
+	#------------------------------------------------------------------------------
+	x31[ 1,:] = [.00, .00, .00]
+	x31[ 2,:] = [.01, .00, .00]
+	x31[ 3,:] = [.00, .00, .00]
+	x31[ 4,:] = [.01, .00, .01]
+	x31[ 5,:] = [.02, .00, .01]
+	x31[ 6,:] = [.03, .00, .05]
+	x31[ 7,:] = [.04, .01, .09]
+	x31[ 8,:] = [.05, .01, .15]
+	x31[ 9,:] = [.07, .05, .19]
+	x31[10,:] = [.08, .09, .19]
+	x31[11,:] = [.09, .15, .15]
+	x31[12,:] = [.10, .19, .09]
+	x31[13,:] = [.10, .19, .05]
+	x31[14,:] = [.09, .15, .01]
+	x31[15,:] = [.08, .09, .01]
+	x31[16,:] = [.07, .06, .00]
+	x31[17,:] = [.05, .01, .00]
+	x31[18,:] = [.04, .01, .00]
+	x31[19,:] = [.03, .00, .00]
+	x31[20,:] = [.02, .00, .00]
+	x31[21,:] = [.01, .00, .00]
+	x31[22,:] = [.00, .00, .00]
+	x31[23,:] = [.01, .00, .00]
+	x31[24,:] = [.00, .00, .00]
+ 	size(x31)
+end # begin
+
+# ╔═╡ 8a3b8b4d-e92f-437e-bc28-245c72aaad88
+plotRatingDistributions1(x31, "Thurstone's 2nd Example (Tab 2; without Controv. S4)", maxY=0.25)
+
+# ╔═╡ 593f000d-0e11-4a08-a7b4-e737dc3bda2b
+discreteVotingModel(x31, "Thurstone's 2nd Example (Tab 2; without Controv. S4)")
+
+# ╔═╡ 1f445771-32a8-41d8-8faf-519fdab8ac93
+modelComparison1("Voting vs Thurstone Mod (Thurst.'s 2nd data no S4)",
+	[.48, .45, .07],  # Thurstone Model (Thurstone, 1945, p.247) 
+	[0.462963, 0.472222, 0.0648148], # Voting Model
+	xlabel="Thurstone Model",
+	ylabel="Voting Model")  
+
+# ╔═╡ c4898b15-d8d8-4201-bfbe-bf16fbc7ecaf
+begin
+	x32 = Array{Real, 2}(undef, (24, 4))
+	#------------------------------------------------------------------------------
+	x32[ 1,:] = [.00, .00, .00, 1/24]
+	x32[ 2,:] = [.01, .00, .00, 1/24]
+	x32[ 3,:] = [.00, .00, .00, 1/24]
+	x32[ 4,:] = [.01, .00, .01, 1/24]
+	x32[ 5,:] = [.02, .00, .01, 1/24]
+	x32[ 6,:] = [.03, .00, .05, 1/24]
+	x32[ 7,:] = [.04, .01, .09, 1/24]
+	x32[ 8,:] = [.05, .01, .15, 1/24]
+	x32[ 9,:] = [.07, .05, .19, 1/24]
+	x32[10,:] = [.08, .09, .19, 1/24]
+	x32[11,:] = [.09, .15, .15, 1/24]
+	x32[12,:] = [.10, .19, .09, 1/24]
+	x32[13,:] = [.10, .19, .05, 1/24]
+	x32[14,:] = [.09, .15, .01, 1/24]
+	x32[15,:] = [.08, .09, .01, 1/24]
+	x32[16,:] = [.07, .06, .00, 1/24]
+	x32[17,:] = [.05, .01, .00, 1/14]
+	x32[18,:] = [.04, .01, .00, 1/24]
+	x32[19,:] = [.03, .00, .00, 1/24]
+	x32[20,:] = [.02, .00, .00, 1/24]
+	x32[21,:] = [.01, .00, .00, 1/24]
+	x32[22,:] = [.00, .00, .00, 1/24]
+	x32[23,:] = [.01, .00, .00, 1/24]
+	x32[24,:] = [.00, .00, .00, 1/24]
+ 	size(x32)
+end # begin
+
+# ╔═╡ 160981ae-22a9-4ae9-a7a3-935e0a4b39fe
+plotRatingDistributions1(x32, "Thurstone's 2nd Example (Tab 2; incl. Controv. S4)", maxY=0.25)
+
+# ╔═╡ a10bd04c-265f-4b78-9f24-cdbb73e47020
+discreteVotingModel(x32, "Thurstone's 2nd Example (Tab 2; incl. Controv. S4)")
+
+# ╔═╡ 0a3a119b-211a-4dc4-bc6f-e7860b81e050
+modelComparison1("Voting vs Thurstone Mod (Thurst.'s 2nd data incl S4)",
+	[.48, .45, .07], #, 00],  # Thurstone Model  
+	[0.325708, 0.260566, 0.0162854], #, 0.397441], # Voting Model
+	xlabel="Thurstone Model",
+	ylabel="Voting Model")  
+
+# ╔═╡ 85331d45-5442-4b01-9c84-5105b7a0ab53
+md"
+**Summary**: Applied to Thurstone's own published demo data *both* models *agree* perfectly. This coincidence is deteriorated when studying empirical data (below). 
 "
 
 # ╔═╡ 9babe800-837a-4d2b-9d59-7ed2d4419719
@@ -1551,6 +1647,15 @@ version = "1.4.1+0"
 # ╟─23cb6297-23b8-4cd2-8af4-529e25511f65
 # ╠═bac5626f-f5a5-4077-a42a-db1b768754c5
 # ╟─45815157-d41f-4c1a-b08d-8a511aacc420
+# ╠═f447a7ca-ec7d-4584-ad15-1ee482186e61
+# ╠═8a3b8b4d-e92f-437e-bc28-245c72aaad88
+# ╠═593f000d-0e11-4a08-a7b4-e737dc3bda2b
+# ╠═1f445771-32a8-41d8-8faf-519fdab8ac93
+# ╠═c4898b15-d8d8-4201-bfbe-bf16fbc7ecaf
+# ╠═160981ae-22a9-4ae9-a7a3-935e0a4b39fe
+# ╠═a10bd04c-265f-4b78-9f24-cdbb73e47020
+# ╠═0a3a119b-211a-4dc4-bc6f-e7860b81e050
+# ╟─85331d45-5442-4b01-9c84-5105b7a0ab53
 # ╟─9babe800-837a-4d2b-9d59-7ed2d4419719
 # ╟─bcf2c87b-64ed-4aee-a666-b96dd65a5373
 # ╠═ea394cd7-e6d0-4e55-8e19-4ff8150a3bfa
