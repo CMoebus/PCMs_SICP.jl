@@ -10,10 +10,10 @@ using Plots, QuadGK, LaTeXStrings, Statistics
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
 md"
 ===================================================================================
-#### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
+#### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Integration à la Riemann & Lebesgue (NonSICP))
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/12 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/10/29 ***
 ===================================================================================
 "
 
@@ -1179,6 +1179,96 @@ let f(x) = stickDensity(x)
 	Integral, est = quadgk(f, a, b, rtol=1e-6)
 end # let
 
+# ╔═╡ ae3b9175-9e73-458d-af3d-6d5480b2a20a
+md"
+---
+###### Integration of function $(x^2-1)$ with respect to Lebesgue measure $\lambda(dx)$ 
+Please note, that Hable's result is $8$ which is an *error* (Hable, 2015, p.73). This is fixed here.
+
+$\;$
+$\;$
+
+$\int_{[0,3]}(x^2-1)\lambda(dx)=\left(\frac{1}{3}x^3-x\right)\Bigg\vert_0^3$
+
+$\;$
+$\;$
+$\;$
+
+$=\left(\frac{27}{3}-3\right)-(0-0)=6$
+
+$\;$
+$\;$
+$\;$
+"
+
+# ╔═╡ 5aaeacc4-6d26-4cc5-be26-2161db3ce784
+plot(x->x^2-1, 0.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+
+# ╔═╡ d6f4ab59-0a81-404d-bebf-1e89ab674079
+let f(x) = x^2-1
+	a=0.0
+	b=3.0
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 40eb47d3-6f33-47f2-9902-b1d9df4c8277
+md"
+---
+$\;$
+$\;$
+
+$\int_{[0,3]}(x^2-1)\lambda(dx)=\left(\frac{1}{3}x^3-x\right)\Bigg\vert_1^3$
+
+$\;$
+$\;$
+$\;$
+
+$=\left(\frac{27}{3}-3\right)-\left(\frac{1}{3}-1\right)=\left(6+\frac{2}{3}\right)=6.66666...$
+
+$\;$
+$\;$
+$\;$
+"
+
+# ╔═╡ 5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
+plot(x->x^2-1, 1.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+
+# ╔═╡ 10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
+let f(x) = x^2-1
+	a=1.0
+	b=3.0
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 5a481e43-eb57-4df7-a914-e72c30a69e6a
+md"
+---
+$\;$
+$\;$
+
+$\int_{[0,3]}(x^2-1)\lambda(dx)=\left(\frac{1}{3}x^3-x\right)\Bigg\vert_0^1$
+
+$\;$
+$\;$
+$\;$
+
+$=\left(\frac{1}{3}-1\right)-\left(0-0\right)=-\frac{2}{3}=-0.66666...$
+
+$\;$
+$\;$
+$\;$
+"
+
+# ╔═╡ 5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
+plot(x->x^2-1, 0.0, 1.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+
+# ╔═╡ a9ec7875-1522-42a5-a5e2-438fe312604c
+let f(x) = x^2-1
+	a=0.0
+	b=1.0
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
 # ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 md"
 ---
@@ -1201,6 +1291,7 @@ md"
 ##### References
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
 - **Ahrens, H.J. & Möbus, C.**; [*Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf);  Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; last visit: 2023/09/05
+- **Hable, R.**; *Einführung in die Stochastik*, Heidelberg: Springer, 2015
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
 - **Nazarathy, Y. & Klok, H.**; *Statistics with Julia*; Cham, Switzland: Springer, 2021
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
@@ -2424,6 +2515,15 @@ version = "1.4.1+0"
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
 # ╠═fa6643ce-8d9a-4525-825d-8a8d915118c0
+# ╟─ae3b9175-9e73-458d-af3d-6d5480b2a20a
+# ╠═5aaeacc4-6d26-4cc5-be26-2161db3ce784
+# ╠═d6f4ab59-0a81-404d-bebf-1e89ab674079
+# ╟─40eb47d3-6f33-47f2-9902-b1d9df4c8277
+# ╠═5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
+# ╠═10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
+# ╟─5a481e43-eb57-4df7-a914-e72c30a69e6a
+# ╠═5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
+# ╠═a9ec7875-1522-42a5-a5e2-438fe312604c
 # ╟─7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 # ╠═8f884ca3-790c-42fd-8bcb-8476012d4ee1
 # ╟─84667282-7410-4c19-b227-1a2bc8bf88ee
