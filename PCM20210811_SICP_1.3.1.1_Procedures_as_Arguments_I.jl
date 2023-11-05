@@ -10,10 +10,10 @@ using Plots, QuadGK, LaTeXStrings, Statistics
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
 md"
 ===================================================================================
-#### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Integration à la Riemann & Lebesgue (NonSICP))
+#### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Cantor Set, Integration à la Riemann & Lebesgue (NonSICP))
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/10/29 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/05 ***
 ===================================================================================
 "
 
@@ -219,6 +219,438 @@ myError(*(8, piSum1(a=1, b=10^4)))                     # error 0.000199999998000
 # ╔═╡ ddae764c-b5c0-4eda-8c80-4f57fbeac486
 # stack overflow, as expected
 myError(*(8, piSum1(a=1, b=^(10, 5))))                 
+
+# ╔═╡ 6c793213-177e-4c50-99b2-482704cbad75
+md"
+---
+###### The *Lebesgue Measure* $\lambda(C)$ (= Length) of [*Cantor's Set (=Discontinuum) C*](https://en.wikipedia.org/wiki/Cantor_set))
+(NonSICP)
+We take the interval 
+
+$C_0=[0,1]$ 
+
+$\;$
+ 
+$\lambda(C_0) = |C_0| = 1$
+
+$\;$
+
+and construct the *discontinuum* (Schilling, 2015, p.2f.) by removing ternary *open* intervals $(...,...)_3$: 
+
+- 1st construction step generating $C_1$: Remove from $C_0$ the middle *open* interval $I_2$
+
+$I_2=(0.1,0.2)_3=(0*3^0+1*3^{-1}, 0*3^0+2*3^{-1})=\left(\frac{1}{3},\frac{2}{3}\right)$
+
+$\;$
+$\;$
+
+$C_1 = C_0\backslash\;I_2=\left[0,\frac{1}{3}\right]\cup\left[\frac{2}{3},1\right]$
+
+$\;$
+$\;$
+
+$\lambda(C_1)=|C_1|=\frac{1}{3}+\frac{1}{3}=\frac{2}{3}=\frac{\#intercals}{interval\, size}=0.\overline{6}$
+
+$\;$
+$\;$
+
+- 2nd construction step generating $C_2$: Remove from the $2^1$ *closed* intervals of $C_1$ the middle *open* intervals $I_{t_12}$ where $t_1 \in \{0,2\}$
+
+$\;$
+
+$I_{02} := (0.01,0.02)_3=$
+$(0*3^0+0*3^{-1}+1*3^{-2},0*3^0+0*3^{-1}+2*3^{-2})=\left(\frac{1}{9}, \frac{2}{9}\right)$
+
+$\;$
+$\;$
+
+$I_{22} := (0.21,0.22)_3=$
+$(0*3^0+2*3^{-1}+1*3^{-2},0*3^0+2*3^{-1}+2*3^{-2})=\left(\frac{7}{9}, \frac{8}{9}\right)$
+
+$\;$
+$\;$
+$\;$
+
+$C_2=C_1\;\backslash I_{02}\cup I_{22}=$
+
+$\;$
+
+$=\left[0,\frac{1}{9}\right]\cup\left[\frac{2}{9},\frac{1}{3}\right]\cup\left[\frac{2}{3},\frac{7}{9}\right]\cup\left[\frac{8}{9},1\right]$
+
+$\;$
+$\;$
+
+$\lambda(C_2)=|C_2| = \frac{4}{9}=\frac{\#intercals}{interval\, size}=0.\overline{4}$
+
+$\;$
+$\;$
+
+- 3rd construction step generating $C_3$: Remove from the $2^2$ *closed* intervals of $C_2$ the middle *open* intervals $I_{1_1t_22}$ where $t_1,t_2 \in \{0,2\}$
+
+$\;$
+$I_{002} = (0.001, 0.002)_3 =$
+
+$\;$
+
+$=(0*3^0 + 0*3^{-1} + 0*3^{-2} + 1*3^{-3}, 
+   0*3^0 + 0*3^{-1} + 0*3^{-2} + 2*3^{-3})=$
+
+$\;$
+$\;$
+
+$\left(0+0+0+\frac{1}{27}, 0+0+0+\frac{2}{27}\right)=\left(\frac{1}{27}, \frac{2}{27}\right) = (0.03704, 0.07407)$
+
+$\;$
+$\;$
+$\;$
+ 
+$I_{022}= (0.021, 0.022)_3=$
+
+$\;$
+
+$=(0*3^0 + 0*3^{-1} + 2*3^{-2} + 1*3^{-3}, 
+   0*3^0 + 0*3^{-1} + 2*3^{-2} + 2*3^{-3})=$
+
+$\;$
+$\;$
+
+$=\left(0+0+\frac{2}{9}+\frac{1}{27}, 0+0+\frac{2}{9}+\frac{2}{27}\right)=\left(\frac{7}{27}, \frac{8}{27}\right)=(0.25926,0.29630)$
+
+$\;$
+$\;$
+$\;$
+
+$I_{202}= (0.201, 0.202)_3=$
+
+$\;$
+
+$=(0*3^0 + 2*3^{-1} + 0*3^{-2} + 1*3^{-3}, 
+   0*3^0 + 2*3^{-1} + 0*3^{-2} + 2*3^{-3})=$
+
+$\;$
+$\;$
+
+$=\left(0+\frac{2}{3}+0+\frac{1}{27},0+\frac{2}{3}+0+\frac{2}{27}\right)=$
+
+$\;$
+$\;$
+
+$=\left(\frac{19}{27},\frac{20}{27}\right)=(0.70370, 0.74074)$
+
+$\;$
+$\;$
+$\;$
+
+$I_{222}=(0.221, 0.222)_3=$
+
+$\;$
+$\;$
+
+$=(0*3^0 + 2*3^{-1} + 2*3^{-2} + 1*3^{-3}, 
+   0*3^0 + 2*3^{-1} + 2*3^{-2} + 2*3^{-3})=$
+
+$\;$
+$\;$
+
+$=\left(0+\frac{2}{3}+\frac{2}{9}+\frac{1}{27},0+\frac{2}{3}+\frac{2}{9}+\frac{2}{27}\right)=\left(\frac{25}{27},\frac{26}{27}\right)=(0.9293,0.96296)$
+
+$\;$
+$\;$
+$\;$
+$\;$
+
+$C_3 = C_2 \backslash\;I_{002} \cup I_{022} \cup I_{202} \cup I_{222}=$
+
+$\;$
+$\;$
+
+$=\left[0,\frac{1}{27}\right]\cup\left[\frac{2}{27},\frac{1}{3}\right]\cup\left[\frac{2}{9},\frac{7}{27}\right]\cup\left[\frac{8}{27},\frac{1}{3}\right]\cup\left[\frac{7}{3},\frac{19}{27}\right]\cup\left[\frac{20}{27},\frac{7}{9}\right]\cup\left[\frac{8}{9},\frac{25}{27}\right]\cup\left[\frac{26}{27},1\right]$
+
+$\;$
+$\;$
+
+$\lambda(C_3) = \frac{8}{27}=\frac{\#intercals}{interval\, size}=0.\overline{2}\overline{9}\overline{6}.$
+
+$\;$ 
+$\;$
+
+" 
+
+# ╔═╡ d9eefee2-a53c-4064-8ebf-c4345a76798c
+md"
+###### Numeration of Intervals
+In the $n^{th}+1$ step we remove all intervals
+
+$I_{t_1t_2...t_{n-1}t_n2}=(0.t_1t_2...t_{n-1}t_n1, 0.t_1t_2...t_{n-1}t_n2)_3 \in \{0,2\}.$
+
+$\;$
+
+Endpoints are written as *triadic* numbers with numbers $t_1t_2...t_{n-1}t_n \in \{0,2\}.$ The sequence of triadic numbers $t_1...t_n$ encodes the position of the interval $I_{t_1t_2...t_{n-1}t_n2}$ in relation to the interval $I_{t_1t_2...t_{n-1}2}.$ $t_n=0$ means that the interval is *left* of $I_{t_1t_2...t_{n-1}2}$ and $t_n=2$ means that it is *right* of. This results in a binary tree.
+
+The *Lebesgue* measure (= length) of the interval $I_{t_1t_2...t_{n-1}t_n2}$ is:
+
+$\;$
+
+$\lambda(I_{t_1t_2...t_{n-1}t_n2})=0.t_1t_2...t_{n-1}t_n2-
+0.t_1t_2...t_{n-1}t_n1=0.00...001_3=3^{-(n+1)}.$
+
+$\;$
+$\;$
+
+So interval lengths can be derived from this ternary encoding:
+
+- 1st step: 2^0 intervals $\lambda(I_2) = 0.2_3-0.1_3=0.1_3=3^{-(0+1)}=\frac{1}{3}$
+- 2nd step: 2^1 intervals $\lambda(I_{02}), \lambda(I_{22}) =3^{-(1+1)}=\frac{1}{9}$
+- 3rd step: 2^2 intervals $\lambda(I_{002}), \lambda(I_{022}), \lambda(I_{022}) , \lambda(I_{222})=3^{-(2+1)}=\frac{1}{27}$
+- (n+1)th step: 2^n intervals with length $3^{-(n+1)}.$
+
+$\;$
+
+" 
+
+# ╔═╡ b61f0964-d023-4bba-9822-812e3218f716
+begin
+plot(x->1.0, 0.0, 1.0, size=(700, 400), xlims=(-0.02, 1.24), ylims=(0, 1.2), line=:blue, lw=3, label="", title="Construction of Cantor's Set (=Discontinuum)", framestyle=:semi)
+plot!([(0.0,1.02),(0.0,0.98)],line=:blue,lw=1,label="") # left vertical start bar
+plot!([(1.0,1.02),(1.0,0.98)],line=:blue,lw=1,label="") # right vertical end bar
+annotate!(1.1, 1.0, L"C_0")
+#----------------------------------------------------------------------------------
+annotate!(1/3, 0.83, L"\frac{1}{3}", 10); annotate!(2/3, 0.83, L"\frac{2}{3}", 10)
+plot!(x->0.75, [[0.0, 1/3], [2/3, 1.0]], line=:blue, lw=3, label="")
+plot!([(0.0,0.77),(0.0,0.73)],line=:blue,lw=1,label="") # left vertical start bar
+plot!([(1/3,0.77),(1/3,0.73)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(2/3,0.77),(2/3,0.73)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(1.0,0.77),(1.0,0.73)],line=:blue,lw=1,label="") # right vertical end bar
+annotate!(1.1, 0.75, L"C_1")
+annotate!(1/2, 3/4, L"I_2")
+annotate!(1/9, 0.58, L"\frac{1}{9}", 10); annotate!(2/9, 0.58, L"\frac{2}{9}", 10)
+annotate!(7/9, 0.58, L"\frac{7}{9}", 10); annotate!(8/9, 0.58, L"\frac{8}{9}", 10)
+#----------------------------------------------------------------------------------
+plot!(x->0.50, [[0.0, 1/9], [2/9, 3/9], [6/9, 7/9], [8/9, 9/9]], line=:blue, lw=3, label="")
+plot!([(0.0,0.52),(0.0,0.48)],line=:blue,lw=1,label="") # left vertical start bar
+plot!([(1/9,0.52),(1/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(2/9,0.52),(2/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(3/9,0.52),(3/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(6/9,0.52),(6/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(7/9,0.52),(7/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(8/9,0.52),(8/9,0.48)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(1.0,0.52),(1.0,0.48)],line=:blue,lw=1,label="") # left vertical bar
+annotate!(1.1, 0.5, L"C_2")
+annotate!(0.17, 0.5, L"I_{02}")
+annotate!(0.835, 0.5, L"I_{22}")
+#----------------------------------------------------------------------------------
+plot!(x->0.25, [[0.0, 1/27], [2/27, 3/27], [6/27, 7/27], [8/27, 9/27], [18/27, 19/27], [20/27, 21/27], [24/27, 25/27], [26/27, 27/27]], line=:blue, lw=3, label="")
+plot!([( 0/27,0.27),( 0/27,0.23)],line=:blue,lw=1,label="") # left vertical start bar
+plot!([( 1/27,0.27),( 1/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 2/27,0.27),( 2/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 3/27,0.27),( 3/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 6/27,0.27),( 6/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 7/27,0.27),( 7/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 8/27,0.27),( 8/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([( 9/27,0.27),( 9/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(18/27,0.27),(18/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(19/27,0.27),(19/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(20/27,0.27),(20/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(21/27,0.27),(21/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(24/27,0.27),(24/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(25/27,0.27),(25/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(26/27,0.27),(26/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+plot!([(27/27,0.27),(27/27,0.23)],line=:blue,lw=1,label="") # left vertical bar
+annotate!(1.1, 0.25, L"C_3")
+annotate!(0.075, 0.20, L"I_{002}")
+annotate!(1/27-0.005, 0.32, L"\frac{1}{27}",8), annotate!(2/27+0.007, 0.32, L"\frac{2}{27}",8)
+annotate!(7/27-0.005, 0.32, L"\frac{7}{27}",8), annotate!(8/27+0.007, 0.32, L"\frac{8}{27}",8)
+annotate!(19/27-0.005, 0.32, L"\frac{19}{27}",8), annotate!(20/27+0.007, 0.32, L"\frac{20}{27}",8)
+annotate!(25/27-0.005, 0.32, L"\frac{25}{27}",8), annotate!(26/27+0.007, 0.32, L"\frac{26}{27}",8)
+annotate!(0.3, 0.20, L"I_{022}")
+annotate!(0.745, 0.20, L"I_{202}")
+annotate!(0.97, 0.20, L"I_{222}")
+#----------------------------------------------------------------------
+# binary tree
+plot!([(1/2, 3/4), (0.17, 0.5)], color=:pink,lw=2,ls=:dash,label="")
+plot!([(1/2, 3/4),(0.835, 0.5)], color=:pink,lw=2,ls=:dash,label="")
+plot!([(0.17, 0.5),(0.055, 0.25)], color=:pink,lw=2,ls=:dash,label="")
+plot!([(0.17, 0.5),(0.28, 0.25)], color=:pink,lw=2,ls=:dash,label="")
+plot!([(0.835, 0.5),(0.722, 0.25)], color=:pink,lw=2,ls=:dash,label="")
+plot!([(0.835, 0.5),(0.945, 0.25)], color=:pink,lw=2,ls=:dash,label="")
+#----------------------------------------------------------------------
+end # begin
+
+# ╔═╡ d2f67bf1-a301-4c93-aaac-4c66a7c9b944
+md"
+
+The *Lebesgue Measure* $\lambda(C)$ of *Cantor's Discontinuum* $C$ is (c.f. Schilling, 2015, p.2f.):
+
+$\lambda(C_0)=\lambda([0,1])=1$
+
+$\;$
+
+$\lambda(C_1)=\lambda(C_0)-\frac{1}{3}=\lambda([0,1])-\frac{1}{3}=1-\frac{1}{3}= \frac{2}{3}=0.\overline{6}$
+
+$\;$
+$\;$
+
+$\lambda(C_2)=\lambda(C_1)-2\cdot\frac{1}{9} = \frac{2}{3}-\frac{2}{9}=\frac{6}{9}-\frac{2}{9}=\frac{4}{9}=0.\overline{4}$
+
+$\;$
+$\;$
+
+$\lambda(C_3)=1-\frac{1}{3}\left[\frac{2^0}{3^0}+\frac{2^1}{3^1}+\frac{2^2}{3^2}\right]=1-\frac{1}{3}\left[1+\frac{2}{3}+\frac{4}{9}\right]=$
+
+$\;$
+$\;$
+$\;$
+
+$=1-\frac{1}{3}\cdot\frac{19}{9}=1-\frac{19}{27}=\frac{8}{27}=0.\overline{2}\overline{9}\overline{6}$
+
+$\;$
+$\;$
+$......$
+$\;$
+
+$\lambda(C_{n+1})=1-2^0\times\frac{1}{3^1}-2^1\times\frac{1}{3^2}-...-2^n\times\frac{1}{3^{n+1}}=1-\frac{1}{3}\sum_{j=0}^n\frac{2^j}{3^j}=1-\frac{1}{3}\sum_{j=0}^n\left(\frac{2}{3}\right)^j$
+
+$\;$
+$\;$
+$......$
+$\;$
+
+$\lambda(C)=1-\sum_{n=0}^\infty\frac{2^n}{3^{n+1}}=1-\frac{1}{3}\sum_{n=0}^\infty\frac{2^n}{3^n}=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=0$
+
+$\;$
+$\;$
+$\;$
+$\;$
+
+"
+
+# ╔═╡ 4dae9415-e8e2-4133-9cef-a3c4618bdbda
+md"
+Because $\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n$ is a convergent geometric series with $r=\frac{2}{3}$ the sum is 
+
+$\;$
+$\;$
+
+$\sum_{n=0}^\infty\left(r\right)^n=\frac{1}{1-r}$
+
+$\;$
+$\;$
+
+and
+
+$\;$
+
+$\lambda(C)=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=1-\frac{1}{3}\left(\frac{1}{1-\frac{2}{3}}\right)=1-\frac{1}{3}\left(\frac{1}{\frac{1}{3}}\right)=1-\frac{1}{3}\left(\frac{3}{1}\right)=0$
+
+$\;$
+$\;$
+$\;$
+$\;$
+
+But *C* is not empty (e.g. Schilling, 2015, p.3). At least the end points of intervals left over after removings are contained in the *Cantor set* $C$.
+$\;$
+
+"
+
+# ╔═╡ ed9af448-5867-4cfd-815a-c295eaffac8b
+function λC(n; j=0, accu=0.0)
+	r = 2/3
+	if j == n
+		1 - 1/3 * accu
+	else
+		reduction = r^j
+		accuOld = accu
+		accuNew = accu + reduction
+		if accuOld ≈ accuNew
+			error("no substantial reduction with j = $j")
+		end # if
+		λC(n; j=j+1, accu=accu+reduction)
+	end # if 
+end # function λC 
+
+# ╔═╡ ed8e7ccf-5c04-4304-baf9-60cc07773d28
+λC(0)                      # ==> 1.0  --> :)
+
+# ╔═╡ 83b7e51e-2e73-4448-8cb1-ed98787c3994
+λC(1)                      # ==> 2/3  --> 0.666... --> :)
+
+# ╔═╡ 14b8a22d-5443-4fae-abd9-b54a283eaa92
+λC(2)                      # ==> 4/9  --> 0.444... --> :)
+
+# ╔═╡ c9905375-c8ea-4403-8ce7-2af82324027a
+λC(3)                      # ==> 8/27 --> 0.296... --> :)
+
+# ╔═╡ 6052b447-cd20-4f1e-87e1-bda2ea6461a3
+λC(10)
+
+# ╔═╡ 650c0387-e516-4b08-8c9a-aa49682183a4
+λC(50)
+
+# ╔═╡ 299fb3ee-a3a6-44d1-9b0c-094283e6dfa4
+λC(42)
+
+# ╔═╡ f89d9a5d-0fd8-4684-82bd-797de43582a2
+λC(43)
+
+# ╔═╡ c193805e-df87-4842-bdb5-d1991db9ccf0
+function λC2(n) #; j=0, accu=0.0)
+    j = 0
+	if n == 0
+		1
+	else
+		r = 2/3 
+		1 - 1/3 * sum(
+			j -> r^(j-1), [j for j in 1:n], init=0.0)
+	end # if
+end # function λC 
+
+# ╔═╡ 70ec1fa0-2e9d-4aab-923a-10fa0fb249a5
+λC2(0)
+
+# ╔═╡ 2eba09ba-f280-47c6-8753-18b9a77c4a5b
+λC2(1)
+
+# ╔═╡ 5d34717f-f9fe-4796-9fc5-51462bdabe85
+λC2(2)
+
+# ╔═╡ 6f6e5499-7dcb-4a3a-b0b9-a8ca9898b689
+λC2(3)
+
+# ╔═╡ b37131ce-d9c0-4b9e-9392-f752dba44c13
+λC2(42)                       # same as λC(42)
+
+# ╔═╡ 2874445b-ced9-45bd-9094-5a1e48651831
+λC2(43)                       # less than λC(43)
+
+# ╔═╡ f9034ab8-2af6-4d79-be1d-1da8c6cccd81
+λC2(50)                       # less than λC(50)
+
+# ╔═╡ 477debe7-5232-4bcf-8109-3ee8352f0047
+λC2(60)                       # less than λC(60)
+
+# ╔═╡ 2c0a3d9d-8656-46b9-83ce-080854f59923
+λC2(70)                       # less than λC(70)
+
+# ╔═╡ 281ea205-6462-45bb-a63a-24de59f396e2
+λC2(70) 
+
+# ╔═╡ cb608af4-73cf-4c5b-824d-073b36414664
+λC2(80)
+
+# ╔═╡ e566a3ee-1f78-4caa-b56e-0c6354074fec
+λC2(85)
+
+# ╔═╡ bf31819b-32ef-4099-bd68-982f085be0c4
+λC2(87)
+
+# ╔═╡ 0d76bef3-53bf-4947-862b-8f46a0438481
+λC2(88)
+
+# ╔═╡ 07577047-ac4f-4f8f-950d-2db31ee94539
+λC2(89)
+
+# ╔═╡ e846e3a1-0b2f-43e0-adfb-866d9511c4f2
+λC2(90)                         # no further improvement observable
 
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
@@ -1223,7 +1655,7 @@ $\;$
 $\;$
 $\;$
 
-$=\left(\frac{27}{3}-3\right)-\left(\frac{1}{3}-1\right)=\left(6+\frac{2}{3}\right)=6.66666...$
+$=\left(\frac{27}{3}-3\right)-\left(\frac{1}{3}-1\right)=\left(6+\frac{2}{3}\right)=6.\overline{6}$
 
 $\;$
 $\;$
@@ -1252,7 +1684,7 @@ $\;$
 $\;$
 $\;$
 
-$=\left(\frac{1}{3}-1\right)-\left(0-0\right)=-\frac{2}{3}=-0.66666...$
+$=\left(\frac{1}{3}-1\right)-\left(0-0\right)=-\frac{2}{3}=-0.\overline{6}$
 
 $\;$
 $\;$
@@ -1296,6 +1728,7 @@ md"
 - **Nazarathy, Y. & Klok, H.**; *Statistics with Julia*; Cham, Switzland: Springer, 2021
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
 - **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
+- **Schilling, R.L.**; *Maß und Integral*; Berlin: de Gruyter, 2015
 - **Thurstone, L.L.**; *The Prediction of Choice*; Psychometrika 10.4 (1945): 237-253; [https://link.springer.com/content/pdf/10.1007/BF02288891.pdf](https://link.springer.com/content/pdf/10.1007/BF02288891.pdf); last visit 2023/09/05
 - **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
 - **Wikipedia**; *Leibnitz'* Formula for $\pi$; [https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
@@ -2360,6 +2793,37 @@ version = "1.4.1+0"
 # ╠═54b81d43-1219-45e9-abaa-805311268810
 # ╠═1745d75d-dcc8-4a32-b9a8-607f5da744d9
 # ╠═ddae764c-b5c0-4eda-8c80-4f57fbeac486
+# ╟─6c793213-177e-4c50-99b2-482704cbad75
+# ╟─d9eefee2-a53c-4064-8ebf-c4345a76798c
+# ╟─b61f0964-d023-4bba-9822-812e3218f716
+# ╟─d2f67bf1-a301-4c93-aaac-4c66a7c9b944
+# ╟─4dae9415-e8e2-4133-9cef-a3c4618bdbda
+# ╠═ed9af448-5867-4cfd-815a-c295eaffac8b
+# ╠═ed8e7ccf-5c04-4304-baf9-60cc07773d28
+# ╠═83b7e51e-2e73-4448-8cb1-ed98787c3994
+# ╠═14b8a22d-5443-4fae-abd9-b54a283eaa92
+# ╠═c9905375-c8ea-4403-8ce7-2af82324027a
+# ╠═6052b447-cd20-4f1e-87e1-bda2ea6461a3
+# ╠═650c0387-e516-4b08-8c9a-aa49682183a4
+# ╠═299fb3ee-a3a6-44d1-9b0c-094283e6dfa4
+# ╠═f89d9a5d-0fd8-4684-82bd-797de43582a2
+# ╠═c193805e-df87-4842-bdb5-d1991db9ccf0
+# ╠═70ec1fa0-2e9d-4aab-923a-10fa0fb249a5
+# ╠═2eba09ba-f280-47c6-8753-18b9a77c4a5b
+# ╠═5d34717f-f9fe-4796-9fc5-51462bdabe85
+# ╠═6f6e5499-7dcb-4a3a-b0b9-a8ca9898b689
+# ╠═b37131ce-d9c0-4b9e-9392-f752dba44c13
+# ╠═2874445b-ced9-45bd-9094-5a1e48651831
+# ╠═f9034ab8-2af6-4d79-be1d-1da8c6cccd81
+# ╠═477debe7-5232-4bcf-8109-3ee8352f0047
+# ╠═2c0a3d9d-8656-46b9-83ce-080854f59923
+# ╠═281ea205-6462-45bb-a63a-24de59f396e2
+# ╠═cb608af4-73cf-4c5b-824d-073b36414664
+# ╠═e566a3ee-1f78-4caa-b56e-0c6354074fec
+# ╠═bf31819b-32ef-4099-bd68-982f085be0c4
+# ╠═0d76bef3-53bf-4947-862b-8f46a0438481
+# ╠═07577047-ac4f-4f8f-950d-2db31ee94539
+# ╠═e846e3a1-0b2f-43e0-adfb-866d9511c4f2
 # ╟─fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 # ╠═da24559b-1937-4258-847d-e0f7b7a7c293
 # ╠═b9c17500-0301-4a9f-8707-c18fda55261c
