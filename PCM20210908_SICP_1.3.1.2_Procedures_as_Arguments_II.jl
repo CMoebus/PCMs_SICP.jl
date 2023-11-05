@@ -10,15 +10,15 @@ using Statistics, Plots, LaTeXStrings
 # ╔═╡ 951cce60-4e4f-11ee-379a-4385f4005380
 md"
 ===================================================================================
-#### SICP: 1.3.1.2 Procedures as Arguments II: Nonparametric First Choice Models
+#### SICP: 1.3.1.2 Procedures as Arguments II: Nonparametric Voting Model
 ##### file: PCM20210908\_SICP\_1.3.1.2\_Procedures\_as\_Arguments\_II.jl
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/09/26 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/05 ***
 
 ===================================================================================
 "
 
 
-# ╔═╡ 8950b580-db8e-45b4-a9cd-1a532a7a4358
+# ╔═╡ dbdf0a16-71ed-4a83-99a1-f8119fb84ffe
 # idiomatic Julia-code with 'Function', 'Real', 'while', '+='
 #------------------------------------------------------------------
 function sum2(f::Function, a::Real, succ::Function, b::Real)::Real
@@ -30,497 +30,611 @@ function sum2(f::Function, a::Real, succ::Function, b::Real)::Real
 	sum
 end # function sum2
 
-# ╔═╡ 40bfbb32-b766-4d45-89e1-6701495cd098
+# ╔═╡ a76a6491-b5e9-45a2-8b14-d54cc1586e9d
 md"
 ---
-##### 1.3.1.2.1 Application of *Nonparametric* First Choice Models to Thurstone's 1st Artificial Dataset 
+##### 1.3.1.2.1 Family of Gaussians as Components of Cognitive Choice Models
 
-We apply here the *nonparametric* versions of Thurstone's and our *voting model* to Thurstone first artificial data set. Thurstone describes his dataset as: *Here we* (Thurstone) *have chosen arbitrary bimodal and skewed distributions to illustrate the latitude of the method*. (Thurstone, 1945, p.245)
+A *family* of Gaussians was proposed by [*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) and [Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf), as a component of a *cognitive stochastic* model for choice predictions. Each distribution of this family represents subjective *latent* affects related to one stimulus in a set of alternatives. The  model predicts the percentage of *first* choice for each stimulus in the set of alternatives. The latent affect dispersions (= *discriminal dispersions* in Thurstone's own words) are supposed to be measured by psychological scaling methods (e.g. rating scales) to get empirical data for affect values (for e.g. sensations, attitudes, subjective utility, moral or aestetic sentiments).
 "
 
-# ╔═╡ 6cb97be2-3167-418d-a717-1425792cb566
-md"
----
-###### Thurstone's 1st Data Set
-"
+# ╔═╡ f3d7c861-4acb-4f9d-92e7-b1bec765c02d
+gaussianDensity(x; μ=0.0, σ=1.0) = 1/(σ*sqrt(2π))*exp(-(1/2)*((x-μ)/σ)^2)
 
-# ╔═╡ b14d83b4-0dc3-4893-a645-fd69d9fb15e6
+# ╔═╡ a21ce88d-141f-46d6-b7fd-af5daf70ca02
 begin
-	y1 = Array{Real, 2}(undef, (9, 3))
-	#------------------------------------------------------------------------------
-	y1[1,:] = [.04, .03, .00]
-	y1[2,:] = [.16, .13, .02]
-	y1[3,:] = [.13, .18, .14]
-	y1[4,:] = [.11, .17, .34]
-	y1[5,:] = [.08, .15, .34]
-	y1[6,:] = [.06, .12, .14]
-	y1[7,:] = [.11, .10, .02]
-	y1[8,:] = [.19, .08, .00]
-	y1[9,:] = [.12, .04, .00]
- 	size(y1)
+	gaussianDensityI(x) = gaussianDensity(x; μ=-1.0, σ=3.0)
+	gaussianDensityJ(x) = gaussianDensity(x; μ=+1.0, σ=1.0)
+	gaussianDensityK(x) = gaussianDensity(x; μ=+3.0, σ=2.0)
+	uniformDensityL(x; a=-10, b=+10) = 1/(b - a)
+	#-------------------------------------------------------
+	density = Array{Function, 1}(undef, 4)
+	density[1] = gaussianDensityI
+	density[2] = gaussianDensityJ
+	density[3] = gaussianDensityK
+	density[4] = uniformDensityL
+	density
 end # begin
 
-# ╔═╡ f2f78b7e-6a68-4fa3-846d-95bb979794c2
-function plotRatingDistributions1(x::Array; title="Discriminal Dispersions (Thurstone's 1st Example)", ylimits=(-0.05, 0.40), labels=[L"S1", L"S2", L"S3"])
-	let (nRows, nCols) = size(x)
-		nS = 3
-		nCats = nRows
-		xs = 1:1:nCats
-		#----------------------------------------------------------------------------
-		plot(xs,  x[:, 1], title=title, xlimits=(0.5, nCats+0.5), xticks=:1:1:nCats, ylimits=ylimits, seriestype=:scatter, colour=:blue, label=labels[1], xlabel=L"positive affect rating category $c$", ylabel = L"P(c)")
-		#----------------------------------------------------------------------------
-		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label=labels[2])
-		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label=labels[3])
-		plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label=labels[1])
-		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label=labels[2])
-		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label=labels[3])
-		#----------------------------------------------------------------------------
-	end # let
-end # function plotRatingDistributions1
-
-# ╔═╡ f5aabcd1-58af-418d-82f1-f25bfa171b3f
-plotRatingDistributions1(y1)
-
-# ╔═╡ bbc32e76-b40c-4588-af8e-6feb31a5cbc3
-md"
----
-###### Thurstone's *Nonparametric* First Choice Model
-
-- probability that stimulus $j$ is perceived *below* category $c:$
-$p_{j<c} = p_{c-1, j} = \sum_{m=1}^{c-1} y_{m,j}$
-
-- probability that *all* stimuli $j; j\ne i$ in the comparison group are perceived *below* category $c:$
-
-$u_{c-1, i} = \prod_{j=1, j\ne i}^{nS-1}p_{c-1,j}$
-
-- probability that *all* stimuli $j; j\ne i$ in the comparison group are perceived *below* and *within* category $c:$
-
-$u_{c, i} = \prod_{j=1, j\ne i}^{nS-1}p_{c,j}$
-
- 
-$\Delta u_c = u_{c, i} - u_{c-1, i}$
-
-
-where
-
-$nS = \#\text{stimuli}$
-
-$nCats = \#\text{categories}$
-
-$i = 1,...,nS$
-
-$j = 1,...,nS\;\;; j \ne i \;\;(\text{stimuli in the group compared to stimulus i)}$
-
-$m, c = 1,...,nCats\;\;; m \le c$
-
-"
-
-# ╔═╡ 298a28bf-696a-4485-a09f-5dabc5a9447c
-md"
-The probability that stimulus $i$ is perceived in interval $c$ and all other below :
-
-$y_{c,i} \cdot u_{c-1,i}.$
-
-This probability is too small. It has to be corrected for that interval $c$ with length $|c|$. For any point $x \in (c-1, c]$ the probability that $i$ is perceived at $x$ and others below is:
-
-$P_{i_c > j,...;i\ne j} = \int_0^1 y_{c,i} \cdot (u_{c-1,i}+x\Delta u_c) dx=$
-
-$= y_{c,i} \cdot u_{c-1,i} + \frac{1}{2}y_{c,i}\cdot \Delta u_c$
-
-$= y_{c,i} \cdot u_{c-1,i} + \frac{1}{2}y_{c,i} \cdot (u_{c, i} - u_{c-1, i})$
-
-$= \frac{1}{2}y_{c,i} \cdot u_{c, i} + \frac{1}{2}y_{c,i} \cdot u_{c-1, i}$
-
-$= \frac{1}{2}y_{c,i} \cdot (u_{c, i} + u_{c-1, i})$
-
-The probability that stimulus $i$ is perceived higher than the other is :
-
-$P_{i > j,...;i\ne j} = \frac{1}{2} \sum_{c=1}^{nCats} y_{c,i} \cdot (u_{c, i} + u_{c-1, i})$
-
-For Thurstone's simulated two data sets normalization was not necessary. The preference probabilities $P_{i > j,...;i\ne j}$ summed up to $1$.
-
-But sometimes their sum is $>1$ so normalization is necessary to convert these probabilities into *exclusive 1st choice* probabilities:
-
-$\sum_{i=1}^{nS} P_{i > j,...;i\ne j} = 1$.
-
-"
-
-# ╔═╡ 439a31a1-91a1-488e-a488-bb98ba7a660d
-function discreteThurstoneChoiceModelFor3(y, title) 
-	nRows, nCols = size(y)
-	nCats = nRows
-	nS    = nCols                                          # number of stimuli
-	println("nCats=$nCats, nS=$nS")
-	prefProbs = zeros(Float64, nS)                         # initalization to 0.0
-	u  = Array{Real, 2}(undef, (nCats, nS))
-	uSum = Array{Real, 2}(undef, (nCats, nS))
-	preferenceProbFunct = Array{Function, 1}(undef, nS)
-	for i in 1:nS
-		solutionFor_IJK_Found = false
-		for j in 1:nS
-			if !(j == i)
-				for k in 1:nS 
-					if !((k == i) || (k == j))
-						if nS == 3
-							preferenceProbFunct[i] = 
-								function(c)
-									u[c,i] = 
-										sum2(c -> y[c,j], 1, cat->cat+1, c) *
-										sum2(c -> y[c,k], 1, cat->cat+1, c)
-									uSum[c,i] = 
-										(c == 1) ? u[c,i] : 
-											(u[c,i] + u[c-1,i])
-									y[c,i] * uSum[c,i]
-								end # function(c)
-							solutionFor_IJK_Found = true
-							# println("ijk = $i,$j,$k")
-							break
-						end # if
-					end # if
-				end # for k
-				if solutionFor_IJK_Found == true
-					break
-				end # if
-				println("ijk = $i,$j")
-			end # if
-		end # for j
-		prefProbs[i] = 
-			0.5 * sum2(c -> preferenceProbFunct[i](c), 1, cat->cat+1, nCats) # Si
-	end # for i
+# ╔═╡ 83b2d8cc-6790-4b62-a5e4-9fb308898335
+let x = -0.3
+	plot(gaussianDensityI, -11.0, x, size=(700, 500), xlim=(-11.0, 11.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model", xlabel=L"Latent Affective Variable $S:\;(\mu(S_i)=-1.0)<(\mu(S_j)=+1.0)<(\mu(S_k)=+3.0)$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, +11, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
 	#--------------------------------------------------------------------------------
-	title, u, prefProbs, sum(prefProbs)
-	end # function discreteThurstoneChoiceModelFor3
-
-# ╔═╡ 90f5a2d2-7022-4e2c-a188-05b97f590ded
-function discreteThurstoneChoiceModelFor3_Or_6(y, title) 
-	nRows, nCols = size(y)
-	nCats = nRows
-	nS    = nCols
-	println("nCats=$nCats, kS=$nS")
-	prefProbs = zeros(Float64, nS)                         # initalization to 0.0
-	prefProbsNormalized = zeros(Float64, nS) 
-	u  = Array{Real, 2}(undef, (nCats, nS))
-	uSum = Array{Real, 2}(undef, (nCats, nS))
-	preferenceProbFunct = Array{Function, 1}(undef, nS)
-	for i in 1:nS
-		let colSum_i = sum(y[:,i])
-			if !(colSum_i ≈ 1.0)
-				for j = 1:nCats
-					y[j,i] /= colSum_i
-				end # for j
-			end # if
-		end # let
-		solutionFor_IJK_Found = false
-		solutionFor_IJKLMN_Found = false
-		for j in 1:nS
-			if !(j == i)
-				for k in 1:nS 
-					if !((k == i) || (k == j))
-						if nS == 3
-							preferenceProbFunct[i] = 
-								function(c)
-									u[c,i] = 
-										sum2(c -> y[c,j], 1, cat->cat+1, c) *
-										sum2(c -> y[c,k], 1, cat->cat+1, c)
-									uSum[c,i] =    # (u_{m,j} + u_{m-1, j})
-										(c == 1) ? u[c,i] : 
-											(u[c,i] + u[c-1,i])
-									y[c,i] * uSum[c,i]
-								end # function(c)
-							solutionFor_IJK_Found = true
-							println("ijk = $i,$j,$k")
-							break
-						end # if
-						for l in 1:nS
-							if !((l == i) || (l == j) || (l == k))
-								for m in 1:nS
-									if !((m == i) || (m == j) || (m == k) || (m == l))
-										for n in 1:nS
-											if !((n == i) || (n == j) ||            	(n == k) || (n == l) || (n == m))
-												if nS == 6
-													preferenceProbFunct[i] = 
-														function(c)
-															u[c,i] = 
-																sum2(c -> 
-																	y[c,j], 1, cat->cat+1, c) *
-																sum2(c -> 
-																	y[c,k], 1, cat->cat+1, c) *
-																sum2(c -> 
-																	y[c,l], 1, cat->cat+1, c) *
-																sum2(c -> 
-																	y[c,m], 1, cat->cat+1, c) *
-																sum2(c -> 
-																	y[c,n], 1, cat->cat+1, c)
-															uSum[c,i] = 
-																(c == 1) ? u[c,i] : 
-																	(u[c,i] + u[c-1,i])
-															y[c,i] * uSum[c,i]
-													end # function(c)
-													solutionFor_IJKLMN_Found = true
-													println("ijklmn = $i, $j, $k, $l, $m, $n")
-													break
-												end # if
-											end # if
-										end # for n
-										if solutionFor_IJKLMN_Found == true
-											break
-										end # if
-									end # if
-								end # for m
-								if solutionFor_IJKLMN_Found == true
-									break
-								end # if
-							end # if
-						end # for l
-						if solutionFor_IJKLMN_Found == true
-							break
-						end # if
-					end # if
-				end # for k
-				if (solutionFor_IJK_Found == true) || 
-					(solutionFor_IJKLMN_Found = true)
-					break
-				end # if
-				println("ijk = $i,$j")
-			end # if
-		end # for j
-		prefProbs[i] = 
-			0.5 * sum2(c -> preferenceProbFunct[i](c), 1, cat->cat+1, nCats) # Si
-	end # for i
-	#-----------------------------------------------------------------------------
-	let sumPrefProbs = sum(prefProbs)
-		for i in 1:nS
-			prefProbsNormalized[i] = prefProbs[i]
-			prefProbsNormalized[i] /= sumPrefProbs
-		end # for i
-	end # let
+	plot!(gaussianDensityJ, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, +11, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
 	#--------------------------------------------------------------------------------
-	title, u, prefProbs, sum(prefProbs), prefProbsNormalized, sum(prefProbsNormalized)				
-	end # function discreteThurstoneChoiceModelFor3_Or_6
+	plot!(gaussianDensityK, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, +11.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	#------------------------------------------------------------------------------
+	annotate!([(-4.0, 0.09, text(L"Stimulus $S_i$", 12, :darkblue))])
+	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
+	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(X=-0.3)$")
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), line=:darkblue, label=L"$f_i(X)$")
+end # let
 
-# ╔═╡ 75c54882-179c-4216-9522-91c66bfd0d1a
-discreteThurstoneChoiceModelFor3(y1, "Thurstone's 1st data set, 1945, p.245")
-
-# ╔═╡ 1402b6d9-3073-49cb-9230-538b619e73da
-discreteThurstoneChoiceModelFor3_Or_6(y1, "Thurstone's 1st data set, 1945, p.245")
-
-# ╔═╡ 2dded7eb-6a6d-46a8-bf18-3492b5b90c0a
+# ╔═╡ 80b9a128-bd19-4851-b3f7-b699700fbd08
 md"
 ---
-###### The *Nonparametric* First Choice Voting Model
+###### Thurstone's Choice Model
 
-The voting model can best be understood by the analogue of [communicating vessels](https://en.wikipedia.org/wiki/Communicating_vessels). Each stimulus-specific discriminal dispersion is like a communicating vessel. The attractiveness of a stimulus is inverse related to the height of the vessel. The more attractive a stimulus is the deeper is the position of its vessel. The voters probability mass (liquid) of $1$ is poured into one or more vessels. Because the vessels are communicating the level in all vessels is equal high. Now, the vessel-specific volume of the probability liquid is analogue to the probability of 1st choice for this stimulus.
+According to Thurstone the probability 
+
+$P_i(i > j = 1, ..., k; j\neq i)$ 
+
+$\;$
+
+that a stimulus $S_i$ is a *first* choice when presented together with a set of alternatives $j = 1, ..., k; j\neq i$ is:
+
+$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty}f_i(x)\prod_{j=1; j\neq i}^k p_j(x)\;dx$
+
+$\;$
+$\;$
+$\;$
+
+were:
+
+$p_j(x) = \int_{-\infty}^x f_j(x)\;dx$
+
+$\;$
+$\;$
+$\;$
+$\;$
+
+We'll present below an alternative model with less demanding assumptions. We call this model *Voting Choice Model*. According to this model the probability of preference mass (PoPM) is distributed across all discriminal dispersions starting from the most positive affect $x$ walking down to least positive affect till the PoPM 
+is exhausted. 
+" 
+
+# ╔═╡ 14ccb9a2-ec6e-4a2b-a2cf-f3d78deba2fc
+md"
+The *informal* meaning is that the strength of preference for stimulus $S_i$ at the point of affect strength $x$ is the product of the density $f_i(x)$ (vertical *red* line in the graphic above) and the probabilities $p_{j=1,...,k; j \ne i}(x)$ (marked by *blue* shaded areas left of the vertical *red* line in the above graphic). 
+
+The product $\prod_{j=1,...,k; j \ne i}^k p_j(x)$ is the probability that *all* alternatives $S_j$ of $S_i$ stimulate a *lower* affective value than $x$. 
+
+The *total* preference strength or probability $P_i(i > j = 1, ..., k; j\neq i)$  is the integral over the total range of sensations.
+
+The *formal* meaning of $P_i(i > j = 1, ..., k; j\neq i)$ is that of a conditional *expected value*. It is the expectation for $S_i$ that the alternative set $S_{j = 1, ..., k; j\neq i}$ stimulates lower affects.
+
+$\;$
+
+$\mathbb E(p_j(x)|i) = P_i(i > j = 1, ..., k; j\neq i)$
+
+$\;$
+
+Because of its characteristic as an *expectation* we expect that the model favors stimuli with large variance. This can lead to various interesting and surprising effects as are discussed by Thurstone.
+
+The assumptions of the model are rather demanding. There is the hypothesis that there exists a cognitive mechanism which computes for stimulus $S_i$ for *each* point of affect $x$ the preference strength of $S_i$ in relation to all alternatives. Furthermore the mechanism integrates these preference strengths not only over the *total* range of $X_i$ but also for *all* stimuli. 
+
+We'll present below an alternative model with less demanding assumptions. We call this model *Voting Choice Model*. According to this model the probability of preference mass (PoPM) is distributed across all discriminal dispersions starting from the most positive affect $x$ walking down to least positive affect till the PoPM is exhausted. 
 
 "
 
-# ╔═╡ 2ce67ad7-7d93-4d4d-b5b2-cfc9329580ef
+# ╔═╡ a441e6a2-6d46-4887-9927-85a86c9f3257
+function integral2(f, a, b; Δx=0.01) 
+	add_Δx(x) = x + Δx
+	sum2(f::Function, (a + Δx/2.0), add_Δx, b) * Δx
+end
+
+# ╔═╡ fcc429c2-8e92-4a23-b374-6f9cf46067f2
+uniformDensityl(x; a=-10.0, b=10.0) = 1/(b - a)
+
+# ╔═╡ b3dc6e56-97ab-4a2a-9dfd-cbeb0a855aed
+integral2(uniformDensityl, -10.0, 10.0, Δx=0.1)   # ==> 1.000 test integral2
+
+# ╔═╡ ec9f191f-8fa9-48e9-97f2-385ee4b2e218
+function thurstoneChoiceModel(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
+	prefProbs = zeros(Float64, kS)                         # initalization to 0.0
+	preferenceDensity = Array{Function, 1}(undef, 4)
+	for i in 1:kS
+		for j in 1:kS
+			if !(j == i)
+				for k in 1:kS
+					if !((k == i) || (k == j))
+						#-----------------------------------------------
+						if kS == 3
+							preferenceDensity[i] = x -> density[i](x) * integral2(density[j], -10.0, x, Δx=Δx) * integral2(density[k], -10.0, x, Δx=Δx)
+						end # if kS == 3
+						#-----------------------------------------------
+						if kS == 4
+							for l in 1:kS
+								if !((l == i) || (l == j) || (l == k))
+									preferenceDensity[i] = x -> density[i](x) * integral2(density[j], -10.0, x, Δx=Δx) * integral2(density[k], -10.0, x, Δx=Δx) * integral2(density[l], -10.0, x, Δx=Δx)
+								end # if 
+							end # for l
+						end # if kS == 4
+						#-----------------------------------------------
+					end # if k
+				end # for k
+			end # if j
+		end # for j
+		prefProbs[i] = integral2(preferenceDensity[i], -10, +10, Δx=Δx) # Si
+	end # for i
+	prefProbs, sum(prefProbs)
+end # function thurstoneChoiceModel
+
+# ╔═╡ b97475c2-771e-4f52-925d-831b0babc3d3
+md"
+$P(S_i > S_j, S_k) = 0.109514$
+$P(S_j > S_i, S_K) = 0.14831$
+$P(S_k > S_i, S_j) = 0.74062$
+
+$\;$
+
+"
+
+# ╔═╡ 83f46574-345e-40a9-a14b-6ab6cbeb2f40
+thurstoneChoiceModel(Δx=0.001)
+
+# ╔═╡ d3345a8f-5abf-467f-8c7a-2ae85e150474
 md"
 ---
-In the *voting model* we look for a category $m$ and a propotion $x$ so that the following equation is fulfilled. It describes the postulate that the sum of all stimulis-specific *1st choice* voting probabilities is 1.00 when the two parameter $m, x$ are chosen so that all constraints are met:
+###### Introduction of a Controversial Candidate $S_l$
+The introduction of a *controversial* candidate $S_l$ will distract preference from a more favorable *non*controversial candidate $S_k$.
+"
 
-$Em,x: \sum_{i=1}^{nS}P(m,x)_{i>j;j=1,...,nS;j\ne i}=1.0$
+# ╔═╡ e8478494-dba3-4448-a0fa-f523c29a1e99
+let x = -0.3
+	#--------------------------------------------------------------------------------
+	plot(uniformDensityL, -10.0, x, size=(700, 500), line=:orange, framestyle=:semi, fill=(0, :lightblue), label=L"$f_l(X)$")
+	plot!(uniformDensityL, x, +10.0, size=(700, 500), line=:orange, label=L"$f_l(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), xlim=(-11.0, 11.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), title="Discriminal Dispersions of Thurstone's Choice Model",xlabel=L"Latent Affective Variable $S:\;(\mu(S_i)=-1.)<(\mu(S_l)=0.)<(\mu(S_j)=1.)<(\mu(S_k)=3.)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityJ, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi,  fill=(0, :lightblue), label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, +10, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityK, -11.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, +10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	#------------------------------------------------------------------------------
+	annotate!([(-4.0, 0.09, text(L"Stimulus $S_i$", 12, :darkblue))])
+	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
+	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
+	annotate!([(+8.5, 0.06, text(L"Stimulus $S_l$", 12, :darkblue))])
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(X=-0.3)$")
+	plot!(uniformDensityL, -10.0, x, size=(700, 500), line=:orange, label=L"$f_l(X)$")
+	plot!(gaussianDensityI, -11.0, x, size=(700, 500), line=:darkblue, label=L"$f_i(X)$")
+end # let
 
-where the *probability* of *1st choice* voting for stimulis $i$ is:
+# ╔═╡ c9242575-0d24-4108-9bd5-3590ad4d3c45
+md"
+Facit: The introduction of a *controversial* candidate $S_l$ will distract preference from the most favorable but *less* controversial candidate $S_k$:
 
-$P(m,x)_{i>j;j=1,...,nS;j\ne i}=\sum_{c=m+1}^{nCats}y_{c,i} + \int_0^x x\cdot y_{m,i}\;dx$
+$\;$
 
-and
+$P(S_i > S_j, S_k) = 0.109514 > P(S_i > S_j, S_k, S_l) = 0.0742588$
+$P(S_j > S_i, S_K) = 0.14831 > P(S_j > S_i, S_k, S_l) = 0.0870487$
+$P(S_k > S_i, S_j) = 0.74062 >> P(S_k > S_i, S_j, S_l) = 0.507737$
+$P(S_l > S_i, S_j, S_k) = 0.329387$
+$\;$
 
-$\sum_{c=m+1}^{nCats}y_{c,i} \le 1.00$
+"
 
-$\sum_{c=m}^{nCats}y_{c,i} \gt 1.00$
+# ╔═╡ 0aeebc71-81a5-43d8-a698-b2cfb84d53c0
+thurstoneChoiceModel(kS=4, Δx=0.001)
 
+# ╔═╡ aeaf21e4-c7c2-4b95-a082-68c0e20c2ff8
+md"
+---
+###### Our Voting Choice Model
+
+The *Voting Choice Model* avoids the cognitive implausible product of densities and probabilities. Instead it assumes that on an *individual* level each person possesses a certain amount of preference of *voting* mass which will be distributed across the *latent affective* discriminal dispersions till this affective mass is exhausted (*blue* shade areas to the right of the vertical *red* line). This distribution process starts at $x = +\infty$. Then the $x$ moves to lower values down to the point $x_{crit}$ (*red* vertical line in the graphic below) where the sum of the $p_j(x)$ is $1.0$:
+
+$\;$
+
+$\sum_{j=1}^k p_j(x_{crit}) = \sum_{j=1}^k \int_{-\infty}^{x_{crit}} f_j(x)\;dx = 1.0$
+
+$\;$
+$\;$
+$\;$
 $\;$
 "
 
-# ╔═╡ 3832f1e1-ee46-4a64-9d56-d9698ffc5b20
-function discreteVotingModel(y::Array, title; Δc = 0.0001)
-	pLimit = 1.0
-	nRows, nCols = size(y)
-	nCats = nRows
-	nS    = nCols
-	println("nCats=$nCats, nS=$nS") 
-	sumOfProbs_ItoK_1 = zeros(Float64, nS)
-	sumOfProbs_ItoK_2 = zeros(Float64, nS)
-	sumOfProbs_ItoK_3 = zeros(Float64, nS)
-	#------------------------------------------------------------------
-	c = nCats
-	sumOfProbs_1 = 0.0
-	while !((sumOfProbs_1 > pLimit) || (c < 1))
-		c = c - 1
-		println(y[c,:])
-		for i in 1:nS
-			sumOfProbs_ItoK_1[i] = sumOfProbs_ItoK_1[i] + y[c,i]
-		end # for i
-		sumOfProbs_1 = sum(sumOfProbs_ItoK_1)
-	end # while
-	#------------------------------------------------------------------
-	# subtraction of proportion Δc of last category c Δc⋅y[c,i] 
-	#   if sumOfProbs_1 > pLimit
-	sumOfProbs_ItoK_2 = sumOfProbs_ItoK_1
-	sumOfProbs_2 = sumOfProbs_1
-	while !(sumOfProbs_2 < pLimit)
-		for i in 1:nS
-			sumOfProbs_ItoK_2[i] = sumOfProbs_ItoK_2[i] - Δc * y[c,i]
-			sumOfProbs_2 = sum(sumOfProbs_ItoK_2)
-		end # for i
-		# println(sumOfProbs_ItoK_2)
-	end # while
-	#------------------------------------------------------------------
-	sumOfProbs_3 = 0.0
-	for i in 1:nS
-		# normalization of probs
-		sumOfProbs_ItoK_3[i] = sumOfProbs_ItoK_2[i] / sumOfProbs_2 
-	end # for i
-	sumOfProbs_3 = sum(sumOfProbs_ItoK_3)
-	#--------------------------------------------------------------------------
-	title, c, sumOfProbs_ItoK_2, sumOfProbs_2, sumOfProbs_ItoK_3, sumOfProbs_3
-end # function discreteVotingModel
+# ╔═╡ 1b53baf1-376b-44b6-9718-48385a68fd3c
+let x = 2.015
+	#--------------------------------------------------------------------------------
+	plot(gaussianDensityK, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	plot!(gaussianDensityK, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_k(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityI, -10.0, x, size=(700, 500), xlim=(-10.0, 10.0), ylim=(0, 0.45), line=:darkblue, title="Discriminal Dispersions of Voting Choice model", xlabel=L"Latent Affective Variable $X$", ylabel=L"Density $f(X)$", label=L"$f_i(X)$")
+	plot!(gaussianDensityI, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_i(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityJ, -10.0, x, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_j(X)$")
+	plot!(gaussianDensityJ, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, fill=(0, :lightblue), label=L"$f_j(X)$")
+	#--------------------------------------------------------------------------------
+	plot!(gaussianDensityI, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
+	plot!(gaussianDensityK, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
+	#------------------------------------------------------------------------------
+	annotate!([(-4.8, 0.08, text(L"Stimulus $S_i$", 12, :darkblue))])
+	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
+	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
+	#--------------------------------------------------------------------------------
+	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(x=-2.015)$")
+	#--------------------------------------------------------------------------------
+end # let
 
-# ╔═╡ a5103b99-2766-4d73-88e7-9564148d88fd
-discreteVotingModel(y1, "Thurstone's 1st data set") 
+# ╔═╡ 3947ae42-c5e2-4893-8793-4314f1485b5a
+function votingChoiceModel(;kS=3, b=+10.0, Δx=0.001)
+	votingProb = zeros(Float64, kS)                         # initalization to 0.0
+	x = b
+	while !(1.0 < sum(votingProb))
+		for i in 1:kS
+			votingProb[i] = integral2(density[i], x, b, Δx=Δx)
+		end # for i
+		x = x - Δx
+	end # while
+	votingProb, sum(votingProb)
+end # function votingChoiceModel
 
-# ╔═╡ 6380735b-4410-4ee8-925e-02cbca2ca156
+# ╔═╡ 04efd6b7-7d4f-4c80-b30f-3ac1b55e9bc1
+votingChoiceModel()
+
+# ╔═╡ 8a1c25a5-e091-49f7-8455-cc90b769a4d8
 md"
----
-###### Model Comparisons: Thurstone's vs. Voting Model
+Both models show strong agreement in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is near 1.00 (!). Empirical Studies have to demonstrate what model is more useful: The simpler Voting Model or the more demanding Thurstone model.
 "
 
-# ╔═╡ e9c53501-7ba2-4393-bdee-f609e371a5ac
-function modelComparison1(title, x, y; xlabel="VotingModel", ylabel="Thurstone Model")
-	let x = x                             # probs of voting model
-		y = y                             # probs of Thurstone model (p.245)
-		rxy = trunc(Statistics.cor(x, y), digits=3)
+# ╔═╡ be0ac072-efd0-4e41-a805-dce10550cca1
+function modelComparison(title, x, y)
+	let rxy = trunc(Statistics.cor(x, y), digits=4)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		plot(xs, ys, xlims=(-0.01, 0.75), ylims=(-0.01, 0.75), title=title, seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect model agreement")
+		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), title=title, seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
+		plot!(xs, ys, label="line of perfect model agreement")
 		#---------------------------------------------------------------------------
-		plot!((x[1], y[1]), seriestype=:scatter, colour=:blue, label=L"S1")
-		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label=L"S2")
-		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label=L"S3")
+		annotate!([(0.7, 0.1, "r(model1, model2) = $rxy")])
+	end # let
+end # function modelComparison
+
+# ╔═╡ 4e22fd91-107a-4421-8f4d-bf12871cf4ef
+modelComparison("Voting vs. Thurstone's Model (3 Stimuli)", 
+	[0.109514, 0.14831,  0.74062],                  # Thurstone's model predictions
+	[0.157245, 0.154815, 0.688408])                 # voting model predictions
+
+# ╔═╡ 0b6e1719-d88b-4d17-a7b8-57b6942a07d6
+modelComparison("Voting vs. Thurstone's Model (4 Stimuli)", 
+	[0.0742588, 0.0870487, 0.507737, 0.329387],       # Thurstone's model predictions
+	[0.0966776, 0.0287166, 0.519706, 0.355])          # voting model predictions
+
+# ╔═╡ 40bfbb32-b766-4d45-89e1-6701495cd098
+md"
+---
+##### 1.3.1.2.2 Application of *Nonparametric* Voting Model to Thurstone's 1st Artificial Dataset 
+
+We apply here the *nonparametric* version of our *voting model* to Thurstone first artificial data set. Thurstone describes his dataset as: *Here we* (Thurstone) *have chosen arbitrary bimodal and skewed distributions to illustrate the latitude of the method*. (Thurstone, 1945, p.245)
+"
+
+# ╔═╡ b14d83b4-0dc3-4893-a645-fd69d9fb15e6
+begin                                         # Thurstone, 1945, p.245, Table 1
+	x1 = Array{Real, 2}(undef, (9, 3))
+	#------------------------------------------------------------------------------
+	x1[1,:] = [.04, .03, .00]
+	x1[2,:] = [.16, .13, .02]
+	x1[3,:] = [.13, .18, .14]
+	x1[4,:] = [.11, .17, .34]
+	x1[5,:] = [.08, .15, .34]
+	x1[6,:] = [.06, .12, .14]
+	x1[7,:] = [.11, .10, .02]
+	x1[8,:] = [.19, .08, .00]
+	x1[9,:] = [.12, .04, .00]
+ 	size(x1)
+end # begin
+
+# ╔═╡ f2f78b7e-6a68-4fa3-846d-95bb979794c2
+function plotRatingDistributions1(x::Array, title; maxY=0.4)
+	(nRows, nCols) = size(x)
+	nCats = nRows              # number of rating categories
+	nStims = nCols             # number of stimuli
+	xs = 1:1:nCats
+	#----------------------------------------------------------------------------
+	plot(xs,  x[:, 1], title=title, xlimits=(0.5, nCats+.5), xticks=:1:1:nCats, ylimits=(-0.05, maxY), seriestype=:scatter, colour=:blue, label="S1", xlabel=L"positive affect rating category $m$", ylabel = L"P(m)")
+	if nStims == 3
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
+		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+	elseif nStims == 4 
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 1], seriestype=:line, colour=:blue, label="S1")
+		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
+		#------------------------------------------------------------------------
+		plot!(xs, x[:, 4], seriestype=:scatter, colour=:orange, label="S4")
+		plot!(xs, x[:, 4], seriestype=:line, colour=:orange, label="S4")
+	end # if
+	#----------------------------------------------------------------------------
+end # function plotRatingDistributions1
+
+# ╔═╡ f5aabcd1-58af-418d-82f1-f25bfa171b3f
+plotRatingDistributions1(x1,"Thurstone's 1st Ex.(p.245, tab.1, without Controv. S4) ")
+
+# ╔═╡ 3832f1e1-ee46-4a64-9d56-d9698ffc5b20
+function discreteVotingModel(x::Array, title; plimit=1.0)
+	let (nRows, nCols) = size(x)
+		m = nRows                                 # number of rating categories
+		k = nCols                                 # number of stimuli
+		sumOfProbs = zeros(Float64, k)
+		while !(sum(sumOfProbs) > plimit || m < 1)
+			for j in 1:k
+				sumOfProbs[j] += x[m,j]
+			end # for j
+			m -= 1
+		end # while
+		sumOfProbs = map(x -> x/sum(sumOfProbs), sumOfProbs) # normalization of probs
+		title, m-1, sumOfProbs, sum(sumOfProbs)
+	end # let
+end # function discreteVotingModel
+
+# ╔═╡ 71d9d34c-c674-4168-9ecb-52a42c45684d
+discreteVotingModel(x1, "Voting Model: Thurstone's 1st data set")
+
+# ╔═╡ e9c53501-7ba2-4393-bdee-f609e371a5ac
+function modelComparison1(title, x, y ; xlabel="VotingModel", ylabel="Thurstone Model")
+	let rxy = trunc(Statistics.cor(x, y), digits=3)
+		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		annotate!([(0.42, 0.05, "r($ylabel, $xlabel) = $rxy")])
+		plot(xs, ys, xlims=(-0.01, 1.0), ylims=(-0.01, 1.0), title=title, seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect model agreement")
+		#---------------------------------------------------------------------------
+		plot!((x[1], y[1]), seriestype=:scatter, colour=:blue, label="S1")
+		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label="S2")
+		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label="S3")
+		if length(x) == 4
+			plot!((x[4], y[4]), seriestype=:scatter, colour=:orange, label="S4")
+		end # if
+		#---------------------------------------------------------------------------
+		annotate!([(0.7, 0.1, "r(model_1, model_2) = $rxy")])
 	end # let
 end # function modelComparison1
 
-# ╔═╡ 0409897a-83db-4142-a44f-2944da12a97c
-md"
----
-"
-
-# ╔═╡ 87c289db-7964-4660-b85a-fa34d874caa9
+# ╔═╡ 403c8660-75cb-4866-9a70-e822b425c797
 modelComparison1("Thurstone vs Voting Model", 
-	[0.385276, 0.347373, 0.267352],   # x (= Predictions of Voting Model)
-	[0.472173, 0.299155, 0.228672])   # y (= Predictions of Thurstone's model)
-
-# ╔═╡ 613c163e-7bc7-42b4-afec-f8d23d268a20
-md"
----
-"
+	[0.36129, 0.316129, 0.322581],         # predictions of Voting model
+	[0.47, 0.30, 0.23])   # predictions of Thurstone's model (Thurstone, 1945, p.247)
 
 # ╔═╡ 1261f045-99d1-4580-a926-6bba736ec1fe
 md"
-We observe a high positive correlation $r=0.903$ between the predictions of Thurstone's and our voting model.
+Though we have a high positive correlation between the predictions of Thurstone's and our voting model they are not perfect. This seems due to the fact that Thurstone's model predictions are more *discriminative* between the stimuli than our voting model. 
 
-A test for the cognitive validity of either model cannot be made here because Thurstone's 'data' are only artificial and not behavioral. The obligatory empirical test has to wait until we study our own data set (Ahrens & Möbus, 1968).
+The reason for this is hat Thurstone's model favours stimuli which a *controversal* ; that is stimuli with wide (e.g. *uniform*) discriminal dispersions.
+
+A test for the cognitive validity of either model cannot be made here because Thurstone's 'data' are only artificial and not behavioral. The empirical test has to wait until we study our own data set (Ahrens & Möbus, 1968).
 "
+
+# ╔═╡ 4460796f-06bc-4cb2-9121-c1ff56dca37c
+md"
+---
+###### Thurstone's 1st Data Set augmented with a *Controversal* Stimulus 
+(with Uniform Ratings)
+"
+
+# ╔═╡ 28e1cf28-49f4-4488-946c-0c4fcd0689d1
+begin
+	x2 = Array{Real, 2}(undef, (9, 4))
+	#------------------------------------------------------------------------------
+	x2[1,:] = [.04, .03, .00, 1/9]
+	x2[2,:] = [.16, .13, .02, 1/9]
+	x2[3,:] = [.13, .18, .14, 1/9]
+	x2[4,:] = [.11, .17, .34, 1/9]
+	x2[5,:] = [.08, .15, .34, 1/9]
+	x2[6,:] = [.06, .12, .14, 1/9]
+	x2[7,:] = [.11, .10, .02, 1/9]
+	x2[8,:] = [.19, .08, .00, 1/9]
+	x2[9,:] = [.12, .04, .00, 1/9]
+ 	size(x2)
+end # begin
+
+# ╔═╡ 3b5f6d28-7fde-4492-aa10-da11539a1b77
+plotRatingDistributions1(x2, "Thurstone's 1st Ex.(p.245, tab.1, incl. Controv. S4)")
+
+# ╔═╡ 9d3e5de5-d489-4bea-af40-d55d3ce076fd
+discreteVotingModel(x2, "Voting Model: Thurstone's 1st augmented data set") 
+
+# ╔═╡ 23cb6297-23b8-4cd2-8af4-529e25511f65
+md"
+The introduction of a maximal *controversal* stimulus distracts preference mass mainly from the most *non*controversal stimus $S_3$:
+
+$\;$
+
+$P(S_1 > S_2, S_3) = 0.36129  > P(S_1 > S_2, S_3, S_4) = 0.336973$
+$P(S_2 > S_1, S_3) = 0.316129 > P(S_2 > S_1, S_3, S_4) = 0.23869$
+$P(S_3 > S_1, S_2) = 0.322581 >> P(S_3 > S_1, S_2, S_4) = 0.112324$
+$P(S_4 > S_1, S_2, S_3) = 0.312012$
+
+$\;$
+
+Stimulus $S_3$ is the main loser when the *controversal* stimulus $S_4$ is introduced into the set of alternatives. This can be seen in the correlational diagram of $modelComparison1$ (below).
+
+$\;$ 
+
+"
+
+# ╔═╡ bac5626f-f5a5-4077-a42a-db1b768754c5
+modelComparison1("Voting Model: S3 vs S4", 
+	[0.36129, 0.316129, 0.322581], #, 0.0000],      # voting model for S3
+	[0.336973, 0.23869, 0.112324], #, 0.31201])     # voting model for S4
+	xlabel="Voting Model for S4",
+    ylabel="Voting Model for S3") 
 
 # ╔═╡ 45815157-d41f-4c1a-b08d-8a511aacc420
 md"
 ---
-##### 1.3.1.2.2 Application of *Nonparametric* First Choice Models to Thurstone's 2nd Artificial Dataset 
+##### 1.3.1.2.3 Nonparametric Voting Model: *Thurstone*'s 2nd Numerical Example
 
-Now, we apply the *nonparametric* versions to Thurstone's second set of articial data. Thurstone motivates the characterics of his dataset as: *... we have a numerical example of the theorem that when two psychological objects are tied in average popularity, as measured by the mean scale positions $S_i$ and $S_j$, then the more variable of them can win election for first choice by the introduction of a third competing object of lower average popularity. Here we used 24 successive intervals. All three of these affective distributions were made Gaussian, and it is here assumed that the distributions are at least roughly symmetric. The first two candidates are the leading ones that are tied. The third candidate has a lower average popularity* ...(Thurstone, 1945, p.247)
+Now, we apply the *nonparametric* version of our voting model to Thurstone's second set of articial data. He motivates the characterics of his dataset as: *... we have a numerical example of the theorem that when two psychological objects are tied in average popularity, as measured by the mean scale positions $S_i$ and $S_j$, then the more variable of them can win election for first choice by the introduction of a third competing object of lower average popularity. Here we used 24 successive intervals. All three of these affective distributions were made Gaussian, and it is here assumed that the distributions are at least roughly symmetric. The first two candidates are the leading ones that are tied. The third candidate has a lower average popularity* ...(Thurstone, 1945, p.247)
 "
 
-# ╔═╡ 835417f0-bc4d-4c53-b46b-bcc0b4581de1
-md"
----
-###### Thurstone's 2nd Data Set
-"
-
-# ╔═╡ a95d61ae-c672-4db5-b5ec-88ab29f756d7
+# ╔═╡ f447a7ca-ec7d-4584-ad15-1ee482186e61
 begin
-	y2 = Array{Real, 2}(undef, (24, 3))
+	x31 = Array{Real, 2}(undef, (24, 3))
 	#------------------------------------------------------------------------------
-	y2[ 1,:] = [.00, .00, .00]
-	y2[ 2,:] = [.01, .00, .00]
-	y2[ 3,:] = [.00, .00, .00]
-	y2[ 4,:] = [.01, .00, .01]
-	y2[ 5,:] = [.02, .00, .01]
-	y2[ 6,:] = [.03, .00, .05]
-	y2[ 7,:] = [.04, .01, .09]
-	y2[ 8,:] = [.05, .01, .15]
-	y2[ 9,:] = [.07, .05, .19]
-	y2[10,:] = [.08, .09, .19]
-	y2[11,:] = [.09, .15, .15]
-	y2[12,:] = [.10, .19, .09]
-	y2[13,:] = [.10, .19, .05]
-	y2[14,:] = [.09, .15, .01]
-	y2[15,:] = [.08, .09, .01]
-	y2[16,:] = [.07, .05, .00]
-	y2[17,:] = [.05, .01, .00]
-	y2[18,:] = [.04, .01, .00]
-	y2[19,:] = [.03, .00, .00]
-	y2[20,:] = [.02, .00, .00]
-	y2[21,:] = [.01, .00, .00]
-	y2[22,:] = [.00, .00, .00]
-	y2[23,:] = [.01, .00, .00]
-	y2[24,:] = [.00, .00, .00]
- 	size(y2)
+	x31[ 1,:] = [.00, .00, .00]
+	x31[ 2,:] = [.01, .00, .00]
+	x31[ 3,:] = [.00, .00, .00]
+	x31[ 4,:] = [.01, .00, .01]
+	x31[ 5,:] = [.02, .00, .01]
+	x31[ 6,:] = [.03, .00, .05]
+	x31[ 7,:] = [.04, .01, .09]
+	x31[ 8,:] = [.05, .01, .15]
+	x31[ 9,:] = [.07, .05, .19]
+	x31[10,:] = [.08, .09, .19]
+	x31[11,:] = [.09, .15, .15]
+	x31[12,:] = [.10, .19, .09]
+	x31[13,:] = [.10, .19, .05]
+	x31[14,:] = [.09, .15, .01]
+	x31[15,:] = [.08, .09, .01]
+	x31[16,:] = [.07, .06, .00]
+	x31[17,:] = [.05, .01, .00]
+	x31[18,:] = [.04, .01, .00]
+	x31[19,:] = [.03, .00, .00]
+	x31[20,:] = [.02, .00, .00]
+	x31[21,:] = [.01, .00, .00]
+	x31[22,:] = [.00, .00, .00]
+	x31[23,:] = [.01, .00, .00]
+	x31[24,:] = [.00, .00, .00]
+ 	size(x31)
 end # begin
 
-# ╔═╡ 4bee60c9-66ff-45e4-8cf6-88c952e28be6
-plotRatingDistributions1(y2, title="Thurstone's 2nd Data Set", ylimits=(-0.04, +0.24))
+# ╔═╡ 8a3b8b4d-e92f-437e-bc28-245c72aaad88
+plotRatingDistributions1(x31, "Thurstone's 2nd Example (Tab 2; without Controv. S4)", maxY=0.25)
 
-# ╔═╡ 792ddc3a-b117-40cc-9ea6-02fa5a3dc7d9
-discreteThurstoneChoiceModelFor3(y2, "Thurstone's 2nd data set, 1945, p.246")
+# ╔═╡ 593f000d-0e11-4a08-a7b4-e737dc3bda2b
+discreteVotingModel(x31, "Thurstone's 2nd Example (Tab 2; without Controv. S4)")
 
-# ╔═╡ c0576fbd-9868-401d-8344-3fa41d407448
-discreteThurstoneChoiceModelFor3_Or_6(y2, "Thurstone's 2nd data set, 1945, p.246")
+# ╔═╡ 1f445771-32a8-41d8-8faf-519fdab8ac93
+modelComparison1("Voting vs Thurstone Mod (Thurst.'s 2nd data no S4)",
+	[.48, .45, .07],  # Thurstone Model (Thurstone, 1945, p.247) 
+	[0.462963, 0.472222, 0.0648148], # Voting Model
+	xlabel="Thurstone Model",
+	ylabel="Voting Model")  
 
-# ╔═╡ 52b2ed76-7e33-43aa-9703-fb26d9e802c3
-discreteVotingModel(y2, "Thurstone's 2nd data set, 1945, p.246")
+# ╔═╡ c4898b15-d8d8-4201-bfbe-bf16fbc7ecaf
+begin
+	x32 = Array{Real, 2}(undef, (24, 4))
+	#------------------------------------------------------------------------------
+	x32[ 1,:] = [.00, .00, .00, 1/24]
+	x32[ 2,:] = [.01, .00, .00, 1/24]
+	x32[ 3,:] = [.00, .00, .00, 1/24]
+	x32[ 4,:] = [.01, .00, .01, 1/24]
+	x32[ 5,:] = [.02, .00, .01, 1/24]
+	x32[ 6,:] = [.03, .00, .05, 1/24]
+	x32[ 7,:] = [.04, .01, .09, 1/24]
+	x32[ 8,:] = [.05, .01, .15, 1/24]
+	x32[ 9,:] = [.07, .05, .19, 1/24]
+	x32[10,:] = [.08, .09, .19, 1/24]
+	x32[11,:] = [.09, .15, .15, 1/24]
+	x32[12,:] = [.10, .19, .09, 1/24]
+	x32[13,:] = [.10, .19, .05, 1/24]
+	x32[14,:] = [.09, .15, .01, 1/24]
+	x32[15,:] = [.08, .09, .01, 1/24]
+	x32[16,:] = [.07, .06, .00, 1/24]
+	x32[17,:] = [.05, .01, .00, 1/14]
+	x32[18,:] = [.04, .01, .00, 1/24]
+	x32[19,:] = [.03, .00, .00, 1/24]
+	x32[20,:] = [.02, .00, .00, 1/24]
+	x32[21,:] = [.01, .00, .00, 1/24]
+	x32[22,:] = [.00, .00, .00, 1/24]
+	x32[23,:] = [.01, .00, .00, 1/24]
+	x32[24,:] = [.00, .00, .00, 1/24]
+ 	size(x32)
+end # begin
 
-# ╔═╡ d1fdacc3-40e9-4639-84fa-689e62c32f83
+# ╔═╡ 160981ae-22a9-4ae9-a7a3-935e0a4b39fe
+plotRatingDistributions1(x32, "Thurstone's 2nd Example (Tab 2; incl. Controv. S4)", maxY=0.25)
+
+# ╔═╡ a10bd04c-265f-4b78-9f24-cdbb73e47020
+discreteVotingModel(x32, "Thurstone's 2nd Example (Tab 2; incl. Controv. S4)")
+
+# ╔═╡ 0a3a119b-211a-4dc4-bc6f-e7860b81e050
+modelComparison1("Voting vs Thurstone Mod (Thurst.'s 2nd data incl S4)",
+	[.48, .45, .07], #, 00],  # Thurstone Model  
+	[0.325708, 0.260566, 0.0162854], #, 0.397441], # Voting Model
+	xlabel="Thurstone Model",
+	ylabel="Voting Model")  
+
+# ╔═╡ 85331d45-5442-4b01-9c84-5105b7a0ab53
 md"
----
-###### Model Comparisons: Thurstone's vs. Voting Model
+**Summary**: Applied to Thurstone's own published demo data *both* models *agree* perfectly. This coincidence is deteriorated when studying empirical data (below). 
 "
 
-# ╔═╡ 1a958fbc-425a-442f-8693-fe245912644b
-modelComparison1("Thurstone vs Voting Model", 
-	[0.479413, 0.460882, 0.0597054],   # x (= Predictions of Voting Model)
-	[0.480027, 0.453862, 0.0661109])   # y (= Predictions of Thurstone's model)
-
-# ╔═╡ 29f770e7-16e7-4cf6-a80e-5a3f16cbebba
-md"
-We observe an even higher positive correlation of $r=0.999$ between the predictions of Thurstone's and our voting model. 
-
-A test for the cognitive validity of either model cannot be made here because Thurstone's 'data' are only artificial and not behavioral. The obligatory empirical test has to wait until we study our own data set (Ahrens & Möbus, 1968).
-"
-
-# ╔═╡ e37fdd58-a755-43e7-b747-d810a668ebb6
+# ╔═╡ 9babe800-837a-4d2b-9d59-7ed2d4419719
 md"
 ---
-##### 1.3.1.2.3 Application of *Nonparametric* First Choice Models to Empirical Attitude Ratings of West-German Politicians 
+##### 1.3.1.2.4 Nonparametric Voting Model: Attitude and 1st Choice Data 
 (Ahrens & Möbus, 1968)
 "
 
-# ╔═╡ 39c8b1e2-34bd-4885-9174-56a4cdbb2478
+# ╔═╡ bcf2c87b-64ed-4aee-a666-b96dd65a5373
 md"
-###### West-German Politicans presented as Stimuli
-Here we present the correspondence of the name of the politicians used as stimuli and their codes $S_1-S_6$. As these politicans maybe unknown today to foreign readers I have provided links to Wikipedia.
-
-- S1 = Gerhard [Schröder](https://en.wikipedia.org/wiki/Gerhard_Schr%C3%B6der_(CDU))
-- S2 = Helmut [Schmidt](https://en.wikipedia.org/wiki/Helmut_Schmidt)
-- S3 = Herbert [Wehner](https://en.wikipedia.org/wiki/Herbert_Wehner)
-- S4 = Franz Josef [Strauß](https://en.wikipedia.org/wiki/Franz_Josef_Strauss)
-- S5 = Willy [Brandt](https://en.wikipedia.org/wiki/Willy_Brandt)
-- S6 = Kurt Georg [Kiesinger](https://en.wikipedia.org/wiki/Kurt_Georg_Kiesinger)
-
-Please be careful with the ordering of the stimuli when reading the paper of Ahrens & Möbus (1968). Orderings in table 3 and table 4 are a bit *mixed up* !
+---
+##### Empirical Validity of Thurstone Model 
+(Ahrens & Möbus, 1968)
 "
+
+# ╔═╡ 646d5dc9-22ea-40f7-a3d0-d5870e9106e0
+md"
+Best predictors when using the Thurstone model are *Sencerity/Honesty* ($r=.944$), *Liberality* ($r=.922$), and *Objectivity* ($r=.868$).
+"
+
+# ╔═╡ 06e7e9c9-123c-440f-b702-55aca1efdc73
+md"
+---
+##### Empirical Validity of Voting Model 
+
+"
+
+# ╔═╡ 431f0ea9-d09e-4983-978f-5791daf853d0
+md"
+Best predictors when using the Voting model are *Civil Courage* ($r=.647$) and to a lesser degree *Intelligence* ($r=.424$). Both models seem to make different prediction when using correlations as a judgmental basis.
+"
+
+# ╔═╡ f5530e6d-179c-4153-8009-d7713d162c03
+md"
+---
+##### Model Predictions for Thurstone and Voting Model
+(Data are obtained from Ahrens & Möbus, 1968, p.558, Tab. 3)
+###### 1. Civil Courage Ratings
+"
+
+# ╔═╡ 4b9757c8-88e4-4b3a-a435-a647431e713f
+begin # Civil Courage; Ahrens & Möbus, 1968, p.558, table 3
+	S1 = Array{Real, 2}(undef, (7, 6))
+	S1[:, 1] = [.00, .00, .10, .14, .29, .43, .05] # column 1
+	S1[:, 2] = [.00, .00, .00, .05, .19, .48, .29] # column 2
+	S1[:, 3] = [.00, .00, .05, .00, .33, .52, .10] # ...
+	S1[:, 4] = [.00, .00, .10, .10, .19, .38, .24] # ...
+	S1[:, 5] = [.00, .00, .00, .05, .57, .33, .05] # ...
+	S1[:, 6] = [.00, .05, .05, .19, .43, .29, .00] # column 6
+end
 
 # ╔═╡ 974842e6-2257-4e0f-b8c6-efe1ade14ec5
 function plotRatingDistributions2(x::Array, title::String)
@@ -529,202 +643,187 @@ function plotRatingDistributions2(x::Array, title::String)
 		nCats = nRows
 		xs = 1:1:nCats
 		#----------------------------------------------------------------------------
-		plot(xs,  x[:, 1], title=title, xlimits=(0, nCats+4), ylimits=(-0.05, 0.60), seriestype=:scatter, colour=:aquamarine, label=L"S1\;(=Schröder)", xlabel=L"positive affect ratings $c$", ylabel = L"P(c)")
+		plot(xs,  x[:, 1], title=title, xlimits=(0, 8), ylimits=(-0.05, 0.60), seriestype=:scatter, colour=:aquamarine, label="S1", xlabel=L"positive affect ratings $m$", ylabel = L"P(m)")
 		#----------------------------------------------------------------------------
-		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label=L"S2\;(=Schmidt)")
-		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label=L"S3\;(=Wehner)")
-		plot!(xs, x[:, 4], seriestype=:scatter, colour=:violet, label=L"S4\;(=Strauß)")
-		plot!(xs, x[:, 5], seriestype=:scatter, colour=:orange, label=L"S5\;(=Brandt)")
-		plot!(xs, x[:, 6], seriestype=:scatter, colour=:blue, label=L"S6\;(=Kiesinger)")
+		plot!(xs, x[:, 2], seriestype=:scatter, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:scatter, colour=:green, label="S3")
+		plot!(xs, x[:, 4], seriestype=:scatter, colour=:violet, label="S4")
+		plot!(xs, x[:, 5], seriestype=:scatter, colour=:orange, label="S5")
+		plot!(xs, x[:, 6], seriestype=:scatter, colour=:blue, label="S6")
 		#----------------------------------------------------------------------------
-		plot!(xs, x[:, 1], seriestype=:line, colour=:aquamarine, label=L"S1\;(=Schröder)")
-		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label=L"S2\;(=Schmidt)")
-		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label=L"S3\;(=Wehner)")
-		plot!(xs, x[:, 4], seriestype=:line, colour=:violet, label=L"S4\;(=Strauß)")
-		plot!(xs, x[:, 5], seriestype=:line, colour=:orange, label=L"S5\;(=Brandt)")
-		plot!(xs, x[:, 6], seriestype=:line, colour=:blue, label=L"S6\;(=Kiesinger)")
+		plot!(xs, x[:, 1], seriestype=:line, colour=:aquamarine, label="S1")
+		plot!(xs, x[:, 2], seriestype=:line, colour=:red, label="S2")
+		plot!(xs, x[:, 3], seriestype=:line, colour=:green, label="S3")
+		plot!(xs, x[:, 4], seriestype=:line, colour=:violet, label="S4")
+		plot!(xs, x[:, 5], seriestype=:line, colour=:orange, label="S5")
+		plot!(xs, x[:, 6], seriestype=:line, colour=:blue, label="S6")
 		#----------------------------------------------------------------------------
 	end # let
 end # function plotRatingDistributions2
 
-# ╔═╡ 9babe800-837a-4d2b-9d59-7ed2d4419719
-md"
----
-###### Civil Courage (Zivilcourage) Ratings
-"
-
-# ╔═╡ 4b9757c8-88e4-4b3a-a435-a647431e713f
-begin # Civil Courage
-	S1 = Array{Real, 2}(undef, (7, 6))
-	S1[:, 1] = [.00, .00, .10, .14, .29, .43, .05] # column 1
-	S1[:, 2] = [.00, .00, .00, .05, .19, .48, .29] # column 2
-	S1[:, 3] = [.00, .00, .05, .00, .33, .52, .10] # column 3
-	S1[:, 4] = [.00, .00, .10, .10, .19, .38, .24] # column 4
-	S1[:, 5] = [.00, .00, .00, .05, .57, .33, .05] # column 5
-	S1[:, 6] = [.00, .05, .05, .19, .43, .29, .00] # column 6
-	size(S1)
-end
-
-# ╔═╡ 16157c44-7161-457f-b067-8822a1364cb0
-S1
-
 # ╔═╡ abd1374a-8528-4838-ba5c-924e4cfa557d
-plotRatingDistributions2(S1, "Civil Courage Ratings")
-
-# ╔═╡ eef9807b-79f0-48fb-b534-8a4d526aec83
-discreteThurstoneChoiceModelFor3_Or_6(S1, "Civil Courage Ratings")
-
-# ╔═╡ c38fa99f-da7f-476e-9e60-c183cd94acf6
-S1
+plotRatingDistributions2(S1, "Ratings: Civil Courage")
 
 # ╔═╡ c54b5f99-4a0c-4c60-9a04-d01dc5a6664a
 discreteVotingModel(S1, "Civil Courage Ratings")
 
 # ╔═╡ 380be5b0-7d95-42f4-ac92-98d151b3851a
-function modelComparison2(x, y; xlabel="Thurstone Model", ylabel="Voting Model")
-	let x = x                             # probs of voting model
-		y = y                             # probs of Thurstone model (p.245)
-		rxy = trunc(Statistics.cor(x, y), digits=3)
+function modelComparison2(title, x, y ;xlabel="Voting Model", ylabel="Thurstone Model")
+	let rxy = trunc(Statistics.cor(x, y), digits=3)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		plot(xs, ys, xlims=(-0.02, 0.75), ylims=(-0.02, 0.75), title="Model Comparison", seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect model agreement")
+		plot(xs, ys, xlims=(-0.01, 1.0), ylims=(-0.01, 1.0), title=title, seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect model agreement")
 		#---------------------------------------------------------------------------
-		plot!((x[1], y[1]), seriestype=:scatter, colour=:aquamarine, label=L"S1\;(=Schröder)")
-		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label=L"S2\;(=Schmidt)")
-		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label=L"S3\;(=Wehner)")
-		plot!((x[4], y[4]), seriestype=:scatter, colour=:violet, label=L"S4\; (=Strauß)")
-		plot!((x[5], y[5]), seriestype=:scatter, colour=:orange, label=L"S5\; (=Brandt)")
-		plot!((x[6], y[6]), seriestype=:scatter, colour=:blue, label=L"S6\; (=Kiesinger)")
+
+		plot!((x[1], y[1]), seriestype=:scatter, colour=:aquamarine, label="S1")
+		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label="S2")
+		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label="S3")
+		plot!((x[4], y[4]), seriestype=:scatter, colour=:violet, label="S4")
+		plot!((x[5], y[5]), seriestype=:scatter, colour=:orange, label="S5")
+		plot!((x[6], y[6]), seriestype=:scatter, colour=:blue, label="S6")
 		#---------------------------------------------------------------------------
-		annotate!([(0.42, 0.05, "r($xlabel, $ylabel) = $rxy")])
+		annotate!([(0.7, 0.1, "r(model_i, model_j) = $rxy")])
 	end # let
 end # function modelComparison2
 
 # ╔═╡ a63ee0a9-b615-47a9-80a9-0eb46b5088f4
-function dataModelComparison(x, y; xlabel="Model", ylabel="Ratings Data")
-	let x = x                             # probs of model
-		y = y                             # probs of data
-		rxy = trunc(Statistics.cor(x, y), digits=3)
+function dataModelComparison(title, x, y,; xlabel="Voting Model", ylabel="Ratings Data")
+	let rxy = trunc(Statistics.cor(x, y), digits=3)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		plot(xs, ys, xlims=(-0.02, 0.75), ylims=(-0.02, 0.75), title="Data-Model-Comparison", seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect agreement")
+		plot(xs, ys, xlims=(-0.01, 1.0), ylims=(-0.01, 1.0), title=title, seriestype=:line, colour=:red, xlabel=xlabel, ylabel=ylabel, label="line of perfect agreement")
 		#---------------------------------------------------------------------------
-		plot!((x[1], y[1]), seriestype=:scatter, colour=:aquamarine, label=L"S1\; (=Schröder)")
-		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label=L"S2\;(=Schmidt)")
-		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label=L"S3\;(=Wehner)")
-		plot!((x[4], y[4]), seriestype=:scatter, colour=:violet, label=L"S4\; (=Strauß)")
-		plot!((x[5], y[5]), seriestype=:scatter, colour=:orange, label=L"S5\; (=Brandt)")
-		plot!((x[6], y[6]), seriestype=:scatter, colour=:blue, label=L"S6\; (=Kiesinger)")
+		plot!((x[1], y[1]), seriestype=:scatter, colour=:aquamarine, label="S1")
+		plot!((x[2], y[2]), seriestype=:scatter, colour=:red, label="S2")
+		plot!((x[3], y[3]), seriestype=:scatter, colour=:green, label="S3")
+		plot!((x[4], y[4]), seriestype=:scatter, colour=:violet, label="S4")
+		plot!((x[5], y[5]), seriestype=:scatter, colour=:orange, label="S5")
+		plot!((x[6], y[6]), seriestype=:scatter, colour=:blue, label="S6")
 		#---------------------------------------------------------------------------
-		annotate!([(0.42, 0.05, "r($xlabel, $ylabel) = $rxy")])
+		annotate!([(0.7, 0.1, "r(rating_i, model) = $rxy")])
 	end # let
 end # function modelDataComparison
 
-# ╔═╡ ca2c9228-9367-4c62-9e77-8756675e94cf
-modelComparison2(
-	[0.114168, 0.317372, 0.171402, 0.245551, 0.0967584, 0.0547475], # Thurstone
-	[0.176338, 0.196842, 0.215378,0.155834, 0.136682, 0.118926],    # Voting        
-	xlabel="Thurstone Model", ylabel="Voting Model")      
+# ╔═╡ ea394cd7-e6d0-4e55-8e19-4ff8150a3bfa
+dataModelComparison("1st Choice Data - Thurstone Mod.(Sincerity/Honesty)",
+	[.33, .20, .29, .10, .08, .00], # Thurstone Model (Ahrens&Möbus,1968,p.560,Tab. 4)
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
 
-# ╔═╡ b39ef960-0549-4064-9a57-9d432f74d040
-dataModelComparison(
-	[0.114168, 0.317372, 0.171402, 0.245551, 0.0967584, 0.0547475], # Thurstone Model
-	[.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Thurstone Model")
+# ╔═╡ eacd0bc1-6579-4395-be97-9a4221c3ab22
+dataModelComparison("1st Choice Data vs. Thurstone Model (Liberality)",
+	[.25, .23, .21, .19, .09, .03], # Thurstone Model (Ahrens&Möbus,1968,p.560,Tab. 4)
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ 04ccd8a7-c97b-4760-bf2b-948dc20409f6
+dataModelComparison("1st Choice Data vs. Thurstone Model (Objectivity)",
+	[.29, .16, .22, .14, .14, .05], # Thurstone Model (Ahrens&Möbus,1968,p.560,Tab. 4)
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ 8cedc30e-6061-4f0b-8fa4-5af825725ea8
+dataModelComparison("1st Choice Data vs. Thurstone Model (Intelligence)",
+	[.26, .04, .15, .22, .07, .26], # Thurstone Model (Ahrens&Möbus,1968,p.560,Tab. 4)
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ bc5ad309-5b2f-41a4-ad5f-04dd49b410a6
+dataModelComparison("1st Choice Data vs. Thurstone Model (Civil Courage)",
+	[.11, .10, .06, .31, .17, .25], # Thurstone Model (Ahrens&Möbus,1968,p.560,Tab. 4)
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ 70c13302-72e0-4dbb-85c0-3cee2a9f0272
+dataModelComparison("1st Choice Data vs. Voting Model (Sincerity/Honesty)",
+	[.296296, .117284, .0617284, .0, .234568, .290123], # voting model predictions
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ 77547f53-7ba4-4e3f-ae8e-6206cc83c747
+dataModelComparison("1st Choice Data vs. Voting Model (Liberality)",
+	# Voting Model on basis of liberality ratings
+	[.248705, .176166, .0984456, .0259067, .222798, .227979], # voting model preds.   
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ 980ca609-9885-44aa-99b8-035d697f2610
+dataModelComparison("1st Choice Data vs. Voting Model (Objectivity Ratings)",
+	[0.239819, 0.171946, 0.108597, 0.0452489, 0.19457, 0.239819],  # voting model
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ f917eefe-50cf-47f9-9c6b-a19f15ca17c0
+dataModelComparison("1st Choice Data vs. Voting Model (Intelligence)",
+	# Voting Model on basis of intelligence ratings
+	[0.286957, 0.252174, 0.0434783, 0.252174, 0.0, 0.165217], # voting model pred.
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
 
 # ╔═╡ 9441e656-5fb4-45f2-b4e9-394a08110d6a
-dataModelComparison(
-	[0.176955, 0.197531, 0.213992, 0.156379, 0.135802, 0.119342],  # Voting Model
-	[.33, .10, .05, .00, .28, .24],                                # empirical voting
-	xlabel="Voting Model")       
+dataModelComparison("1st Choice Data vs. Voting Model (Civil Courage)",
+	# Voting Model predictions on basis of civil courage ratings
+	[.151899, .243671, .196203, .196203, .120253, .0917722], 
+	[.33, .28, .24, .10, .05, .00]) # 1st choice data (Ahrens&Möbus,1968,p.560,Tab. 4)
+
+# ╔═╡ ca2c9228-9367-4c62-9e77-8756675e94cf
+modelComparison2("Thurstone vs Voting Model (Civil Courage Rating)",
+	[0.151899, 0.243671, 0.196203, 0.196203, 0.120253,0.0917722],  # voting model
+	[.11, .10, .06, .31, .17, .25])  # Thurstone Model(Ahrens&Möbus,1968,p.560, Tab.4)
 
 # ╔═╡ fdab7ae8-3acc-4ce3-8506-e47a4137b94d
 md"
 ---
-###### Liberality (Liberalität) Ratings
+###### Liberality Ratings
 "
 
 # ╔═╡ d56c1cde-d025-4d8b-be57-33651f8a58cd
-begin # Liberality
+begin # Liberality Ratings; Ahrens & Möbus, 1968, p.558, table 3
 	S2 = Array{Real, 2}(undef, (7, 6))
 	S2[:, 1] = [.00, .00, .05, .14, .33, .43, .05] # column 1
 	S2[:, 2] = [.00, .14, .10, .29, .14, .24, .10] # column 2
-	S2[:, 3] = [.00, .10, .24, .24, .24, .19, .00] # column 3
-	S2[:, 4] = [.19, .29, .24, .10, .14, .05, .00] # column 4
-	S2[:, 5] = [.00, .05, .05, .05, .43, .38, .05] # column 5
+	S2[:, 3] = [.00, .10, .24, .24, .24, .19, .00] # ...
+	S2[:, 4] = [.19, .29, .24, .10, .14, .05, .00] # ...
+	S2[:, 5] = [.00, .05, .05, .05, .43, .38, .05] # ...
 	S2[:, 6] = [.00, .00, .10, .29, .19, .38, .06] # column 6
 end
 
+# ╔═╡ 04aa6f0c-50bd-44b5-980e-a0562e27091b
+discreteVotingModel(S2, "Liberality Ratings")
+
 # ╔═╡ ada73f85-c8f1-4baa-9898-0f89dd1c0795
 plotRatingDistributions2(S2, "Liberality Ratings")
-
-# ╔═╡ 3a1965b5-980f-4abc-b2f1-2e335c5e96c1
-discreteThurstoneChoiceModelFor3_Or_6(S2, "Liberality Ratings")
 
 # ╔═╡ 4a80b025-44b9-492b-9cd3-71550666c7b4
 discreteVotingModel(S2, "Liberality Ratings")
 
 # ╔═╡ 54c8c91c-2397-433a-9d3f-cd337154bd0b
-modelComparison2(
-	[0.257379, 0.194993, 0.0848376, 0.0244728, 0.226435, 0.211884], # Thurstone Model
-	[0.25997, 0.143663, 0.113733, 0.0299298, 0.227467,0.225237],    # Voting Model    
-	xlabel="Thurstone Model")
-
-# ╔═╡ 222edb0a-5434-49e9-86dc-b7755ac3dd49
-dataModelComparison(
-	[0.257379, 0.194993, 0.0848376, 0.0244728, 0.226435, 0.211884], # Thurstone model
-	[.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Thurstone Model")
-
-# ╔═╡ ad87afd5-a63f-417e-854b-76526efc930f
-dataModelComparison(
-	[0.25997, 0.143663, 0.113733, 0.0299298, 0.227467,0.225237],    # Voting Model  
-	[.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Voting Model")
+modelComparison2("Thurstone vs Voting Model (Liberality Ratings)",
+	[.248705, .176166, .0984456, .0259067, .222798, .227979],  # voting model
+	[.25, .23, .21, .19, .09, .03])  # Thurstone Model(Ahrens&Möbus,1968,p.560, Tab.4)
 
 # ╔═╡ d4d328c9-15bd-4538-a3ce-e16f951377a8
 md"
 ---
-###### Sincerity/Honesty (Aufrichtigkeit) Ratings
+###### Sincerity/Honesty Ratings
 "
 
 # ╔═╡ 31b9f7ad-95cb-404e-affb-de0cefea0ade
-begin # Sincerity/Honesty
+begin # Sincerity/Honesty Ratings; Ahrens & Möbus, 1968, p.558, table 3
 	S3 = Array{Real, 2}(undef, (7, 6))
 	S3[:, 1] = [.00, .00, .14, .14, .24, .29, .19] # column 1
 	S3[:, 2] = [.00, .00, .19, .24, .38, .19, .00] # column 2
-	S3[:, 3] = [.00, .10, .14, .29, .38, .05, .05] # column 3
-	S3[:, 4] = [.38, .29, .19, .10, .05, .00, .00] # column 4
-	S3[:, 5] = [.00, .05, .00, .24, .33, .33, .05] # column 5
+	S3[:, 3] = [.00, .10, .14, .29, .38, .05, .05] # ...
+	S3[:, 4] = [.38, .29, .19, .10, .05, .00, .00] # ...
+	S3[:, 5] = [.00, .05, .00, .24, .33, .33, .05] # ...
 	S3[:, 6] = [.00, .00, .05, .24, .24, .33, .14] # column 6
 end
 
+# ╔═╡ d1b49b43-f76a-492d-a90c-cc0f718be634
+discreteVotingModel(S3, "Sincerity/Honesty Ratings")
+
 # ╔═╡ 7af53601-021c-4560-8ebd-df89d8c17f47
 plotRatingDistributions2(S3, "Sincerity/Honesty Ratings")
-
-# ╔═╡ 370c1fe2-770f-4cb4-a859-3a2f1689c655
-discreteThurstoneChoiceModelFor3_Or_6(S3, "Sincerity/Honesty Ratings")
 
 # ╔═╡ b8c1072f-c206-4c0b-a088-f10c1491f80a
 discreteVotingModel(S3, "Sincerity/Honesty Ratings")
 
 # ╔═╡ 80f8adc0-1e60-4008-9963-36d4ead0f562
-modelComparison2(
-	[0.324623, 0.0999771, 0.0832025, 0.00318217, 0.202951, 0.286064], # Thurstone's
-	[0.243799, 0.15973, 0.0416181, 0.0, 0.277426, 0.277426],          # Voting Model
-	xlabel="Thurstone Model")
-
-# ╔═╡ 70c13302-72e0-4dbb-85c0-3cee2a9f0272
-dataModelComparison(
-	[0.324623, 0.0999771, 0.0832025, 0.00318217, 0.202951, 0.286064], # Thurstone's
-	[.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Thurstone Model")
-
-# ╔═╡ d3d35f8b-5dc3-484d-8cc1-7794a6538acd
-dataModelComparison(
-	[0.243799, 0.15973, 0.0416181, 0.0, 0.277426, 0.277426],        # Voting Model 
-	[.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Voting Model")
+modelComparison2("Thurstone - Voting Model(Sincerety/Honesty Ratings)",
+	# Voting Model on basis of sincerety/honesty ratings
+	[0.296296, 0.117284, 0.0617284, 0.0, 0.234568, 0.290123], # voting model
+	[.33, .20, .29, .10, .08, .00])  # Thurstone Model(Ahrens&Möbus,1968,p.560, Tab.4)
 
 # ╔═╡ b3af7545-e622-417b-b56b-6047d50127ae
 md"
@@ -737,38 +836,26 @@ begin # Intelligence
 	S4 = Array{Real, 2}(undef, (7, 6))
 	S4[:, 1] = [.00, .00, .00, .05, .29, .33, .33] # column 1
 	S4[:, 2] = [.00, .00, .10, .10, .24, .29, .29] # column 2
-	S4[:, 3] = [.00, .00, .05, .14, .43, .33, .05] # ...
-	S4[:, 4] = [.00, .00, .00, .10, .19, .52, .29] # ...
-	S4[:, 5] = [.00, .00, .10, .14, .43, .33, .00] # ...
+	S4[:, 3] = [.00, .00, .05, .14, .43, .33, .05] 
+	S4[:, 4] = [.00, .00, .00, .10, .19, .52, .29] 
+	S4[:, 5] = [.00, .00, .10, .14, .43, .33, .00] 
 	S4[:, 6] = [.00, .00, .00, .14, .43, .24, .19] # column 6
 end
+
+# ╔═╡ 50aef5d2-5b53-4abf-91e9-26b9a91021c9
+discreteVotingModel(S4, "Voting Model: Intelligence Ratings")
 
 # ╔═╡ 578a003d-8e39-4dd7-939d-0b4a95040a8a
 plotRatingDistributions2(S4, "Intelligence Ratings")
 
-# ╔═╡ 9c1035a1-2ae8-480f-8b29-61955b7c8670
-discreteThurstoneChoiceModelFor3_Or_6(S4, "Intelligence Ratings")
-
 # ╔═╡ 5943c7df-8512-428f-ac17-e16c5450fdd1
-discreteVotingModel(S4, "Intelligence Ratings")
+discreteVotingModel(S4, "Voting Model: Intelligence Ratings")
 
 # ╔═╡ 2c0d5a84-6dfa-4855-ba41-764cb3d7b078
-modelComparison2(
-	[0.282347, 0.230333, 0.0765583, 0.228459, 0.0409843, 0.141318], # Thurstone's
-	[0.166076, 0.143084, 0.166076, 0.237905, 0.166076, 0.120783],   # Voting model
-	xlabel="Thurstone model")
-
-# ╔═╡ 4b05297c-aa2d-40e3-9e48-67317fcbdb44
-dataModelComparison(
-	[0.282347, 0.230333, 0.0765583, 0.228459, 0.0409843, 0.141318], # Thurstone's
-    [.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Thurstone model")
-
-# ╔═╡ 9c0cce2e-328c-4d53-b4b9-6ec4b15292f4
-dataModelComparison(
-	[0.166076, 0.143084, 0.166076, 0.237905, 0.166076, 0.120783],   # Voting model
-    [.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Voting model")
+modelComparison2("Thurstone vs Voting Model (Intelligence Ratings)",
+	# Voting Model on basis of intelligence ratings
+	[0.286957, 0.252174, 0.0434783, 0.252174, 0.0, 0.165217], # voting model
+	[.26, .04, .15, .22, .07, .26])  # Thurstone Model(Ahrens&Möbus,1968,p.560, Tab.4)
 
 # ╔═╡ 01780409-edab-4bcd-8569-e9ee23c9587e
 md"
@@ -787,55 +874,25 @@ begin # Objectivity
 	S5[:, 6] = [.00, .00, .14, .10, .24, .43, .10] # column 6
 end
 
-# ╔═╡ 7de57a9f-fcab-45b4-aec3-7ac478271ba6
-plotRatingDistributions2(S5, "Objectivity Ratings")
+# ╔═╡ 16f1cd7b-c994-4271-b556-2bf520c925f3
+discreteVotingModel(S5, "Objectivity Ratings")
 
-# ╔═╡ ac5e6064-46ef-4ac5-8f28-b50136340f5f
-discreteThurstoneChoiceModelFor3_Or_6(S5, "Objectivity Ratings")
+# ╔═╡ 7de57a9f-fcab-45b4-aec3-7ac478271ba6
+plotRatingDistributions2(S4, "Objectivity Ratings")
 
 # ╔═╡ c2b421f4-80f6-4c88-bdae-e4cd97e9c2a5
 discreteVotingModel(S5, "Objectivity Ratings")
 
 # ╔═╡ 8c21b6ed-9f4c-4e08-9d88-2c621a68394a
-modelComparison2(
-	[0.295971, 0.140626, 0.136772, 0.0584072,  0.156672, 0.211552], # Thurstone model
-	[0.183104, 0.210443, 0.0631393, 0.0318853, 0.239929, 0.271499], # Voting model
-	xlabel="Thurstone model")
+modelComparison2("Thurstone vs Voting Model (Objectivity Ratings)",
+	[0.239819, 0.171946, 0.108597, 0.0452489, 0.19457, 0.239819], 
+	[.11, .10, .06, .31, .17, .25])  # Thurstone Model(Ahrens&Möbus,1968,p.560, Tab.4)
 
-# ╔═╡ 980ca609-9885-44aa-99b8-035d697f2610
-dataModelComparison(
-	[0.295971, 0.140626, 0.136772, 0.0584072,  0.156672, 0.211552], # Thurstone model
-    [.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Thurstone Model")
-
-# ╔═╡ 066bb377-b128-4ef7-9b91-3c9c0d41a1cd
-dataModelComparison(
-	[0.183104, 0.210443, 0.0631393, 0.0318853, 0.239929, 0.271499], # Voting model
-    [.33, .10, .05, .00, .28, .24],                                 # empirical voting
-	xlabel="Voting Model")
-
-# ╔═╡ b01d5a68-c60b-4d4c-8c70-a3ca3f511d8c
+# ╔═╡ f997f20d-26ba-4ad4-98cd-d050a10c8e30
 md"
----
-###### Summary
+Both models seem to make very different predictions when we look at correlations as a judgmental basis. The highest congruence between both models is on the basis of *Intelligence* ratings ($r=0.399$). 
 
-$\begin{array}{c|c|c|c}
-\text{Rating Scale} & \text{Thurstone's model} & \text{Voting Model} & \text{Model Congruence} \\
-\hline
-civil courage & -0.725 & -0.455 & +0.599 \\
-\mathbf{liberality}    & \mathbf{+0.916} & \mathbf{+0.971} & \mathbf{+0.954} \\
-\mathbf{honesty}       & \mathbf{+0.948} & \mathbf{+0.929} & +0.885 \\
-intelligence  & -0.019 & -0.519 & +0.218 \\
-objectivity   & +0.862 & +0.766 & +0.580  \\
-\hline
-\end{array}$
-
-"
-
-# ╔═╡ dcc33e41-8596-498b-b793-3307927a4ff7
-md"
-Both model generate nearly perfect predictions of empirical first choice ratings. Good predictors are ratings of liberality and honesty. Honesty was the best predictor when we had only the Thurstone model at hand. This was the situation in 1968 (Ahrens & Möbus, 1968). Now we have formulated as an alternative a mathematical much simpler model which demonstrates its predictionquality using liberality ratings as predictor.
-From a statistical view point is the Thurstone model extracting more information from the discriminal dispersions. Being formulated as an expectation it extracts information from the total discriminal distribution wheras the voting model only uses information from the upper positive affected ends of all stimulus dispersions. Whereas the Thurstone model scores from statistical aspects it sucks from a psychological point of view. The voting model is much simpler and more realistic in its assumed psychological mechanisms.
+As a resume we can say that Thurstone's model seems to have a higher empirical validity than the voting model. The reason for this may be the fact that Thurstone's model exploits information not only from the extreme positive parts of the discriminal dispersions but from the *whole* distributions.
 "
 
 # ╔═╡ bbd5f8c0-cfb6-4417-a8d2-5474bf0b4cb1
@@ -844,7 +901,6 @@ md"
 ##### References
 - **Ahrens, H.J. & Möbus, C.**; [*Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf); Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; last visit: 2023/09/08
 - **Thurstone, L.L.**; [*The Prediction of Choice*](https://link.springer.com/content/pdf/10.1007/BF02288891.pdf); Psychometrika 10.4 (1945): 237-253; ; last visit 2023/09/08
-- **Wikipedia**; [Communicating Vessels](https://en.wikipedia.org/wiki/Communicating_vessels); last visit 2023/09/25
 "
 
 # ╔═╡ 6f837e7f-3085-411b-b39f-c63f7fcf2939
@@ -1862,87 +1918,104 @@ version = "1.4.1+0"
 # ╔═╡ Cell order:
 # ╟─951cce60-4e4f-11ee-379a-4385f4005380
 # ╠═d31c78a4-66e9-4196-8fb6-0aba3e4ae0d7
-# ╠═8950b580-db8e-45b4-a9cd-1a532a7a4358
+# ╠═dbdf0a16-71ed-4a83-99a1-f8119fb84ffe
+# ╟─a76a6491-b5e9-45a2-8b14-d54cc1586e9d
+# ╠═f3d7c861-4acb-4f9d-92e7-b1bec765c02d
+# ╠═a21ce88d-141f-46d6-b7fd-af5daf70ca02
+# ╟─83b2d8cc-6790-4b62-a5e4-9fb308898335
+# ╟─80b9a128-bd19-4851-b3f7-b699700fbd08
+# ╟─14ccb9a2-ec6e-4a2b-a2cf-f3d78deba2fc
+# ╠═a441e6a2-6d46-4887-9927-85a86c9f3257
+# ╠═fcc429c2-8e92-4a23-b374-6f9cf46067f2
+# ╠═b3dc6e56-97ab-4a2a-9dfd-cbeb0a855aed
+# ╠═ec9f191f-8fa9-48e9-97f2-385ee4b2e218
+# ╟─b97475c2-771e-4f52-925d-831b0babc3d3
+# ╠═83f46574-345e-40a9-a14b-6ab6cbeb2f40
+# ╟─d3345a8f-5abf-467f-8c7a-2ae85e150474
+# ╟─e8478494-dba3-4448-a0fa-f523c29a1e99
+# ╟─c9242575-0d24-4108-9bd5-3590ad4d3c45
+# ╠═0aeebc71-81a5-43d8-a698-b2cfb84d53c0
+# ╟─aeaf21e4-c7c2-4b95-a082-68c0e20c2ff8
+# ╟─1b53baf1-376b-44b6-9718-48385a68fd3c
+# ╠═3947ae42-c5e2-4893-8793-4314f1485b5a
+# ╠═04efd6b7-7d4f-4c80-b30f-3ac1b55e9bc1
+# ╠═be0ac072-efd0-4e41-a805-dce10550cca1
+# ╠═4e22fd91-107a-4421-8f4d-bf12871cf4ef
+# ╠═0b6e1719-d88b-4d17-a7b8-57b6942a07d6
+# ╟─8a1c25a5-e091-49f7-8455-cc90b769a4d8
 # ╟─40bfbb32-b766-4d45-89e1-6701495cd098
-# ╟─6cb97be2-3167-418d-a717-1425792cb566
 # ╠═b14d83b4-0dc3-4893-a645-fd69d9fb15e6
-# ╠═f2f78b7e-6a68-4fa3-846d-95bb979794c2
+# ╟─f2f78b7e-6a68-4fa3-846d-95bb979794c2
 # ╠═f5aabcd1-58af-418d-82f1-f25bfa171b3f
-# ╟─bbc32e76-b40c-4588-af8e-6feb31a5cbc3
-# ╟─298a28bf-696a-4485-a09f-5dabc5a9447c
-# ╠═439a31a1-91a1-488e-a488-bb98ba7a660d
-# ╠═90f5a2d2-7022-4e2c-a188-05b97f590ded
-# ╠═75c54882-179c-4216-9522-91c66bfd0d1a
-# ╠═1402b6d9-3073-49cb-9230-538b619e73da
-# ╟─2dded7eb-6a6d-46a8-bf18-3492b5b90c0a
-# ╟─2ce67ad7-7d93-4d4d-b5b2-cfc9329580ef
 # ╠═3832f1e1-ee46-4a64-9d56-d9698ffc5b20
-# ╠═a5103b99-2766-4d73-88e7-9564148d88fd
-# ╟─6380735b-4410-4ee8-925e-02cbca2ca156
+# ╠═71d9d34c-c674-4168-9ecb-52a42c45684d
 # ╠═e9c53501-7ba2-4393-bdee-f609e371a5ac
-# ╟─0409897a-83db-4142-a44f-2944da12a97c
-# ╠═87c289db-7964-4660-b85a-fa34d874caa9
-# ╟─613c163e-7bc7-42b4-afec-f8d23d268a20
+# ╠═403c8660-75cb-4866-9a70-e822b425c797
 # ╟─1261f045-99d1-4580-a926-6bba736ec1fe
+# ╟─4460796f-06bc-4cb2-9121-c1ff56dca37c
+# ╠═28e1cf28-49f4-4488-946c-0c4fcd0689d1
+# ╠═3b5f6d28-7fde-4492-aa10-da11539a1b77
+# ╠═9d3e5de5-d489-4bea-af40-d55d3ce076fd
+# ╟─23cb6297-23b8-4cd2-8af4-529e25511f65
+# ╠═bac5626f-f5a5-4077-a42a-db1b768754c5
 # ╟─45815157-d41f-4c1a-b08d-8a511aacc420
-# ╟─835417f0-bc4d-4c53-b46b-bcc0b4581de1
-# ╠═a95d61ae-c672-4db5-b5ec-88ab29f756d7
-# ╠═4bee60c9-66ff-45e4-8cf6-88c952e28be6
-# ╠═792ddc3a-b117-40cc-9ea6-02fa5a3dc7d9
-# ╠═c0576fbd-9868-401d-8344-3fa41d407448
-# ╠═52b2ed76-7e33-43aa-9703-fb26d9e802c3
-# ╟─d1fdacc3-40e9-4639-84fa-689e62c32f83
-# ╠═1a958fbc-425a-442f-8693-fe245912644b
-# ╟─29f770e7-16e7-4cf6-a80e-5a3f16cbebba
-# ╟─e37fdd58-a755-43e7-b747-d810a668ebb6
-# ╟─39c8b1e2-34bd-4885-9174-56a4cdbb2478
-# ╠═974842e6-2257-4e0f-b8c6-efe1ade14ec5
+# ╠═f447a7ca-ec7d-4584-ad15-1ee482186e61
+# ╠═8a3b8b4d-e92f-437e-bc28-245c72aaad88
+# ╠═593f000d-0e11-4a08-a7b4-e737dc3bda2b
+# ╠═1f445771-32a8-41d8-8faf-519fdab8ac93
+# ╠═c4898b15-d8d8-4201-bfbe-bf16fbc7ecaf
+# ╠═160981ae-22a9-4ae9-a7a3-935e0a4b39fe
+# ╠═a10bd04c-265f-4b78-9f24-cdbb73e47020
+# ╠═0a3a119b-211a-4dc4-bc6f-e7860b81e050
+# ╟─85331d45-5442-4b01-9c84-5105b7a0ab53
 # ╟─9babe800-837a-4d2b-9d59-7ed2d4419719
+# ╟─bcf2c87b-64ed-4aee-a666-b96dd65a5373
+# ╠═ea394cd7-e6d0-4e55-8e19-4ff8150a3bfa
+# ╠═eacd0bc1-6579-4395-be97-9a4221c3ab22
+# ╠═04ccd8a7-c97b-4760-bf2b-948dc20409f6
+# ╠═8cedc30e-6061-4f0b-8fa4-5af825725ea8
+# ╠═bc5ad309-5b2f-41a4-ad5f-04dd49b410a6
+# ╟─646d5dc9-22ea-40f7-a3d0-d5870e9106e0
+# ╟─06e7e9c9-123c-440f-b702-55aca1efdc73
+# ╠═70c13302-72e0-4dbb-85c0-3cee2a9f0272
+# ╠═d1b49b43-f76a-492d-a90c-cc0f718be634
+# ╠═77547f53-7ba4-4e3f-ae8e-6206cc83c747
+# ╠═04aa6f0c-50bd-44b5-980e-a0562e27091b
+# ╠═980ca609-9885-44aa-99b8-035d697f2610
+# ╠═16f1cd7b-c994-4271-b556-2bf520c925f3
+# ╠═f917eefe-50cf-47f9-9c6b-a19f15ca17c0
+# ╠═50aef5d2-5b53-4abf-91e9-26b9a91021c9
+# ╠═9441e656-5fb4-45f2-b4e9-394a08110d6a
+# ╟─431f0ea9-d09e-4983-978f-5791daf853d0
+# ╟─f5530e6d-179c-4153-8009-d7713d162c03
 # ╠═4b9757c8-88e4-4b3a-a435-a647431e713f
-# ╠═16157c44-7161-457f-b067-8822a1364cb0
+# ╟─974842e6-2257-4e0f-b8c6-efe1ade14ec5
 # ╠═abd1374a-8528-4838-ba5c-924e4cfa557d
-# ╠═eef9807b-79f0-48fb-b534-8a4d526aec83
-# ╠═c38fa99f-da7f-476e-9e60-c183cd94acf6
 # ╠═c54b5f99-4a0c-4c60-9a04-d01dc5a6664a
 # ╠═380be5b0-7d95-42f4-ac92-98d151b3851a
 # ╠═a63ee0a9-b615-47a9-80a9-0eb46b5088f4
 # ╠═ca2c9228-9367-4c62-9e77-8756675e94cf
-# ╠═b39ef960-0549-4064-9a57-9d432f74d040
-# ╠═9441e656-5fb4-45f2-b4e9-394a08110d6a
 # ╟─fdab7ae8-3acc-4ce3-8506-e47a4137b94d
 # ╠═d56c1cde-d025-4d8b-be57-33651f8a58cd
 # ╠═ada73f85-c8f1-4baa-9898-0f89dd1c0795
-# ╠═3a1965b5-980f-4abc-b2f1-2e335c5e96c1
 # ╠═4a80b025-44b9-492b-9cd3-71550666c7b4
 # ╠═54c8c91c-2397-433a-9d3f-cd337154bd0b
-# ╠═222edb0a-5434-49e9-86dc-b7755ac3dd49
-# ╠═ad87afd5-a63f-417e-854b-76526efc930f
 # ╟─d4d328c9-15bd-4538-a3ce-e16f951377a8
 # ╠═31b9f7ad-95cb-404e-affb-de0cefea0ade
 # ╠═7af53601-021c-4560-8ebd-df89d8c17f47
-# ╠═370c1fe2-770f-4cb4-a859-3a2f1689c655
 # ╠═b8c1072f-c206-4c0b-a088-f10c1491f80a
 # ╠═80f8adc0-1e60-4008-9963-36d4ead0f562
-# ╠═70c13302-72e0-4dbb-85c0-3cee2a9f0272
-# ╠═d3d35f8b-5dc3-484d-8cc1-7794a6538acd
 # ╟─b3af7545-e622-417b-b56b-6047d50127ae
 # ╠═f8f2b229-efcd-4a0d-a62c-744e1cb8618a
 # ╠═578a003d-8e39-4dd7-939d-0b4a95040a8a
-# ╠═9c1035a1-2ae8-480f-8b29-61955b7c8670
 # ╠═5943c7df-8512-428f-ac17-e16c5450fdd1
 # ╠═2c0d5a84-6dfa-4855-ba41-764cb3d7b078
-# ╠═4b05297c-aa2d-40e3-9e48-67317fcbdb44
-# ╠═9c0cce2e-328c-4d53-b4b9-6ec4b15292f4
 # ╟─01780409-edab-4bcd-8569-e9ee23c9587e
 # ╠═8c661015-9dfc-4d82-a81c-4fb79cb206e5
 # ╠═7de57a9f-fcab-45b4-aec3-7ac478271ba6
-# ╠═ac5e6064-46ef-4ac5-8f28-b50136340f5f
 # ╠═c2b421f4-80f6-4c88-bdae-e4cd97e9c2a5
 # ╠═8c21b6ed-9f4c-4e08-9d88-2c621a68394a
-# ╠═980ca609-9885-44aa-99b8-035d697f2610
-# ╠═066bb377-b128-4ef7-9b91-3c9c0d41a1cd
-# ╟─b01d5a68-c60b-4d4c-8c70-a3ca3f511d8c
-# ╟─dcc33e41-8596-498b-b793-3307927a4ff7
+# ╟─f997f20d-26ba-4ad4-98cd-d050a10c8e30
 # ╟─bbd5f8c0-cfb6-4417-a8d2-5474bf0b4cb1
 # ╟─6f837e7f-3085-411b-b39f-c63f7fcf2939
 # ╟─517c3c8f-be36-49b2-98da-b9f2d67ddcf8
