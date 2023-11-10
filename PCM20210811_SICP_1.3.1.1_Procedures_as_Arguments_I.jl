@@ -9,12 +9,12 @@ using Plots, QuadGK, LaTeXStrings, Statistics
 
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
 md"
-===================================================================================
+=====================================================================================
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Cantor Set, Integration à la Riemann & Lebesgue (NonSICP))
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/05 ***
-===================================================================================
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/10 ***
+=====================================================================================
 "
 
 # ╔═╡ acd01166-5258-4012-a6f4-e4f05b49dce3
@@ -223,8 +223,8 @@ myError(*(8, piSum1(a=1, b=^(10, 5))))
 # ╔═╡ 6c793213-177e-4c50-99b2-482704cbad75
 md"
 ---
-###### The *Lebesgue Measure* $\lambda(C)$ (= Length) of [*Cantor's Set (=Discontinuum) C*](https://en.wikipedia.org/wiki/Cantor_set))
-(NonSICP)
+###### NonSICP: The *Lebesgue Measure* $\lambda(C)$ (= Length) of [*Cantor's Set (=Discontinuum) C*](https://en.wikipedia.org/wiki/Cantor_set))
+
 We take the interval 
 
 $C_0=[0,1]$ 
@@ -385,7 +385,7 @@ $I_{t_1t_2...t_{n-1}t_n2}=(0.t_1t_2...t_{n-1}t_n1, 0.t_1t_2...t_{n-1}t_n2)_3 \in
 
 $\;$
 
-Endpoints are written as *triadic* numbers with numbers $t_1t_2...t_{n-1}t_n \in \{0,2\}.$ The sequence of triadic numbers $t_1...t_n$ encodes the position of the interval $I_{t_1t_2...t_{n-1}t_n2}$ in relation to the interval $I_{t_1t_2...t_{n-1}2}.$ $t_n=0$ means that the interval is *left* of $I_{t_1t_2...t_{n-1}2}$ and $t_n=2$ means that it is *right* of. This results in a binary tree.
+Endpoints are written as *triadic* numbers with numbers $t_1t_2...t_{n-1}t_n \in \{0,2\}.$ The sequence of triadic numbers $t_1...t_n$ encodes the position of the interval $I_{t_1t_2...t_{n-1}t_n2}$ in relation to the interval $I_{t_1t_2...t_{n-1}2}.$ $t_n=0$ means that the interval is *left* of $I_{t_1t_2...t_{n-1}2}$ and $t_n=2$ means that it is *right* of. This results in a binary tree (plot below).
 
 The *Lebesgue* measure (= length) of the interval $I_{t_1t_2...t_{n-1}t_n2}$ is:
 
@@ -393,6 +393,11 @@ $\;$
 
 $\lambda(I_{t_1t_2...t_{n-1}t_n2})=0.t_1t_2...t_{n-1}t_n2-
 0.t_1t_2...t_{n-1}t_n1=0.00...001_3=3^{-(n+1)}.$
+
+$\;$
+$\;$
+
+$\text{e.g. }3^{-(0+1)}=\frac{1}{3},\; 3^{-(1+1)}=\frac{1}{9},\; 3^{-(2+1)}=\frac{1}{27},\;...$  
 
 $\;$
 $\;$
@@ -515,11 +520,14 @@ $\;$
 $......$
 $\;$
 
-$\lambda(C)=1-\sum_{n=0}^\infty\frac{2^n}{3^{n+1}}=1-\frac{1}{3}\sum_{n=0}^\infty\frac{2^n}{3^n}=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=0$
+$\lambda(C)=1-\sum_{n=0}^\infty\frac{2^n}{3^{n+1}}=1-\frac{1}{3}\sum_{n=0}^\infty\frac{2^n}{3^n}=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=0.$
 
 $\;$
 $\;$
 $\;$
+
+This means that the *Cantor set* is a [*Null Set*](https://en.wikipedia.org/wiki/Null_set). It has length *zero* though it is not empty. It contains at least the endpoints of the intervals.
+
 $\;$
 
 "
@@ -547,7 +555,7 @@ $\;$
 $\;$
 $\;$
 
-But *C* is not empty (e.g. Schilling, 2015, p.3). At least the end points of intervals left over after removings are contained in the *Cantor set* $C$.
+*C* is not empty (e.g. Schilling, 2015, p.3). At least the end points of intervals are left over in $C$ after removings.
 $\;$
 
 "
@@ -584,13 +592,13 @@ end # function λC
 λC(10)
 
 # ╔═╡ 650c0387-e516-4b08-8c9a-aa49682183a4
-λC(50)
+λC(50)                    # ==> no substantial reduction with j = 42
 
 # ╔═╡ 299fb3ee-a3a6-44d1-9b0c-094283e6dfa4
 λC(42)
 
 # ╔═╡ f89d9a5d-0fd8-4684-82bd-797de43582a2
-λC(43)
+λC(43)                     # ==> no substantial reduction with j = 42
 
 # ╔═╡ c193805e-df87-4842-bdb5-d1991db9ccf0
 function λC2(n) #; j=0, accu=0.0)
@@ -754,7 +762,7 @@ $\;$
 "
 
 # ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
-plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^3$", framestyle=:semi)
+plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^3$", framestyle=:semi, label="")
 
 # ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
 integral1(cube, 0, 1)                                  # SICP, p.60
@@ -783,7 +791,7 @@ $\;$
 halfParabola(x) =  -6x^5 + 6 # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
 
 # ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
-plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$x\mapsto -6x^5 + 6$")
+plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$x\mapsto -6x^5 + 6$", label="")
 
 # ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
 integral1(halfParabola, 0.0, 1.0, Δx=0.1)          # should be 5.0
@@ -805,7 +813,7 @@ let x1 = +1.0
 	x2 = -1.0
 	y1 = gaussianDensity(+1.0)
 	y2 = gaussianDensity(-1.0)
-	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"f(X)")
 	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"$f(X)$")
 	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
 	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
@@ -1012,21 +1020,20 @@ integral2(cube, 0.0, 1.0, Δx=1.0E-4)
 md"
 ---
 ###### Lebesgue Integration
-This section containing a Julia-script is not contained in SICP or elsewhere. The reason for this may be the fact that for most practical applications numerical integration a la *Riemann* is simple and gives the same results as integration a la *Lebesgue* would do. The superiority of Lebesgue integration shines in more theoretical contexts; e.g. integrating the [Dirichlet function](https://en.wikipedia.org/wiki/Dirichlet_function).
+This section contains a Julia-script not found elsewhere. The reason for this may be the fact that for most practical purposes numerical integration a la *Riemann* would do. The superiority of Lebesgue integration shines in more theoretical contexts when Riemann integration fails (e.g. integral of the [Dirichlet function](https://en.wikipedia.org/wiki/Dirichlet_function)).
 
-What is in simple words the difference between both integration methods ? Here we quote an expert in stochastics:
-'...is the fact that the Riemann sums partition the domain of the function without taking into account the shape of the function, thus slicing up the area under the function *vertically*. Lebesgue's approach is exactly the opposite: the domain is partitioned according to the values of the function at hand, leading to a *horizontal* decomposition of the aera' (Schilling, 2005, p.94).
+The difference between both methods is:
+*'... the fact that the Riemann sums partition the domain of the function without taking into account the shape of the function, thus slicing up the area under the function $vertically$. Lebesgue's approach is exactly the opposite: the domain is partitioned according to the values of the function at hand, leading to a $horizontal$ decomposition of the aera'* (Schilling, 2005, p.94).
 
-Our Julia script is an implementation of the discrete sum on the right side of the next formula:
-
-$\;$
+Our Julia scripts $lebesgueIntegral1, lebesgueIntegral2$ sum *horizontal sclices* according to the formula:
 
 $\int_a^b f(x)\;dx \approx \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > y\})\right]\;Δy$
 
 $\;$
 $\;$
 $\;$
-In comparison to solving Riemanm integrals numerically our implementation lacks efficiency. This is due to the many calls of function $f(x)$ in each summand. We can improve efficiency slightly by caching function calls.
+
+Compared to the Riemannian approach this script lacks efficiency. This is due to the high number of calls of $f(x)$ in each summand. We can improve efficiency slightly by caching function calls.
 "
 
 # ╔═╡ 1f222db6-67c7-4413-b127-fd6a91a2e390
@@ -1036,27 +1043,28 @@ function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	add_Δx(x) = x + Δx
 	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
 	function μ(y)
-		let μΔx(x) = (f(x) > y) ? Δy : 0
+		let μΔx(x) = (f(x) > y) ? Δx : 0
 			sum(μΔx(x) for x in a:Δx:b)
 		end # let
 	end # function μ
 	#--------------------------------------------------------------------------------
 	function searchForMax(f, fmax, x, b) 
-		if x + Δx > b
+		if add_Δx(x) > b
 			fmax
 		else
-			let fnew = f(add_Δx(x))                # new tentative maximum
+			let x = add_Δx(x)
+				fnew = f(x)                                  # new tentative maximum
 				if fmax < fnew 
 					begin
 						fmax = fnew
-						searchForMax(f, fmax, add_Δx(x), b)
+						searchForMax(f, fmax, x, b)
 					end
 				else
-					searchForMax(f, fmax, add_Δx(x), b)
+					searchForMax(f, fmax, x, b)
 				end # if
 			end # let
 		end # if
-	end # function lookForMax
+	end # function searchForMax
 	#--------------------------------------------------------------------------------
 	fmax = searchForMax(f, f(a), a, b)   # the search for maximum of function f
 	# vertical sum of measures μ of horizontal slabs
@@ -1065,30 +1073,45 @@ function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 end # function lebesgueIntegral1
 
 # ╔═╡ a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
-unit(x) = 1
+unitStep(x) = 0 < x ≤ 1 ? 1 : 0
 
-# ╔═╡ fe0a3f76-e7e6-4573-b52b-7851a2a6c8f8
-unitRamp(x) = x
+# ╔═╡ f6634d4a-06ac-4b83-a94a-c798473cc067
+plot(unitStep, -0.5, 1.5, size=(700, 500), xlim=(-0.5, 1.5), ylim=(0, 1.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitStep(x) = 0 < x\; ≤ \;1 \;? \; 1 : 0", label="")
 
 # ╔═╡ 010ca46b-f127-4b26-99e4-e96f5f4d7c6e
-lebesgueIntegral1(unit, b=1.0, Δx=0.0001)
+lebesgueIntegral1(unitStep, Δx=0.1E-3)
 
 # ╔═╡ b8ed62d0-1e0b-478e-8034-7d06e3d41db1
  # stack overflow, as expected
-lebesgueIntegral1(unit, b=1.0, Δx=0.00001)           
+lebesgueIntegral1(unitStep, Δx=0.1E-4)           
 
-# ╔═╡ f73d60b3-d5c4-4aa0-8581-4d8e49043899
-lebesgueIntegral1(unitRamp, b=1.0, Δx=0.0001)
+# ╔═╡ d6cc5ab7-376a-4e3a-a0c1-edb0b76b4e45
+unitPyramid(x) = x ≤ 1/2 ? x : 1 - x
+
+# ╔═╡ 8f84149d-ea67-421c-ae56-82748dbe5421
+plot(unitPyramid, -0.1, 1.1, size=(700, 500), xlim=(-0.1, 1.1), ylim=(0, 0.6), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitPyramid(x) = x\; ≤\; 1/2 \;?\; x : 1 - x", label="")
+
+# ╔═╡ 000ec5a2-6963-4ac3-870a-a7fd5bad4f6c
+md"
+###### Area of Pyramid: $=\frac{length*height}{2}=(1 * 1/2)/2 = 1/4$
+"
+
+# ╔═╡ 24fe641f-05e5-4bd2-b109-6105d6df90ea
+lebesgueIntegral1(unitPyramid, Δx=0.1E-3)     # (1 * 1/2)/2 = 1/4
 
 # ╔═╡ f2b81dfd-caa8-4d22-ac4a-662694b093a8
 # stack overflow, as expected
-lebesgueIntegral1(unitRamp, b=1.0, Δx=0.00001)       
+lebesgueIntegral1(unitPyramid, Δx=0.1E-4)       
 
 # ╔═╡ 2897cda1-e00b-4bbc-bed3-fcc3e01e5203
-lebesgueIntegral1(halfParabola, Δx=0.0001)  
+lebesgueIntegral1(halfParabola, Δx=0.1E-3)  
 
 # ╔═╡ 9c86d18f-5a34-4c2c-8290-cd9b33cb887d
-lebesgueIntegral1(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.001)
+lebesgueIntegral1(gaussianDensity, a=-1.0, Δx=0.1E-2)
+
+# ╔═╡ 96e1b398-2233-4494-a9cf-aac19a418014
+# stack overflow, as expected
+lebesgueIntegral1(gaussianDensity, a=-1.0, Δx=0.1E-3)
 
 # ╔═╡ 5efe1b56-4f21-4c3c-8b27-fdaaa90a558a
 md"
@@ -1103,25 +1126,26 @@ function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	add_Δx(x) = x + Δx
 	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
 	function μ(y)
-		let μΔx(x) = (f(x) > y) ? Δy : 0
+		let μΔx(x) = (f(x) > y) ? Δx : 0
 			sum(μΔx(x) for x in a:Δx:b)
 		end # let
 	end # function μ
 	#--------------------------------------------------------------------------------
 	function searchForMax(f, fmax, x, b) 
-		while !(x + Δx > b)
-			fnew = f(add_Δx(x))                       # new tentative maximum
-			if fmax < fnew 
-				# searchForMax(f, fmax, add_Δx(x)						
-				fmax = fnew
-			else
-				fmax = fmax
-				# searchForMax(f, fmax, add_Δx(x), b)
+		xmax = x
+		while !(add_Δx(x) > b)
+			x = add_Δx(x)
+			fnew = f(x)                           # new tentative maximum
+			if 	fmax < fnew 
+				begin
+					fmax = fnew
+					xmax = x
+				end # begin
 			end # if
 			x = add_Δx(x)
 		end # while
 		fmax
-	end # function lookForMax
+	end # function searchForMax
 	#--------------------------------------------------------------------------------
 	fmax = searchForMax(f, f(a), a, b)   # the search for maximum of function f
 	# vertical sum of measures μ of horizontal slabs
@@ -1129,31 +1153,144 @@ function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	#--------------------------------------------------------------------------------
 end # function lebesgueIntegral2
 
+# ╔═╡ 8393e473-b9f1-4d2f-97af-483233192490
+lebesgueIntegral2(unitPyramid, Δx=0.1E-3)          # ==> 1/4 --> :)
+
 # ╔═╡ a5150024-f84e-4aca-8890-7d1f5867fdc0
-lebesgueIntegral2(unit, b=1.0, Δx=0.0001)
-
-# ╔═╡ 35f636f2-fc3f-4d96-bcb5-25dcffc54605
 # *no* stack overflow as above with version 1
-lebesgueIntegral2(unit, b=1.0, Δx=0.00001) 
-
-# ╔═╡ 6e2925da-ea7c-4edd-8020-560555d6bb5b
-lebesgueIntegral2(unitRamp, b=1.0, Δx=0.0001)
-
-# ╔═╡ 03b2d053-0516-4dcb-984d-ec942ce56286
-# *no* stack overflow as above with version 1
-lebesgueIntegral2(unitRamp, b=1.0, Δx=0.00001) 
+lebesgueIntegral2(unitPyramid, Δx=0.1E-4)         
 
 # ╔═╡ 9760429d-d67e-4806-bd29-429d4f5df92f
-lebesgueIntegral2(halfParabola, Δx=0.001)
+lebesgueIntegral2(halfParabola, Δx=0.1E-2)
 
 # ╔═╡ 6717a98c-3f97-41c2-a18b-8c2df3587bb3
-lebesgueIntegral2(halfParabola, Δx=0.0001)
+lebesgueIntegral2(halfParabola, Δx=0.1E-3)
 
 # ╔═╡ 42d4bd93-d513-4348-a410-4b00c02e1a6c
-lebesgueIntegral2(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.001)
+lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-2)
 
 # ╔═╡ 57b1b4d4-97b5-4a07-918b-61e5f7c54e63
-lebesgueIntegral2(gaussianDensity, a=-1.0, b=+1.0, y=0.0, Δx=0.0001)
+lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-3)
+
+# ╔═╡ cba16dbb-ed22-400d-963b-24169a956165
+# lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-4)   # ==> 0.6827018600010769
+
+# ╔═╡ 93b4f27b-7c83-4d61-bb82-b0651f9385cf
+md"
+---
+Our Julia script $lebesgueIntegral3$ sum *steps* according to the formula:
+
+$\int_a^b f(x)\;dx = \int_a^b f(x)\;\mu(dx) \approx \left[\sum_{y=0}^{max(f(x))/Δy} y\cdot [x|y+\Delta y < f(x) ≤ y]\right]$
+
+$\;$
+$\;$
+$\;$
+"
+
+# ╔═╡ 5f65b310-d08a-4e7c-879d-f4ebdf9255ec
+function lebesgueIntegral3(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
+	#--------------------------------------------------------------------------------
+	Δy = Δx
+	add_Δx(x) = x + Δx
+	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
+	function μ(y)
+		let μΔx(x) = (add_Δy(y) > f(x) ≥ y) ? Δx : 0
+			sum(μΔx(x) for x in a:Δx:b)
+		end # let
+	end # function μ
+	#--------------------------------------------------------------------------------
+	function searchForMax(f, fmax, x, b) 
+		xmax = x
+		while !(add_Δx(x) > b)
+			x = add_Δx(x)
+			fnew = f(x)                           # new tentative maximum
+			if 	fmax < fnew 
+				begin
+					fmax = fnew
+					xmax = x
+				end # begin
+			end # if
+			x = add_Δx(x)
+		end # while
+		fmax, xmax
+	end # function searchForMax
+	#--------------------------------------------------------------------------------
+	fmax, xmax = searchForMax(f, f(a), a, b)   # the search for maximum of function f
+	# vertical sum of steps f(y)*μ(f(y)) of horizontal slabs
+	sum2(y -> y*μ(y), 0::Real, add_Δy::Function, fmax::Real) 
+	#--------------------------------------------------------------------------------
+end # function lebesgueIntegral3
+
+# ╔═╡ df7f86f6-025b-4134-b205-ac4a078aae23
+begin
+	plot(unitPyramid, 0.0, 1.0, size=(700, 500), xlim=(-0.1, 1.1), ylim=(-0.08, 0.55),
+	line=:darkblue, fill=(0, :lightblue), title="Lebesgue Integration (= Summation of Rectangular Steps)", framestyle=:semi, label="", xlabel=L"x", ylabel=L"f(x)")
+	plot!(x->0.13, 0.00, 0.13, line=:black, label="")           # 2nd horizontal line
+	plot!(x->0.13, 0.13, 0.87, line=:black, ls=:dash, label="") # 2nd horizontal line
+	plot!(x->0.13, 0.87, 1.00, line=:black, label="")           # 2nd horizontal line
+	plot!(x->0.23, 0.00, 0.23, line=:black, label="")           # 3rd horizontal line
+	plot!(x->0.23, 0.23, 0.77, line=:black, ls=:dash, label="") # 3rd horizontal line
+	plot!(x->0.23, 0.77, 1.00, line=:black, label="")           # 3rd horizontal line
+	plot!(x->0.00, 0.00, 1.00, line=:black, label="")           # 4th horizontal line
+	plot!([(.13,.13),(.13,.00)],lw=3,line=:red, label="")       # 1st vertical line
+	plot!([(.23,.23),(.23,.13)],line=:red, ls=:dash, label="")  # 2nd vertical line
+	plot!([(.23,.13),(.23,.00)],line=:red, label="")            # 2nd vertical line
+	plot!([(.77,.23),(.77,.13)],line=:red, ls=:dash, label="")  # 3rd vertical line
+	plot!([(.77,.13),(.77,.00)],line=:red, label="")            # 3rd vertical line
+	plot!([(.87,.13),(.87,.00)],lw=3,line=:red, label="")       # 4th vertical line
+	plot!([(0.175,-.05),(0.175,-.01)],line=:red,arrow=:head, label="") # 1st up arrow
+	plot!([(0.82,-.05),(0.82,-.01)],line=:red,arrow=:head, label="")   # 2nd up arrow
+	plot!([(0.05,.13),(0.05,.23)],line=:red,arrow=:both, label="") # 3rd bi arrow
+	plot!([(0.05,.00),(0.05,.13)],line=:red,arrow=:both, label="") # 4th bi arrow
+	plot!(x->0.00, 0.13, 0.23, line=:red, lw=3,label="")        # 1st horizontal line
+	plot!(x->0.00, 0.77, 0.87, line=:red, lw=3,label="")        # 1st horizontal line
+	plot!(x->-.05, 0.175, 0.34, line=:red, label="")            # 0th horizontal line
+	plot!(x->-.05, 0.66, 0.82, line=:red, label="")             # 0th horizontal line
+	annotate!(.01, 0.17, L"\Delta_y")
+	annotate!(.01, 0.07, L"y")
+	annotate!(0.504,-0.05, L"\{x|y+\Delta y < f(x)\; ≤ y\}", 12)
+	#------------------------------------------------------------------------------
+	# rectangles
+	plot!(x->.13,.13,.23,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
+	plot!(x->.13,.77,.87,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
+end # begin
+
+# ╔═╡ 2635fd73-0552-499d-8be4-9a9323de7213
+lebesgueIntegral3(x->x^2-1, b=1.0, Δx=1.0E-3) 
+
+# ╔═╡ 6f87f654-8310-4e71-875f-a63ac41d0cd0
+lebesgueIntegral3(unitPyramid, Δx=1.0E-4)             # ==> 1/4 --> :)
+
+# ╔═╡ 15fefcd0-fc12-4c48-95f3-71a595aa6b47
+abs(1/4-lebesgueIntegral3(unitPyramid, Δx=1.0E-4))
+
+# ╔═╡ 52554fbf-327c-4ef9-a8ec-7438f930651c
+lebesgueIntegral3(unitPyramid, Δx=1.0E-5)   # ==> 0.24999176180012855 ≈ 1/4 --> :)
+
+# ╔═╡ 413b45a7-fbeb-4176-baff-81ec3b68549e
+abs(1/4-lebesgueIntegral3(unitPyramid, Δx=1.0E-5))
+
+# ╔═╡ c8bb72b1-dd6d-48e4-9664-42b96da540fa
+let x1 = +1.0
+	x2 = -1.0
+	y1 = gaussianDensity(+1.0)
+	y2 = gaussianDensity(-1.0)
+	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"$f(X)$")
+	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
+	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
+	plot!([x2, x2], [0, y2], color=:red, label=L"$x=-1.0=-\sigma$")
+end # let
+
+# ╔═╡ fdcb6e7f-2ca7-48bf-8ecc-2e06a2892ad5
+lebesgueIntegral3(gaussianDensity, a=-1, Δx=1.0E-2)
+
+# ╔═╡ 7312e9d7-df2b-491b-99a0-1429c3f6a9db
+lebesgueIntegral3(gaussianDensity, a=-1, Δx=1.0E-3)
+
+# ╔═╡ 30753208-9392-405e-83bd-8bb7c7cb2cc8
+lebesgueIntegral3(gaussianDensity, a=-1.0, Δx=1.0E-4)
+
 
 # ╔═╡ 20c24717-7b58-4f0c-9d97-236460ee6442
 md"
@@ -1191,98 +1328,95 @@ let x1 = -4.0
 end # let
 
 # ╔═╡ c1d70fd3-5b7f-4e88-95a1-38778629d190
-lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-3)
 
 # ╔═╡ 45294c5a-f803-49af-bad3-43c382429392
-# stack overflow, as expected
-lebesgueIntegral1(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
+lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-3)
 
-# ╔═╡ 8a138046-c27b-452e-8302-326a769b3591
-lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.001)
+# ╔═╡ 989ebdf9-1a46-4e4d-a4f4-6166af8cb654
+lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-4)
 
-# ╔═╡ 48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
-# *no* stack overflow as above with version 1
-lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, y=0.0, Δx=0.0001)
+# ╔═╡ 46415e65-8ee5-4b54-9243-14eb9465a404
+# ==> 0.9685319771905394 --> :) 3911 sec = 65 min 18 sec
+# lebesgueIntegral2(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-5) 
+
+# ╔═╡ 21b6e8e0-1aab-4f8f-8f47-b424756b323a
+lebesgueIntegral3(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-3)
+
+# ╔═╡ 84dddd18-4c20-4162-a07c-e7b1c7219ddc
+lebesgueIntegral3(mixedDensity, a=-4.0, b=6.5, Δx=1.0E-4)
 
 # ╔═╡ 26ba2cbd-bbac-45fe-91c3-df257cde2db0
 md"
 ---
 ###### Lebesgue Integration of Stick Densities
 
-The *Lebesgue measure* (= area) unter this density is $f(x)\cdot 2\Delta x$.
+The *Lebesgue measure* (= area) unter this *stick* density is for $0.0 < x \le 3.0$ approximately $2\cdot(f(x)\cdot 2\Delta x)$.
 "
 
 # ╔═╡ b95e2161-5543-4387-892e-b05870cadd4c
-function myStickDensity(x; Δx=0.001) 
+function stickDensity(x; Δx=1.0E-3) 
 	((1.0-Δx) <= x <= (1.0+Δx)) ? 0.5 : 
 	((2.0-Δx) <= x <= (2.0+Δx)) ? 0.5 : 0.0
 end # function myStickDensity
 
 # ╔═╡ aa84697c-b915-46b6-bba4-3fa5488429db
-function trueValueOfStickIntegral(f, x; Δx=0.001)
-	f(x)*2*Δx
-end # function trueValueOfStickIntegral
-
-# ╔═╡ fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
-stickDensity(x) = myStickDensity(x, Δx=0.001)
+function trueAreaOfStick(f, x; Δx=1.0E-3)
+	f(x)*4*Δx
+end # function trueAreaOfStick
 
 # ╔═╡ 1ef5978e-ab58-4d22-8a16-fcb353bf9864
-trueArea1 = trueValueOfStickIntegral(stickDensity, 1.0)
-
-# ╔═╡ fc9e15a0-7c51-427a-bfdf-bb4f1a1a9f3d
-trueArea2 = trueValueOfStickIntegral(stickDensity, 2.0)
-
-# ╔═╡ 44c2253e-aa15-46be-9b63-4c23c798f58e
-stickDensity(0.99), stickDensity(1.0), stickDensity(1.01)
-
-# ╔═╡ b4196d8c-9a61-4ac3-9509-89a2cb1c8774
-stickDensity(1.99), stickDensity(2.0), stickDensity(2.01)
-
-# ╔═╡ 76341ce7-168b-4ec6-ae98-f3ad62713082
-stickDensities = [myStickDensity(x, Δx=0.001) for x in 0.0:0.01:3.0]
-
-# ╔═╡ cea8d4a3-6033-452c-968f-dfff00f85f8e
-length(stickDensities)
+trueArea = trueAreaOfStick(stickDensity, 1.0)
 
 # ╔═╡ d7412a44-26c8-468d-b52d-e30d0ae56930
-let xs = [x for x in 0.0:0.01:3.0]
+begin
+	xs = [x for x in 0:1E-3:3]
 	#-----------------------------------------------------------------------------
-	plot(xs, stickDensities, size=(700, 500), xlim=(.0, 3.0), ylim=(0, 0.6), 
+	plot(xs, stickDensity, size=(700, 500), xlim=(0.0, 3.0), ylim=(0, 0.6), 
 	line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Stick Function", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
 	#-----------------------------------------------------------------------------
-	annotate!([(2.49, 0.03, L"Area = $0.5\cdot2\Delta x$")])
-end # let
-
-# ╔═╡ 2a963e1d-247d-48cd-a064-f2827a1a92d6
-md"
-The plot program distorts $stickDensities$. It should display *sticks* and not *spikes*.
-"
-
-# ╔═╡ b409618c-3709-4ab8-824c-2010871790cc
-md"
----
-The estimated area is $0.0029939999999999654$ and the *true* area is $0.001$
-"
+	annotate!([(1.5, 0.55, L"$\int_0^3f(x)\cdot\lambda(dx)=0.5 \cdot 4\Delta x$")])
+end # begin
 
 # ╔═╡ 03f2bef6-8b0f-476a-ad4b-f186c60e1e94
-approximateArea1 = lebesgueIntegral1(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.001) 
+approximateArea1 = lebesgueIntegral1(stickDensity, b=3.0, Δx=1.0E-3) 
 
 # ╔═╡ 2f92b01a-d5d7-4ece-9a0e-011220570446
-abs(approximateArea1 - 0.001)                         # error = 0.0019939999999999654
-
-# ╔═╡ beac0bc8-5c3b-4c1e-8274-b6ad5d023a0e
-lebesgueIntegral2(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.001)
+error1 = abs(approximateArea1 - 0.002)             # error = 0.0019939999999999654
 
 # ╔═╡ 0fe0dc04-91fe-4656-b128-c2d40a8be217
 # stack overflow, as expected
-lebesgueIntegral1(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)        
+lebesgueIntegral1(stickDensity, b=3.0, Δx=1.0E-4)        
 
 # ╔═╡ ff7860ed-a4b1-4118-a834-daeead70c70f
-approximateArea2 = lebesgueIntegral2(stickDensity, a=0.0, b=3.0, y=0.0, Δx=0.0001)
+approximateArea2 = 0.002009959799998782     # 1020 sec = 17 min 
+# approximateArea2 = lebesgueIntegral2(stickDensity, b=3.0, Δx=1.0E-5)
 
 # ╔═╡ 73f17ff3-41cb-4e1a-8183-c32d53db82ea
 # the error is smaller than with approximateArea1
-abs(approximateArea2 - 0.001)                        # error = 0.0011000000000002657
+error2 = abs(approximateArea2 - 0.002)             # error2 = 9.959799998781986e-6
+
+# ╔═╡ 9f51beb7-aea9-4c3d-b2c8-6983aad2696d
+error1 > error2
+
+# ╔═╡ 48055835-3c05-4da3-931b-8df2e8a62254
+approximateArea3 = 0.0020099598000014466           # 167 sec
+# approximateArea3 = lebesgueIntegral3(stickDensity, b=3.0, Δx=1.0E-5)
+
+# ╔═╡ 74be22e7-75b8-4aa5-8603-173690af51ee
+error3 = abs(approximateArea3 - 0.002)             # error3 = 9.959800001446521e-6
+
+# ╔═╡ 1724739e-f3a4-4ad5-b361-92b7247512e6
+error1 > error2 > error3
+
+# ╔═╡ 9f9832c1-d913-433f-a727-a2531b3a416a
+error1 > error2 ≈ error3
+
+# ╔═╡ 0dcea040-b70a-4a90-b0c3-47bc1a495d67
+abs(error2 - error3)  # lebesgueIntegral3 is approximately equal to lebesgueIntegral2
+
+# ╔═╡ 9bbe0e86-02a5-40ed-9a41-899323df240e
+# lebesgueIntegral4(stickDensity, b=3.0, Δx=1.0E-5) # ==> 0.0020099598000014466 --> :)
 
 # ╔═╡ 2b1e1603-963e-4d3e-b2b9-7469e54649aa
 md"
@@ -1304,11 +1438,39 @@ let f(x) = halfParabola(x)
 	I,est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
+# ╔═╡ 67512229-1207-4522-bfe7-87dca4feeb02
+md"
+###### *Riemann* fails: $QuadGK$ generates an *incorrect* integral value of $0.0$ instead of $0.002$
+"
+
 # ╔═╡ fa6643ce-8d9a-4525-825d-8a8d915118c0
 let f(x) = stickDensity(x)
 	a= 0.0
 	b=+3.0
-	Integral, est = quadgk(f, a, b, rtol=1e-6)
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
+md"
+---
+###### Standard Normal (= Gaussian) Distribution using $QuadGK$
+$Prob(- \sigma \le X \le +\sigma) \text{ when } X \sim N(X|\mu = 0; \sigma=1)$
+
+$\;$
+"
+
+# ╔═╡ 8f884ca3-790c-42fd-8bcb-8476012d4ee1
+let f(x) = gaussianDensity(x)
+	a=-1.0
+	b=+1.0
+	Integral, est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 8c1b16be-bf24-4897-8176-beff174b9f32
+let f = mixedDensity
+	a=-4.0
+	b=6.5
+	Integral, est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
 # ╔═╡ ae3b9175-9e73-458d-af3d-6d5480b2a20a
@@ -1336,12 +1498,121 @@ $\;$
 # ╔═╡ 5aaeacc4-6d26-4cc5-be26-2161db3ce784
 plot(x->x^2-1, 0.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
 
+# ╔═╡ f1178d94-b52b-41ea-a171-3fbe164a3fa1
+# idiomatic Julia-code with 'Function', 'Real', 'while', '+='
+#------------------------------------------------------------------
+function sum3(f::Function, a::Real, succ::Function, b::Real)::Real
+	sum = 0
+	if a ≤ b
+		while !(a > b)
+			sum += f(a)
+			a = succ(a)
+		end # while
+	else # a > b
+		while !(a < b)
+			sum += f(a)
+			a = succ(a)
+		end # while
+	end # if
+	sum
+end # function sum3
+
+# ╔═╡ 85ce27de-7e09-4f96-a408-e2be7e62dde4
+sum3(x->x, 0, x->x+1, 5)
+
+# ╔═╡ e1292842-365e-4cfd-a2f9-d95fc6516860
+sum3(x->x, 0, x->x-1, -5)
+
+# ╔═╡ a344568c-f02b-4735-ad47-32c725892827
+function lebesgueIntegral4(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
+	#--------------------------------------------------------------------------------
+	Δy = Δx
+	add_Δx(x) = x + Δx
+	add_Δy(y) = y + Δy	
+	sub_Δx(x) = x - Δx
+	sub_Δy(y) = y - Δy	
+	#--------------------------------------------------------------------------------
+	function μ(y)
+		let μPositiveΔx(x) = (add_Δy(y) > f(x) ≥ y) ? Δx : 0
+		    μNegativeΔx(x) = (y > f(x) ≥ sub_Δy(y)) ? Δx : 0
+			μPositive = sum(μPositiveΔx(x) for x in a:Δx:b)
+			μNegative = sum(μNegativeΔx(x) for x in a:Δx:b)
+		    (μPositive, μNegative)
+		end # let
+	end # function μ
+	#--------------------------------------------------------------------------------
+	function searchForMax(f, fmax, x, b) 
+		xmax = x
+		while !(add_Δx(x) > b)
+			x = add_Δx(x)
+			fnew = f(x)                           # new tentative maximum
+			if 	fmax < fnew 
+				begin
+					fmax, xmax = fnew, x
+				end # begin
+			end # if
+			x = add_Δx(x)
+		end # while
+		if fmax < 0.0
+			fmax, xmax = 0.0, 0.0
+		end # if
+		fmax, xmax
+	end # function searchForMax
+	#--------------------------------------------------------------------------------
+	function searchForMin(f, fmin, x, b) 
+		xmin = x
+		while !(add_Δx(x) > b)
+			x = add_Δx(x)
+			fnew = f(x)                           # new tentative mainimum
+			if 	fmin > fnew 
+				begin
+					fmin, xmin = fnew, x
+				end # begin
+			end # if
+			x = add_Δx(x)
+		end # while
+		if fmin > 0.0
+			fmin, xmin = 0.0, 0.0
+		end # if
+		fmin, xmin
+	end # function searchForMin
+	#--------------------------------------------------------------------------------
+	fmax, xmax = searchForMax(f, f(a), a, b)  # the search for maximum of function f
+	fmin, xmin = searchForMin(f, f(a), a, b)  # the search for minimum of function f
+	# vertical sum of steps y*μ(f(y))
+    if fmax ≥ 0.0
+		positiveIntegral = sum3(y -> y*μ(y)[1], 0::Real, add_Δy::Function, fmax::Real)
+	else
+		positiveIntegral = 0.0
+	end # if
+	if fmin < 0.0
+		negativeIntegral = sum3(y -> y*μ(y)[2], 0::Real, sub_Δy::Function, fmin::Real)
+	else
+		negativeIntegral = 0.0
+	end # if
+    positiveIntegral + negativeIntegral
+	#--------------------------------------------------------------------------------
+end # function lebesgueIntegral4
+
+# ╔═╡ 10d4b49f-f938-486f-86f8-80c13b41b73d
+lebesgueIntegral4(stickDensity, b=3.0, Δx=1.0E-4) 
+
 # ╔═╡ d6f4ab59-0a81-404d-bebf-1e89ab674079
 let f(x) = x^2-1
 	a=0.0
 	b=3.0
 	I,est = quadgk(f, a, b, rtol=1e-8)
 end # let
+
+# ╔═╡ 3676bba9-1e6f-40c7-9fa4-4ffe4b819c81
+# false ! the negative part has to be subtracted ! 
+lebesgueIntegral3(x->x^2-1, b=3.0, Δx=0.1E-3)  
+
+# ╔═╡ e04a9354-1c6e-4c49-b1a2-a6b070a8d6e4
+lebesgueIntegral4(x->x^2-1, b=1.0, Δx=0.1E-3) 
+
+# ╔═╡ 4ee84ced-a30b-4452-9408-452df4b6008c
+lebesgueIntegral4(x->x^2-1, b=3.0, Δx=0.1E-3)   # ==> 5.999503340000599 ≈ 6.0
 
 # ╔═╡ 40eb47d3-6f33-47f2-9902-b1d9df4c8277
 md"
@@ -1372,6 +1643,12 @@ let f(x) = x^2-1
 	I,est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
+# ╔═╡ 1a2d5069-9ad4-42b0-b4b1-60e5b3f18a41
+lebesgueIntegral3(x->x^2-1, a=1.0, b=3.0, Δx=1.0E-3)  
+
+# ╔═╡ fe4b73a6-3c96-45b1-8abf-3d954538c5a1
+lebesgueIntegral4(x->x^2-1, a=1.0, b=3.0, Δx=1.0E-3)  
+
 # ╔═╡ 5a481e43-eb57-4df7-a914-e72c30a69e6a
 md"
 ---
@@ -1401,40 +1678,26 @@ let f(x) = x^2-1
 	I,est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
-# ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
-md"
----
-###### Standard Normal (= Gaussian) Distribution using $QuadGK$
-$Prob(- \sigma \le X \le +\sigma) \text{ when } X \sim N(X|\mu = 0; \sigma=1)$
-
-$\;$
-"
-
-# ╔═╡ 8f884ca3-790c-42fd-8bcb-8476012d4ee1
-let f(x) = gaussianDensity(x)
-	a=-1.0
-	b=+1.0
-	Integral, est = quadgk(f, a, b, rtol=1e-8)
-end # let
+# ╔═╡ c018d013-3a67-4a61-adcc-69d252839e04
+lebesgueIntegral4(x->x^2-1, b=1.0, Δx=1.0E-3) 
 
 # ╔═╡ 84667282-7410-4c19-b227-1a2bc8bf88ee
 md"
 ---
 ##### References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; *Structure and Interpretation of Computer Programs*, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2022/08/25
-- **Ahrens, H.J. & Möbus, C.**; [*Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf);  Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; last visit: 2023/09/05
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://sarabander.github.io/sicp/), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2022/08/25
 - **Hable, R.**; *Einführung in die Stochastik*, Heidelberg: Springer, 2015
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
 - **Nazarathy, Y. & Klok, H.**; *Statistics with Julia*; Cham, Switzland: Springer, 2021
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
 - **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
 - **Schilling, R.L.**; *Maß und Integral*; Berlin: de Gruyter, 2015
-- **Thurstone, L.L.**; *The Prediction of Choice*; Psychometrika 10.4 (1945): 237-253; [https://link.springer.com/content/pdf/10.1007/BF02288891.pdf](https://link.springer.com/content/pdf/10.1007/BF02288891.pdf); last visit 2023/09/05
 - **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
-- **Wikipedia**; *Leibnitz'* Formula for $\pi$; [https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
 - **Wikipedia**; [*Lebesgue-Integration*](https://en.wikipedia.org/wiki/Lebesgue_integration); last visit 2023/09/03
+- **Wikipedia**; [*Leibnitz'* Formula for $\pi$](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
 - **Wikipedia**; [*Mixture Model*](https://en.wikipedia.org/wiki/Mixture_model); last visit 2023/09/04
-- **Wikipedia**; *Normal Distribution*; [https://en.wikipedia.org/wiki/Normal_distribution](https://en.wikipedia.org/wiki/Normal_distribution); last visit: 2023/08/31
+- **Wikipedia**; [*Normal Distribution*](https://en.wikipedia.org/wiki/Normal_distribution); last visit: 2023/08/31
+- **Wikipedia**; [*Null set*](https://en.wikipedia.org/wiki/Null_set); last visit 2023/11/06
 "
 
 # ╔═╡ 9c61b414-134f-4924-87b8-8e761e5816ed
@@ -2602,23 +2865,38 @@ version = "1.4.1+0"
 # ╟─f7839cb5-a075-4e70-9cca-96dd760d356f
 # ╠═1f222db6-67c7-4413-b127-fd6a91a2e390
 # ╠═a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
-# ╠═fe0a3f76-e7e6-4573-b52b-7851a2a6c8f8
+# ╟─f6634d4a-06ac-4b83-a94a-c798473cc067
 # ╠═010ca46b-f127-4b26-99e4-e96f5f4d7c6e
 # ╠═b8ed62d0-1e0b-478e-8034-7d06e3d41db1
-# ╠═f73d60b3-d5c4-4aa0-8581-4d8e49043899
+# ╠═d6cc5ab7-376a-4e3a-a0c1-edb0b76b4e45
+# ╠═8f84149d-ea67-421c-ae56-82748dbe5421
+# ╟─000ec5a2-6963-4ac3-870a-a7fd5bad4f6c
+# ╠═24fe641f-05e5-4bd2-b109-6105d6df90ea
 # ╠═f2b81dfd-caa8-4d22-ac4a-662694b093a8
 # ╠═2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 # ╠═9c86d18f-5a34-4c2c-8290-cd9b33cb887d
+# ╠═96e1b398-2233-4494-a9cf-aac19a418014
 # ╟─5efe1b56-4f21-4c3c-8b27-fdaaa90a558a
 # ╠═680bef65-3d43-4f11-b56c-442f7a16d158
+# ╠═8393e473-b9f1-4d2f-97af-483233192490
 # ╠═a5150024-f84e-4aca-8890-7d1f5867fdc0
-# ╠═35f636f2-fc3f-4d96-bcb5-25dcffc54605
-# ╠═6e2925da-ea7c-4edd-8020-560555d6bb5b
-# ╠═03b2d053-0516-4dcb-984d-ec942ce56286
 # ╠═9760429d-d67e-4806-bd29-429d4f5df92f
 # ╠═6717a98c-3f97-41c2-a18b-8c2df3587bb3
 # ╠═42d4bd93-d513-4348-a410-4b00c02e1a6c
 # ╠═57b1b4d4-97b5-4a07-918b-61e5f7c54e63
+# ╠═cba16dbb-ed22-400d-963b-24169a956165
+# ╟─93b4f27b-7c83-4d61-bb82-b0651f9385cf
+# ╠═5f65b310-d08a-4e7c-879d-f4ebdf9255ec
+# ╟─df7f86f6-025b-4134-b205-ac4a078aae23
+# ╠═2635fd73-0552-499d-8be4-9a9323de7213
+# ╠═6f87f654-8310-4e71-875f-a63ac41d0cd0
+# ╠═15fefcd0-fc12-4c48-95f3-71a595aa6b47
+# ╠═52554fbf-327c-4ef9-a8ec-7438f930651c
+# ╠═413b45a7-fbeb-4176-baff-81ec3b68549e
+# ╟─c8bb72b1-dd6d-48e4-9664-42b96da540fa
+# ╠═fdcb6e7f-2ca7-48bf-8ecc-2e06a2892ad5
+# ╠═7312e9d7-df2b-491b-99a0-1429c3f6a9db
+# ╠═30753208-9392-405e-83bd-8bb7c7cb2cc8
 # ╟─20c24717-7b58-4f0c-9d97-236460ee6442
 # ╠═ebdd80ce-c7b5-4e3a-92df-0b9424371805
 # ╠═bf8476db-30aa-4c86-a9d7-28f1e7c81663
@@ -2628,42 +2906,55 @@ version = "1.4.1+0"
 # ╟─c7e33dd3-3e37-44b3-a154-4fc2caec15de
 # ╠═c1d70fd3-5b7f-4e88-95a1-38778629d190
 # ╠═45294c5a-f803-49af-bad3-43c382429392
-# ╠═8a138046-c27b-452e-8302-326a769b3591
-# ╠═48d67561-6ab9-4832-a5e9-ebf5dbd4f4a1
+# ╠═989ebdf9-1a46-4e4d-a4f4-6166af8cb654
+# ╠═46415e65-8ee5-4b54-9243-14eb9465a404
+# ╠═21b6e8e0-1aab-4f8f-8f47-b424756b323a
+# ╠═84dddd18-4c20-4162-a07c-e7b1c7219ddc
 # ╟─26ba2cbd-bbac-45fe-91c3-df257cde2db0
 # ╠═b95e2161-5543-4387-892e-b05870cadd4c
 # ╠═aa84697c-b915-46b6-bba4-3fa5488429db
 # ╠═1ef5978e-ab58-4d22-8a16-fcb353bf9864
-# ╠═fc9e15a0-7c51-427a-bfdf-bb4f1a1a9f3d
-# ╠═fcbccf70-4d5c-4c83-ae6a-b16aa7e7d384
-# ╠═44c2253e-aa15-46be-9b63-4c23c798f58e
-# ╠═b4196d8c-9a61-4ac3-9509-89a2cb1c8774
-# ╠═76341ce7-168b-4ec6-ae98-f3ad62713082
-# ╠═cea8d4a3-6033-452c-968f-dfff00f85f8e
 # ╟─d7412a44-26c8-468d-b52d-e30d0ae56930
-# ╟─2a963e1d-247d-48cd-a064-f2827a1a92d6
-# ╟─b409618c-3709-4ab8-824c-2010871790cc
 # ╠═03f2bef6-8b0f-476a-ad4b-f186c60e1e94
 # ╠═2f92b01a-d5d7-4ece-9a0e-011220570446
-# ╠═beac0bc8-5c3b-4c1e-8274-b6ad5d023a0e
 # ╠═0fe0dc04-91fe-4656-b128-c2d40a8be217
 # ╠═ff7860ed-a4b1-4118-a834-daeead70c70f
 # ╠═73f17ff3-41cb-4e1a-8183-c32d53db82ea
+# ╠═9f51beb7-aea9-4c3d-b2c8-6983aad2696d
+# ╠═48055835-3c05-4da3-931b-8df2e8a62254
+# ╠═74be22e7-75b8-4aa5-8603-173690af51ee
+# ╠═1724739e-f3a4-4ad5-b361-92b7247512e6
+# ╠═9f9832c1-d913-433f-a727-a2531b3a416a
+# ╠═0dcea040-b70a-4a90-b0c3-47bc1a495d67
+# ╠═10d4b49f-f938-486f-86f8-80c13b41b73d
+# ╠═9bbe0e86-02a5-40ed-9a41-899323df240e
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─12103e5c-658a-43fa-b904-d83e3d610a63
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
+# ╟─67512229-1207-4522-bfe7-87dca4feeb02
 # ╠═fa6643ce-8d9a-4525-825d-8a8d915118c0
-# ╟─ae3b9175-9e73-458d-af3d-6d5480b2a20a
-# ╠═5aaeacc4-6d26-4cc5-be26-2161db3ce784
-# ╠═d6f4ab59-0a81-404d-bebf-1e89ab674079
-# ╟─40eb47d3-6f33-47f2-9902-b1d9df4c8277
-# ╠═5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
-# ╠═10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
-# ╟─5a481e43-eb57-4df7-a914-e72c30a69e6a
-# ╠═5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
-# ╠═a9ec7875-1522-42a5-a5e2-438fe312604c
 # ╟─7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 # ╠═8f884ca3-790c-42fd-8bcb-8476012d4ee1
+# ╠═8c1b16be-bf24-4897-8176-beff174b9f32
+# ╟─ae3b9175-9e73-458d-af3d-6d5480b2a20a
+# ╟─5aaeacc4-6d26-4cc5-be26-2161db3ce784
+# ╠═f1178d94-b52b-41ea-a171-3fbe164a3fa1
+# ╠═85ce27de-7e09-4f96-a408-e2be7e62dde4
+# ╠═e1292842-365e-4cfd-a2f9-d95fc6516860
+# ╠═a344568c-f02b-4735-ad47-32c725892827
+# ╠═d6f4ab59-0a81-404d-bebf-1e89ab674079
+# ╠═3676bba9-1e6f-40c7-9fa4-4ffe4b819c81
+# ╠═e04a9354-1c6e-4c49-b1a2-a6b070a8d6e4
+# ╠═4ee84ced-a30b-4452-9408-452df4b6008c
+# ╟─40eb47d3-6f33-47f2-9902-b1d9df4c8277
+# ╟─5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
+# ╠═10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
+# ╠═1a2d5069-9ad4-42b0-b4b1-60e5b3f18a41
+# ╠═fe4b73a6-3c96-45b1-8abf-3d954538c5a1
+# ╟─5a481e43-eb57-4df7-a914-e72c30a69e6a
+# ╟─5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
+# ╠═a9ec7875-1522-42a5-a5e2-438fe312604c
+# ╠═c018d013-3a67-4a61-adcc-69d252839e04
 # ╟─84667282-7410-4c19-b227-1a2bc8bf88ee
 # ╟─9c61b414-134f-4924-87b8-8e761e5816ed
 # ╟─00000000-0000-0000-0000-000000000001
