@@ -13,7 +13,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Cantor Set, Integration à la Riemann & Lebesgue (NonSICP))
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/10 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/11 ***
 =====================================================================================
 "
 
@@ -223,7 +223,8 @@ myError(*(8, piSum1(a=1, b=^(10, 5))))
 # ╔═╡ 6c793213-177e-4c50-99b2-482704cbad75
 md"
 ---
-###### NonSICP: The *Lebesgue Measure* $\lambda(C)$ (= Length) of [*Cantor's Set (=Discontinuum) C*](https://en.wikipedia.org/wiki/Cantor_set))
+###### The *Lebesgue Measure* $\lambda(C)$ (= Length) of [*Cantor's Set (=Discontinuum) C*](https://en.wikipedia.org/wiki/Cantor_set))
+(NonSICP)
 
 We take the interval 
 
@@ -378,7 +379,9 @@ $\;$
 
 # ╔═╡ d9eefee2-a53c-4064-8ebf-c4345a76798c
 md"
-###### Numeration of Intervals
+###### Numeration of Intervals in the *Cantor Set*
+(NonSICP)
+
 In the $n^{th}+1$ step we remove all intervals
 
 $I_{t_1t_2...t_{n-1}t_n2}=(0.t_1t_2...t_{n-1}t_n1, 0.t_1t_2...t_{n-1}t_n2)_3 \in \{0,2\}.$
@@ -483,6 +486,9 @@ end # begin
 
 # ╔═╡ d2f67bf1-a301-4c93-aaac-4c66a7c9b944
 md"
+---
+###### Measuring $\lambda(C_n)$ 
+(NonSICP)
 
 The *Lebesgue Measure* $\lambda(C)$ of *Cantor's Discontinuum* $C$ is (c.f. Schilling, 2015, p.2f.):
 
@@ -663,6 +669,8 @@ end # function λC
 # ╔═╡ fdcd0ad9-a81c-48c8-ab7d-8f8b70e38c4d
 md"
 ---
+(SICP, p.58)
+
 $sum : (\mathbb N \rightarrow \mathbb N) \times (\mathbb N \cup \mathbb R) \times (\mathbb N \rightarrow \mathbb N) \times (\mathbb N \cup \mathbb R) \rightarrow (\mathbb N \cup \mathbb R)$
 
 $\;$
@@ -762,7 +770,7 @@ $\;$
 "
 
 # ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
-plot(cube, 0.0, 1.0, size=(700, 300), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^3$", framestyle=:semi, label="")
+plot(cube, 0.0, 1.0, size=(525, 400), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^3$", framestyle=:semi, label="")
 
 # ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
 integral1(cube, 0, 1)                                  # SICP, p.60
@@ -776,7 +784,8 @@ integral1(cube, 0, 1, Δx=1.0E-4)
 # ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
 md"""
 ---
-###### Example 6-1 in: Stark, P.A., Introduction to Numerical Methods, 1970, ch. 6.2-6.3, p. 196
+###### Halfparabola
+(NonSICP), Stark, P.A., *Introduction to Numerical Methods*, 1970, ch. 6.2-6.3, p. 196, Example 6-1
 $\;$
 
 $\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1=(6-1)=5$
@@ -791,7 +800,7 @@ $\;$
 halfParabola(x) =  -6x^5 + 6 # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
 
 # ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
-plot(halfParabola, 0.0, 1.0, size=(300, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$x\mapsto -6x^5 + 6$", label="")
+plot(halfParabola, 0.0, 1.0, size=(200, 400), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$x\mapsto -6x^5 + 6$", label="")
 
 # ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
 integral1(halfParabola, 0.0, 1.0, Δx=0.1)          # should be 5.0
@@ -803,6 +812,7 @@ integral1(halfParabola, 0.0, 1.0, Δx=0.01)         # should be 5.0
 md"
 ---
 ###### [Standard Normal (= Gaussian) Distribution](https://en.wikipedia.org/wiki/Normal_distribution)
+(NonSICP)
 "
 
 # ╔═╡ b2e9582d-bf46-486b-b7fb-1e3a68e77efe
@@ -813,7 +823,7 @@ let x1 = +1.0
 	x2 = -1.0
 	y1 = gaussianDensity(+1.0)
 	y2 = gaussianDensity(-1.0)
-	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"f(X)")
+	plot(gaussianDensity, -1.0, 1.0, size=(525, 400), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"f(X)")
 	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"$f(X)$")
 	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
 	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
@@ -1020,7 +1030,9 @@ integral2(cube, 0.0, 1.0, Δx=1.0E-4)
 md"
 ---
 ###### Lebesgue Integration
-This section contains a Julia-script not found elsewhere. The reason for this may be the fact that for most practical purposes numerical integration a la *Riemann* would do. The superiority of Lebesgue integration shines in more theoretical contexts when Riemann integration fails (e.g. integral of the [Dirichlet function](https://en.wikipedia.org/wiki/Dirichlet_function)).
+(nonSICP)
+
+This section contains a Julia-scripts not found elsewhere. The reason for this may be the fact that for most practical purposes numerical integration a la *Riemann* would do. The superiority of Lebesgue integration shines in more theoretical contexts when Riemann integration fails (e.g. integral of the [Dirichlet function](https://en.wikipedia.org/wiki/Dirichlet_function)).
 
 The difference between both methods is:
 *'... the fact that the Riemann sums partition the domain of the function without taking into account the shape of the function, thus slicing up the area under the function $vertically$. Lebesgue's approach is exactly the opposite: the domain is partitioned according to the values of the function at hand, leading to a $horizontal$ decomposition of the aera'* (Schilling, 2005, p.94).
@@ -1037,6 +1049,11 @@ Compared to the Riemannian approach this script lacks efficiency. This is due to
 "
 
 # ╔═╡ 1f222db6-67c7-4413-b127-fd6a91a2e390
+#------------------------------------------------------------------------------------
+# lebesgueIntegral1 only integrates *positive* functions
+# - integration method is summation of horizontal slabs
+# - recursive function earchForMax
+#------------------------------------------------------------------------------------
 function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01) 
 	#--------------------------------------------------------------------------------
 	Δy = Δx
@@ -1076,7 +1093,7 @@ end # function lebesgueIntegral1
 unitStep(x) = 0 < x ≤ 1 ? 1 : 0
 
 # ╔═╡ f6634d4a-06ac-4b83-a94a-c798473cc067
-plot(unitStep, -0.5, 1.5, size=(700, 500), xlim=(-0.5, 1.5), ylim=(0, 1.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitStep(x) = 0 < x\; ≤ \;1 \;? \; 1 : 0", label="")
+plot(unitStep, -0.5, 1.5, size=(525, 400), xlim=(-0.5, 1.5), ylim=(0, 1.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitStep(x) = 0 < x\; ≤ \;1 \;? \; 1 : 0", label="")
 
 # ╔═╡ 010ca46b-f127-4b26-99e4-e96f5f4d7c6e
 lebesgueIntegral1(unitStep, Δx=0.1E-3)
@@ -1089,7 +1106,7 @@ lebesgueIntegral1(unitStep, Δx=0.1E-4)
 unitPyramid(x) = x ≤ 1/2 ? x : 1 - x
 
 # ╔═╡ 8f84149d-ea67-421c-ae56-82748dbe5421
-plot(unitPyramid, -0.1, 1.1, size=(700, 500), xlim=(-0.1, 1.1), ylim=(0, 0.6), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitPyramid(x) = x\; ≤\; 1/2 \;?\; x : 1 - x", label="")
+plot(unitPyramid, -0.1, 1.1, size=(525, 400), xlim=(-0.1, 1.1), ylim=(0, 0.6), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"unitPyramid(x) = x\; ≤\; 1/2 \;?\; x : 1 - x", label="")
 
 # ╔═╡ 000ec5a2-6963-4ac3-870a-a7fd5bad4f6c
 md"
@@ -1120,6 +1137,11 @@ md"
 "
 
 # ╔═╡ 680bef65-3d43-4f11-b56c-442f7a16d158
+#------------------------------------------------------------------------------------
+# lebesgueIntegral2 only integrates *positive* functions
+# - integration method is summation of horizontal slabs
+# - *non*recursive function earchForMax using *while*
+#------------------------------------------------------------------------------------
 function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01) 
 	#--------------------------------------------------------------------------------
 	Δy = Δx
@@ -1160,14 +1182,8 @@ lebesgueIntegral2(unitPyramid, Δx=0.1E-3)          # ==> 1/4 --> :)
 # *no* stack overflow as above with version 1
 lebesgueIntegral2(unitPyramid, Δx=0.1E-4)         
 
-# ╔═╡ 9760429d-d67e-4806-bd29-429d4f5df92f
-lebesgueIntegral2(halfParabola, Δx=0.1E-2)
-
 # ╔═╡ 6717a98c-3f97-41c2-a18b-8c2df3587bb3
 lebesgueIntegral2(halfParabola, Δx=0.1E-3)
-
-# ╔═╡ 42d4bd93-d513-4348-a410-4b00c02e1a6c
-lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-2)
 
 # ╔═╡ 57b1b4d4-97b5-4a07-918b-61e5f7c54e63
 lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-3)
@@ -1180,7 +1196,7 @@ md"
 ---
 Our Julia script $lebesgueIntegral3$ sum *steps* according to the formula:
 
-$\int_a^b f(x)\;dx = \int_a^b f(x)\;\mu(dx) \approx \left[\sum_{y=0}^{max(f(x))/Δy} y\cdot [x|y+\Delta y < f(x) ≤ y]\right]$
+$\int_a^b f(x)\;dx = \int_a^b f(x)\;\mu(dx) \approx \left[\sum_{y=0}^{max(f(x))/Δy} y\cdot \lambda(\{x|y+\Delta y < f(x) ≤ y\})\right]$
 
 $\;$
 $\;$
@@ -1188,6 +1204,12 @@ $\;$
 "
 
 # ╔═╡ 5f65b310-d08a-4e7c-879d-f4ebdf9255ec
+#------------------------------------------------------------------------------------
+# lebesgueIntegral3 only integrates *positive* functions
+# - integration method is summation of all rectangles with base x and
+#      function f(x) value within horizontal slab y + Δy > f(x) ≥ y
+# - *non*recursive function earchForMax using *while*
+#------------------------------------------------------------------------------------
 function lebesgueIntegral3(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	#--------------------------------------------------------------------------------
 	Δy = Δx
@@ -1221,40 +1243,6 @@ function lebesgueIntegral3(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	#--------------------------------------------------------------------------------
 end # function lebesgueIntegral3
 
-# ╔═╡ df7f86f6-025b-4134-b205-ac4a078aae23
-begin
-	plot(unitPyramid, 0.0, 1.0, size=(700, 500), xlim=(-0.1, 1.1), ylim=(-0.08, 0.55),
-	line=:darkblue, fill=(0, :lightblue), title="Lebesgue Integration (= Summation of Rectangular Steps)", framestyle=:semi, label="", xlabel=L"x", ylabel=L"f(x)")
-	plot!(x->0.13, 0.00, 0.13, line=:black, label="")           # 2nd horizontal line
-	plot!(x->0.13, 0.13, 0.87, line=:black, ls=:dash, label="") # 2nd horizontal line
-	plot!(x->0.13, 0.87, 1.00, line=:black, label="")           # 2nd horizontal line
-	plot!(x->0.23, 0.00, 0.23, line=:black, label="")           # 3rd horizontal line
-	plot!(x->0.23, 0.23, 0.77, line=:black, ls=:dash, label="") # 3rd horizontal line
-	plot!(x->0.23, 0.77, 1.00, line=:black, label="")           # 3rd horizontal line
-	plot!(x->0.00, 0.00, 1.00, line=:black, label="")           # 4th horizontal line
-	plot!([(.13,.13),(.13,.00)],lw=3,line=:red, label="")       # 1st vertical line
-	plot!([(.23,.23),(.23,.13)],line=:red, ls=:dash, label="")  # 2nd vertical line
-	plot!([(.23,.13),(.23,.00)],line=:red, label="")            # 2nd vertical line
-	plot!([(.77,.23),(.77,.13)],line=:red, ls=:dash, label="")  # 3rd vertical line
-	plot!([(.77,.13),(.77,.00)],line=:red, label="")            # 3rd vertical line
-	plot!([(.87,.13),(.87,.00)],lw=3,line=:red, label="")       # 4th vertical line
-	plot!([(0.175,-.05),(0.175,-.01)],line=:red,arrow=:head, label="") # 1st up arrow
-	plot!([(0.82,-.05),(0.82,-.01)],line=:red,arrow=:head, label="")   # 2nd up arrow
-	plot!([(0.05,.13),(0.05,.23)],line=:red,arrow=:both, label="") # 3rd bi arrow
-	plot!([(0.05,.00),(0.05,.13)],line=:red,arrow=:both, label="") # 4th bi arrow
-	plot!(x->0.00, 0.13, 0.23, line=:red, lw=3,label="")        # 1st horizontal line
-	plot!(x->0.00, 0.77, 0.87, line=:red, lw=3,label="")        # 1st horizontal line
-	plot!(x->-.05, 0.175, 0.34, line=:red, label="")            # 0th horizontal line
-	plot!(x->-.05, 0.66, 0.82, line=:red, label="")             # 0th horizontal line
-	annotate!(.01, 0.17, L"\Delta_y")
-	annotate!(.01, 0.07, L"y")
-	annotate!(0.504,-0.05, L"\{x|y+\Delta y < f(x)\; ≤ y\}", 12)
-	#------------------------------------------------------------------------------
-	# rectangles
-	plot!(x->.13,.13,.23,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
-	plot!(x->.13,.77,.87,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
-end # begin
-
 # ╔═╡ 2635fd73-0552-499d-8be4-9a9323de7213
 lebesgueIntegral3(x->x^2-1, b=1.0, Δx=1.0E-3) 
 
@@ -1265,17 +1253,18 @@ lebesgueIntegral3(unitPyramid, Δx=1.0E-4)             # ==> 1/4 --> :)
 abs(1/4-lebesgueIntegral3(unitPyramid, Δx=1.0E-4))
 
 # ╔═╡ 52554fbf-327c-4ef9-a8ec-7438f930651c
-lebesgueIntegral3(unitPyramid, Δx=1.0E-5)   # ==> 0.24999176180012855 ≈ 1/4 --> :)
+areaPyramid = 0.24999176180012855
+# areaPyramid = lebesgueIntegral3(unitPyramid, Δx=1.0E-5)   # ==> 0.24999176180012855 ≈ 1/4 --> :)
 
 # ╔═╡ 413b45a7-fbeb-4176-baff-81ec3b68549e
-abs(1/4-lebesgueIntegral3(unitPyramid, Δx=1.0E-5))
+abs(1/4 - areaPyramid)
 
 # ╔═╡ c8bb72b1-dd6d-48e4-9664-42b96da540fa
 let x1 = +1.0
 	x2 = -1.0
 	y1 = gaussianDensity(+1.0)
 	y2 = gaussianDensity(-1.0)
-	plot(gaussianDensity, -1.0, 1.0, size=(700, 500), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot(gaussianDensity, -1.0, 1.0, size=(525, 400), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
 	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"$f(X)$")
 	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
 	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
@@ -1312,6 +1301,83 @@ mixedGaussianDensity(+3.0, μ1=-3.0, μ2=+3.0)
 
 # ╔═╡ 2fd2285a-4695-4802-8125-1b81e007a0da
 mixedDensity(x) = mixedGaussianDensity(x, μ1=-3.0, μ2=+3.0, σ1=0.5, σ2=2.0)
+
+# ╔═╡ 3e612d04-9ef1-4d2d-af38-70c2d4ec6fb7
+begin 
+	#--------------------------------------------------------------------------------
+	# plot of mixed density
+	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Lebesgue Integration (= Summation of Horizontal Slabs)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot!(x->0.00, -5, 10, line=:darkblue, lw=1,label="")      # base line
+	#--------------------------------------------------------------------------------
+	plot!(x->0.08, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
+	plot!(x->0.12, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
+	plot!([(-5.0,.08),(-5.0,.12)],line=:red,arrow=:both, label="") # 1st bi arrow
+	plot!([(-5.0,.00),(-5.0,.08)],line=:red,arrow=:both, label="") # 2nd bi arrow
+	annotate!(-5.5, 0.096, L"\Delta_y")
+	annotate!(-5.5, 0.045, L"y")
+	#--------------------------------------------------------------------------------
+	plot!([(-3.9,.08),(-3.9,.12)],line=:red,lw=4,label="")      # 1st vertical line
+	plot!([(-3.9,.12),(-3.9,.00)],line=:red,ls=:dash,label="")  # 2nd vertical line
+	plot!([(-2.1,.12),(-2.1,.00)],line=:red,ls=:dash,label="")  # 3rd vertical line
+	plot!([( 1.7,.12),( 1.7,.00)],line=:red,ls=:dash,label="")  # 6th vertical line
+	plot!([( 4.3,.12),( 4.3,.00)],line=:red,ls=:dash,label="")  # 8th vertical line
+	#--------------------------------------------------------------------------------
+	# rectangles
+	rect1 = Shape([(-3.9,.08),(-2.1,.08),(-2.1,.12),(-3.9,.12),(-3.9,0.08)])
+	rect2 = Shape([( 1.7,.08),( 4.3,.08),( 4.3,.12),( 1.7,.12),( 1.7,0.08)])
+	plot!(rect1, fillcolor = :pink)
+	plot!(rect2, fillcolor = :pink)
+	#--------------------------------------------------------------------------------
+	annotate!(0.2,-0.03, L"\{x|f(x)\; ≤ y\}", 12)
+	plot!([(-3.10,-.03),(-3.10,-.00)],line=:red,arrow=:head, label="") # 1st up arrow
+	plot!([( 3.00,-.03),( 3.00,-.00)],line=:red,arrow=:head, label="") # 3rd up arrow
+	plot!(x->.00,-3.9,-2.1,line=:red, lw=3,label="")            # 2nd horizontal line
+	plot!(x->.00, 1.7, 4.3,line=:red, lw=3,label="")            # 3rd horizontal line
+	plot!(x->-.03,-3.10,-1.2,line=:red, label="")               # 5th horizontal line
+	plot!(x->-.03, 1.50, 3.0,line=:red, label="")               # 6th horizontal line
+	#--------------------------------------------------------------------------------
+	plot!(mixedDensity, -6.0, 10, line=:darkblue, label="")
+end # begin
+
+# ╔═╡ df7f86f6-025b-4134-b205-ac4a078aae23
+begin 
+	#--------------------------------------------------------------------------------
+	# plot of mixed density
+	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Lebesgue Integration (= Summation of Related Steps)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot!(x->0.00, -5, 10, line=:darkblue, lw=1,label="")      # base line
+	#--------------------------------------------------------------------------------
+	plot!(x->0.08, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
+	plot!(x->0.12, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
+	plot!([(-5.0,.08),(-5.0,.12)],line=:red,arrow=:both, label="") # 1st bi arrow
+	plot!([(-5.0,.00),(-5.0,.08)],line=:red,arrow=:both, label="") # 2nd bi arrow
+	annotate!(-5.5, 0.096, L"\Delta_y")
+	annotate!(-5.5, 0.045, L"y")
+	#--------------------------------------------------------------------------------
+	plot!([(-3.9,.08),(-3.9,.00)],lw=3,line=:red, label="")     # 1st vertical line	
+	plot!([(-3.75,.12),(-3.75,.00)],line=:red,ls=:dash,label="")# 2nd vertical line
+	plot!([(-2.25,.12),(-2.25,.00)],line=:red,ls=:dash,label="")# 3rd vertical line
+	plot!([(-2.1,.08),(-2.1,.00)],lw=3,line=:red, label="")     # 4th vertical line
+	plot!([( 1.7,.08),( 1.7,.00)],lw=3,line=:red, label="")     # 5th vertical line
+	plot!([( 1.7,.12),( 1.7,.00)],line=:red,ls=:dash,label="")  # 6th vertical line
+	plot!([( 4.3,.08),( 4.3,.00)],lw=3,line=:red, label="")     # 7th vertical line
+	plot!([( 4.3,.12),( 4.3,.00)],line=:red,ls=:dash,label="")  # 8th vertical line
+	#--------------------------------------------------------------------------------
+	# rectangles
+	plot!(x->.08,-3.9,-3.75,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
+	plot!(x->0.00, -3.9,-3.75,line=:red,lw=3,label="")          # 2nd horizontal line
+	plot!(x->.08,-2.25,-2.1,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
+	plot!(x->0.00,-2.25,-2.10,line=:red,lw=3,label="")          # 3rd horizontal line
+	plot!(x->.08, 1.7, 4.3,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
+	plot!(x->0.0, 1.7, 4.3,line=:red,lw=3,label="")             # 4th horizontal line
+	#--------------------------------------------------------------------------------
+	annotate!(0.36,-0.03, L"\{x|y+\Delta y < f(x)\; ≤ y\}", 12)
+	plot!([(-3.84,-.03),(-3.84,-.00)],line=:red,arrow=:head, label="") # 1st up arrow
+	plot!([(-2.15,-.03),(-2.15,-.00)],line=:red,arrow=:head, label="") # 2nd up arrow
+	plot!([( 3.00,-.03),( 3.00,-.00)],line=:red,arrow=:head, label="") # 3rd up arrow
+	plot!(x->-.03,-3.84,-1.90,line=:red, label="")              # 5th horizontal line
+	plot!(x->-.03, 2.55, 3.00,line=:red, label="")              # 6th horizontal line
+	#--------------------------------------------------------------------------------
+end # begin
 
 # ╔═╡ 3ef10af4-d6c0-4979-814b-c3674746e8ad
 mixedDensity(-3.5)
@@ -1477,7 +1543,9 @@ end # let
 md"
 ---
 ###### Integration of function $(x^2-1)$ with respect to Lebesgue measure $\lambda(dx)$ 
-Please note, that Hable's result is $8$ which is an *error* (Hable, 2015, p.73). This is fixed here.
+(NonSICP)
+
+Note, that Hable's result is $8$ which is an *error* (Hable, 2015, p.73). This is fixed here.
 
 $\;$
 $\;$
@@ -1498,32 +1566,19 @@ $\;$
 # ╔═╡ 5aaeacc4-6d26-4cc5-be26-2161db3ce784
 plot(x->x^2-1, 0.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
 
-# ╔═╡ f1178d94-b52b-41ea-a171-3fbe164a3fa1
-# idiomatic Julia-code with 'Function', 'Real', 'while', '+='
-#------------------------------------------------------------------
-function sum3(f::Function, a::Real, succ::Function, b::Real)::Real
-	sum = 0
-	if a ≤ b
-		while !(a > b)
-			sum += f(a)
-			a = succ(a)
-		end # while
-	else # a > b
-		while !(a < b)
-			sum += f(a)
-			a = succ(a)
-		end # while
-	end # if
-	sum
-end # function sum3
-
 # ╔═╡ 85ce27de-7e09-4f96-a408-e2be7e62dde4
-sum3(x->x, 0, x->x+1, 5)
+sum2(x->x, 0, x->x+1, 5)
 
 # ╔═╡ e1292842-365e-4cfd-a2f9-d95fc6516860
-sum3(x->x, 0, x->x-1, -5)
+sum2(x->x, -5, x->x+1, 0)
 
 # ╔═╡ a344568c-f02b-4735-ad47-32c725892827
+#------------------------------------------------------------------------------------
+# lebesgueIntegral4 integrates *positive* and *negative* functions
+# - integration method is summation of all rectangles with base x and
+#      function f(x) value within horizontal slab y + Δy > f(x) ≥ y
+# - *non*recursive function earchForMax using *while*
+#------------------------------------------------------------------------------------
 function lebesgueIntegral4(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	#--------------------------------------------------------------------------------
 	Δy = Δx
@@ -1581,12 +1636,12 @@ function lebesgueIntegral4(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	fmin, xmin = searchForMin(f, f(a), a, b)  # the search for minimum of function f
 	# vertical sum of steps y*μ(f(y))
     if fmax ≥ 0.0
-		positiveIntegral = sum3(y -> y*μ(y)[1], 0::Real, add_Δy::Function, fmax::Real)
+		positiveIntegral = sum2(y -> y*μ(y)[1], 0::Real, add_Δy::Function, fmax::Real)
 	else
 		positiveIntegral = 0.0
 	end # if
 	if fmin < 0.0
-		negativeIntegral = sum3(y -> y*μ(y)[2], 0::Real, sub_Δy::Function, fmin::Real)
+		negativeIntegral = sum2(y -> y*μ(y)[2], fmin::Real, add_Δy::Function, 0::Real)
 	else
 		negativeIntegral = 0.0
 	end # if
@@ -1612,7 +1667,7 @@ lebesgueIntegral3(x->x^2-1, b=3.0, Δx=0.1E-3)
 lebesgueIntegral4(x->x^2-1, b=1.0, Δx=0.1E-3) 
 
 # ╔═╡ 4ee84ced-a30b-4452-9408-452df4b6008c
-lebesgueIntegral4(x->x^2-1, b=3.0, Δx=0.1E-3)   # ==> 5.999503340000599 ≈ 6.0
+lebesgueIntegral4(x->x^2-1, b=3.0, Δx=0.1E-3)   # ==> 5.999504280000504 ≈ 6.0
 
 # ╔═╡ 40eb47d3-6f33-47f2-9902-b1d9df4c8277
 md"
@@ -1692,6 +1747,7 @@ md"
 - **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
 - **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
 - **Schilling, R.L.**; *Maß und Integral*; Berlin: de Gruyter, 2015
+- **Stark, P.A.**; *Introduction to Numerical Methods*, NY: MacMillan, 1970
 - **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
 - **Wikipedia**; [*Lebesgue-Integration*](https://en.wikipedia.org/wiki/Lebesgue_integration); last visit 2023/09/03
 - **Wikipedia**; [*Leibnitz'* Formula for $\pi$](https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80); last visit 2023/08/31
@@ -2813,7 +2869,7 @@ version = "1.4.1+0"
 # ╠═71319af0-3051-41c8-8c12-20c142901c11
 # ╟─7dffb4c0-1820-46c4-8676-f327de55048e
 # ╠═76170408-797d-451b-bcf6-b69fec927085
-# ╟─b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
+# ╠═b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
 # ╠═73a0deb5-6dc3-41d8-b810-5553c74455ed
 # ╠═08f1b671-dc0a-4b7a-92ce-4568c24589f1
 # ╠═7174bf72-b914-4944-95ac-a47cc7ddbfef
@@ -2863,13 +2919,14 @@ version = "1.4.1+0"
 # ╠═43b2d09b-8822-46bc-9372-6ee4b9f1141a
 # ╠═fba935d4-ee66-44b8-8e5b-bf14a8c08810
 # ╟─f7839cb5-a075-4e70-9cca-96dd760d356f
+# ╟─3e612d04-9ef1-4d2d-af38-70c2d4ec6fb7
 # ╠═1f222db6-67c7-4413-b127-fd6a91a2e390
 # ╠═a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
 # ╟─f6634d4a-06ac-4b83-a94a-c798473cc067
 # ╠═010ca46b-f127-4b26-99e4-e96f5f4d7c6e
 # ╠═b8ed62d0-1e0b-478e-8034-7d06e3d41db1
 # ╠═d6cc5ab7-376a-4e3a-a0c1-edb0b76b4e45
-# ╠═8f84149d-ea67-421c-ae56-82748dbe5421
+# ╟─8f84149d-ea67-421c-ae56-82748dbe5421
 # ╟─000ec5a2-6963-4ac3-870a-a7fd5bad4f6c
 # ╠═24fe641f-05e5-4bd2-b109-6105d6df90ea
 # ╠═f2b81dfd-caa8-4d22-ac4a-662694b093a8
@@ -2880,14 +2937,12 @@ version = "1.4.1+0"
 # ╠═680bef65-3d43-4f11-b56c-442f7a16d158
 # ╠═8393e473-b9f1-4d2f-97af-483233192490
 # ╠═a5150024-f84e-4aca-8890-7d1f5867fdc0
-# ╠═9760429d-d67e-4806-bd29-429d4f5df92f
 # ╠═6717a98c-3f97-41c2-a18b-8c2df3587bb3
-# ╠═42d4bd93-d513-4348-a410-4b00c02e1a6c
 # ╠═57b1b4d4-97b5-4a07-918b-61e5f7c54e63
 # ╠═cba16dbb-ed22-400d-963b-24169a956165
 # ╟─93b4f27b-7c83-4d61-bb82-b0651f9385cf
-# ╠═5f65b310-d08a-4e7c-879d-f4ebdf9255ec
 # ╟─df7f86f6-025b-4134-b205-ac4a078aae23
+# ╠═5f65b310-d08a-4e7c-879d-f4ebdf9255ec
 # ╠═2635fd73-0552-499d-8be4-9a9323de7213
 # ╠═6f87f654-8310-4e71-875f-a63ac41d0cd0
 # ╠═15fefcd0-fc12-4c48-95f3-71a595aa6b47
@@ -2938,7 +2993,6 @@ version = "1.4.1+0"
 # ╠═8c1b16be-bf24-4897-8176-beff174b9f32
 # ╟─ae3b9175-9e73-458d-af3d-6d5480b2a20a
 # ╟─5aaeacc4-6d26-4cc5-be26-2161db3ce784
-# ╠═f1178d94-b52b-41ea-a171-3fbe164a3fa1
 # ╠═85ce27de-7e09-4f96-a408-e2be7e62dde4
 # ╠═e1292842-365e-4cfd-a2f9-d95fc6516860
 # ╠═a344568c-f02b-4735-ad47-32c725892827
