@@ -13,7 +13,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics (e.g. Cantor Set, Integration à la Riemann & Lebesgue (NonSICP))
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/11 ***
+##### Julia/Pluto.jl-code (1.9.3/19.27) by PCM *** 2023/11/12 ***
 =====================================================================================
 "
 
@@ -1039,7 +1039,7 @@ The difference between both methods is:
 
 Our Julia scripts $lebesgueIntegral1, lebesgueIntegral2$ sum *horizontal sclices* according to the formula:
 
-$\int_a^b f(x)\;dx \approx \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > y\})\right]\;Δy$
+$\int_a^b f(x)\;dx = \lim_{\Delta y \to 0} Δy\; \left[\sum_{y=0}^{max(f(x))/Δy} \mu(\{x|f(x) > (y + \Delta y)\})\right]$
 
 $\;$
 $\;$
@@ -1048,7 +1048,7 @@ $\;$
 Compared to the Riemannian approach this script lacks efficiency. This is due to the high number of calls of $f(x)$ in each summand. We can improve efficiency slightly by caching function calls.
 "
 
-# ╔═╡ 1f222db6-67c7-4413-b127-fd6a91a2e390
+# ╔═╡ a9ee6052-2021-4543-8680-b66f76b659af
 #------------------------------------------------------------------------------------
 # lebesgueIntegral1 only integrates *positive* functions
 # - integration method is summation of horizontal slabs
@@ -1060,7 +1060,7 @@ function lebesgueIntegral1(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	add_Δx(x) = x + Δx
 	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
 	function μ(y)
-		let μΔx(x) = (f(x) > y) ? Δx : 0
+		let μΔx(x) = (f(x) > add_Δy(y)) ? Δx : 0
 			sum(μΔx(x) for x in a:Δx:b)
 		end # let
 	end # function μ
@@ -1116,6 +1116,9 @@ md"
 # ╔═╡ 24fe641f-05e5-4bd2-b109-6105d6df90ea
 lebesgueIntegral1(unitPyramid, Δx=0.1E-3)     # (1 * 1/2)/2 = 1/4
 
+# ╔═╡ a161ea4f-74b4-4a0b-bce6-fb435685ba91
+errorPyramid1 = abs(1/4-lebesgueIntegral1(unitPyramid, Δx=0.1E-3))
+
 # ╔═╡ f2b81dfd-caa8-4d22-ac4a-662694b093a8
 # stack overflow, as expected
 lebesgueIntegral1(unitPyramid, Δx=0.1E-4)       
@@ -1136,7 +1139,7 @@ md"
 ###### Lebesgue Integration with $while$-Loops
 "
 
-# ╔═╡ 680bef65-3d43-4f11-b56c-442f7a16d158
+# ╔═╡ 234a5247-a16b-4d4c-a47b-06c832391e60
 #------------------------------------------------------------------------------------
 # lebesgueIntegral2 only integrates *positive* functions
 # - integration method is summation of horizontal slabs
@@ -1148,7 +1151,7 @@ function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	add_Δx(x) = x + Δx
 	add_Δy(y) = y + Δy	#--------------------------------------------------------------------------------
 	function μ(y)
-		let μΔx(x) = (f(x) > y) ? Δx : 0
+		let μΔx(x) = (f(x) > add_Δy(y)) ? Δx : 0
 			sum(μΔx(x) for x in a:Δx:b)
 		end # let
 	end # function μ
@@ -1175,28 +1178,29 @@ function lebesgueIntegral2(f::Function; a=0.0, b=1.0, y=0.0, Δx=0.01)
 	#--------------------------------------------------------------------------------
 end # function lebesgueIntegral2
 
-# ╔═╡ 8393e473-b9f1-4d2f-97af-483233192490
-lebesgueIntegral2(unitPyramid, Δx=0.1E-3)          # ==> 1/4 --> :)
+# ╔═╡ 7276b63c-f0aa-4cfc-9014-ba5cee36e9fa
+lebesgueIntegral2(unitPyramid, Δx=0.1E-3)
 
-# ╔═╡ a5150024-f84e-4aca-8890-7d1f5867fdc0
+# ╔═╡ a31a361f-fcc7-4824-bcda-627760d5474a
+abs(1/4 - lebesgueIntegral2(unitPyramid, Δx=0.1E-3))         # ==> 1/4 --> :)
+
+# ╔═╡ 3725189a-4eb5-4fc1-bb73-8d0976ef0e88
 # *no* stack overflow as above with version 1
-lebesgueIntegral2(unitPyramid, Δx=0.1E-4)         
+lebesgueIntegral2(unitPyramid, Δx=0.1E-4)   
 
-# ╔═╡ 6717a98c-3f97-41c2-a18b-8c2df3587bb3
-lebesgueIntegral2(halfParabola, Δx=0.1E-3)
+# ╔═╡ ebfe529d-19ec-415a-a5d4-9183652c26cd
+abs(1/4 - lebesgueIntegral2(unitPyramid, Δx=0.1E-4))
 
-# ╔═╡ 57b1b4d4-97b5-4a07-918b-61e5f7c54e63
-lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-3)
-
-# ╔═╡ cba16dbb-ed22-400d-963b-24169a956165
-# lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-4)   # ==> 0.6827018600010769
+# ╔═╡ 926772b6-fc86-4728-9d9d-f4bcc41ef9b8
+# integral2Gaussian = 0.6826819276010768
+lebesgueIntegral2(gaussianDensity, a=-1.0, Δx=0.1E-4)   # ==> 0.6826819276010768
 
 # ╔═╡ 93b4f27b-7c83-4d61-bb82-b0651f9385cf
 md"
 ---
 Our Julia script $lebesgueIntegral3$ sum *steps* according to the formula:
 
-$\int_a^b f(x)\;dx = \int_a^b f(x)\;\mu(dx) \approx \left[\sum_{y=0}^{max(f(x))/Δy} y\cdot \lambda(\{x|y+\Delta y < f(x) ≤ y\})\right]$
+$\int_a^b f(x)\;dx = \int_a^b f(x)\;\mu(dx) = \lim_{\Delta y \to 0} \left[\sum_{y=0}^{max(f(x))/Δy} y\cdot \lambda(\{x|(y + \Delta y) > f(x) \geq y\})\right]$
 
 $\;$
 $\;$
@@ -1306,7 +1310,7 @@ mixedDensity(x) = mixedGaussianDensity(x, μ1=-3.0, μ2=+3.0, σ1=0.5, σ2=2.0)
 begin 
 	#--------------------------------------------------------------------------------
 	# plot of mixed density
-	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Lebesgue Integration (= Summation of Horizontal Slabs)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="1st Lebesgue Integration (= Summation of Horizontal Slabs)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
 	plot!(x->0.00, -5, 10, line=:darkblue, lw=1,label="")      # base line
 	#--------------------------------------------------------------------------------
 	plot!(x->0.08, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
@@ -1316,25 +1320,18 @@ begin
 	annotate!(-5.5, 0.096, L"\Delta_y")
 	annotate!(-5.5, 0.045, L"y")
 	#--------------------------------------------------------------------------------
-	plot!([(-3.9,.08),(-3.9,.12)],line=:red,lw=4,label="")      # 1st vertical line
-	plot!([(-3.9,.12),(-3.9,.00)],line=:red,ls=:dash,label="")  # 2nd vertical line
-	plot!([(-2.1,.12),(-2.1,.00)],line=:red,ls=:dash,label="")  # 3rd vertical line
-	plot!([( 1.7,.12),( 1.7,.00)],line=:red,ls=:dash,label="")  # 6th vertical line
-	plot!([( 4.3,.12),( 4.3,.00)],line=:red,ls=:dash,label="")  # 8th vertical line
+	plot!([(-3.75,.08),(-3.75,.12)],line=:red,lw=4,label="")     # 1st vertical line
+	plot!([(-3.76,.12),(-3.76,.00)],line=:red,ls=:dash,label="") # 2nd vertical line
+	plot!([(-2.24,.12),(-2.24,.00)],line=:red,ls=:dash,label="") # 3rd vertical line
 	#--------------------------------------------------------------------------------
 	# rectangles
-	rect1 = Shape([(-3.9,.08),(-2.1,.08),(-2.1,.12),(-3.9,.12),(-3.9,0.08)])
-	rect2 = Shape([( 1.7,.08),( 4.3,.08),( 4.3,.12),( 1.7,.12),( 1.7,0.08)])
+	rect1 = Shape([(-3.75,.08),(-2.24,.08),(-2.24,.12),(-3.75,.12),(-3.75,0.08)])
 	plot!(rect1, fillcolor = :pink)
-	plot!(rect2, fillcolor = :pink)
 	#--------------------------------------------------------------------------------
-	annotate!(0.2,-0.03, L"\{x|f(x)\; ≤ y\}", 12)
+	annotate!(0.2,-0.03, L"\{x|(y + \Delta y) \geq f(x)\}", 10)
 	plot!([(-3.10,-.03),(-3.10,-.00)],line=:red,arrow=:head, label="") # 1st up arrow
-	plot!([( 3.00,-.03),( 3.00,-.00)],line=:red,arrow=:head, label="") # 3rd up arrow
-	plot!(x->.00,-3.9,-2.1,line=:red, lw=3,label="")            # 2nd horizontal line
-	plot!(x->.00, 1.7, 4.3,line=:red, lw=3,label="")            # 3rd horizontal line
-	plot!(x->-.03,-3.10,-1.2,line=:red, label="")               # 5th horizontal line
-	plot!(x->-.03, 1.50, 3.0,line=:red, label="")               # 6th horizontal line
+	plot!(x->.00,-3.75,-2.24,line=:red, lw=3,label="")          # 2nd horizontal line
+	plot!(x->-.03,-3.10,-1.7,line=:red, label="")               # 5th horizontal line
 	#--------------------------------------------------------------------------------
 	plot!(mixedDensity, -6.0, 10, line=:darkblue, label="")
 end # begin
@@ -1343,7 +1340,7 @@ end # begin
 begin 
 	#--------------------------------------------------------------------------------
 	# plot of mixed density
-	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Lebesgue Integration (= Summation of Related Steps)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot(mixedDensity, -6.0, 10, size=(700, 500), xlim=(-6.0, 10.0), ylim=(-0.05, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="2nd Lebesgue Integration (= Summation of Related Steps)", xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
 	plot!(x->0.00, -5, 10, line=:darkblue, lw=1,label="")      # base line
 	#--------------------------------------------------------------------------------
 	plot!(x->0.08, -5.5, 9, line=:darkblue, lw=1,label="")     # 1st horizontal line
@@ -1370,7 +1367,7 @@ begin
 	plot!(x->.08, 1.7, 4.3,line=:darkblue,fill=(0,:pink),framestyle=:semi, label="")
 	plot!(x->0.0, 1.7, 4.3,line=:red,lw=3,label="")             # 4th horizontal line
 	#--------------------------------------------------------------------------------
-	annotate!(0.36,-0.03, L"\{x|y+\Delta y < f(x)\; ≤ y\}", 12)
+	annotate!(0.40,-0.03, L"\{x|(y + \Delta y) > f(x)\; \geq y\}", 10)
 	plot!([(-3.84,-.03),(-3.84,-.00)],line=:red,arrow=:head, label="") # 1st up arrow
 	plot!([(-2.15,-.03),(-2.15,-.00)],line=:red,arrow=:head, label="") # 2nd up arrow
 	plot!([( 3.00,-.03),( 3.00,-.00)],line=:red,arrow=:head, label="") # 3rd up arrow
@@ -2920,7 +2917,7 @@ version = "1.4.1+0"
 # ╠═fba935d4-ee66-44b8-8e5b-bf14a8c08810
 # ╟─f7839cb5-a075-4e70-9cca-96dd760d356f
 # ╟─3e612d04-9ef1-4d2d-af38-70c2d4ec6fb7
-# ╠═1f222db6-67c7-4413-b127-fd6a91a2e390
+# ╠═a9ee6052-2021-4543-8680-b66f76b659af
 # ╠═a6c249cf-dd5f-4a1e-a4b7-beb30ea16fa5
 # ╟─f6634d4a-06ac-4b83-a94a-c798473cc067
 # ╠═010ca46b-f127-4b26-99e4-e96f5f4d7c6e
@@ -2929,17 +2926,18 @@ version = "1.4.1+0"
 # ╟─8f84149d-ea67-421c-ae56-82748dbe5421
 # ╟─000ec5a2-6963-4ac3-870a-a7fd5bad4f6c
 # ╠═24fe641f-05e5-4bd2-b109-6105d6df90ea
+# ╠═a161ea4f-74b4-4a0b-bce6-fb435685ba91
 # ╠═f2b81dfd-caa8-4d22-ac4a-662694b093a8
 # ╠═2897cda1-e00b-4bbc-bed3-fcc3e01e5203
 # ╠═9c86d18f-5a34-4c2c-8290-cd9b33cb887d
 # ╠═96e1b398-2233-4494-a9cf-aac19a418014
 # ╟─5efe1b56-4f21-4c3c-8b27-fdaaa90a558a
-# ╠═680bef65-3d43-4f11-b56c-442f7a16d158
-# ╠═8393e473-b9f1-4d2f-97af-483233192490
-# ╠═a5150024-f84e-4aca-8890-7d1f5867fdc0
-# ╠═6717a98c-3f97-41c2-a18b-8c2df3587bb3
-# ╠═57b1b4d4-97b5-4a07-918b-61e5f7c54e63
-# ╠═cba16dbb-ed22-400d-963b-24169a956165
+# ╠═234a5247-a16b-4d4c-a47b-06c832391e60
+# ╠═7276b63c-f0aa-4cfc-9014-ba5cee36e9fa
+# ╠═a31a361f-fcc7-4824-bcda-627760d5474a
+# ╠═3725189a-4eb5-4fc1-bb73-8d0976ef0e88
+# ╠═ebfe529d-19ec-415a-a5d4-9183652c26cd
+# ╠═926772b6-fc86-4728-9d9d-f4bcc41ef9b8
 # ╟─93b4f27b-7c83-4d61-bb82-b0651f9385cf
 # ╟─df7f86f6-025b-4134-b205-ac4a078aae23
 # ╠═5f65b310-d08a-4e7c-879d-f4ebdf9255ec
