@@ -20,28 +20,41 @@ md"
 
 # ╔═╡ 53196c5e-41a1-4e37-9405-5e2ee4d8c58e
 md"
-##### 0. Introduction and Topics
+##### 0. Introduction
 First we try to be as close as possible to the *functional* style of the original Scheme implementation, then we introduce *idiomatic* Julia elements.
-- Numeral, Number
-- Types: $Int64$, $Float64$
-- Expression
-- Operator associativity
-- Test of identity $===$
-- Type conversion
-- Kantorovic trees
+
+"
+
+# ╔═╡ 991bea2b-cb9b-4f95-8085-58eb16f7f775
+md"
+---
+##### 1. Topics
+
+*Topics* dealt are:
+
+- [Numeral](https://en.wikipedia.org/wiki/Numeral_system), Number
+- [Types](https://en.wikipedia.org/wiki/Data_type): $Int64$, $Float64$
+- [Expression](https://en.wikipedia.org/wiki/Expression_(computer_science))
+- [Operator](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
+- [Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity)
+- Tests of *identity*: $==$, $===$
+- *built-in* functions: $typeof(.)$
+- Type *conversion*
+- *Kantorovic* trees
+
 "
 
 # ╔═╡ 30996adf-ecc2-4132-ae86-3c02ce8ddff4
 md"
 ---
-##### 1. Libraries
+##### 2. Libraries
 "
 
 # ╔═╡ 3ecd4f01-805a-4c67-8897-fb57016b50ae
 md"
 ---
-##### 2. Expressions
-###### 2.1 Primitive Expressions: Numerals
+##### 3. Expressions and *built-in* Functions
+###### 3.1 Primitive Expressions: Numerals
 "
 
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
@@ -50,10 +63,16 @@ md"
 # ╔═╡ dc5f6985-d4ae-4336-9f66-185bfed79a05
 typeof(486)                                               # ==> Int64 
 
+# ╔═╡ c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
+486.                                                      # ==> 486.0
+
+# ╔═╡ 17468ebe-4b5c-4ff1-a067-fae14a5e332f
+typeof(486.)                                              # ==> Float64
+
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
-##### 2.2 *Prefix* Expressions (= *Combinations*)
-###### 2.2.1 *Flat* Combination: <*combination*> = <*operator*>(<*operand*>,...)
+###### 3.2 *Prefix* Expressions (= *Combinations*)
+###### 3.2.1 *Flat* Combination: <*combination*> = <*operator*>(<*operand*>,...)
 "
 
 # ╔═╡ f46897fa-abdc-4a21-846e-0195b0172fa0
@@ -123,6 +142,9 @@ div(10, 5)                                                # ==> 2 --> :)
 # prefix Julia:
 ÷(10, 5)                                                  # ==> 2 --> :)
 
+# ╔═╡ 0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
+==(÷, div)                                                # ==> true 
+
 # ╔═╡ 8c64d38b-98e2-4b45-bdc7-e1772efdc965
 ===(÷, div)                                               # ==> true 
 
@@ -158,7 +180,7 @@ md"
 # ╔═╡ b3af6b38-3b06-4966-8e88-3da2fe720e3e
 md"
 ---
-###### 2.2.2 *Nested* Combinations
+###### 3.2.2 *Nested* Combinations
 ###### *Nested* Combination <*combination*> = <*operator*>(<*operand*>,..., <*operator*>(<*operand*>,...),...)
 "
 
@@ -166,7 +188,7 @@ md"
 # Math: 3 * 5 + (10 - 6)                                  # ==> 19
 # SICP: (+ (* 3 5) (- 10 6))                              # ==> 19
 # prefix Julia:
-+(*(3, 5), -(10, 6))                                      # ==> 19 --> :)
++( *(3, 5), -(10, 6))                                     # ==> 19 --> :)
 
 # ╔═╡ 63571818-e93c-4122-a998-59c040df93da
 # Math: (3 * ((2 * 4) + (3 + 5))) + ((10 - 7) + 6) =
@@ -189,7 +211,7 @@ md"
 #	           6))                                      ==> 57
 #
 # prefix Julia:
-+(*(3, +(*(2, 4), +(3, 5))), +(-(10, 7), 6))
++( *(3, +( *(2, 4), +(3, 5))), +( -(10, 7), 6))
 
 # ╔═╡ 07d566e1-77a2-45b1-be22-5521d1f65d2e
 md"
@@ -198,9 +220,9 @@ md"
 "
 
 # ╔═╡ 9fe7665f-faf4-4633-be95-62126d7d6c90
-# SICP: (+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))    ==> 57
+# SICP: (+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))            # ==> 57
 # prefix Julia:
-# +(*(3, +(*(2, 4), +(3, 5))), +(-(10, 7), 6))
+# +( *(3, +( *(2, 4), +(3, 5))), +( -(10, 7), 6))
   +(
 	*(
 		3, 
@@ -244,7 +266,7 @@ begin
 			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
 	end # function plotBinaryTree!
 	#---------------------------------------------------
-	plot(xlim=(-1, 10), ylim=(0, 11), legend=:false, ticks=:none, title="Kantorovic Tree")
+	plot(xlim=(-1, 10), ylim=(0, 11), legend=:false, ticks=:none, title="Kantorovic Tree", titlefontsize=12)
 	plotBinaryTree!( "2", "4", "*", 1.5,  8.0)
 	plotBinaryTree!( "3", "5", "+", 4.0,  8.0)
 	plotBinaryTree!( "*", "+", "+", 2.75, 6.0; widthOfTree=2.5)
@@ -269,13 +291,12 @@ $\;$
 $((3,((2,4)*,(3, 5)+)+)*,((10,7)-,6)+)+$
 $\;$
 
----
 "
 
 # ╔═╡ 36ceefbb-a164-49cf-a499-19c6c336be23
 md"
 ---
-##### 3. Idiomatic Julia: infix operators and expressions, *inbuilt* functions, methods
+##### 4. Idiomatic Julia: infix operators and expressions, *inbuilt* functions
 "
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
@@ -299,6 +320,9 @@ md"
 # prefix Julia: -(-(1000, 300), 34)                       # ==> 666 --> :)
 # infix Julia:
 (1000 - 300) - 34 == 1000 - 300 -34                       # ==> 666 --> :)
+
+# ╔═╡ b8dcf0cd-7183-4da2-aab1-154f8c31e510
+(1000 - 300) - 34 === 1000 - 300 -34                      # ==> 666 --> :)
 
 # ╔═╡ a3b868e5-ff5d-44a0-a5e6-1191867fb2e4
 # Math: 5 * 99                                            # ==> 495
@@ -382,7 +406,7 @@ md"
 # ╔═╡ d2dd2233-7afb-4222-96bb-86ae61ba5e72
 md"
 ---
-##### 4. Summary
+##### 5. Summary
 We evaluated *flat (= unnested)* and *nested* expressions. These can be written in *linear* form with brackets in different ways in *prefix*, *infix*, and *postfix* notation. Wheras *SICP* (= *MIT-Scheme*) only understands *prefix* expressions Julia understands even *infix* notation which everybody learnt in school. Brackets are used to control the evaluation process.
 
 Alternatively to the *linear* form expressions can also be documented in *nonlinear* graphical bracket-less form with *Kantorovic* trees. The three linear forms can be read out from the tree by various search strategies. In Kantorovic trees the evaluation process is controlled by the edges of the graph.
@@ -392,13 +416,11 @@ Alternatively to the *linear* form expressions can also be documented in *nonlin
 # ╔═╡ 9e0c051d-5502-4ac2-98ba-aa4fee74df33
 md"
 ---
-##### References
+##### 6. References
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2024/12/01
 
 - **Bauer, F.L. & Wössner, H.**; *Algorithmic Language and Program Development*, Heidelberg: Springer, 1981
-
-- **Wikipedia**: [*Operator-associativity*](https://en.wikipedia.org/wiki/Operator_associativity); last visit 2024/12/02
 
 "
 
@@ -1552,11 +1574,14 @@ version = "1.4.1+1"
 # ╔═╡ Cell order:
 # ╟─0b714da0-b003-11ef-36b9-c1998185b8b1
 # ╟─53196c5e-41a1-4e37-9405-5e2ee4d8c58e
+# ╟─991bea2b-cb9b-4f95-8085-58eb16f7f775
 # ╟─30996adf-ecc2-4132-ae86-3c02ce8ddff4
 # ╠═a5837b6b-a4d0-45bb-976c-cecda8e6781b
 # ╟─3ecd4f01-805a-4c67-8897-fb57016b50ae
 # ╠═198ce2f2-988c-4387-a73d-60f5d785c3bc
 # ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
+# ╠═c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
+# ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╠═f46897fa-abdc-4a21-846e-0195b0172fa0
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
@@ -1571,6 +1596,7 @@ version = "1.4.1+1"
 # ╠═6dfc1c6c-9b77-4df8-9133-63c988696161
 # ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
 # ╠═0f5bb248-9230-41a6-ad18-f68636100328
+# ╠═0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
 # ╠═8c64d38b-98e2-4b45-bdc7-e1772efdc965
 # ╟─d955da7c-2570-4808-8e6b-cb8564c2f0cd
 # ╠═9f83cded-8b07-459b-847e-87e3aca59da5
@@ -1588,6 +1614,7 @@ version = "1.4.1+1"
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
+# ╠═b8dcf0cd-7183-4da2-aab1-154f8c31e510
 # ╠═a3b868e5-ff5d-44a0-a5e6-1191867fb2e4
 # ╠═5f9f3c23-735f-4f24-814c-f332a0308df4
 # ╠═af131abe-cad2-48e6-a3b4-1143dc22bea0
