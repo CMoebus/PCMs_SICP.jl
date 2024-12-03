@@ -38,11 +38,12 @@ md"
 
 *Topics* dealt are:
 
-- [Numeral](https://en.wikipedia.org/wiki/Numeral_system), Number
-- [Types](https://en.wikipedia.org/wiki/Data_type): $Int64$, $Float64$
-- [Expression](https://en.wikipedia.org/wiki/Expression_(computer_science))
-- [Operator](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
-- [Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity)
+- [*Numeral*](https://en.wikipedia.org/wiki/Numeral_system), *Number*
+- [*Types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
+- *Supertype, Subtypes, Type hierarchy*
+- [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science))
+- [*Operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
+- [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity)
 - Tests of *identity*: $==$, $===$
 - *built-in* functions: $typeof(.), typejoin(.,.)$
 - Type *conversion*
@@ -59,7 +60,7 @@ md"
 # ╔═╡ 3ecd4f01-805a-4c67-8897-fb57016b50ae
 md"
 ---
-##### 3. Expressions and *built-in* Functions
+##### 3.  SICP-Scheme-like *functional* Julia: *Expressions* and *built-in* Functions
 ###### 3.1 Primitive Expressions: Numerals
 "
 
@@ -278,7 +279,9 @@ end # begin
 
 # ╔═╡ 56f8b0f1-04ce-4111-84e5-e265c5c0209b
 md"
-###### Fig. 1.1.1.1: Kantorovic tree (Bauer & Wössner, 1981, p.21) of
+###### Fig. 1.1.1.1: Kantorovic tree (Bauer & Wössner, 1981, p.21)
+
+The abstract representation of an expression in *linear* form is the *nonlinear* graphic *Kantorovic* tree. By various search strategies we can generate the *linear surface* representation of the expression.
 
 - *prefix*-expression (from root to leaves): 
 $+( *(3, +( *( 2, 4), +(3, 5))), +( -(10, 7), 6))$
@@ -307,7 +310,16 @@ typeof(486)                                               # ==> Int64
 typeof(486.)                                              # ==> Float64
 
 # ╔═╡ 751b2fc4-298b-479f-9974-67578d4c5f24
-typejoin(Int64, Float64)
+typejoin(Int64, Float64)                                  # ==> Real
+
+# ╔═╡ 0f0ce1d6-c474-4cc4-8673-5117fb05039e
+Int64 <: Real                                             # ==> true
+
+# ╔═╡ 16a261cb-b368-4296-9452-490a0247b593
+Float64 <: Real                                           # ==> true
+
+# ╔═╡ 838f513c-fbaa-4233-a766-79f592df74d8
+subtypes(Real)               # ==> there are many more types than we used here !
 
 # ╔═╡ 8021a0af-cdbf-4708-926f-eea8a30ead15
 begin
@@ -342,8 +354,8 @@ begin
 			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
 	end # function plotBinaryTree!
 	#-----------------------------------------------------------------------------
-	plot(xlim=(-1, 11), ylim=(1.7, 4.3), legend=:false, ticks=:none, title="Excerpt of Type Hierarchy", titlefontsize=12)
-	plotTypeHierarchy!( "Int64", "Float64", "Real", 5.0, 4.0; widthOfTree=6.75, fontSize=12)
+	plot(xlim=(-1, 11), ylim=(2.8, 4.2), legend=:false, ticks=:none, title="Excerpt of Type Hierarchy", titlefontsize=12)
+	plotTypeHierarchy!( "Int64", "Float64", "Real", 5.0, 4.0; widthOfTree=6.75, fontSize=12, heightOfTree=1)
 end # begin
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
@@ -457,6 +469,8 @@ md"
 We evaluated *flat (= unnested)* and *nested* expressions. These can be written in *linear* form with brackets in different ways in *prefix*, *infix*, and *postfix* notation. Wheras *SICP* (= *MIT-Scheme*) only understands *prefix* expressions Julia understands even *infix* notation which everybody learnt in school. Brackets are used to control the evaluation process.
 
 Alternatively to the *linear* form expressions can also be documented in *nonlinear* graphical bracket-less form with *Kantorovic* trees. The three linear forms can be read out from the tree by various search strategies. In Kantorovic trees the evaluation process is controlled by the edges of the graph.
+
+As a further topic we discussed a small exerpt from Julia's type hierarchy. In our computations we came along with $Int64$ and $Float64$ which are both subtypes of the supertype $Real$.
 
 "
 
@@ -1766,6 +1780,9 @@ version = "1.4.1+1"
 # ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
 # ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╠═751b2fc4-298b-479f-9974-67578d4c5f24
+# ╠═0f0ce1d6-c474-4cc4-8673-5117fb05039e
+# ╠═16a261cb-b368-4296-9452-490a0247b593
+# ╠═838f513c-fbaa-4233-a766-79f592df74d8
 # ╟─8021a0af-cdbf-4708-926f-eea8a30ead15
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
