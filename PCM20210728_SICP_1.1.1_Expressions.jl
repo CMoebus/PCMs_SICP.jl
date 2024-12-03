@@ -5,14 +5,20 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ a5837b6b-a4d0-45bb-976c-cecda8e6781b
-using Plots
+begin 
+	using Pluto
+	using Plots
+	#----------------------------------------------------------
+	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
+	println("pkgversion(Plots)         = ", pkgversion(Plots))
+end # begin
 
 # ╔═╡ 0b714da0-b003-11ef-36b9-c1998185b8b1
 md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.1/0.19.27 by PCM *** 2024/12/02 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/03 ***
 
 ====================================================================================
 "
@@ -38,7 +44,7 @@ md"
 - [Operator](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
 - [Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity)
 - Tests of *identity*: $==$, $===$
-- *built-in* functions: $typeof(.)$
+- *built-in* functions: $typeof(.), typejoin(.,.)$
 - Type *conversion*
 - *Kantorovic* trees
 
@@ -60,14 +66,8 @@ md"
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
 486                                                       # ==> 486 
 
-# ╔═╡ dc5f6985-d4ae-4336-9f66-185bfed79a05
-typeof(486)                                               # ==> Int64 
-
 # ╔═╡ c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
 486.                                                      # ==> 486.0
-
-# ╔═╡ 17468ebe-4b5c-4ff1-a067-fae14a5e332f
-typeof(486.)                                              # ==> Float64
 
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
@@ -296,8 +296,55 @@ $\;$
 # ╔═╡ 36ceefbb-a164-49cf-a499-19c6c336be23
 md"
 ---
-##### 4. Idiomatic Julia: infix operators and expressions, *inbuilt* functions
+##### 4. Idiomatic Julia
+###### Type Hierarchy, Infix Operators and Expressions, *Inbuilt* Functions
 "
+
+# ╔═╡ dc5f6985-d4ae-4336-9f66-185bfed79a05
+typeof(486)                                               # ==> Int64 
+
+# ╔═╡ 17468ebe-4b5c-4ff1-a067-fae14a5e332f
+typeof(486.)                                              # ==> Float64
+
+# ╔═╡ 751b2fc4-298b-479f-9974-67578d4c5f24
+typejoin(Int64, Float64)
+
+# ╔═╡ 8021a0af-cdbf-4708-926f-eea8a30ead15
+begin
+	function plotTypeHierarchy!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=10) 
+		annotate!(
+			(coordinateXOfRootMark-widthOfTree/2, 
+			 coordinateYOfRootMark-heightOfTree, 
+			 text(markOfLeftLeaf, fontSize, :blue))) # mark of left vertical arm 'x'
+		plot!([
+			(coordinateXOfRootMark-widthOfTree/2,   
+			coordinateYOfRootMark - heightOfTree+heightOfTree/8),  
+			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark - heightOfTree/2)], 
+			lw=1, linecolor=:black) #  left vertical arm '|'
+		annotate!(
+			(coordinateXOfRootMark+widthOfTree/2, 
+			coordinateYOfRootMark-heightOfTree, 
+			text(markOfRightLeaf, fontSize, :blue))) # mark of right vertical arm 'x'
+		plot!([
+			(coordinateXOfRootMark+widthOfTree/2, 
+			coordinateYOfRootMark-heightOfTree+heightOfTree/8), 
+			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
+			lw=1, linecolor=:black) #  right vertical arm '|'
+		plot!([
+			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2), 
+			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
+			lw=1, linecolor=:black) #  horizontal bar '-'
+		plot!([
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/2), 
+			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8)], 
+			lw=1.5, linecolor=:black) #  middle vertical arm '|'
+		annotate!(
+			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
+	end # function plotBinaryTree!
+	#-----------------------------------------------------------------------------
+	plot(xlim=(-1, 11), ylim=(1.7, 4.3), legend=:false, ticks=:none, title="Excerpt of Type Hierarchy", titlefontsize=12)
+	plotTypeHierarchy!( "Int64", "Float64", "Real", 5.0, 4.0; widthOfTree=6.75, fontSize=12)
+end # begin
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -319,10 +366,10 @@ md"
 # SICP: (- 1000 300 34)                                   # ==> 666
 # prefix Julia: -(-(1000, 300), 34)                       # ==> 666 --> :)
 # infix Julia:
-(1000 - 300) - 34 == 1000 - 300 -34                       # ==> 666 --> :)
+(1000 - 300) - 34 == 1000 - 300 - 34                      # ==> 666 --> :)
 
 # ╔═╡ b8dcf0cd-7183-4da2-aab1-154f8c31e510
-(1000 - 300) - 34 === 1000 - 300 -34                      # ==> 666 --> :)
+(1000 - 300) - 34 === 1000 - 300 - 34                     # ==> 666 --> :)
 
 # ╔═╡ a3b868e5-ff5d-44a0-a5e6-1191867fb2e4
 # Math: 5 * 99                                            # ==> 495
@@ -437,18 +484,20 @@ This is a **draft** under the Attribution-NonCommercial-ShareAlike 4.0 Internati
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 
 [compat]
 Plots = "~1.40.8"
+Pluto = "~0.20.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.1"
+julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "37a60a8aadbc2c69d1a38bf02e0fbdfa20784462"
+project_hash = "7e9f10e3d5bd92f42a83c9bcff1fce3d4c904e9d"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -540,6 +589,12 @@ git-tree-sha1 = "ea32b83ca4fefa1768dc84e504cc0a94fb1ab8d1"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
 version = "2.4.2"
 
+[[deps.Configurations]]
+deps = ["ExproniconLite", "OrderedCollections", "TOML"]
+git-tree-sha1 = "4358750bb58a3caefd5f37a4a0c5bfdbbf075252"
+uuid = "5218b696-f38b-4ac9-8b61-a12ec717816d"
+version = "0.17.6"
+
 [[deps.Contour]]
 git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
@@ -555,6 +610,11 @@ deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
 git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 version = "0.18.20"
+
+[[deps.DataValueInterfaces]]
+git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+version = "1.0.0"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -572,6 +632,11 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -601,6 +666,16 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "1c6317308b9dc757616f0b5cb379db10494443a7"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.6.2+0"
+
+[[deps.ExpressionExplorer]]
+git-tree-sha1 = "0889fdf7ac69b67b65f54b763941967e0a08b7b3"
+uuid = "21656369-7473-754a-2065-74616d696c43"
+version = "1.0.4"
+
+[[deps.ExproniconLite]]
+git-tree-sha1 = "4c9ed87a6b3cd90acf24c556f2119533435ded38"
+uuid = "55351af7-c7e9-48d6-89ff-24e801d99491"
+version = "0.10.13"
 
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
@@ -646,6 +721,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "1ed150b39aebcc805c26b93a8d0122c940f64ce2"
 uuid = "559328eb-81f9-559d-9380-de523a88c83c"
 version = "1.0.14+0"
+
+[[deps.FuzzyCompletions]]
+deps = ["REPL"]
+git-tree-sha1 = "be713866335f48cfb1285bff2d0cbb8304c1701c"
+uuid = "fb4132e2-a121-4a70-b8a1-d5b831dcdcc2"
+version = "0.5.5"
 
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
@@ -700,6 +781,12 @@ git-tree-sha1 = "401e4f3f30f43af2c8478fc008da50096ea5240f"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "8.3.1+0"
 
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.5"
+
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
@@ -709,6 +796,11 @@ version = "1.11.0"
 git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.2.2"
+
+[[deps.IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
 
 [[deps.JLFzf]]
 deps = ["Pipe", "REPL", "Random", "fzf_jll"]
@@ -778,6 +870,11 @@ version = "0.16.5"
     DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LazilyInitializedFields]]
+git-tree-sha1 = "8f7f3cabab0fd1800699663533b6d5cb3fc0e612"
+uuid = "0e77f7df-68c5-4e49-93ce-4cd80f5598bf"
+version = "1.2.2"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -887,11 +984,22 @@ git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.1.0"
 
+[[deps.MIMEs]]
+git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "0.1.4"
+
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
 git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.13"
+
+[[deps.Malt]]
+deps = ["Distributed", "Logging", "RelocatableFolders", "Serialization", "Sockets"]
+git-tree-sha1 = "02a728ada9d6caae583a0f87c1dd3844f99ec3fd"
+uuid = "36869731-bdee-424d-aa32-cab38c994e3b"
+version = "1.1.2"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -927,6 +1035,12 @@ version = "1.11.0"
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2023.12.12"
+
+[[deps.MsgPack]]
+deps = ["Serialization"]
+git-tree-sha1 = "f5db02ae992c260e4826fe78c942954b48e1d9c2"
+uuid = "99f44e22-a591-53d1-9472-aa23ef4bd671"
+version = "1.2.1"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
@@ -1046,6 +1160,23 @@ version = "1.40.8"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
+[[deps.Pluto]]
+deps = ["Base64", "Configurations", "Dates", "Downloads", "ExpressionExplorer", "FileWatching", "FuzzyCompletions", "HTTP", "HypertextLiteral", "InteractiveUtils", "Logging", "LoggingExtras", "MIMEs", "Malt", "Markdown", "MsgPack", "Pkg", "PlutoDependencyExplorer", "PrecompileSignatures", "PrecompileTools", "REPL", "RegistryInstances", "RelocatableFolders", "Scratch", "Sockets", "TOML", "Tables", "URIs", "UUIDs"]
+git-tree-sha1 = "7bfacc26d134744edc825f1434abca4960f53936"
+uuid = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+version = "0.20.0"
+
+[[deps.PlutoDependencyExplorer]]
+deps = ["ExpressionExplorer", "InteractiveUtils", "Markdown"]
+git-tree-sha1 = "4bc5284f77d731196d3e97f23abb732ad6f2a6e4"
+uuid = "72656b73-756c-7461-726b-72656b6b696b"
+version = "1.0.4"
+
+[[deps.PrecompileSignatures]]
+git-tree-sha1 = "18ef344185f25ee9d51d80e179f8dad33dc48eb1"
+uuid = "91cefc8d-f054-46dc-8f8c-26e11d7c5411"
+version = "3.0.3"
+
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
 git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
@@ -1113,6 +1244,12 @@ version = "0.6.12"
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
+
+[[deps.RegistryInstances]]
+deps = ["LazilyInitializedFields", "Pkg", "TOML", "Tar"]
+git-tree-sha1 = "ffd19052caf598b8653b99404058fce14828be51"
+uuid = "2792f1a3-b283-48e8-9a74-f99dce5104f3"
+version = "0.1.0"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
@@ -1208,6 +1345,18 @@ deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
 
+[[deps.TableTraits]]
+deps = ["IteratorInterfaceExtensions"]
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "1.0.1"
+
+[[deps.Tables]]
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "OrderedCollections", "TableTraits"]
+git-tree-sha1 = "598cd7c1f68d1e205689b1c2fe65a9f85846f297"
+uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+version = "1.12.0"
+
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
@@ -1228,6 +1377,11 @@ version = "1.11.0"
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.11.3"
+
+[[deps.Tricks]]
+git-tree-sha1 = "7822b97e99a1672bfb1b49b668a6d46d58d8cbcb"
+uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
+version = "0.1.9"
 
 [[deps.URIs]]
 git-tree-sha1 = "67db6cc7b3821e19ebe75791a9dd19c9b1188f2b"
@@ -1579,9 +1733,7 @@ version = "1.4.1+1"
 # ╠═a5837b6b-a4d0-45bb-976c-cecda8e6781b
 # ╟─3ecd4f01-805a-4c67-8897-fb57016b50ae
 # ╠═198ce2f2-988c-4387-a73d-60f5d785c3bc
-# ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
 # ╠═c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
-# ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╠═f46897fa-abdc-4a21-846e-0195b0172fa0
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
@@ -1611,6 +1763,10 @@ version = "1.4.1+1"
 # ╟─9cfedf46-4325-4972-9c35-d8e604003eaa
 # ╟─56f8b0f1-04ce-4111-84e5-e265c5c0209b
 # ╟─36ceefbb-a164-49cf-a499-19c6c336be23
+# ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
+# ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
+# ╠═751b2fc4-298b-479f-9974-67578d4c5f24
+# ╟─8021a0af-cdbf-4708-926f-eea8a30ead15
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
