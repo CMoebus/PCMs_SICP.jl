@@ -7,7 +7,7 @@ using InteractiveUtils
 # ╔═╡ a5837b6b-a4d0-45bb-976c-cecda8e6781b
 begin 
 	using Pluto
-	using Plots
+	using Plots	
 	using GraphRecipes
 	#----------------------------------------------------------------
 	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/03 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/04 ***
 
 ====================================================================================
 "
@@ -29,7 +29,7 @@ md"
 # ╔═╡ 53196c5e-41a1-4e37-9405-5e2ee4d8c58e
 md"
 ##### 0. Introduction
-First we try to be as close as possible to the *functional* style of the original Scheme implementation, then we introduce *idiomatic* Julia elements.
+First we try to be as close as possible to the *functional* style of SICP in [*MIT-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme), then we introduce *idiomatic* Julia elements.
 
 "
 
@@ -62,7 +62,7 @@ md"
 # ╔═╡ 3ecd4f01-805a-4c67-8897-fb57016b50ae
 md"
 ---
-##### 3.  SICP-Scheme-like *functional* Julia: *Expressions* and *built-in* Functions
+##### 3.  SICP-Scheme-like *functional* Julia: *Expressions* and *Call* of built-in *Functions*
 ###### 3.1 Primitive Expressions: Numerals
 "
 
@@ -75,7 +75,13 @@ md"
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
 ###### 3.2 *Prefix* Expressions (= *Combinations*)
-###### 3.2.1 *Flat* Combination: <*combination*> = <*operator*>(<*operand*>,...)
+###### *Combinations* are *function call*s:
+
+$\mathbf{<operator>(<operand>,...)\; \Longrightarrow\; <value>}$
+
+$\;$
+
+###### 3.2.1 <*flat combination*> = <*operator*>(<*operand*>,...)
 "
 
 # ╔═╡ f46897fa-abdc-4a21-846e-0195b0172fa0
@@ -95,25 +101,6 @@ typeof(+(137, 349))                                       # ==> Int64
 
 # ╔═╡ 79e083b5-e2a0-426f-968a-1f6c59eac390
 typeof( -(1000, 334))                                     # ==> Int64 
-
-# ╔═╡ 62a20957-b08b-48a9-968b-e65038cc520a
-md"
-###### [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity): *left*-associativity of operator '-'
-"
-
-# ╔═╡ 2507313b-a2c7-452e-9288-a4da8bfb0ff9
-# *left*-associativity of operator '-'
-# Math: 1000 - 300 - 34                                   # ==> 666
-# SICP: (- 1000 300 34)                                   # ==> 666
-# prefix Julia:
--(1000, -(300, 34))                                       # ==> 734 --> :(
-
-# ╔═╡ aaa8d90b-b0d9-4e8b-aff6-a286910afc65
-# left-associativity of operator '-'
-# Math: 1000 - 300 - 34                                   # ==> 666
-# SICP: (- 1000 300 34)                                   # ==> 666
-# prefix Julia:
--(-(1000, 300), 34)                                       # ==> 666 --> :)
 
 # ╔═╡ c45887c0-ddbf-4d09-b89b-af83216e51cf
 # Math: 5 * 99                                            # ==> 495
@@ -187,6 +174,25 @@ md"
 ###### *Nested* Combination <*combination*> = <*operator*>(<*operand*>,..., <*operator*>(<*operand*>,...),...)
 "
 
+# ╔═╡ 62a20957-b08b-48a9-968b-e65038cc520a
+md"
+###### [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity): *left*-associativity of operator '-'
+"
+
+# ╔═╡ 2507313b-a2c7-452e-9288-a4da8bfb0ff9
+# *left*-associativity of operator '-'
+# Math: 1000 - 300 - 34                                   # ==> 666
+# SICP: (- 1000 300 34)                                   # ==> 666
+# prefix Julia:
+-(1000, -(300, 34))                                       # ==> 734 --> :(
+
+# ╔═╡ aaa8d90b-b0d9-4e8b-aff6-a286910afc65
+# left-associativity of operator '-'
+# Math: 1000 - 300 - 34                                   # ==> 666
+# SICP: (- 1000 300 34)                                   # ==> 666
+# prefix Julia:
+-(-(1000, 300), 34)                                       # ==> 666 --> :)
+
 # ╔═╡ 3c945bff-e78a-433d-8a4d-118b6915ffc4
 # Math: 3 * 5 + (10 - 6)                                  # ==> 19
 # SICP: (+ (* 3 5) (- 10 6))                              # ==> 19
@@ -218,7 +224,7 @@ md"
 
 # ╔═╡ 07d566e1-77a2-45b1-be22-5521d1f65d2e
 md"
-###### *Nested* Combination with *Prefix* Operators as a Data Flow (*Kantorovic*) tree
+###### *Nested* Combination with *Prefix* Operators as a *nonlinear* Data Flow (*Kantorovic*) tree
 (Bauer & Wössner, 1981, p.21)
 "
 
@@ -281,7 +287,7 @@ end # begin
 
 # ╔═╡ 56f8b0f1-04ce-4111-84e5-e265c5c0209b
 md"
-###### Fig. 1.1.1.1: Kantorovic tree (Bauer & Wössner, 1981, p.21)
+###### Fig. 1.1.1.1: *Kantorovic* tree (Bauer & Wössner, 1981, p.21)
 
 The abstract representation of an expression in *linear* form is the *nonlinear* graphic *Kantorovic* tree. By various search strategies we can generate the *linear surface* representation of the expression.
 
@@ -323,42 +329,19 @@ Float64 <: Real                                           # ==> true
 # ╔═╡ 838f513c-fbaa-4233-a766-79f592df74d8
 subtypes(Real)               # ==> there are many more types than we used here !
 
-# ╔═╡ 8021a0af-cdbf-4708-926f-eea8a30ead15
-begin
-	function plotTypeHierarchy!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=10) 
-		annotate!(
-			(coordinateXOfRootMark-widthOfTree/2, 
-			 coordinateYOfRootMark-heightOfTree, 
-			 text(markOfLeftLeaf, fontSize, :blue))) # mark of left vertical arm 'x'
-		plot!([
-			(coordinateXOfRootMark-widthOfTree/2,   
-			coordinateYOfRootMark - heightOfTree+heightOfTree/8),  
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark - heightOfTree/2)], 
-			lw=1, linecolor=:black) #  left vertical arm '|'
-		annotate!(
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark-heightOfTree, 
-			text(markOfRightLeaf, fontSize, :blue))) # mark of right vertical arm 'x'
-		plot!([
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark-heightOfTree+heightOfTree/8), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
-			lw=1, linecolor=:black) #  right vertical arm '|'
-		plot!([
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark-heightOfTree/2), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark-heightOfTree/2)], 
-			lw=1, linecolor=:black) #  horizontal bar '-'
-		plot!([
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/2), 
-			(coordinateXOfRootMark, coordinateYOfRootMark-heightOfTree/8)], 
-			lw=1.5, linecolor=:black) #  middle vertical arm '|'
-		annotate!(
-			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
-	end # function plotBinaryTree!
-	#-----------------------------------------------------------------------------
-	plot(size=(600, 300), xlim=(0, 20), ylim=(3.4, 4.2), legend=:false,ticks=:none, title="Excerpt of Type Hierarchy", titlefontsize=12)
-	plotTypeHierarchy!( "Int64", "Float64", "Real", 10.0, 4.0; widthOfTree=10.0, fontSize=12, heightOfTree=0.4)
-end # begin
+# ╔═╡ 901c4920-b1d8-48dc-a100-d7ae25fa51cb
+function makeMySmallTypeTree()
+	g = [
+		0 0 0;
+		1 0 0;
+		1 0 0]
+	names = ["Real", "Int64", "Float64"]
+	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
+	graphplot(g, x=[0, -2, + 2], y = [2, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.3, fontsize=12, title="Excerpt of Type Tree", titlefontsize=13)
+end # function typeTree
+
+# ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
+makeMySmallTypeTree()
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -485,6 +468,8 @@ md"
 
 - **Bauer, F.L. & Wössner, H.**; *Algorithmic Language and Program Development*, Heidelberg: Springer, 1981
 
+- **Wikipedia**; [*MIT/GNU-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme); last visit 2024/12/04
+
 "
 
 # ╔═╡ f6448ce3-ee6c-4835-984a-20d0e08e425d
@@ -538,9 +523,9 @@ version = "1.1.2"
 
 [[deps.ArnoldiMethod]]
 deps = ["LinearAlgebra", "Random", "StaticArrays"]
-git-tree-sha1 = "d57bd3762d308bded22c3b82d033bff85f6195c6"
+git-tree-sha1 = "62e51b39331de8911e4a7ff6f5aaf38a5f4cc0ae"
 uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
-version = "0.4.0"
+version = "0.2.0"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -872,9 +857,9 @@ version = "1.3.14+1"
 
 [[deps.Graphs]]
 deps = ["ArnoldiMethod", "Compat", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
-git-tree-sha1 = "1dc470db8b1131cfc7fb4c115de89fe391b9e780"
+git-tree-sha1 = "899050ace26649433ef1af25bc17a815b3db52b7"
 uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
-version = "1.12.0"
+version = "1.9.0"
 
 [[deps.Grisu]]
 git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
@@ -1954,9 +1939,6 @@ version = "1.4.1+1"
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
 # ╠═d7e0156f-5b8c-48c9-8ce1-bbb93f6ed6d8
 # ╠═79e083b5-e2a0-426f-968a-1f6c59eac390
-# ╟─62a20957-b08b-48a9-968b-e65038cc520a
-# ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
-# ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # ╠═c45887c0-ddbf-4d09-b89b-af83216e51cf
 # ╠═873a3284-043b-4499-b1ce-8a87605e5a09
 # ╠═6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
@@ -1971,9 +1953,12 @@ version = "1.4.1+1"
 # ╠═575db3c8-3ccc-4d89-9bc8-f25a39cf87d3
 # ╠═e806ccc9-77e6-4a8a-9eec-0b1a643a5b9a
 # ╟─b3af6b38-3b06-4966-8e88-3da2fe720e3e
+# ╟─62a20957-b08b-48a9-968b-e65038cc520a
+# ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
+# ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # ╠═3c945bff-e78a-433d-8a4d-118b6915ffc4
 # ╠═63571818-e93c-4122-a998-59c040df93da
-# ╟─07d566e1-77a2-45b1-be22-5521d1f65d2e
+# ╠═07d566e1-77a2-45b1-be22-5521d1f65d2e
 # ╠═9fe7665f-faf4-4633-be95-62126d7d6c90
 # ╟─9cfedf46-4325-4972-9c35-d8e604003eaa
 # ╟─56f8b0f1-04ce-4111-84e5-e265c5c0209b
@@ -1984,7 +1969,8 @@ version = "1.4.1+1"
 # ╠═0f0ce1d6-c474-4cc4-8673-5117fb05039e
 # ╠═16a261cb-b368-4296-9452-490a0247b593
 # ╠═838f513c-fbaa-4233-a766-79f592df74d8
-# ╟─8021a0af-cdbf-4708-926f-eea8a30ead15
+# ╟─901c4920-b1d8-48dc-a100-d7ae25fa51cb
+# ╠═f3d35d58-5889-44b8-be7c-4ca3c838bf86
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
