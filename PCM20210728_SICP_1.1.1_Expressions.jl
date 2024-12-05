@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/04 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/05 ***
 
 ====================================================================================
 "
@@ -30,6 +30,7 @@ md"
 md"
 ##### 0. Introduction
 First we try to be as close as possible to the *functional* style of SICP in [*MIT-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme), then we introduce *idiomatic* Julia elements.
+In case of any doubt you can consult the [Julia doc](https://docs.julialang.org/en/v1/).
 
 "
 
@@ -43,11 +44,12 @@ md"
 - [*Numeral*](https://en.wikipedia.org/wiki/Numeral_system), *Number*
 - [*Types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
 - *Supertype, Subtypes, Type hierarchy*
-- [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science))
+- [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *Evaluation*
+- *Function call*
 - [*Operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
 - [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity)
 - Tests of *identity*: $==$, $===$
-- *built-in* functions: $typeof(.), typejoin(.,.)$
+- *built-in* functions: $typeof(.), typejoin(.,.), typemin(.), typemax(.)$
 - Type *conversion*
 - *Kantorovic* trees
 
@@ -63,11 +65,18 @@ md"
 md"
 ---
 ##### 3.  SICP-Scheme-like *functional* Julia: *Expressions* and *Call* of built-in *Functions*
+Numbers and Expressions have *values*. *Numbers* evaluate to themselves, *numeric expressions* are *function calls* and evaluate to *numbers*. 
 ###### 3.1 Primitive Expressions: Numerals
 "
 
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
 486                                                       # ==> 486 
+
+# ╔═╡ dc5f6985-d4ae-4336-9f66-185bfed79a05
+typeof(486)                                               # ==> Int64 
+
+# ╔═╡ 17468ebe-4b5c-4ff1-a067-fae14a5e332f
+typeof(486.)                                              # ==> Float64
 
 # ╔═╡ c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
 486.                                                      # ==> 486.0
@@ -75,6 +84,8 @@ md"
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
 ###### 3.2 *Prefix* Expressions (= *Combinations*)
+We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with brackets in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
+
 ###### *Combinations* are *function call*s:
 
 $\mathbf{<operator>(<operand>,...)\; \Longrightarrow\; <value>}$
@@ -90,6 +101,9 @@ $\;$
 # prefix Julia:
 +(137, 349)                                               # ==> 486 --> :)
 
+# ╔═╡ f991ce90-0097-4060-88af-e6daa02ef95e
+typeof(+)
+
 # ╔═╡ 3794e29c-696b-4e18-8cc2-2a36489ccd5c
 typeof(+(137, 349))                                       # ==> Int64 
 
@@ -98,6 +112,9 @@ typeof(+(137, 349))                                       # ==> Int64
 # SICP: (- 1000 334)                                      # ==> 666
 # prefix Julia:
 -(1000, 334)                                              # ==> 666 --> :)
+
+# ╔═╡ c590d4f2-fab6-4bd3-ab24-6fb38a9a5429
+typeof(-)
 
 # ╔═╡ 79e083b5-e2a0-426f-968a-1f6c59eac390
 typeof( -(1000, 334))                                     # ==> Int64 
@@ -108,6 +125,9 @@ typeof( -(1000, 334))                                     # ==> Int64
 # prefix Julia:
 *(5, 99)                                                  # ==> 495 --> :)
 
+# ╔═╡ e31d61c6-0a11-400b-87b5-ccc79038e50a
+typeof(*)
+
 # ╔═╡ 873a3284-043b-4499-b1ce-8a87605e5a09
 typeof( *(5, 99))                                         # ==> Int64 --> :)
 
@@ -116,6 +136,9 @@ typeof( *(5, 99))                                         # ==> Int64 --> :)
 # SICP: (/ 10 5)                                          # ==> 2
 # prefix Julia:
 /(10, 5)                                                  # ==> 2.0 --> !!
+
+# ╔═╡ 982403d6-17cf-4788-972a-49263d10a91a
+typeof(/)
 
 # ╔═╡ 6dfc1c6c-9b77-4df8-9133-63c988696161
 typeof(/(10, 5))                                          # ==> Float64 --> !!
@@ -199,6 +222,9 @@ md"
 # prefix Julia:
 +( *(3, 5), -(10, 6))                                     # ==> 19 --> :)
 
+# ╔═╡ c6082b1c-92d1-4bb9-b93b-1feb803d014c
+typeof(+) <: Function, typeof(*) <: Function
+
 # ╔═╡ 63571818-e93c-4122-a998-59c040df93da
 # Math: (3 * ((2 * 4) + (3 + 5))) + ((10 - 7) + 6) =
 #       (3 * (   8    +    8   )) + (    3    + 6) =
@@ -244,38 +270,38 @@ md"
 
 # ╔═╡ 9cfedf46-4325-4972-9c35-d8e604003eaa
 begin
-	function plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=11) 
+	function plotBinaryTree!(markOfLeftLeaf, markOfRightLeaf, markOfRoot, coordinateXOfRootMark, coordinateYOfRootMark; widthOfTree=1.5, heightOfTree=2, fontSize=12) 
 		annotate!(
-			(coordinateXOfRootMark-widthOfTree/2, 
-			 coordinateYOfRootMark+heightOfTree, 
+			(coordinateXOfRootMark - widthOfTree/2, 
+			 coordinateYOfRootMark + heightOfTree, 
 			 text(markOfLeftLeaf, fontSize, :blue))) # mark of left vertical arm 'x'
 		plot!([
-			(coordinateXOfRootMark-widthOfTree/2,   
-			coordinateYOfRootMark + heightOfTree-heightOfTree/8),  
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
+			(coordinateXOfRootMark -widthOfTree/2,   
+			coordinateYOfRootMark + heightOfTree - heightOfTree/6),  
+			(coordinateXOfRootMark - widthOfTree/2, coordinateYOfRootMark + heightOfTree/2)], 
 			lw=1, linecolor=:black) #  left vertical arm '|'
 		annotate!(
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark+heightOfTree, 
+			(coordinateXOfRootMark + widthOfTree/2, 
+			coordinateYOfRootMark + heightOfTree, 
 			text(markOfRightLeaf, fontSize, :blue))) # mark of right vertical arm 'x'
 		plot!([
-			(coordinateXOfRootMark+widthOfTree/2, 
-			coordinateYOfRootMark+heightOfTree-heightOfTree/8), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
+			(coordinateXOfRootMark + widthOfTree/2, 
+			coordinateYOfRootMark + heightOfTree - heightOfTree/6), 
+			(coordinateXOfRootMark + widthOfTree/2, coordinateYOfRootMark + heightOfTree/2)], 
 			lw=1, linecolor=:black) #  right vertical arm '|'
 		plot!([
-			(coordinateXOfRootMark-widthOfTree/2, coordinateYOfRootMark+heightOfTree/2), 
-			(coordinateXOfRootMark+widthOfTree/2, coordinateYOfRootMark+heightOfTree/2)], 
+			(coordinateXOfRootMark - widthOfTree/2, coordinateYOfRootMark + heightOfTree/2), 
+			(coordinateXOfRootMark + widthOfTree/2, coordinateYOfRootMark + heightOfTree/2)], 
 			lw=1, linecolor=:black) #  horizontal bar '-'
 		plot!([
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/2), 
-			(coordinateXOfRootMark, coordinateYOfRootMark+heightOfTree/8)], 
+			(coordinateXOfRootMark, coordinateYOfRootMark + heightOfTree/2), 
+			(coordinateXOfRootMark, coordinateYOfRootMark + heightOfTree/6)], 
 			lw=1.5, linecolor=:black) #  middle vertical arm '|'
 		annotate!(
 			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
 	end # function plotBinaryTree!
-	#---------------------------------------------------
-	plot(size=(800, 400), xlim=(-1, 10), ylim=(0, 11), legend=:false, ticks=:none, title="Kantorovic Tree", titlefontsize=12)
+	#-----------------------------------------------------------------------------
+	plot(size=(800, 400), xlim=(-1, 11), ylim=(0, 12), legend=:false, ticks=:none, title="Kantorovic Tree", titlefontsize=14)
 	plotBinaryTree!( "2", "4", "*",  1.5,  8.0)
 	plotBinaryTree!( "3", "5", "+",  4.0,  8.0)
 	plotBinaryTree!( "*", "+", "+",  2.75, 6.0; widthOfTree=2.5)
@@ -311,12 +337,6 @@ md"
 ###### Type Hierarchy, Infix Operators and Expressions, *Inbuilt* Functions
 "
 
-# ╔═╡ dc5f6985-d4ae-4336-9f66-185bfed79a05
-typeof(486)                                               # ==> Int64 
-
-# ╔═╡ 17468ebe-4b5c-4ff1-a067-fae14a5e332f
-typeof(486.)                                              # ==> Float64
-
 # ╔═╡ 751b2fc4-298b-479f-9974-67578d4c5f24
 typejoin(Int64, Float64)                                  # ==> Real
 
@@ -342,6 +362,24 @@ end # function typeTree
 
 # ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
 makeMySmallTypeTree()
+
+# ╔═╡ b53099c7-267f-4f3e-aac3-b01f00ba814e
+typeof(+) <: Function
+
+# ╔═╡ 34265915-b300-4291-a327-4b2f512950fc
+isprimitivetype(Int64)
+
+# ╔═╡ 7e379802-13ac-4f26-97ad-644aa42b0b82
+isprimitivetype(Float64)
+
+# ╔═╡ 45269af2-373c-4178-a527-b0d0064f5a06
+isprimitivetype(Function)
+
+# ╔═╡ ba6e6b36-3e29-47cc-b89d-81044f1e21be
+typemin(Int64), typemax(Int64)
+
+# ╔═╡ 69ed7655-db45-4075-8041-1f86b8c0ce67
+typemin(Float64), typemax(Float64)
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -447,15 +485,22 @@ makeMySmallTypeTree()
 # ╔═╡ 2f6afa41-9c1a-403a-9a91-eb697e5f48bd
 3 * (2 * 4 + (3 + 5)) + 10 - 7 + 6 
 
+# ╔═╡ 6cf5f760-e2fc-498a-b73e-aad0aae95059
+3(2 * 4 + (3 + 5)) + 10 - 7 + 6 
+
+# ╔═╡ 477f6294-c4d2-49ee-8b9f-45b24cd696e9
+3(2 * 4 + 3 + 5) + 10 - 7 + 6 
+
 # ╔═╡ d2dd2233-7afb-4222-96bb-86ae61ba5e72
 md"
 ---
 ##### 5. Summary
-We evaluated *flat (= unnested)* and *nested* expressions. These can be written in *linear* form with brackets in different ways in *prefix*, *infix*, and *postfix* notation. Wheras *SICP* (= *MIT-Scheme*) only understands *prefix* expressions Julia understands even *infix* notation which everybody learnt in school. Brackets are used to control the evaluation process.
 
-Alternatively to the *linear* form expressions can also be documented in *nonlinear* graphical bracket-less form with *Kantorovic* trees. The three linear forms can be read out from the tree by various search strategies. In Kantorovic trees the evaluation process is controlled by the edges of the graph.
+We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with brackets in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
 
-As a further topic we discussed a small exerpt from Julia's type hierarchy. In our computations we came along with $Int64$ and $Float64$ which are both subtypes of the supertype $Real$.
+As an alternative to the *linear* form, expressions can also be documented in *non-linear* graphical, parenthesis-free form with *Kantorovic* trees. The three linear forms can be read from this tree using various search strategies. In Kantorovic trees, the evaluation process is controlled by the edges of the graph.
+
+As a further topic, we discussed a small excerpt from Julia's type hierarchy. In our calculations, we came across $Int64$ and $Float64$, both of which are subtypes of the supertype $Real$.
 
 "
 
@@ -467,6 +512,8 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2024/12/01
 
 - **Bauer, F.L. & Wössner, H.**; *Algorithmic Language and Program Development*, Heidelberg: Springer, 1981
+
+- **JuliHub**; [*Julia doc*](https://docs.julialang.org/en/v1/); last visit 2024/12/05
 
 - **Wikipedia**; [*MIT/GNU-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme); last visit 2024/12/04
 
@@ -1933,15 +1980,21 @@ version = "1.4.1+1"
 # ╠═a5837b6b-a4d0-45bb-976c-cecda8e6781b
 # ╟─3ecd4f01-805a-4c67-8897-fb57016b50ae
 # ╠═198ce2f2-988c-4387-a73d-60f5d785c3bc
+# ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
+# ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╠═c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╠═f46897fa-abdc-4a21-846e-0195b0172fa0
+# ╠═f991ce90-0097-4060-88af-e6daa02ef95e
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
 # ╠═d7e0156f-5b8c-48c9-8ce1-bbb93f6ed6d8
+# ╠═c590d4f2-fab6-4bd3-ab24-6fb38a9a5429
 # ╠═79e083b5-e2a0-426f-968a-1f6c59eac390
 # ╠═c45887c0-ddbf-4d09-b89b-af83216e51cf
+# ╠═e31d61c6-0a11-400b-87b5-ccc79038e50a
 # ╠═873a3284-043b-4499-b1ce-8a87605e5a09
 # ╠═6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
+# ╠═982403d6-17cf-4788-972a-49263d10a91a
 # ╠═6dfc1c6c-9b77-4df8-9133-63c988696161
 # ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
 # ╠═0f5bb248-9230-41a6-ad18-f68636100328
@@ -1957,20 +2010,25 @@ version = "1.4.1+1"
 # ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
 # ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # ╠═3c945bff-e78a-433d-8a4d-118b6915ffc4
+# ╠═c6082b1c-92d1-4bb9-b93b-1feb803d014c
 # ╠═63571818-e93c-4122-a998-59c040df93da
-# ╠═07d566e1-77a2-45b1-be22-5521d1f65d2e
+# ╟─07d566e1-77a2-45b1-be22-5521d1f65d2e
 # ╠═9fe7665f-faf4-4633-be95-62126d7d6c90
 # ╟─9cfedf46-4325-4972-9c35-d8e604003eaa
 # ╟─56f8b0f1-04ce-4111-84e5-e265c5c0209b
 # ╟─36ceefbb-a164-49cf-a499-19c6c336be23
-# ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
-# ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╠═751b2fc4-298b-479f-9974-67578d4c5f24
 # ╠═0f0ce1d6-c474-4cc4-8673-5117fb05039e
 # ╠═16a261cb-b368-4296-9452-490a0247b593
 # ╠═838f513c-fbaa-4233-a766-79f592df74d8
 # ╟─901c4920-b1d8-48dc-a100-d7ae25fa51cb
 # ╠═f3d35d58-5889-44b8-be7c-4ca3c838bf86
+# ╠═b53099c7-267f-4f3e-aac3-b01f00ba814e
+# ╠═34265915-b300-4291-a327-4b2f512950fc
+# ╠═7e379802-13ac-4f26-97ad-644aa42b0b82
+# ╠═45269af2-373c-4178-a527-b0d0064f5a06
+# ╠═ba6e6b36-3e29-47cc-b89d-81044f1e21be
+# ╠═69ed7655-db45-4075-8041-1f86b8c0ce67
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
@@ -1986,6 +2044,8 @@ version = "1.4.1+1"
 # ╠═9d009aba-7015-401b-aaf2-0243b81f7d9a
 # ╠═41414ac2-6102-4472-9854-4c046da59cd6
 # ╠═2f6afa41-9c1a-403a-9a91-eb697e5f48bd
+# ╠═6cf5f760-e2fc-498a-b73e-aad0aae95059
+# ╠═477f6294-c4d2-49ee-8b9f-45b24cd696e9
 # ╟─d2dd2233-7afb-4222-96bb-86ae61ba5e72
 # ╟─9e0c051d-5502-4ac2-98ba-aa4fee74df33
 # ╟─f6448ce3-ee6c-4835-984a-20d0e08e425d
