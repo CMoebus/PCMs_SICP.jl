@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/05 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/06 ***
 
 ====================================================================================
 "
@@ -64,9 +64,20 @@ md"
 # ╔═╡ 3ecd4f01-805a-4c67-8897-fb57016b50ae
 md"
 ---
-##### 3.  SICP-Scheme-like *functional* Julia: *Expressions* and *Call* of built-in *Functions*
-Numbers and Expressions have *values*. *Numbers* evaluate to themselves, *numeric expressions* are *function calls* and evaluate to *numbers*. 
-###### 3.1 Primitive Expressions: Numerals
+##### 3.  SICP-Scheme-like *functional* Julia: *Expressions*
+*Expressions* are evaluated to a *value*. When *numeric* expressions are *simple* they are *numerals* and evaluated to *numbers*. When they are *combinations* they are evaluated in several steps to a *number*
+
+*Combinations* are *function calls*:
+
+$\mathbf{operator()\Longrightarrow number}$
+$\mathbf{operator(operand,...)\Longrightarrow number}$
+
+$\;$
+$\;$
+
+The *function call* consists of the *function symbol* or *function name* and zero or more *arguments*.
+
+###### 3.1 Primitive Expressions: Numeral $\Longrightarrow$ Number
 "
 
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
@@ -84,11 +95,13 @@ typeof(486.)                                              # ==> Float64
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
 ###### 3.2 *Prefix* Expressions (= *Combinations*)
-We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with brackets in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
+We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation learnt in school. Parentheses are used to control the evaluation process.
 
 ###### *Combinations* are *function call*s:
 
-$\mathbf{<operator>(<operand>,...)\; \Longrightarrow\; <value>}$
+$\mathbf{operator(operand,...)\; \Longrightarrow\; value}$
+$\mathbf{operator(operand,..., operator(),operand,...)\; \Longrightarrow\; value}$
+$\mathbf{operator(operand,..., operator(operand,...), operand,...)\; \Longrightarrow\; value}$
 
 $\;$
 
@@ -97,80 +110,12 @@ $\;$
 
 # ╔═╡ f46897fa-abdc-4a21-846e-0195b0172fa0
 # Math: 137 + 349                                         # ==> 486
-# SICP: (+ 137 349)                                       # ==> 486
+# SICP-Scheme: (+ 137 349)                                # ==> 486
 # prefix Julia:
 +(137, 349)                                               # ==> 486 --> :)
 
-# ╔═╡ f991ce90-0097-4060-88af-e6daa02ef95e
-typeof(+)
-
 # ╔═╡ 3794e29c-696b-4e18-8cc2-2a36489ccd5c
-typeof(+(137, 349))                                       # ==> Int64 
-
-# ╔═╡ d7e0156f-5b8c-48c9-8ce1-bbb93f6ed6d8
-# Math: 1000 - 334                                        # ==> 666
-# SICP: (- 1000 334)                                      # ==> 666
-# prefix Julia:
--(1000, 334)                                              # ==> 666 --> :)
-
-# ╔═╡ c590d4f2-fab6-4bd3-ab24-6fb38a9a5429
-typeof(-)
-
-# ╔═╡ 79e083b5-e2a0-426f-968a-1f6c59eac390
-typeof( -(1000, 334))                                     # ==> Int64 
-
-# ╔═╡ c45887c0-ddbf-4d09-b89b-af83216e51cf
-# Math: 5 * 99                                            # ==> 495
-# SICP: (* 5 99)                                          # ==> 495
-# prefix Julia:
-*(5, 99)                                                  # ==> 495 --> :)
-
-# ╔═╡ e31d61c6-0a11-400b-87b5-ccc79038e50a
-typeof(*)
-
-# ╔═╡ 873a3284-043b-4499-b1ce-8a87605e5a09
-typeof( *(5, 99))                                         # ==> Int64 --> :)
-
-# ╔═╡ 6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
-# Math: 10 / 5                                            # ==> 2
-# SICP: (/ 10 5)                                          # ==> 2
-# prefix Julia:
-/(10, 5)                                                  # ==> 2.0 --> !!
-
-# ╔═╡ 982403d6-17cf-4788-972a-49263d10a91a
-typeof(/)
-
-# ╔═╡ 6dfc1c6c-9b77-4df8-9133-63c988696161
-typeof(/(10, 5))                                          # ==> Float64 --> !!
-
-# ╔═╡ f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
-# Math: 10 / 5                                            # ==> 2
-# SICP: (/ 10 5)                                          # ==> 2
-# prefix Julia:
-div(10, 5)                                                # ==> 2 --> :)
-
-# ╔═╡ 0f5bb248-9230-41a6-ad18-f68636100328
-# Math: 10 / 5                                            # ==> 2
-# SICP: (/ 10 5)                                          # ==> 2
-# prefix Julia:
-÷(10, 5)                                                  # ==> 2 --> :)
-
-# ╔═╡ 0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
-==(÷, div)                                                # ==> true 
-
-# ╔═╡ 8c64d38b-98e2-4b45-bdc7-e1772efdc965
-===(÷, div)                                               # ==> true 
-
-# ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
-md"
-###### Type conversion
-"
-
-# ╔═╡ 9f83cded-8b07-459b-847e-87e3aca59da5
-# Math: 10.0 / 5                                          # ==> 2.0
-# SICP: (/ 10.0 5)                                        # ==> 2.0
-# prefix Julia:
-/(10.0, 5)                                                # ==> 2.0 --> :)
+typeof( +(137, 349))                                      # ==> Int64 
 
 # ╔═╡ 86072e36-d2f7-4dd7-8461-103ad10090b7
 # Math: 2.7 + 10                                          # ==> 12.7
@@ -184,17 +129,79 @@ md"
 # prefix Julia:
 +(21, 35, 12, 7)                                          # ==> 75 --> :)
 
+# ╔═╡ d7e0156f-5b8c-48c9-8ce1-bbb93f6ed6d8
+# Math: 1000 - 334                                        # ==> 666
+# SICP-Scheme: (- 1000 334)                               # ==> 666
+# prefix Julia:
+-(1000, 334)                                              # ==> 666 --> :)
+
+# ╔═╡ 79e083b5-e2a0-426f-968a-1f6c59eac390
+typeof( -(1000, 334))                                     # ==> Int64 
+
+# ╔═╡ c45887c0-ddbf-4d09-b89b-af83216e51cf
+# Math: 5 * 99                                            # ==> 495
+# SICP-Scheme: (* 5 99)                                   # ==> 495
+# prefix Julia:
+*(5, 99)                                                  # ==> 495 --> :)
+
+# ╔═╡ 873a3284-043b-4499-b1ce-8a87605e5a09
+typeof( *(5, 99))                                         # ==> Int64 --> :)
+
 # ╔═╡ e806ccc9-77e6-4a8a-9eec-0b1a643a5b9a
 # Math: 25 * 4 * 12                                       # ==> 1200
 # SICP: (* 25 4 12)                                       # ==> 1200
 # prefix Julia:
 *(25, 4, 12)                                              # ==> 1200 --> :)      
 
+# ╔═╡ 6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
+# Math: 10 / 5                                            # ==> 2
+# SICP-Scheme: (/ 10 5)                                   # ==> 2
+# prefix Julia:
+/(10, 5)                                                  # ==> 2.0 --> !!
+
+# ╔═╡ 6dfc1c6c-9b77-4df8-9133-63c988696161
+typeof( /(10, 5))                                         # ==> Float64 --> !!
+
+# ╔═╡ 0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
+==(÷, div)                                                # ==> true 
+
+# ╔═╡ 8c64d38b-98e2-4b45-bdc7-e1772efdc965
+===(÷, div)                                               # ==> true 
+
+# ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
+md"
+###### Type conversion
+"
+
+# ╔═╡ f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
+# Math: 10 / 5                                            # ==> 2
+# SICP: (/ 10 5)                                          # ==> 2
+# prefix Julia:
+div(10, 5)                                                # ==> 2 --> :)
+
+# ╔═╡ 0f5bb248-9230-41a6-ad18-f68636100328
+# Math: 10 / 5                                            # ==> 2
+# SICP: (/ 10 5)                                          # ==> 2
+# prefix Julia:
+÷(10, 5)                                                  # ==> 2 --> :)
+
+# ╔═╡ 9f83cded-8b07-459b-847e-87e3aca59da5
+# Math: 10.0 / 5                                          # ==> 2.0
+# SICP: (/ 10.0 5)                                        # ==> 2.0
+# prefix Julia:
+/(10.0, 5)                                                # ==> 2.0 --> :)
+
 # ╔═╡ b3af6b38-3b06-4966-8e88-3da2fe720e3e
 md"
 ---
 ###### 3.2.2 *Nested* Combinations
-###### *Nested* Combination <*combination*> = <*operator*>(<*operand*>,..., <*operator*>(<*operand*>,...),...)
+
+$\mathbf{combination = operator(operand,..., operator(),...)}$
+$\mathbf{combination = operator(operand,..., operator(operand,...),...)}$
+
+$\;$
+$\;$
+
 "
 
 # ╔═╡ 62a20957-b08b-48a9-968b-e65038cc520a
@@ -207,7 +214,11 @@ md"
 # Math: 1000 - 300 - 34                                   # ==> 666
 # SICP: (- 1000 300 34)                                   # ==> 666
 # prefix Julia:
+# -(1000, 300, 34) ==> MethodError: no method matching -(::Int64, ::Int64, ::Int64)  
 -(1000, -(300, 34))                                       # ==> 734 --> :(
+
+# ╔═╡ 435ee7b7-f3d6-4e73-ae0d-3b3b85a71763
+
 
 # ╔═╡ aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # left-associativity of operator '-'
@@ -220,10 +231,7 @@ md"
 # Math: 3 * 5 + (10 - 6)                                  # ==> 19
 # SICP: (+ (* 3 5) (- 10 6))                              # ==> 19
 # prefix Julia:
-+( *(3, 5), -(10, 6))                                     # ==> 19 --> :)
-
-# ╔═╡ c6082b1c-92d1-4bb9-b93b-1feb803d014c
-typeof(+) <: Function, typeof(*) <: Function
++( *(3, 5), -(10, 6))                                     # ==> 19 =/= 666 --> :(
 
 # ╔═╡ 63571818-e93c-4122-a998-59c040df93da
 # Math: (3 * ((2 * 4) + (3 + 5))) + ((10 - 7) + 6) =
@@ -357,14 +365,11 @@ function makeMySmallTypeTree()
 		1 0 0]
 	names = ["Real", "Int64", "Float64"]
 	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
-	graphplot(g, x=[0, -2, + 2], y = [2, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.3, fontsize=12, title="Excerpt of Type Tree", titlefontsize=13)
+	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Excerpt of Type Tree", titlefontsize=12)
 end # function typeTree
 
 # ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
 makeMySmallTypeTree()
-
-# ╔═╡ b53099c7-267f-4f3e-aac3-b01f00ba814e
-typeof(+) <: Function
 
 # ╔═╡ 34265915-b300-4291-a327-4b2f512950fc
 isprimitivetype(Int64)
@@ -380,6 +385,12 @@ typemin(Int64), typemax(Int64)
 
 # ╔═╡ 69ed7655-db45-4075-8041-1f86b8c0ce67
 typemin(Float64), typemax(Float64)
+
+# ╔═╡ 049a95bf-3f4d-4e07-9ae2-97718475c3b3
+typeof(+)
+
+# ╔═╡ b53099c7-267f-4f3e-aac3-b01f00ba814e
+typeof(+) <: Function
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -496,11 +507,11 @@ md"
 ---
 ##### 5. Summary
 
-We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with brackets in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
+We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
 
 As an alternative to the *linear* form, expressions can also be documented in *non-linear* graphical, parenthesis-free form with *Kantorovic* trees. The three linear forms can be read from this tree using various search strategies. In Kantorovic trees, the evaluation process is controlled by the edges of the graph.
 
-As a further topic, we discussed a small excerpt from Julia's type hierarchy. In our calculations, we came across $Int64$ and $Float64$, both of which are subtypes of the supertype $Real$.
+As a further topic, we discussed a small excerpt from Julia's type hierarchy. In our calculations, we came across $Int64, Float64$, and $Function$. The first and second are subtypes of the supertype $Real$.
 
 "
 
@@ -1985,32 +1996,28 @@ version = "1.4.1+1"
 # ╠═c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╠═f46897fa-abdc-4a21-846e-0195b0172fa0
-# ╠═f991ce90-0097-4060-88af-e6daa02ef95e
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
+# ╠═86072e36-d2f7-4dd7-8461-103ad10090b7
+# ╠═575db3c8-3ccc-4d89-9bc8-f25a39cf87d3
 # ╠═d7e0156f-5b8c-48c9-8ce1-bbb93f6ed6d8
-# ╠═c590d4f2-fab6-4bd3-ab24-6fb38a9a5429
 # ╠═79e083b5-e2a0-426f-968a-1f6c59eac390
 # ╠═c45887c0-ddbf-4d09-b89b-af83216e51cf
-# ╠═e31d61c6-0a11-400b-87b5-ccc79038e50a
 # ╠═873a3284-043b-4499-b1ce-8a87605e5a09
+# ╠═e806ccc9-77e6-4a8a-9eec-0b1a643a5b9a
 # ╠═6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
-# ╠═982403d6-17cf-4788-972a-49263d10a91a
 # ╠═6dfc1c6c-9b77-4df8-9133-63c988696161
-# ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
-# ╠═0f5bb248-9230-41a6-ad18-f68636100328
 # ╠═0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
 # ╠═8c64d38b-98e2-4b45-bdc7-e1772efdc965
 # ╟─d955da7c-2570-4808-8e6b-cb8564c2f0cd
+# ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
+# ╠═0f5bb248-9230-41a6-ad18-f68636100328
 # ╠═9f83cded-8b07-459b-847e-87e3aca59da5
-# ╠═86072e36-d2f7-4dd7-8461-103ad10090b7
-# ╠═575db3c8-3ccc-4d89-9bc8-f25a39cf87d3
-# ╠═e806ccc9-77e6-4a8a-9eec-0b1a643a5b9a
 # ╟─b3af6b38-3b06-4966-8e88-3da2fe720e3e
 # ╟─62a20957-b08b-48a9-968b-e65038cc520a
 # ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
+# ╠═435ee7b7-f3d6-4e73-ae0d-3b3b85a71763
 # ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # ╠═3c945bff-e78a-433d-8a4d-118b6915ffc4
-# ╠═c6082b1c-92d1-4bb9-b93b-1feb803d014c
 # ╠═63571818-e93c-4122-a998-59c040df93da
 # ╟─07d566e1-77a2-45b1-be22-5521d1f65d2e
 # ╠═9fe7665f-faf4-4633-be95-62126d7d6c90
@@ -2023,12 +2030,13 @@ version = "1.4.1+1"
 # ╠═838f513c-fbaa-4233-a766-79f592df74d8
 # ╟─901c4920-b1d8-48dc-a100-d7ae25fa51cb
 # ╠═f3d35d58-5889-44b8-be7c-4ca3c838bf86
-# ╠═b53099c7-267f-4f3e-aac3-b01f00ba814e
 # ╠═34265915-b300-4291-a327-4b2f512950fc
 # ╠═7e379802-13ac-4f26-97ad-644aa42b0b82
 # ╠═45269af2-373c-4178-a527-b0d0064f5a06
 # ╠═ba6e6b36-3e29-47cc-b89d-81044f1e21be
 # ╠═69ed7655-db45-4075-8041-1f86b8c0ce67
+# ╠═049a95bf-3f4d-4e07-9ae2-97718475c3b3
+# ╠═b53099c7-267f-4f3e-aac3-b01f00ba814e
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
