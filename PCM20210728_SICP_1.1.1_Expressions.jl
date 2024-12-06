@@ -47,7 +47,7 @@ md"
 - [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *Evaluation*
 - *Function call*
 - [*Operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
-- [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity)
+- [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity), *left*-associativity, *right*-associativity 
 - Tests of *identity*: $==$, $===$
 - *built-in* functions: $typeof(.), typejoin(.,.), typemin(.), typemax(.)$
 - Type *conversion*
@@ -69,8 +69,8 @@ md"
 
 *Combinations* are *function calls*:
 
-$\mathbf{operator()\Longrightarrow number}$
-$\mathbf{operator(operand,...)\Longrightarrow number}$
+$\textit{<operator>}()\Longrightarrow \textit{<number>}$
+$\textit{<operator>}(\textit{<operand>},...)\Longrightarrow \textit{<number>}$
 
 $\;$
 $\;$
@@ -99,9 +99,15 @@ We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting
 
 ###### *Combinations* are *function call*s:
 
-$\mathbf{operator(operand,...)\; \Longrightarrow\; value}$
-$\mathbf{operator(operand,..., operator(),operand,...)\; \Longrightarrow\; value}$
-$\mathbf{operator(operand,..., operator(operand,...), operand,...)\; \Longrightarrow\; value}$
+$\textit{<operator>}(\textit{<operand>},...)\; \Longrightarrow\; \textit{<value>}$
+
+$\;$
+
+$\textit{<operator>}(..., \textit{<operator>}(),...)\; \Longrightarrow\; \textit{<value>}$
+
+$\;$
+
+$\textit{<operator>}(..., \textit{<operator>}(\textit{<operand>},...),...)\; \Longrightarrow\; \textit{<value>}$
 
 $\;$
 
@@ -162,17 +168,6 @@ typeof( *(5, 99))                                         # ==> Int64 --> :)
 # ╔═╡ 6dfc1c6c-9b77-4df8-9133-63c988696161
 typeof( /(10, 5))                                         # ==> Float64 --> !!
 
-# ╔═╡ 0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
-==(÷, div)                                                # ==> true 
-
-# ╔═╡ 8c64d38b-98e2-4b45-bdc7-e1772efdc965
-===(÷, div)                                               # ==> true 
-
-# ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
-md"
-###### Type conversion
-"
-
 # ╔═╡ f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
 # Math: 10 / 5                                            # ==> 2
 # SICP: (/ 10 5)                                          # ==> 2
@@ -184,6 +179,17 @@ div(10, 5)                                                # ==> 2 --> :)
 # SICP: (/ 10 5)                                          # ==> 2
 # prefix Julia:
 ÷(10, 5)                                                  # ==> 2 --> :)
+
+# ╔═╡ 0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
+==(÷, div)                                                # ==> true 
+
+# ╔═╡ 8c64d38b-98e2-4b45-bdc7-e1772efdc965
+===(÷, div)                                               # ==> true 
+
+# ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
+md"
+###### Type conversion
+"
 
 # ╔═╡ 9f83cded-8b07-459b-847e-87e3aca59da5
 # Math: 10.0 / 5                                          # ==> 2.0
@@ -358,18 +364,18 @@ Float64 <: Real                                           # ==> true
 subtypes(Real)               # ==> there are many more types than we used here !
 
 # ╔═╡ 901c4920-b1d8-48dc-a100-d7ae25fa51cb
-function makeMySmallTypeTree()
+function makeMyTypeTreeReal()
 	g = [
 		0 0 0;
 		1 0 0;
 		1 0 0]
-	names = ["Real", "Int64", "Float64"]
+	names = [" Real ", " Int64 ", "Float64"]
 	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
-	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Excerpt of Type Tree", titlefontsize=12)
-end # function typeTree
+	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.2 Excerpt of Type Tree: Real", titlefontsize=12)
+end # function makeMyTypeTreeReal()
 
 # ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
-makeMySmallTypeTree()
+makeMyTypeTreeReal()
 
 # ╔═╡ 34265915-b300-4291-a327-4b2f512950fc
 isprimitivetype(Int64)
@@ -389,8 +395,34 @@ typemin(Float64), typemax(Float64)
 # ╔═╡ 049a95bf-3f4d-4e07-9ae2-97718475c3b3
 typeof(+)
 
+# ╔═╡ c680cf4f-15ec-4f40-aa9b-68ca83447efb
+md"""
+"A *singleton type* in Julia is a type that has exactly *one* instance. Julia assigns each function its own unique singleton type. This type represents the function itself, rather its arguments or behavior" (ChatGPT, 2024/12/06)
+"""
+
+# ╔═╡ c97ebd78-ff4f-46f1-b2d4-bb2a87f268f9
+typeof(==)
+
+# ╔═╡ 74bb6da5-143f-450a-a4c0-23f6535bf91a
+typeof(===)
+
 # ╔═╡ b53099c7-267f-4f3e-aac3-b01f00ba814e
 typeof(+) <: Function
+
+# ╔═╡ 3a215113-f3da-4675-80cd-78e3c0742225
+function makeMyTypeTreeFunction()
+	g = [
+		0 0 0 0;
+		1 0 0 0;
+		1 0 0 0;
+	    1 0 0 0]
+	names = ["Function", "  +  ", "  -  ", "==="]
+	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype", (4, 1) => "supertype")
+	graphplot(g, x=[1.5, -0.0, +1.5, 3.0], y = [0.7, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.3 Excerpt of Type Tree: Function", titlefontsize=12)
+end # function makeMyTypeTreeFunction
+
+# ╔═╡ 7adbad5d-6f70-4b63-93dc-977e71bff457
+makeMyTypeTreeFunction()
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -2006,11 +2038,11 @@ version = "1.4.1+1"
 # ╠═e806ccc9-77e6-4a8a-9eec-0b1a643a5b9a
 # ╠═6568b2a5-bc32-4d22-9c88-c8b1f1fee5af
 # ╠═6dfc1c6c-9b77-4df8-9133-63c988696161
+# ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
+# ╠═0f5bb248-9230-41a6-ad18-f68636100328
 # ╠═0a5dc1b5-c8c5-424b-8712-1d7394a4d07a
 # ╠═8c64d38b-98e2-4b45-bdc7-e1772efdc965
 # ╟─d955da7c-2570-4808-8e6b-cb8564c2f0cd
-# ╠═f7a38676-8f9e-43ab-8cf4-af58e6e2c89c
-# ╠═0f5bb248-9230-41a6-ad18-f68636100328
 # ╠═9f83cded-8b07-459b-847e-87e3aca59da5
 # ╟─b3af6b38-3b06-4966-8e88-3da2fe720e3e
 # ╟─62a20957-b08b-48a9-968b-e65038cc520a
@@ -2029,14 +2061,19 @@ version = "1.4.1+1"
 # ╠═16a261cb-b368-4296-9452-490a0247b593
 # ╠═838f513c-fbaa-4233-a766-79f592df74d8
 # ╟─901c4920-b1d8-48dc-a100-d7ae25fa51cb
-# ╠═f3d35d58-5889-44b8-be7c-4ca3c838bf86
+# ╟─f3d35d58-5889-44b8-be7c-4ca3c838bf86
 # ╠═34265915-b300-4291-a327-4b2f512950fc
 # ╠═7e379802-13ac-4f26-97ad-644aa42b0b82
 # ╠═45269af2-373c-4178-a527-b0d0064f5a06
 # ╠═ba6e6b36-3e29-47cc-b89d-81044f1e21be
 # ╠═69ed7655-db45-4075-8041-1f86b8c0ce67
 # ╠═049a95bf-3f4d-4e07-9ae2-97718475c3b3
+# ╟─c680cf4f-15ec-4f40-aa9b-68ca83447efb
+# ╠═c97ebd78-ff4f-46f1-b2d4-bb2a87f268f9
+# ╠═74bb6da5-143f-450a-a4c0-23f6535bf91a
 # ╠═b53099c7-267f-4f3e-aac3-b01f00ba814e
+# ╟─3a215113-f3da-4675-80cd-78e3c0742225
+# ╟─7adbad5d-6f70-4b63-93dc-977e71bff457
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
