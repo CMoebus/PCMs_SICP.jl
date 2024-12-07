@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/06 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/07 ***
 
 ====================================================================================
 "
@@ -100,6 +100,20 @@ We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting
 ###### *Combinations* are *function call*s:
 
 $\textit{<operator>}(\textit{<operand>},...)\; \Longrightarrow\; \textit{<value>}$
+
+$\;$
+
+Concepts enclosed in $\text{<...>}$ are *nonterminals* symbols; they are replaced by *terminals* of a *grammatic*, e.g.:
+
+$\textit{<operator>} ::= +, -, ..., sin, ...$
+
+$\;$
+
+$\textit{<operand>} ::= 1, 2.0, 3.141, ...$
+
+$\;$
+
+$\textit{<value>} ::= 1, 4.0, 6.2.8.2, ...$
 
 $\;$
 
@@ -202,8 +216,11 @@ md"
 ---
 ###### 3.2.2 *Nested* Combinations
 
-$\mathbf{combination = operator(operand,..., operator(),...)}$
-$\mathbf{combination = operator(operand,..., operator(operand,...),...)}$
+$\textit{<combination>} = \textit{<operator>}(\textit{<operand>},..., \textit{<operator>}(),...)$
+
+$\;$
+
+$\textit{<combination>} = \textit{<operator>}(\textit{<operand>},..., \textit{<operator>}(\textit{<operand>},...),...)$
 
 $\;$
 $\;$
