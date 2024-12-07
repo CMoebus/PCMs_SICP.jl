@@ -46,6 +46,7 @@ md"
 - *Supertype, Subtypes, Type hierarchy*
 - [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *Evaluation*
 - *Function call*
+- *dynamic* typing
 - [*Operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
 - [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity), *left*-associativity, *right*-associativity 
 - Tests of *identity*: $==$, $===$
@@ -78,7 +79,10 @@ $\;$
 The *function call* consists of the *function symbol* or *function name* and zero or more *arguments*.
 
 ###### 3.1 Primitive Expressions: Numeral $\Longrightarrow$ Number
+
+Numerals are *dynamic* typed. Types are not declared beforehand but appear as they are written (e.g. *with* or *without* decimal point).
 "
+
 
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
 486                                                       # ==> 486 
@@ -332,7 +336,7 @@ begin
 			(coordinateXOfRootMark, coordinateYOfRootMark, text(markOfRoot, fontSize, :blue))) # mark of root 'x'
 	end # function plotBinaryTree!
 	#-----------------------------------------------------------------------------
-	plot(size=(800, 400), xlim=(-1, 11), ylim=(0, 12), legend=:false, ticks=:none, title="Kantorovic Tree", titlefontsize=14)
+	plot(size=(800, 400), xlim=(-1, 11), ylim=(0, 12), legend=:false, ticks=:none, title="Kantorovic Tree of expression +( *(3, +( *(2, 4), +(3, 5))), +( -(10, 7), 6))", titlefontsize=12)
 	plotBinaryTree!( "2", "4", "*",  1.5,  8.0)
 	plotBinaryTree!( "3", "5", "+",  4.0,  8.0)
 	plotBinaryTree!( "*", "+", "+",  2.75, 6.0; widthOfTree=2.5)
