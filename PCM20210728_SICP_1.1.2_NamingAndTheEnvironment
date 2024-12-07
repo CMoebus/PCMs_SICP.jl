@@ -42,9 +42,11 @@ md"
 - Type *Irrational*
 - *area*, *circumference* of *circle*
 - *const* definition
-- *Type conversion*
+- *static* type definition
+- *type conversion*
 - *SICP_pi*, Julia's π
 - *isapprox*(.,., *atol*=.,...), ≈
+- *Sys.WORD_SIZE*
 
 "
 
@@ -166,6 +168,9 @@ md"
 ##### 4. Idiomatic Julia
 "
 
+# ╔═╡ 8414c5b4-2ebb-47ee-8ce7-cc7ce7f7c9a2
+Sys.WORD_SIZE                                            # word size
+
 # ╔═╡ 1588999f-1e30-4c30-b78d-1243fd7805f5
 const size3 = 5                                          # ==> size3 = 3
 
@@ -175,22 +180,41 @@ typeof(size3)
 # ╔═╡ b1e8a7f7-a23e-43d8-8b6f-07e65788b58f
 size3
 
+# ╔═╡ 9073dce8-b80b-4b33-9f08-6e0861b3ae1d
+md"
+###### Evaluation of RHS (= *Right* Hand Side) and *Static* Type Definition
+"
+
+# ╔═╡ c74abaac-9fc1-48ac-90b5-0f9027321167
+size4::Int64 = 4.0                     # evaluation of RHS ==> 4.0
+
+# ╔═╡ 7cc7a5cf-423a-46a7-9349-aca87bb3a1de
+typeof(size4)
+
+# ╔═╡ 0ae2571e-0fbf-45f2-b32b-72a664b0e0d6
+md"
+###### Type Conversion and Evaluation of LHS  (= *Left* Hand Side)
+"
+
+# ╔═╡ c446de7d-12a5-462c-ac1e-7361e7effcc0
+size4                                  # evaluation of LHS ==> 4
+
 # ╔═╡ 2350ab87-8ca6-49af-a5bb-f994af4ecbd0
 md"
 ###### Julia's $\pi$
 "
 
 # ╔═╡ 8ef8ad7e-b217-41c3-ba9a-d10e77cc207c
-pi                       # Julia's constant π
+pi                                     # Julia's constant π
 
 # ╔═╡ 46464efb-fce0-444a-ad76-d1b5b0756a86
 pi == π
 
 # ╔═╡ 0db30c16-7a78-453a-9854-598d443d95d5
-typeof(π)                # irrational !
+typeof(π)                              # irrational !
 
 # ╔═╡ d26d6f40-9a72-456d-b165-b7fe171b8ee4
-typeof(SICP_pi)          # Float64
+typeof(SICP_pi)                        # Float64
 
 # ╔═╡ 18c5bc9a-7b9d-485e-b2e3-5c3e2284cc9c
 typejoin(Irrational, Float64, Int64)
@@ -238,7 +262,7 @@ md"
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2024/12/05
 
-- **Wikipedia**; [* Circle*](https://en.wikipedia.org/wiki/Circle); last visit 2024/12/06
+- **Wikipedia**; [*Circle*](https://en.wikipedia.org/wiki/Circle); last visit 2024/12/06
 
 "
 
@@ -1726,9 +1750,15 @@ version = "1.4.1+1"
 # ╠═06dd14e5-4359-4e60-a3bd-5f56ebf562ab
 # ╠═53b16578-7b83-449e-818f-28fdeed2cdca
 # ╟─47de3efd-ca3e-4ebc-a969-feef59eaecf5
+# ╠═8414c5b4-2ebb-47ee-8ce7-cc7ce7f7c9a2
 # ╠═1588999f-1e30-4c30-b78d-1243fd7805f5
 # ╠═8bc0cfa1-de21-4c7f-9d08-52ddf1b6cd40
 # ╠═b1e8a7f7-a23e-43d8-8b6f-07e65788b58f
+# ╟─9073dce8-b80b-4b33-9f08-6e0861b3ae1d
+# ╠═c74abaac-9fc1-48ac-90b5-0f9027321167
+# ╠═7cc7a5cf-423a-46a7-9349-aca87bb3a1de
+# ╟─0ae2571e-0fbf-45f2-b32b-72a664b0e0d6
+# ╠═c446de7d-12a5-462c-ac1e-7361e7effcc0
 # ╟─2350ab87-8ca6-49af-a5bb-f994af4ecbd0
 # ╠═8ef8ad7e-b217-41c3-ba9a-d10e77cc207c
 # ╠═46464efb-fce0-444a-ad76-d1b5b0756a86
