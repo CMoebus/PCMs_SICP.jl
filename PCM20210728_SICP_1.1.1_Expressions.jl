@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: 1.1.1 Expressions
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/07 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.0 by PCM *** 2024/12/08 ***
 
 ====================================================================================
 "
@@ -43,6 +43,7 @@ md"
 
 - [*Numeral*](https://en.wikipedia.org/wiki/Numeral_system), *Number*
 - [*Types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
+- *dynamic*, *static* types
 - *Supertype, Subtypes, Type hierarchy*
 - [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *Evaluation*
 - *Function call*
@@ -68,19 +69,27 @@ md"
 ##### 3.  SICP-Scheme-like *functional* Julia: *Expressions*
 *Expressions* are evaluated to a *value*. When *numeric* expressions are *simple* they are *numerals* and evaluated to *numbers*. When they are *combinations* they are evaluated in several steps to a *number*
 
-*Combinations* are *function calls*:
+$\textit{<expression>} ::= \textit{<numeral>} | \textit{<combination>}$
 
-$\textit{<operator>}()\Longrightarrow \textit{<number>}$
-$\textit{<operator>}(\textit{<operand>},...)\Longrightarrow \textit{<number>}$
+$\textit{<numeral>} \mapsto \textit{<number>}$
+
+$\textit{<combination>} \mapsto \textit{<number>}$
 
 $\;$
+
+*Numeric combinations* are *function calls* with at least *one* operand:
+
+$\textit{<operator>}(\textit{<operand>}) \mapsto \textit{<number>}$
+
+$\textit{<operator>}(\textit{<operand>},...) \mapsto \textit{<number>}$
+
 $\;$
 
-The *function call* consists of the *function symbol* or *function name* and zero or more *arguments*.
+The *function call* consists of the *function symbol* or *function name* (= $\textit{<operator>}$) and zero or more *arguments* (= $\textit{<operands>}$).
 
-###### 3.1 Primitive Expressions: Numeral $\Longrightarrow$ Number
+###### 3.1 Primitive Expressions: *Numeral* $\mapsto$ *Number*
 
-Numerals are *dynamic* typed. Types are not declared beforehand but appear as they are written (e.g. *with* or *without* decimal point).
+Numerals are *dynamic* typed. Types are sets of *possible* elements of *one* kind. *Dynamic* types are *not* declared *in the code* but appear *in the evaluation process* (e.g. *with* or *without* decimal point). In contrast to *dynamic* types *static* types are *declared in the code*. Languages with *dynamic* types are e.g. Scheme, Javascript and Smalltalk, wheras *static* types appear in Java, C++, etc. Julia code can be written in *both* styles.
 "
 
 
@@ -103,7 +112,8 @@ We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting
 
 ###### *Combinations* are *function call*s:
 
-$\textit{<operator>}(\textit{<operand>},...)\; \Longrightarrow\; \textit{<value>}$
+$\textit{<operator>}(\textit{<operand>})\; \mapsto \; \textit{<number>}$
+$\textit{<operator>}(\textit{<operand>},...)\; \mapsto \; \textit{<number>}$
 
 $\;$
 
@@ -113,24 +123,33 @@ $\textit{<operator>} ::= +, -, ..., sin, ...$
 
 $\;$
 
-$\textit{<operand>} ::= 1, 2.0, 3.141, ...$
+$\textit{<operand>} ::= e.g.: -3, 1, -2.0, 3.141, ...$
 
 $\;$
 
-$\textit{<value>} ::= 1, 4.0, 6.2.8.2, ...$
+$\textit{<number>} ::= e.g.: -1, 4.0, -6.2.8.2, ...$
 
 $\;$
 
-$\textit{<operator>}(..., \textit{<operator>}(),...)\; \Longrightarrow\; \textit{<value>}$
+$\textit{<operator>}(..., \textit{<operator>}(),...)\; \mapsto \; \textit{<number>}$
 
 $\;$
 
-$\textit{<operator>}(..., \textit{<operator>}(\textit{<operand>},...),...)\; \Longrightarrow\; \textit{<value>}$
+$\textit{<operator>}(..., \textit{<operator>}(\textit{<operand>},...),...)\; \mapsto\; \textit{<number>}$
 
 $\;$
 
-###### 3.2.1 <*flat combination*> = <*operator*>(<*operand*>,...)
+###### 3.2.1 *Flat Combinations*
 "
+
+# ╔═╡ e7125587-8e19-4201-9faf-e5fcc6d9f0bd
++(486)                                                    # ==> 486
+
+# ╔═╡ 9cc6ba2b-b25d-495f-b4b1-c71e0b897d41
+-(486.)                                                   # -486.0
+
+# ╔═╡ 2741242e-fc52-4918-a884-af95a40626ed
+-(0.)                                                     # -0.0
 
 # ╔═╡ f46897fa-abdc-4a21-846e-0195b0172fa0
 # Math: 137 + 349                                         # ==> 486
@@ -244,9 +263,6 @@ md"
 # -(1000, 300, 34) ==> MethodError: no method matching -(::Int64, ::Int64, ::Int64)  
 -(1000, -(300, 34))                                       # ==> 734 --> :(
 
-# ╔═╡ 435ee7b7-f3d6-4e73-ae0d-3b3b85a71763
-
-
 # ╔═╡ aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # left-associativity of operator '-'
 # Math: 1000 - 300 - 34                                   # ==> 666
@@ -287,6 +303,7 @@ md"
 md"
 ###### *Nested* Combination with *Prefix* Operators as a *nonlinear* Data Flow (*Kantorovic*) tree
 (Bauer & Wössner, 1981, p.21)
+As a tree the *Kantorovic* tree posses *two* types of *nodes*: *leafs* and *roots*. *Leafs* are *<operands>* (like: 2, 4, ...) and *roots* are *<operators>* (like: *, +, ...). Edges are between *leafs* and *roots* (like: 5 -- +) or between *roots* (like: + -- +).
 "
 
 # ╔═╡ 9fe7665f-faf4-4633-be95-62126d7d6c90
@@ -392,7 +409,7 @@ function makeMyTypeTreeReal()
 		1 0 0]
 	names = [" Real ", " Int64 ", "Float64"]
 	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
-	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.2 Excerpt of Type Tree: Real", titlefontsize=12)
+	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.2 Excerpt of Type Tree: Real", titlefontsize=12, size=(800, 400))
 end # function makeMyTypeTreeReal()
 
 # ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
@@ -439,7 +456,7 @@ function makeMyTypeTreeFunction()
 	    1 0 0 0]
 	names = ["Function", "  +  ", "  -  ", "==="]
 	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype", (4, 1) => "supertype")
-	graphplot(g, x=[1.5, -0.0, +1.5, 3.0], y = [0.7, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.3 Excerpt of Type Tree: Function", titlefontsize=12)
+	graphplot(g, x=[1.5, -0.0, +1.5, 3.0], y = [0.7, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, title="Fig. 1.1.1.3 Excerpt of Type Tree: Function", titlefontsize=12, size=(800, 300))
 end # function makeMyTypeTreeFunction
 
 # ╔═╡ 7adbad5d-6f70-4b63-93dc-977e71bff457
@@ -560,7 +577,7 @@ md"
 ---
 ##### 5. Summary
 
-We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation that everyone learned in school. Parentheses are used to control the evaluation process.
+We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation already learnt in school. Parentheses are used to control the evaluation process.
 
 As an alternative to the *linear* form, expressions can also be documented in *non-linear* graphical, parenthesis-free form with *Kantorovic* trees. The three linear forms can be read from this tree using various search strategies. In Kantorovic trees, the evaluation process is controlled by the edges of the graph.
 
@@ -2048,6 +2065,9 @@ version = "1.4.1+1"
 # ╠═17468ebe-4b5c-4ff1-a067-fae14a5e332f
 # ╠═c9fc9278-fe4f-4764-b7bc-7e125f3ab4b6
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
+# ╠═e7125587-8e19-4201-9faf-e5fcc6d9f0bd
+# ╠═9cc6ba2b-b25d-495f-b4b1-c71e0b897d41
+# ╠═2741242e-fc52-4918-a884-af95a40626ed
 # ╠═f46897fa-abdc-4a21-846e-0195b0172fa0
 # ╠═3794e29c-696b-4e18-8cc2-2a36489ccd5c
 # ╠═86072e36-d2f7-4dd7-8461-103ad10090b7
@@ -2068,7 +2088,6 @@ version = "1.4.1+1"
 # ╟─b3af6b38-3b06-4966-8e88-3da2fe720e3e
 # ╟─62a20957-b08b-48a9-968b-e65038cc520a
 # ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
-# ╠═435ee7b7-f3d6-4e73-ae0d-3b3b85a71763
 # ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
 # ╠═3c945bff-e78a-433d-8a4d-118b6915ffc4
 # ╠═63571818-e93c-4122-a998-59c040df93da
