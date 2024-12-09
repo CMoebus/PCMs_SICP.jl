@@ -22,7 +22,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/08 ***
+ ###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/09 ***
 ===================================================================================
 "
 
@@ -42,7 +42,9 @@ md"
 - *definition* of function with *keyword* $function$
 - *definition* of function with *anonymous* function with operator $\textit{->}$
 - *String* as *argument*
-- *typiefying* of arguments
+- *typifying* of arguments
+- *dispatch* of function calls
+- *multiple dispatch*
 "
 
 # ╔═╡ f6741d7a-4cbe-442a-b508-73085eed5ecf
@@ -59,47 +61,28 @@ md"
 
 # ╔═╡ 73339eae-4754-49b1-938a-5ceae1c0f6a3
 md"
----
-###### 3.1 *Definition* and *Application* of *Generic* Function $square$
-A *generic* function is an *untyped* function. This means than *input* and *output* are *not* static typed. Types of arguments and function output get their types *dynamic* during the evaluation process.
+###### 3.1 *Definition* and *Application* of *Function* $square$
 
-$square : \mathbb R \rightarrow \mathbb R$
-$square : x \mapsto square(x)$
-$square(x) := x^2$
+"
 
-$\;$
+# ╔═╡ d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
+md"
+###### 1st *untyped, generic method* of function $square$
+
+A *generic* function is an *untyped* function. This means that *input* and *output* are *not* constrained by *static* types (e.g.: Int64, Float64). Before the *binding* of arguments to parameters arguments possess the default *generic* type $Any$. At *binding time* the generic type $Any$ is *constrained* *dynamically* to the type of the argument.
 
 "
 
 # ╔═╡ ece77425-0b83-4a9a-b2ef-757bfaa60891
 md"
-###### To square something, multiply it by itself* (SICP, 1996, ch. 1.1.4)
+###### To square something, multiply it by itself* (SICP, 1996, ch. 1.1.4)  
+                 |               |
+                 v               v
+             square(x)    =   *(x, x)
 "
 
 # ╔═╡ 150ad79c-42b4-4981-8711-1ef426725ca0
-# To square something, multiply it by itself* (SICP, 1996, ch. 1.1.4)
-	  square(x)     =            *(x,       x)   # == square        
-
-# ╔═╡ 714e9893-f609-4a24-a020-0041f5361a2d
-typeof(square)                                  
-
-# ╔═╡ c97d34e3-3ace-48a2-8044-24758947fdc1
-typeof(square)  <: Function                # true --> :)
-
-# ╔═╡ 2ef23512-6a23-4d2d-86fa-db9c1743c529
-square                       
-
-# ╔═╡ 8db7e80c-a877-44ff-aa15-48841c035aeb
-square(21)                                  # ==> 441 --> :)
-
-# ╔═╡ 95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
-square( +(2, 5))                            # ==> 49 --> :)
-
-# ╔═╡ 731aa7ca-d4af-4be8-8a40-2eec5522ad99
-square(square(3))                           # ==> 81 --> :)
-
-# ╔═╡ d263c3dd-f20b-4de2-b42b-ea88475d63ac
-square(square(3.))                          # ==> 81.0 --> :)
+square(x) = *(x, x)   # ==> square        
 
 # ╔═╡ 7e97208a-d1b0-435e-8756-f0b468b1c795
 md"
@@ -115,9 +98,6 @@ $sumOfSquares(x, y) := x^2 + y^2$
 $\;$
 
 "
-
-# ╔═╡ 7254bd30-87b7-48e9-99f8-56159dc78ad4
-sumOfSquares(x, y) = +(square(x), square(y))
 
 # ╔═╡ b6fda0b6-2ea2-4f2f-961b-65936c050852
 md"
@@ -139,40 +119,129 @@ md"
 ###### ... with *infix* operator, *keyword* $function$, *anonymous* function with operator $->$
 "
 
-# ╔═╡ 0cd52b1c-6e27-4dcf-a7e6-441745238e3e
-md"
-###### unintended (!) use of *generic* function; need for *typing* is obvious !
-"
+# ╔═╡ 51f99623-1572-4c05-b9d9-1cd4393c31e0
+typeof(Function)
 
-# ╔═╡ a8ca27fa-bd58-4163-895f-bf44a4392476
-square("oh no! ")   
+# ╔═╡ 780b9896-21d5-4acd-a878-86a3670ccaaf
+md"
+---
+###### 4.1 Alternatives for Defining Functions
+"
 
 # ╔═╡ 7c8b7c1d-1e23-49c6-be97-32c9f2e38041
 md"
 ---
-###### alternative *typed* function 'square2'
+###### 4.2 More *typed* Methods for Function $square$
+###### 2nd *typed* method of function $square$
+
+$square : \mathbb R \rightarrow \mathbb R$
+$square : x \mapsto x * x$
+$square(x) := *(x, x)$
+
+$\;$
 "
 
 # ╔═╡ 9410ff1c-daf0-48de-be8a-f31c5a76dbed
-square2(x::Real)::Real = x * x  # specialized definition function 'square2'
+square(x::Real)::Real = x * x  # specialized definition function 'square'
 
-# ╔═╡ 6bf0a86b-2d41-49e1-bea9-bf82cddcbc7a
-square2
+# ╔═╡ f9b0181b-c988-4d93-85e9-1a7bc41ecee4
+md"""
+---
+###### 3rd *typed* method of function $square$
+The need for a third method $square$ is clear. If we would call $square("oh,\ no! ")$ we would get the *concatenated* string $oh, no!\ oh, no! $. This happens because the $*$-operator is multiple times *overloaded* and defined not only for the multiplation of *numbers* but also for *concatenation* of *strings*. When we want to suppress the latter behavior, we have to define a special *3rd method* for $square$ with a typed argument $square(x::String)$.
 
-# ╔═╡ 4462e7ca-18f7-4f9d-8198-0196dac76c7d
-typeof(square2)
+$square : \mathbb S \rightarrow \mathbb E$
+$square : x \mapsto error(.)$
+$square(x) := error(.)$
 
-# ╔═╡ bc018df0-02ea-4011-ad6e-2176e4a1b232
-square2(21)         # square2 : Integer --> Integer
+$\;$
 
-# ╔═╡ 965efc63-8dac-4397-8052-312bccd4e736
-square2(21.0)        # square2 : Float --> Float
+"""
+
+# ╔═╡ 7693444c-efe8-4698-b979-787b03bb8d29
+*("oh, ", "no !")                # operator $*$ is defined for strings !
 
 # ╔═╡ bd99f22b-51f2-48fe-8391-b1e37498e7ff
- # blocking of strings does *not* work 
- # because *untyped* 1st method of function square is triggered
- #         so untyped method has to be deleted
-square2("oh no! ")         # ==> blocked, no matching --> :)
+square(x::String) = error("Strings should not be multiplied!")
+
+# ╔═╡ 2ef23512-6a23-4d2d-86fa-db9c1743c529
+square                       
+
+# ╔═╡ 8db7e80c-a877-44ff-aa15-48841c035aeb
+square(21)                                  # ==> 441 --> :)
+
+# ╔═╡ 95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
+square( +(2, 5))                            # ==> 49 --> :)
+
+# ╔═╡ 731aa7ca-d4af-4be8-8a40-2eec5522ad99
+square(square(3))                           # ==> 81 --> :)
+
+# ╔═╡ d263c3dd-f20b-4de2-b42b-ea88475d63ac
+square(square(3.))                          # ==> 81.0 --> :)
+
+# ╔═╡ 7254bd30-87b7-48e9-99f8-56159dc78ad4
+sumOfSquares(x, y) = +(square(x), square(y))
+
+# ╔═╡ 714e9893-f609-4a24-a020-0041f5361a2d
+typeof(square)                                  
+
+# ╔═╡ c97d34e3-3ace-48a2-8044-24758947fdc1
+typeof(square)  <: Function                # true --> :)
+
+# ╔═╡ 6bf0a86b-2d41-49e1-bea9-bf82cddcbc7a
+square
+
+# ╔═╡ 4462e7ca-18f7-4f9d-8198-0196dac76c7d
+typeof(square)
+
+# ╔═╡ bc018df0-02ea-4011-ad6e-2176e4a1b232
+square(21)         # square2 : Integer --> Integer
+
+# ╔═╡ 965efc63-8dac-4397-8052-312bccd4e736
+square(21.0)        # square : Float --> Float
+
+# ╔═╡ fa90b927-c58c-4307-8524-28bb6927423c
+square("oh, no! ")                        # ==> error --> :)
+
+# ╔═╡ 13b98b93-a478-4e4a-b4a2-423d6af45369
+methods(square)
+
+# ╔═╡ 3454c059-533a-4f06-b72e-7deb61c0aedf
+typejoin(Real, String)                    # ==> Any
+
+# ╔═╡ 58c6ef37-5ca5-4e89-b96f-dc2fea19447c
+typejoin(Int64, Float64, String)          # ==> Any
+
+# ╔═╡ ccdbeff9-c398-417b-b933-61662f406ad0
+function makeMyTypeTreeAny()
+	g = [
+		0 0 0 0 0 0;          # Any
+		1 0 0 0 0 0;          # Real       -> Any
+		0 1 0 0 0 0;          # Int64      -> Real
+		0 1 0 0 0 0;          # Float64    -> Real
+	    0 1 0 0 0 0;          # Irrational -> Real
+	    1 0 0 0 0 0]          # String     -> Any
+	names = ["  Any  ", "  Real  ", "  Int64  ", " Float64 ", " Irrational ", " String "]
+	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 2) => "supertype", (4, 2) => "supertype", (5, 2) => "supertype", (6, 1) => "supertype")
+	graphplot(g, x=[5.0, 4.0, 2.0, 4.0, 6.0, 8.0], y = [3, 1.5, 0, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.3, fontsize=8, size=(600, 300), title="Fig. 1.1.4.1 Excerpt of Type Tree: Any", titlefontsize=12)
+end # makeMyTypeTreeAny()
+
+# ╔═╡ 4bb8fae0-d70b-47a0-a551-851d478275a2
+makeMyTypeTreeAny()
+
+# ╔═╡ 21650888-8948-4fe6-8b08-08472a84ad32
+function makeMyTypeTreeSquare()
+	g = [
+		0 0 0;
+		1 0 0;
+		1 0 0]
+	names = ["square(x)", "square(x::Real)", "square(x::String)"]
+	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
+	graphplot(g, x=[1.0, 0.0, 2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.1, fontsize=8, title="Fig. 1.1.4.2 Dispatch of Function Methods: square(.)", titlefontsize=12, size=(800, 300))
+end # function makeMyTypeTreeSquare()
+
+# ╔═╡ 93bf2d55-ca89-436c-802e-8e3f26e7d65c
+makeMyTypeTreeSquare()
 
 # ╔═╡ c44ce267-d9d7-46ea-a6f2-54170cda5409
 md"
@@ -181,7 +250,7 @@ md"
 "
 
 # ╔═╡ abd380fc-5018-462c-8641-3fc269e0d2cb
-sumOfSquares(x::Real, y::Real)::Real = square2(x) + square2(y)
+sumOfSquares(x::Real, y::Real)::Real = square(x) + square(y)
 
 # ╔═╡ e6a69b7f-dfb5-45db-a0fc-e4d24229f6c3
 sumOfSquares(3, 5)
@@ -225,6 +294,7 @@ f4(5.0)
 md"
 ---
 ##### 5. Summary
+First we defined *generic* functions. These are the *first* method of that *function symbol*. Then we *specialized* the *generic* function by *typing* the function's *arguments*. This assures the correct *dispatch* of function calls.
 "
 
 # ╔═╡ 20f492e1-1b1b-4852-8e40-37d4bd96c2a3
@@ -1597,10 +1667,9 @@ version = "1.4.1+1"
 # ╠═3d323fd6-b7a2-427d-a058-6dfe9ab04289
 # ╟─4e1efa4a-cb44-4913-a35f-0a779ee0ee2a
 # ╟─73339eae-4754-49b1-938a-5ceae1c0f6a3
+# ╟─d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
 # ╟─ece77425-0b83-4a9a-b2ef-757bfaa60891
 # ╠═150ad79c-42b4-4981-8711-1ef426725ca0
-# ╠═714e9893-f609-4a24-a020-0041f5361a2d
-# ╠═c97d34e3-3ace-48a2-8044-24758947fdc1
 # ╠═2ef23512-6a23-4d2d-86fa-db9c1743c529
 # ╠═8db7e80c-a877-44ff-aa15-48841c035aeb
 # ╠═95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
@@ -1613,19 +1682,31 @@ version = "1.4.1+1"
 # ╠═706e727c-f29b-4cdb-ae08-cddd5725cdae
 # ╠═2b7d0b48-70de-40fd-bf43-660e70f2416e
 # ╟─1cf1668b-220e-4813-af3b-fef0f938e29b
+# ╠═714e9893-f609-4a24-a020-0041f5361a2d
+# ╠═51f99623-1572-4c05-b9d9-1cd4393c31e0
+# ╠═c97d34e3-3ace-48a2-8044-24758947fdc1
+# ╟─780b9896-21d5-4acd-a878-86a3670ccaaf
 # ╠═358250f0-94b7-48a8-acde-1c1f2734c967
 # ╠═538f4130-f6e1-43c2-8020-f7f2488e2442
 # ╠═3766c9b6-0ff5-4b0d-bc85-2c9bfe0a1d50
 # ╠═84bb8887-9df3-4ff0-ab50-eb144cd2f118
-# ╟─0cd52b1c-6e27-4dcf-a7e6-441745238e3e
-# ╠═a8ca27fa-bd58-4163-895f-bf44a4392476
 # ╟─7c8b7c1d-1e23-49c6-be97-32c9f2e38041
 # ╠═9410ff1c-daf0-48de-be8a-f31c5a76dbed
 # ╠═6bf0a86b-2d41-49e1-bea9-bf82cddcbc7a
 # ╠═4462e7ca-18f7-4f9d-8198-0196dac76c7d
 # ╠═bc018df0-02ea-4011-ad6e-2176e4a1b232
 # ╠═965efc63-8dac-4397-8052-312bccd4e736
+# ╟─f9b0181b-c988-4d93-85e9-1a7bc41ecee4
+# ╠═7693444c-efe8-4698-b979-787b03bb8d29
 # ╠═bd99f22b-51f2-48fe-8391-b1e37498e7ff
+# ╠═fa90b927-c58c-4307-8524-28bb6927423c
+# ╠═13b98b93-a478-4e4a-b4a2-423d6af45369
+# ╠═3454c059-533a-4f06-b72e-7deb61c0aedf
+# ╠═58c6ef37-5ca5-4e89-b96f-dc2fea19447c
+# ╟─ccdbeff9-c398-417b-b933-61662f406ad0
+# ╠═4bb8fae0-d70b-47a0-a551-851d478275a2
+# ╟─21650888-8948-4fe6-8b08-08472a84ad32
+# ╠═93bf2d55-ca89-436c-802e-8e3f26e7d65c
 # ╟─c44ce267-d9d7-46ea-a6f2-54170cda5409
 # ╠═abd380fc-5018-462c-8641-3fc269e0d2cb
 # ╠═8a67cb77-a84f-4750-9099-56b5ef8ae038
