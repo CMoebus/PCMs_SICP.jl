@@ -22,7 +22,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/09 ***
+ ###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/10 ***
 ===================================================================================
 "
 
@@ -154,6 +154,12 @@ $square : \mathbb S \rightarrow \mathbb E$
 $square : x \mapsto error(.)$
 $square(x) := error(.)$
 
+where: 
+
+$\mathbb S = \text{domain of }\textit{strings}$
+$\mathbb E = \text{domain of }\textit{errors}$
+
+
 $\;$
 
 """
@@ -162,7 +168,7 @@ $\;$
 *("oh, ", "no !")                # operator $*$ is defined for strings !
 
 # ╔═╡ bd99f22b-51f2-48fe-8391-b1e37498e7ff
-square(x::String) = error("Strings should not be multiplied!")
+square(x::String) = error("Strings should not be squared!")
 
 # ╔═╡ 2ef23512-6a23-4d2d-86fa-db9c1743c529
 square                       
@@ -200,8 +206,21 @@ square(21)         # square2 : Integer --> Integer
 # ╔═╡ 965efc63-8dac-4397-8052-312bccd4e736
 square(21.0)        # square : Float --> Float
 
+# ╔═╡ 7ff29624-964a-435c-a909-550484a527c6
+md"
+---
+###### 4.3 *Multiple Dispatch*
+*Multiple dispatch* of function calls is possible when there are several *methods* with differently *typed parameters* of the same function symbol. In a function *call* first *more narrow* methods are tried then the *next less narrow* methods, etc. What is more or less narrow is defined by the relevant type hierarchy. This is called *muliple dispatch* of function calls.
+"
+
 # ╔═╡ fa90b927-c58c-4307-8524-28bb6927423c
 square("oh, no! ")                        # ==> error --> :)
+
+# ╔═╡ d78a705e-bf07-4af9-919a-a2b2de73cf6c
+md"
+---
+###### *Methods* as targets for *multiple dispatch*
+"
 
 # ╔═╡ 13b98b93-a478-4e4a-b4a2-423d6af45369
 methods(square)
@@ -236,8 +255,8 @@ function makeMyTypeTreeSquare()
 		1 0 0;
 		1 0 0]
 	names = ["square(x)", "square(x::Real)", "square(x::String)"]
-	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
-	graphplot(g, x=[1.0, 0.0, 2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.1, fontsize=8, title="Fig. 1.1.4.2 Dispatch of Function Methods: square(.)", titlefontsize=12, size=(800, 300))
+	edgelabels = Dict{Tuple, String}((2, 1) => "less narrow argument's type", (3, 1) => "less narrow argument's type")
+	graphplot(g, x=[1.0, 0.0, 2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.1, fontsize=8, title="Fig. 1.1.4.2 Dispatch of Methods of Function: square(.)", titlefontsize=12, size=(800, 300))
 end # function makeMyTypeTreeSquare()
 
 # ╔═╡ 93bf2d55-ca89-436c-802e-8e3f26e7d65c
@@ -294,7 +313,8 @@ f4(5.0)
 md"
 ---
 ##### 5. Summary
-First we defined *generic* functions. These are the *first* method of that *function symbol*. Then we *specialized* the *generic* function by *typing* the function's *arguments*. This assures the correct *dispatch* of function calls.
+First we defined *generic* functions. These are the *first* method of that *function symbol*. Then we *specialized* the *generic* function by *typing* the function's *arguments*. This assures the correct *dispatch* of function calls. In a function call first *more narrow* methods are tried then the *next less narrow* methods, etc.
+This is called *muliple dispatch* of function calls.
 "
 
 # ╔═╡ 20f492e1-1b1b-4852-8e40-37d4bd96c2a3
@@ -1699,7 +1719,9 @@ version = "1.4.1+1"
 # ╟─f9b0181b-c988-4d93-85e9-1a7bc41ecee4
 # ╠═7693444c-efe8-4698-b979-787b03bb8d29
 # ╠═bd99f22b-51f2-48fe-8391-b1e37498e7ff
+# ╟─7ff29624-964a-435c-a909-550484a527c6
 # ╠═fa90b927-c58c-4307-8524-28bb6927423c
+# ╟─d78a705e-bf07-4af9-919a-a2b2de73cf6c
 # ╠═13b98b93-a478-4e4a-b4a2-423d6af45369
 # ╠═3454c059-533a-4f06-b72e-7deb61c0aedf
 # ╠═58c6ef37-5ca5-4e89-b96f-dc2fea19447c
