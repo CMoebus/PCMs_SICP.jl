@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.1.5 [The Substitution Model for Procedure Application](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html)
 ##### file: PCM20241210\_SICP\_1.1.5\_TheSubstitutionModelForProcedureApplication
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/10 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/11 ****
 
 ===================================================================================
 "
@@ -31,6 +31,9 @@ md"
 md"
 ---
 ##### 0. Introduction
+In ch. 1.1.5 SICP presents a first approximate *model* of an *interpreter*, which can be used a *mental* model of the software developer. This model is called the *substitutional model* for procedure application. Single steps computing the value of a *function call* consist of *textual substitutions*. This is only a rough approximation of the real working interpreter. 
+
+We deal with two strategies of evaluation: *applicative* (*eager* evaluation, *call-by-value*) vs. *normal* order (*lazy* evaluation, *call-by-name*). Under the first strategy *all* arguments in the function call are evaluated before they are bound to the parameters of the function. Under the second strategy *only* arguments needed are evaluated. This behavior is really *lazy*.
 "
 
 # ╔═╡ f471a615-91f2-44cd-89ec-109f9c4dc1f0
@@ -38,9 +41,10 @@ md"
 ----
 ##### 1. Topics
 
+- models of interpreter
 - *mental model* of interpreter
-- *applicative* order evaluation
-- *normal* order evaluation
+- *applicative* order evaluation, *call-by-value*
+- *normal* order evaluation, *call-by-name*
 - *substitutions*
 - *reductions*
 
@@ -55,7 +59,8 @@ md"
 # ╔═╡ 7fe7cac1-aeb1-4eeb-8112-bd1a16bda78d
 md"
 ---
-##### 3. Informal Definition of Interpreter
+##### 3. Substitutional Model of an Interpreter
+###### 3.1 *Functional* (Scheme-like) Julia
 
 The evaluation of a *combination* (= *function call*) is *case-based*:
 
@@ -99,33 +104,33 @@ $\;$
 # ╔═╡ e9a4282e-5f66-4af0-9b9b-ac73ab643a6f
 md"
 ---
-###### 3.1 *Applicative* Order Evaluation: *evaluate the arguments and then apply*
+###### 3.1.1 *Applicative* Order Evaluation: *evaluate the arguments and then apply*
 
-###### 3.1.1 Evaluation by reduction of arguments
+- *Evaluation* by reduction of arguments
 
 $sumOfSquares(+(5,1),∗(5,2)) \mapsto sumOfSquares(6, 10)$
 
 $\;$
 
-###### 3.1.2 Expansion by substitution of nonprimitive function call by function's body
+- *Expansion* by substitution of nonprimitive function call by function's body
 
 $sumOfSquares(6, 10) \mapsto +(square(6),square(10))$
 
 $\;$
 
-###### 3.1.2 Expansion by substitution of nonprimitive function call by function's body
+- *Expansion* by substitution of nonprimitive function call by function's body
 
 $+(square(6),square(10)) \mapsto +(*(6, 6), *(10, 10))$
 
 $\;$
 
-###### 3.1.3 Evaluation by reduction of primitive expressions
+- *Evaluation* by reduction of primitive expressions
 
 $+(*(6, 6), *(10, 10)) \mapsto +(36, 100)$
 
 $\;$
 
-###### 3.1.3 Evaluation by reduction of primitive expressions
+- *Evaluation* by reduction of primitive expressions
 
 $+(36, 100) \mapsto 136$
 
@@ -136,37 +141,144 @@ $\;$
 # ╔═╡ 61877f22-eb56-4085-a182-8dc1d213d0d4
 md"
 ---
-###### 3.2 *Normal Order* Evaluation: *fully expand and then reduce*
+###### 3.1.2 *Normal Order* Evaluation: *fully expand and then reduce*
 
 Fully *expand* by *substitutions* till there are only primitive operators and then *reduce*.
 
-###### 3.2.1 *Expansion* by *substitution* of function *head* by function *body*
+- *Expansion* by *substitution* of function *head* by function *body*
 
 $sumOfSquares(+(5,1),∗(5,2)) \mapsto +(square(+(5,1)),square(∗(5,2))$
 
 $\;$
 
-###### 3.2.2 *Expansion* by *substitution* of function *head* by function *body*
+- *Expansion* by *substitution* of function *head* by function *body*
 
 $+(square(+(5,1)),square(∗(5,2)) \mapsto +(*(+(5,1),+(5,1)),*(∗(5,2),∗(5,2)))$
 
 $\;$
 
-###### 3.2.3 *Evaluation* by *reduction* of *primitive* expressions
+- *Evaluation* by *reduction* of *primitive* expressions
 
 $+(*(+(5,1),+(5,1)),*(∗(5,2),∗(5,2))) \mapsto +(*(6,6),*(10,10))$
 
 $\;$
 
-###### 3.2.4 *Evaluation* by *reduction* of *primitive* expressions
+- *Evaluation* by *reduction* of *primitive* expressions
 
 $+(*(6,6),*(10,10)) \mapsto +(36, 100)$
 
 $\;$
 
-###### 3.2.5 *Evaluation* by *reduction* of *primitive* expressions
+- *Evaluation* by *reduction* of *primitive* expressions
 
 $+(36, 100) \mapsto 136$
+
+$\;$
+
+"
+
+# ╔═╡ 0ea9ee43-7ed8-47d9-b2c1-03ea8a45fc15
+md"
+---
+###### 3.2 Idiomatic Julia
+
+Now, we take the functions in *partial infix* form
+
+$f(a) = sumOfSquares(a + 1, a * 2)$
+
+$\;$
+
+$sumOfSquares(x, y) = square(x) + square(y)$
+
+$\;$
+
+$square(x) = x * x$
+
+$\;$
+
+and evaluate the function call $f(5)$:
+
+$f(5) \mapsto sumOfSquares(5 + 1, 5 * 2)$
+
+$\;$
+
+Now, there are two alternative *strategies*: *applicative* or *normal order*.
+
+$\;$
+
+"
+
+# ╔═╡ 93ca9e2e-7e68-495c-ba9a-6d6be46a9b7f
+md"
+---
+###### 3.2.1 *Applicative* Order Evaluation: *evaluate the arguments and then apply*
+
+- *Evaluation* by reduction of arguments
+
+$sumOfSquares(5 + 1, 5 * 2) \mapsto sumOfSquares(6, 10)$
+
+$\;$
+
+- *Expansion* by substitution of nonprimitive function call by function's body
+
+$sumOfSquares(6, 10) \mapsto square(6) + square(10)$
+
+$\;$
+
+- *Expansion* by substitution of nonprimitive function call by function's body
+
+$square(6) + square(10) \mapsto 6 * 6 + 10 * 10$
+
+$\;$
+
+- *Evaluation* by reduction of primitive expressions
+
+$6 * 6 + 10 * 10 \mapsto 36 + 100$
+
+$\;$
+
+- *Evaluation* by reduction of primitive expressions
+
+$36 + 100 \mapsto 136$
+
+$\;$
+
+"
+
+# ╔═╡ 17e4b07e-e167-4f00-8880-a46af72ff192
+md"
+---
+###### 3.2.2 *Normal Order* Evaluation: *fully expand and then reduce*
+
+Fully *expand* by *substitutions* till there are only primitive operators and then *reduce*.
+
+- *Expansion* by *substitution* of function *head* by function *body*
+
+$sumOfSquares(5 + 1, 5 * 2) \mapsto square(5 + 1) + square(5 * 2)$
+
+$\;$
+
+- *Expansion* by *substitution* of function *head* by function *body*
+
+$square(5 + 1) + square(5 * 2) \mapsto (5+1) * (5+1) + (5*2) * (5*2)$
+
+$\;$
+
+- *Evaluation* by *reduction* of *primitive* expressions
+
+$(5+1) * (5+1) + (5*2) * (5*2) \mapsto 6 * 6 + 10 * 10$
+
+$\;$
+
+- *Evaluation* by *reduction* of *primitive* expressions
+
+$6 * 6 + 10 * 10 \mapsto 36 + 100$
+
+$\;$
+
+- *Evaluation* by *reduction* of *primitive* expressions
+
+$36 + 100 \mapsto 136$
 
 $\;$
 
@@ -1655,6 +1767,9 @@ version = "1.4.1+1"
 # ╟─4c83dace-36f7-44f7-8b7a-700618f55c2c
 # ╟─e9a4282e-5f66-4af0-9b9b-ac73ab643a6f
 # ╟─61877f22-eb56-4085-a182-8dc1d213d0d4
+# ╟─0ea9ee43-7ed8-47d9-b2c1-03ea8a45fc15
+# ╟─93ca9e2e-7e68-495c-ba9a-6d6be46a9b7f
+# ╟─17e4b07e-e167-4f00-8880-a46af72ff192
 # ╟─aac78346-0991-4bbe-87f0-4f6e1c947455
 # ╟─1d6258a3-dc05-40e2-94bf-604a33e3fb7a
 # ╟─3ec15fe7-0e46-448a-965b-73557ae9d252
