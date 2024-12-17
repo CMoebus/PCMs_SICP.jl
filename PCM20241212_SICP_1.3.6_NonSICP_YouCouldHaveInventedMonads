@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.6 NonSICP: [You Could Have Invented Monads](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
 ##### file: PCM20241212\_SICP\_1.3.6\_NonSICP\_YouCouldHaveInventedMonads
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/16 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/17 ****
 
 ==================================================================================
 "
@@ -52,7 +52,7 @@ md"
 ---
 ##### 3. You Could Have Invented Monads within Julia
 
-###### 3.1 *Pure Non-augmented* Functions
+###### 3.1 *Pure Non-augmented* Functions $f, g$
 
 In  a pure functional language (e.g. Haskell) you might have two functions $f, g$ with *types* $Float \rightarrow Float$:
 
@@ -95,7 +95,7 @@ f(4.0)
 
 # ╔═╡ 6e2322aa-3223-4305-a1b9-80ca7e75f145
 md"
-###### 3.2 *Pure* but *Output-Augmented* Functions
+###### 3.2 *Pure* but *Output-Augmented* Functions $f', g'$
 
 If we want that $f, g$ output *side-effects* (e.g. *status* or *error* messages) and stay within *pure functional* style we need to augment the output type of the two functions 
 
@@ -133,7 +133,7 @@ $\;$
                                 |                   |
                                 +-------------------+
 
-**Fig. 1.3.6.2** IO-Box-Diagrams of Functions $\{f, f'\}, \{g, g'\}$
+**Fig. 1.3.6.2** IO-Box-Diagrams of Functions $f', g'$
 
 $\;$
 
@@ -150,50 +150,75 @@ gApostrophe(3.0)
 typeof(gApostrophe(3.0))
 
 # ╔═╡ d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
+# with (pseudo) side-effect augmented function f'
 fApostrophe(gx::Float) = (f(gx), " f was called...") 
 
 # ╔═╡ 6392590c-642d-4c81-9b29-9b9ff689a392
 md"            
-           +------------------------------------------------------------+
-           |   compose(f', g', x)                                       |
-           |                                                            |
-           |  +---------------+           +---------------+             |
-           |  |               |           |               |             |
-           |  |               |           |               |             |
-           |  |  +---+        |           |  +---+        |             |
-     x --->|->|->| g |->gx    |    +----->|->| f |->fgx   |             |
-           |  |  +---+  |     |    ^      |  +---+   |    |             |
-           |  |         v     |    |      |          v    |             |
-    g' --->|->|--->g'->(.,,)->|->(gx,g's) |    f'->(.,.)->|->(fgx, f't) | 
-           |  |               |       |   |    ^          |    |    |   |  
-           |  |               |       |   |    |          |    v    v   |
-           |  +---------------+       |   +---------------+    |    |   |
-           |                          v        ^               |    |   |
-           |                          |        |               v    v   |
-           |                          |        |             ( ., .*.)->|->(fgx,g's*f't)                        
-           |                          |        ^                  ^     |
-           |                          v        |                  |     |
-           |                          +------->|-------->-------->+     |
-           |                                   ^                        |
-           |                                   |                        |
-           +------------------------------------------------------------+
-                                               ^
-                                               |
-    f' ----------------------------------------+
+                                   f'         g'
+                                   |          |
+                                   v          v
+                            +------------------------+
+                            |   myCompose(f', g')    |
+                            +------------------------+
+                                        |
+                                        v
+         +-----------------------------------------------------------+  
+         |                        fgApostrophe(x)                    |  
+         |                                                           |
+         |  +----------------+           +-------------+             |  
+         |  |                |           |             |             |  
+         |  |  +---+         |           |  +---+      |             |  
+    x -->|->|->| g |-->gx    |    +----->|->| f |->fgx |             |  
+         |  |  +---+   |     |    ^      |  +---+   |  |             |  
+         |  |          v     |    |      |          v  |             |  
+         |  |    g'-->(.,.)->|->(gx,g's) |    f'--->+->|->(fgx, f't) |   
+         |  |                |       |   |    ^        |    |    |   |    
+         |  |                |       |   |    |        |    v    v   |  
+         |  +----------------+       |   +-------------+    |    |   |  
+         |                           v        ^             |    |   |  
+         |                           |        |             v    v   |  
+         |                           |        |            (., .*.)->|-->(fgx,g's*f't)                        
+         |                           |        ^                ^     |  
+         |                           v        |                |     |  
+         |                           +------->+-------->------>+     |   
+         |                                                           |  
+         +-----------------------------------------------------------+  
 
-**Fig. 1.3.6.3**: IO-Box-Diagram of *Functor* (= *higher order* function) $compose$
+
+**Fig. 1.3.6.3**: IO-Box-Diagram of *Functor* (= *higher order* function) $myCompose$
 		   
 "
 
+# ╔═╡ 759bb009-c878-48bb-8378-6d5dc3fb3001
+md"
+###### Implementation of *higher order* function $myCompose$ 
+"
+
 # ╔═╡ 7f3b3217-e947-49fd-af32-c694b71305d5
-compose(fApostrophe, gApostrophe, x) = 
-	let (gx, gApostrophe_s) = gApostrophe(x)
+function myCompose(fApostrophe, gApostrophe)
+	#-------------------------------------------
+	function fgApostrophe(x)
+		(gx, gApostrophe_s) = gApostrophe(x)
 		(fgx, fApostrophe_t) = fApostrophe(gx)
 		(fgx, gApostrophe_s * fApostrophe_t)
-	end # let
+	end # function fgApostrophe(x)
+	#-------------------------------------------
+end # function myCompose
+
+# ╔═╡ 3ab20dc7-b53b-4533-9475-f03e3e83d71c
+md"
+###### Julian *Composition* Operator $\circ$
+"
+
+# ╔═╡ f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
+md"
+###### Julian *Pipelining* Operator $\textit{|>}$
+"
 
 # ╔═╡ 6bb496ba-837a-4410-b378-8691075b1765
 md"
+---
 ###### *Functional* Lifting of $f'$ to $f''$ by *bind(f') = f''*
 
 ... *we need to 'upgrade f' (Piponi, 2006, 2024), so that* $f'' = bind\ f'$ is a new function with *same* input-output signature $(Float, String)$:
@@ -246,10 +271,19 @@ function fApostrophe(floatStringTuple::Tuple{Float, String})
 end # function fApostrophe
 
 # ╔═╡ 8ff6ec09-f644-455d-9f66-30517a84c4f5
-fApostrophe(4.0)                            # with side-effect augmented function f'
+fApostrophe(4.0)                           
 
 # ╔═╡ 062181b9-3d55-4041-aeb1-aecb70ea1ae0
-compose(fApostrophe, gApostrophe, 3.0)
+myCompose(fApostrophe, gApostrophe)(3.0)
+
+# ╔═╡ 0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
+∘(fApostrophe, gApostrophe)(3.0)
+
+# ╔═╡ 81e64564-344a-4df1-90c5-f7cfde4cde4c
+3.0 |> gApostrophe |> fApostrophe
+
+# ╔═╡ c474a179-fb95-477c-9795-de298e2b7a08
+(3.0) |> gApostrophe |> fApostrophe
 
 # ╔═╡ 8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
 bind(fApostrophe)                              # ==> f''
@@ -1801,9 +1835,15 @@ version = "1.4.1+1"
 # ╠═d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
 # ╠═8ff6ec09-f644-455d-9f66-30517a84c4f5
 # ╟─6392590c-642d-4c81-9b29-9b9ff689a392
+# ╟─759bb009-c878-48bb-8378-6d5dc3fb3001
 # ╠═7f3b3217-e947-49fd-af32-c694b71305d5
 # ╠═062181b9-3d55-4041-aeb1-aecb70ea1ae0
-# ╟─6bb496ba-837a-4410-b378-8691075b1765
+# ╟─3ab20dc7-b53b-4533-9475-f03e3e83d71c
+# ╠═0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
+# ╟─f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
+# ╠═81e64564-344a-4df1-90c5-f7cfde4cde4c
+# ╠═c474a179-fb95-477c-9795-de298e2b7a08
+# ╠═6bb496ba-837a-4410-b378-8691075b1765
 # ╠═b5783895-509f-4080-8c30-f76527ab0a38
 # ╠═8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
 # ╠═7dc723ba-adf8-40b0-ab4c-875e379b78f5
