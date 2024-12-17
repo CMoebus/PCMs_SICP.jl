@@ -82,13 +82,13 @@ Float = Union{Float32, Float64}
 Float <: Real
 
 # ╔═╡ 67b7c688-4f24-4696-9eb8-ff415512da92
-g(x::Float) = (2.0 * x)::Float                 # example function g
+g(x::Float)::Float = (2.0 * x)                       # example function g
 
 # ╔═╡ 39f27f02-e20a-4f6d-92e5-589b1a8256ab
 g(3.0)
 
 # ╔═╡ 0328afa9-91c1-4100-bb2b-8e7c95490f21
-f(gx) = (4.0 + gx)::Float                      # example function f
+f(gx::Float)::Float = (4.0 + gx)                     # example function f
 
 # ╔═╡ 2cf460e0-3e35-4611-bc1e-dae85af1c1ac
 f(4.0)
@@ -141,7 +141,10 @@ $\;$
 
 # ╔═╡ 97edee73-6922-4dd1-bed4-d8f60c299c9f
 # with (pseudo) side-effect augmented function g'
-gApostrophe(x::Float) = (g(x), " g was called >>")
+gApostrophe(x::Float)::Tuple{Float, String} = (g(x), " g was called >>")
+
+# ╔═╡ 0b12912f-1556-4971-aa5c-90ef4c313cc9
+Tuple{Float64, String} <: Tuple{Float, String}
 
 # ╔═╡ 9fe7f07c-7126-4adc-a782-b8bb08157b18
 gApostrophe(3.0)
@@ -151,7 +154,7 @@ typeof(gApostrophe(3.0))
 
 # ╔═╡ d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
 # with (pseudo) side-effect augmented function f'
-fApostrophe(gx::Float) = (f(gx), " f was called...") 
+fApostrophe(gx::Float)::Tuple{Float, String} = (f(gx), " f was called...") 
 
 # ╔═╡ 6392590c-642d-4c81-9b29-9b9ff689a392
 md"            
@@ -196,14 +199,14 @@ md"
 "
 
 # ╔═╡ 7f3b3217-e947-49fd-af32-c694b71305d5
-function myCompose(fApostrophe, gApostrophe)
-	#-------------------------------------------
-	function fgApostrophe(x)
+function myCompose(fApostrophe::Function, gApostrophe::Function)
+	#------------------------------------------------------------
+	function fgApostrophe(x::Float)::Tuple{Float, String}
 		(gx, gApostrophe_s) = gApostrophe(x)
 		(fgx, fApostrophe_t) = fApostrophe(gx)
 		(fgx, gApostrophe_s * fApostrophe_t)
 	end # function fgApostrophe(x)
-	#-------------------------------------------
+	#------------------------------------------------------------
 end # function myCompose
 
 # ╔═╡ 3ab20dc7-b53b-4533-9475-f03e3e83d71c
@@ -273,8 +276,26 @@ end # function fApostrophe
 # ╔═╡ 8ff6ec09-f644-455d-9f66-30517a84c4f5
 fApostrophe(4.0)                           
 
+# ╔═╡ f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
+myCompose(fApostrophe, gApostrophe)
+
+# ╔═╡ a9577f41-3ea3-48c5-9cba-5dce82f1208d
+typeof(myCompose(fApostrophe, gApostrophe)) <: Function
+
 # ╔═╡ 062181b9-3d55-4041-aeb1-aecb70ea1ae0
 myCompose(fApostrophe, gApostrophe)(3.0)
+
+# ╔═╡ aa28c8fe-2c84-45e7-8b5a-881a5df4d5fb
+typeof(myCompose(fApostrophe, gApostrophe)(3.0))
+
+# ╔═╡ 1a2bd5f3-a6a4-44e4-98ab-9eb01e7e52c7
+∘(fApostrophe, gApostrophe)
+
+# ╔═╡ ece1a024-dba3-4931-8466-b403491b6dfe
+typeof(∘(fApostrophe, gApostrophe))
+
+# ╔═╡ 152d303b-4ee6-400e-b15d-af34ca006267
+typeof(∘(fApostrophe, gApostrophe)) <: Function
 
 # ╔═╡ 0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
 ∘(fApostrophe, gApostrophe)(3.0)
@@ -1830,6 +1851,7 @@ version = "1.4.1+1"
 # ╠═2cf460e0-3e35-4611-bc1e-dae85af1c1ac
 # ╟─6e2322aa-3223-4305-a1b9-80ca7e75f145
 # ╠═97edee73-6922-4dd1-bed4-d8f60c299c9f
+# ╠═0b12912f-1556-4971-aa5c-90ef4c313cc9
 # ╠═9fe7f07c-7126-4adc-a782-b8bb08157b18
 # ╠═890c07be-20ca-4c28-854f-932ba6d199a3
 # ╠═d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
@@ -1837,8 +1859,14 @@ version = "1.4.1+1"
 # ╟─6392590c-642d-4c81-9b29-9b9ff689a392
 # ╟─759bb009-c878-48bb-8378-6d5dc3fb3001
 # ╠═7f3b3217-e947-49fd-af32-c694b71305d5
+# ╠═f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
+# ╠═a9577f41-3ea3-48c5-9cba-5dce82f1208d
 # ╠═062181b9-3d55-4041-aeb1-aecb70ea1ae0
+# ╠═aa28c8fe-2c84-45e7-8b5a-881a5df4d5fb
 # ╟─3ab20dc7-b53b-4533-9475-f03e3e83d71c
+# ╠═1a2bd5f3-a6a4-44e4-98ab-9eb01e7e52c7
+# ╠═ece1a024-dba3-4931-8466-b403491b6dfe
+# ╠═152d303b-4ee6-400e-b15d-af34ca006267
 # ╠═0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
 # ╟─f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
 # ╠═81e64564-344a-4df1-90c5-f7cfde4cde4c
