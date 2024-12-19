@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.6 NonSICP: [You Could Have Invented Monads](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
 ##### file: PCM20241212\_SICP\_1.3.6\_NonSICP\_YouCouldHaveInventedMonads
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/18 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/19 ****
 
 ==================================================================================
 "
@@ -32,7 +32,7 @@ md"
 ##### 0. Introduction
 [Pisoni (2006, 2024)](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) wrote a tutorial about *monads* in *Haskell*. The tutorial had the title '*You Cold Have Invented Monads (And Maybe You Already Have)*'. [*Monads*](https://en.wikipedia.org/wiki/Monad_(functional_programming)) are a hard-to-understand concept in functional language like e.g. *Haskell*. They deal with the *chaining of effects* in a *pure* functional context. 
 
-This chapter has two goals. First, we want to deal with *higher-order* functions by transpiling Haskell code into Julia. Second, we want to study, whether *monads* are necessary in Julia with its *multiple-dispatch* competence.
+This chapter has two goals. First, we want to deal with *higher-order* functions by transpiling Haskell code into Julia. Second, we want to study, whether *monads* are really necessary in Julia with its *multiple-dispatch* competence.
 "
 
 # ╔═╡ 564b5a6f-a20d-45e4-8414-659449f8cf3f
@@ -164,7 +164,7 @@ fApostrophe(gx::Float)::Tuple{Float, String} = (f(gx), " f was called...")
 
 # ╔═╡ 759bb009-c878-48bb-8378-6d5dc3fb3001
 md"
-###### Implementierung der *höherwertigen* Funktion $myCompose$
+###### Implementation of *Higher-Order* Function $myCompose$
 Composing two functions *is hard work every time we need* them ... *and if we had to implement this kind of plumbing all the way through our code it would be a pain. What we need is to define a higher-order function that will this plumbing for us.* (Piponi, 2024, p.4)
 
 Piponi proposed as a solution a function $bind$ which applied to $f'$ *lifts* $f'$ with input type $Float$ to $f''$ with the *augmented* input type $Tuple{Float, String}$. 
@@ -442,6 +442,9 @@ Here we demonstrate that by *multiple-dispatching* function $fApostrophe$  and *
 md"
 ---
 ##### 4. Summary
+We transpiled Piponi's Haskell code into functional Julia. Beside that we introduced a new function $myCompose(f', g')$ which made it possible to *compose* functions with nonmatching *output* type (here $g'$'s $Tuple\{Float, String\}$) and *input* type (here $f'$'s $Float$). 
+
+Furthermore it could be demonstrated that when we define a *second* method for function $f'$ with *lifted* input type $Tuple\{Float, String\}$ we can exploit *multiple dispatch* and *compose* or *pipeline* $f'$ and $g'$ with *standard* Julian operators $\circ$ or $\textit{|>}$ *without* Piponi's $bind$ function.
 "
 
 # ╔═╡ cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
