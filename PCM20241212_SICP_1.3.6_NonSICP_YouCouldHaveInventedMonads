@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.6 NonSICP: [You Could Have Invented Monads](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
 ##### file: PCM20241212\_SICP\_1.3.6\_NonSICP\_YouCouldHaveInventedMonads
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2024/12/19 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM  **** 2024/12/19 ****
 
 ==================================================================================
 "
@@ -282,11 +282,17 @@ gApostrophe(3.0)::Tuple{Float, String}
 
 # ╔═╡ 42868372-c96e-4bea-b723-ace73b010c29
 md"
-###### Composition
+###### Composition with $\circ$ 
+Piponi's: $f' * g'$ is equal to our $∘(f'', g') == f'' ∘ g'$
 "
 
 # ╔═╡ 3e22ebd1-0517-4383-8adf-a932b9aae202
 gApostrophe(3.0) # ==> (6.0, " g was called >>") --> :)
+
+# ╔═╡ 695ac03e-5523-42ef-827b-3dfb6595fe9c
+md"
+###### Pipelining with $\textit{|>}$
+"
 
 # ╔═╡ 9882727e-8dad-47a1-9ad1-4a5503cf2928
 md"
@@ -369,7 +375,7 @@ bind(fApostrophe)((6.0, " g was called >>"))::Tuple{Float, String}
 fApostropheApostrophe = bind(fApostrophe)::Function   # ==> f''
 
 # ╔═╡ f1838720-e721-4cfc-89ce-2323492965b4
-fApostropheApostrophe::Function
+fApostropheApostrophe::Function                       # f'' = bind(f')
 
 # ╔═╡ b8b96cf3-cae1-48f7-9f4a-61b5b5bd24d6
 # = f''(g(3.0))
@@ -377,14 +383,17 @@ fApostropheApostrophe((6.0, " g was called >>"))::Tuple{Float, String}
 # ==> (10.0, " g was called >> f was called...") --> :)    success
 
 # ╔═╡ 5b1454ff-e2d7-477a-9631-e8e89153637f
-fApostropheApostrophe(gApostrophe(3.0))
+# f''(g'(3.0))
+fApostropheApostrophe(gApostrophe(3.0))               
 # ==> (10.0, " g was called >> f was called...") --> :)    success
 
 # ╔═╡ daff6c16-6d47-4f18-a032-be3eb461f98e
+# f''(g'(3.0))
 fApostropheApostrophe(gApostrophe(3.0))
 # ==> (10.0, " g was called >> f was called...") --> :)    success
 
 # ╔═╡ 21e88360-b25c-4ed4-9d2b-48cbe24a5c15
+# Piponi's: f' * g' == our: ∘(f'', g') == f'' ∘ g'
 ∘(fApostropheApostrophe, gApostrophe)
 
 # ╔═╡ 1bb7614c-01c5-4f38-a27d-6567c2242412
@@ -394,9 +403,17 @@ typeof(∘(fApostropheApostrophe, gApostrophe)) <:Function   # ==> true --> :)
 ∘(fApostropheApostrophe, gApostrophe)(3.0)
 # ==> (10.0, " g was called >> f was called...") --> :)    success
 
+# ╔═╡ aa4f0d7e-9f82-4b29-a930-6434a8d4ef76
+3.0 |> gApostrophe |> fApostropheApostrophe
+# ==> (10.0, " g was called >> f was called...") --> :)    success
+
+# ╔═╡ 28c1557f-87be-41d9-8c4a-9962ca8586af
+(3.0) |> gApostrophe |> fApostropheApostrophe
+# ==> (10.0, " g was called >> f was called...") --> :)    success)
+
 # ╔═╡ d9160bae-da93-4181-9247-b17ae50fe401
 md"
-###### Composition
+###### Composition with $\circ$ 
 "
 
 # ╔═╡ 6be88a33-0af3-4955-9be6-54faaf85a30f
@@ -423,7 +440,7 @@ fgApostrophe2(3.0)                               # success !compositum without (
 
 # ╔═╡ 03944647-c36d-4fec-b2d7-05b1b02f865d
 md"
-###### Pipelining
+###### Pipelining with $\textit{|>}$
 "
 
 # ╔═╡ 73090d52-0cfd-4d2c-b70f-735fcc34d048
@@ -437,6 +454,12 @@ Here we demonstrate that by *multiple-dispatching* function $fApostrophe$  and *
 # ╔═╡ c8ab0b73-4931-48fe-a4f2-19821064a0f3
 3.0 |> gApostrophe |> fApostrophe                     
 # ==> (10.0, " g was called >> f was called...") --> :)    success
+
+# ╔═╡ 8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
+md"
+---
+---
+"
 
 # ╔═╡ 0f062f15-86a1-4540-80e9-bb61d4c3b109
 md"
@@ -1972,6 +1995,9 @@ version = "1.4.1+1"
 # ╠═21e88360-b25c-4ed4-9d2b-48cbe24a5c15
 # ╠═1bb7614c-01c5-4f38-a27d-6567c2242412
 # ╠═4ea33f22-4315-41bb-a5c1-81341bbc33d8
+# ╟─695ac03e-5523-42ef-827b-3dfb6595fe9c
+# ╠═aa4f0d7e-9f82-4b29-a930-6434a8d4ef76
+# ╠═28c1557f-87be-41d9-8c4a-9962ca8586af
 # ╟─9882727e-8dad-47a1-9ad1-4a5503cf2928
 # ╠═4f1a1d63-7249-478a-b970-a05b1949e4a0
 # ╟─d9160bae-da93-4181-9247-b17ae50fe401
@@ -1985,6 +2011,7 @@ version = "1.4.1+1"
 # ╠═73090d52-0cfd-4d2c-b70f-735fcc34d048
 # ╟─b04198c2-665b-4e0d-b618-4be374952810
 # ╠═c8ab0b73-4931-48fe-a4f2-19821064a0f3
+# ╟─8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
 # ╟─0f062f15-86a1-4540-80e9-bb61d4c3b109
 # ╟─cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
 # ╟─28d1564f-2e8f-4aff-b0a6-f6fd381078ee
