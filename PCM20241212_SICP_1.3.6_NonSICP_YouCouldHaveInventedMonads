@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.6 NonSICP: [You Could Have Invented Monads](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
 ##### file: PCM20241212\_SICP\_1.3.6\_NonSICP\_YouCouldHaveInventedMonads
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM  **** 2024/12/19 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM  **** 2024/12/22 ****
 
 ==================================================================================
 "
@@ -30,15 +30,20 @@ md"
 # ╔═╡ e5abf66b-1e47-42e2-8792-b71eb2d7634c
 md"
 ##### 0. Introduction
-[Pisoni (2006, 2024)](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) wrote a tutorial about *monads* in *Haskell*. The tutorial had the title '*You Cold Have Invented Monads (And Maybe You Already Have)*'. [*Monads*](https://en.wikipedia.org/wiki/Monad_(functional_programming)) are a hard-to-understand concept in functional language like e.g. *Haskell*. They deal with the *chaining of effects* in a *pure* functional context. 
+[Piponi (2006, 2024)](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) wrote a tutorial about *monads* in *Haskell*. The tutorial had the title '*You Cold Have Invented Monads (And Maybe You Already Have)*'. [*Monads*](https://en.wikipedia.org/wiki/Monad_(functional_programming)) are a hard-to-understand concept in functional language like e.g. *Haskell*. They deal with the *chaining of effects* in a *pure* functional context. 
 
 This chapter has two goals. First, we want to deal with *higher-order* functions by transpiling Haskell code into Julia. Second, we want to study, whether *monads* are really necessary in Julia with its *multiple-dispatch* competence.
+
+It is strongly recommended to follow [Piponi's (2024) original tutorial](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) and our *transpilation* step-by-step in parallel. You should take the first steps in Piponi's tutorial. 
 "
 
 # ╔═╡ 564b5a6f-a20d-45e4-8414-659449f8cf3f
 md"
 ---
 ##### 1. Topics
+
+- *Union* of types (e.g. $Float = Union\{Float32, Float64\}$)
+- *Parametrized* types (e.g. $Tuple\{Float, String\}$)
 "
 
 # ╔═╡ ec45bd94-23b6-4993-bcec-64492cb499a3
@@ -69,7 +74,7 @@ $\;$
                         gx::Float --> |  f  | --> fgx::Float
                                       +-----+
 
-**Fig. 1.3.6.1** IO-(≈ UML-Activity)-Diagram of Functions $f, g$
+**Fig. 1.3.6.1** Input-Output-Dataflow-(≈ UML-Activity)-Diagram of Functions $f, g$
 
 $\;$
 
@@ -82,19 +87,20 @@ Float = Union{Float32, Float64}
 Float <: Real
 
 # ╔═╡ 67b7c688-4f24-4696-9eb8-ff415512da92
-g(x::Float)::Float = (2.0 * x)                       # example function g
+g(x::Float)::Float = (2.0 * x)                       # an example function g
 
 # ╔═╡ 39f27f02-e20a-4f6d-92e5-589b1a8256ab
 g(3.0)
 
 # ╔═╡ 0328afa9-91c1-4100-bb2b-8e7c95490f21
-f(gx::Float)::Float = (4.0 + gx)                     # example function f
+f(gx::Float)::Float = (4.0 + gx)                     # an example function f
 
 # ╔═╡ 2cf460e0-3e35-4611-bc1e-dae85af1c1ac
 f(4.0)
 
 # ╔═╡ 6e2322aa-3223-4305-a1b9-80ca7e75f145
 md"
+---
 ###### 3.2 *Pure* but *Output-Augmented* Functions $f', g'$
 
 We want that $f, g$ output a sequence of *side-effects* (e.g. *status* or *error* messages) and stay within *pure functional* style. Now we need to augment the output type of the two functions 
@@ -102,6 +108,9 @@ We want that $f, g$ output a sequence of *side-effects* (e.g. *status* or *error
 - *nonaugmented* output types
 
 $f :: Float \rightarrow Float$
+
+$\;$
+
 $g :: Float \rightarrow Float$
 
 $\;$
@@ -109,11 +118,14 @@ $\;$
 - *augmented* output types
 
 $f' :: Float \rightarrow Tuple\{Float, String\}$
+
+$\;$
+
 $g' :: Float \rightarrow Tuple\{Float, String\}$
 
 $\;$
 
-We graph the two functions $f', g'$ as input-output-(IO)-flow-diagrams (a kind of simplified [*UML-activity*](https://www.uml-diagrams.org/activity-diagrams.html) diagrams) in **Fig. 1.3.6.2**.
+We graph the two functions $f', g'$ as input-output-(IO)-dataflow-diagrams (a kind of simplified [*UML-activity*](https://www.uml-diagrams.org/activity-diagrams.html) diagrams) in **Fig. 1.3.6.2**.
 
                                 +-------------------+
                                 |                   |
@@ -146,30 +158,29 @@ $\;$
 "
 
 # ╔═╡ 97edee73-6922-4dd1-bed4-d8f60c299c9f
+# first method of gApostrophe
 # with (pseudo) side-effect augmented function g'
-gApostrophe(x::Float)::Tuple{Float, String} = (g(x), " g was called >>")
+gApostrophe(x::Float)::Tuple{Float, String} = 
+	(g(x), " g's 1st method was called >>;")
 
 # ╔═╡ 0b12912f-1556-4971-aa5c-90ef4c313cc9
-Tuple{Float64, String} <: Tuple{Float, String}   # ==> true --> :)
-
-# ╔═╡ 9fe7f07c-7126-4adc-a782-b8bb08157b18
-gApostrophe(3.0)                          # ==> (6.0, " g was called >>") --> :)
-
-# ╔═╡ 890c07be-20ca-4c28-854f-932ba6d199a3
-typeof(gApostrophe(3.0))                  # ==> Tuple{Float64, String} --> :)
+Tuple{Float64, String} <: Tuple{Float, String} # ==> true --> :)
 
 # ╔═╡ d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
+# first method of fApostrophe
 # with (pseudo) side-effect augmented function f'
-fApostrophe(gx::Float)::Tuple{Float, String} = (f(gx), " f was called...") 
+fApostrophe(gx::Float)::Tuple{Float, String} = 
+	(f(gx), " f's 1st method was called >>;") 
 
 # ╔═╡ 759bb009-c878-48bb-8378-6d5dc3fb3001
 md"
-###### Implementation of *Higher-Order* Function $myCompose$
+---
+###### 3.3 Implementation of *Higher-Order* Function $myCompose$
 Composing two functions *is hard work every time we need* them ... *and if we had to implement this kind of plumbing all the way through our code it would be a pain. What we need is to define a higher-order function that will this plumbing for us.* (Piponi, 2024, p.4)
 
-Piponi proposed as a solution a function $bind$ which applied to $f'$ *lifts* $f'$ with input type $Float$ to $f''$ with the *augmented* input type $Tuple{Float, String}$. 
+Piponi proposed as a solution a function $bind$ which applied to $f'$ *lifts* $f'$ with input type $Float$ to $f''$ with the *augmented* input type $Tuple\{Float, String\}$. 
 
-But before we implement the Haskell $bind$ in Julia we define a function $myCompose$ which composes the *unlifted* functions $f', g'$. We demonstrate that $myComposes$ succeeds in composing $f', g'$ *despite the fact that the output type of $g'$ is augmented and the input type of $f'$ is not. The composed function $fgApostrophe$ is graphed in **Fig. 1.3.6.3**.
+But before we implement the Haskell $bind$ in Julia we define a function $myCompose$ which composes the *unlifted* functions $f', g'$. We demonstrate that $myComposes$ succeeds in composing $f', g'$ despite the fact that the *output* type of $g'$ is *augmented* and the *input* type of $f'$ is *not*. The composed function $fgApostrophe$ is displayed in **Fig. 1.3.6.3**.
 
 "
 
@@ -222,93 +233,49 @@ function myCompose(fApostrophe::Function, gApostrophe::Function)
 	#-----------------------------------------------------------------------
 end # function myCompose
 
-# ╔═╡ 3ab20dc7-b53b-4533-9475-f03e3e83d71c
-md"
-###### Julian *Composition* Operator $\circ$
-"
-
 # ╔═╡ 5e9a1ea6-07e5-4de3-b13a-ba0f680dbaf4
 md"
-Piponi (2024, p.4) stated that the ordinary coposition of $f', g'$ would not work, because $g'$ has an output type $Tuple{Float, String}$ which is different from the input type $Float$ of $f'$. In contrast to that statement Julia's composition with $\circ(.,.)$ succeeds. This is due to the fact that we defined *two* methods for $f'$. The *first* method similar to Pisoni's was defined above. The *second* method for $f' = fApostrophe$ is defined below. It has instead the $Float$ input type an *augmented* (or *lifted*) input type $Tuple(Float, String)$. Now exploiting *multiple dispatch* the ordinary Julian *composition* $\circ(.,.)$ and *pipelining* operators work satisfactorily.
-"
-
-# ╔═╡ f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
-md"
-###### Julian *Pipelining* Operator $\textit{|>}$
-"
-
-# ╔═╡ 6bb496ba-837a-4410-b378-8691075b1765
-md"
 ---
-###### *Functional* Lifting of $f'$ to $f''$ by *bind(f') = f''*
+###### 3.4 Julia's *Multiple Dispatch* and  *Composition* Operator $\circ$
 
-Because the *output* type of $g'$ does not match the *input* type of $f'$'s first method $g'$ is not ordinary composable with $f'$'s first method. Unfortunately Piponi had no *multiple dispatch* at hand. So he proposed to *lift* or *upgrade* $f'$. *...we need to 'upgrade f' (Piponi, 2006, 2024)*, so that $f'' = bind\ f'$ is a new function with *same* input-output signature $(Float, String)$:
+Piponi (2024, p.4) stated that the ordinary composition of $f', g'$ would not work, because $g'$ has an *output* type $Tuple{Float, String}$ which is different from the *input* type $Float$ of $f'$. 
 
-$f'' = bind(\ f') :: (Float, String) \rightarrow (Float, String)$
+In contrast to Piponi's statement Julia's composition with $\circ(.,.)$ succeeds when we provide $f', g'$ with a second method each. These new method get augmented *input* types. Instead of simple input type $Float$ they get augmented input type $Tuple\{Float, String\}$.
 
-$\;$
-
-which *implies* that $bind$ takes a function $f'$ and *lifts it* to $f''$:
-
-$bind: f' \mapsto f''$
-
-$\;$
-
-$bind :: (Float \rightarrow (Float, String)) \mapsto ((Float, String) \rightarrow (Float, String))$
-
-$\;$
-
-For comparison purposes we quote here Pisoni's Haskell code of function $bind$
-
-bind f' (gx, gs) = let (fx, fs) = f' gx
-                   in  (fx, gs ++ fs)
-
-In the Haskell code variable names are written in a short *mathematical* style. For documentary purposes we used longer self-explaining words in camel style.
-
+Now input and output type are identical so ordinary Julia's *composition* $\circ(.,.)$ and *pipelining* $\textit{ |> }$ operators work satisfactorily by exploiting Julia's *multiple dispatch*.
 "
 
-# ╔═╡ b5783895-509f-4080-8c30-f76527ab0a38
-function bind(fApostrophe::Function)::Function 
-	function fApostropheApostrophe(tuple::Tuple{Float, String})
-		(gx::Float, gApostrophe_s::String) = tuple::Tuple{Float, String}
-		(fgx, fApostrophe_t) = fApostrophe(gx)::Tuple{Float, String}
-		(fgx, gApostrophe_s * fApostrophe_t)::Tuple{Float, String}
-	end # function fApostropheApostrophe
-end # function bind(fApostrophe) 
+# ╔═╡ dd416472-545f-4b0f-a910-dfc07116ac7f
+# 2nd method of gApostrophe
+function gApostrophe(floatStringTuple::Tuple{Float, String})
+	(x::Float, predessor_s) = floatStringTuple
+	(g(x), predessor_s * " g's 2nd method was called >>; ")
+end # function fApostrophe
 
-# ╔═╡ 7dc723ba-adf8-40b0-ab4c-875e379b78f5
-gApostrophe(3.0)::Tuple{Float, String}       
-# g'(3.0) ==> (6.0, " g was called >>") --> :)
+# ╔═╡ 9fe7f07c-7126-4adc-a782-b8bb08157b18
+gApostrophe(3.0)                  
+# ==> (6.0, " g's 1st method was called >>;") --> :)
 
-# ╔═╡ 42868372-c96e-4bea-b723-ace73b010c29
-md"
-###### Composition with $\circ$ 
-Piponi's: $f' * g'$ is equal to our $∘(f'', g') == f'' ∘ g'$
-"
+# ╔═╡ 890c07be-20ca-4c28-854f-932ba6d199a3
+typeof(gApostrophe(3.0))                      # ==> Tuple{Float64, String} --> :)
 
-# ╔═╡ 3e22ebd1-0517-4383-8adf-a932b9aae202
-gApostrophe(3.0) # ==> (6.0, " g was called >>") --> :)
-
-# ╔═╡ 695ac03e-5523-42ef-827b-3dfb6595fe9c
-md"
-###### Pipelining with $\textit{|>}$
-"
-
-# ╔═╡ 9882727e-8dad-47a1-9ad1-4a5503cf2928
-md"
-###### *Multiple-Dispatch* Lifting of $f'$ to $f''$
-Now we want to investigate whether we can abandon the $bind$ function when we take advantage of Julia's *multiple-dispatch* competence. We hope that the effect of the function $fApostrophe_g = bind(fApostrophe)$ can be achieved by a *new* 1-parameter method of function fApostrophe. This *single* parameter expects a *tuple* of type $::Tuple\{Float, String\}$.
-"
+# ╔═╡ 7eea8c69-3a4d-4f87-88e7-c9687137769e
+methods(gApostrophe)
 
 # ╔═╡ 4f1a1d63-7249-478a-b970-a05b1949e4a0
 # 2nd method of fApostrophe
 function fApostrophe(floatStringTuple::Tuple{Float, String})
-	(x::Float, gAprostrophe_s) = floatStringTuple
-	(f(x), gAprostrophe_s * " f was called..." )
+	(gx::Float, gAprostrophe_s) = floatStringTuple
+	(f(gx), gAprostrophe_s * " f's 2nd method was called >>; ")
 end # function fApostrophe
 
 # ╔═╡ 8ff6ec09-f644-455d-9f66-30517a84c4f5
-fApostrophe(4.0)                          # ==> (8.0, " f was called...") --> :)                    
+fApostrophe(4.0)                              
+# ==> (8.0, " f's 1st method was called >>;") --> :)
+
+# ╔═╡ 062181b9-3d55-4041-aeb1-aecb70ea1ae0
+myCompose(fApostrophe, gApostrophe)(3.0)::Tuple{Float, String}
+# ==> (10.0, " g's 1st method was called >>; f's 1st method was called >>;") --> :)  
 
 # ╔═╡ f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
 fgApostrophe = myCompose(fApostrophe, gApostrophe)
@@ -318,7 +285,7 @@ typeof(fgApostrophe) <: Function
 
 # ╔═╡ 770767ec-d109-4f53-aed9-a16e5380b338
 fgApostrophe(3.0)
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f's 1st method was called >>;") --> :)
 
 # ╔═╡ aa28c8fe-2c84-45e7-8b5a-881a5df4d5fb
 typeof(fgApostrophe(3.0))
@@ -327,10 +294,6 @@ typeof(fgApostrophe(3.0))
 # ╔═╡ 3c657371-13ab-40ec-8111-55ad286d7668
 typeof(fgApostrophe(3.0)) <: Tuple{Float, String}
 # ==> true --> :)
-
-# ╔═╡ 062181b9-3d55-4041-aeb1-aecb70ea1ae0
-myCompose(fApostrophe, gApostrophe)(3.0)::Tuple{Float, String}
-# ==> (10.0, " g was called >> f was called...") --> :)    success
 
 # ╔═╡ 185f027c-a385-411c-9280-b9cf8094f6fd
 methods(fApostrophe)
@@ -346,30 +309,120 @@ typeof(∘(fApostrophe, gApostrophe)) <: ComposedFunction <: Function
 
 # ╔═╡ 0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
 ∘(fApostrophe, gApostrophe)(3.0)::Tuple{Float, String}
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10, " g's 1st method was called >>; f's 2nd method was called >>; ") --> :)
+
+# ╔═╡ 4584a752-7b7e-460d-bf36-b3ed7bb424a5
+∘(fApostrophe, gApostrophe)((3.0, ""))::Tuple{Float, String}
+# ==> (10.0, " g's 2nd method was called >>; f's 2nd method was called >>; ") --> :)
+
+# ╔═╡ a2f6461a-2a64-4f1e-98ab-14d62b8c299b
+∘(gApostrophe, fApostrophe)(3.0)::Tuple{Float, String}
+# ==> (14, " f's 1st method was called >>; g's 2nd method was called >>; ") --> :
+
+# ╔═╡ 92ac4efa-ad2d-4647-b6f4-97648484722f
+∘(gApostrophe, fApostrophe)((3.0, ""))::Tuple{Float, String}
+# ==> (14, " f's 2nd method was called >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
+md"
+---
+###### 3.5 Julia's *Multiple Dispatch* and *Pipelining* Operator $\textit{|>}$
+"
 
 # ╔═╡ 81e64564-344a-4df1-90c5-f7cfde4cde4c
 3.0 |> gApostrophe |> fApostrophe              # starts with '3.0'
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f's 2nd method was called >>;") --> :)
 
 # ╔═╡ 9b6b8944-b6dc-4fc7-91c7-2b55b1fc3e24
 typeof(3.0 |> gApostrophe |> fApostrophe) <: Tuple{Float, String}
 
 # ╔═╡ c474a179-fb95-477c-9795-de298e2b7a08
 (3.0) |> gApostrophe |> fApostrophe            # starts with '(3.0)'
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f's 2nd method was called >>;") --> :)  
 
 # ╔═╡ ba621366-d49b-4e9a-874d-dab2d4dca1d8
 typeof((3.0) |> gApostrophe |> fApostrophe) <: Tuple{Float, String}
 # ==> true --> :)
 
+# ╔═╡ b54308ed-2f9c-4ee3-af4f-4b8a7e1f449e
+(3.0, "") |> gApostrophe |> fApostrophe              # starts with '(3.0, "")'
+# ==> (10.0, " g's 2nd method was called >>; f's 2nd method was called >>;") --> :)
+
+# ╔═╡ d295a9da-60f6-4788-8df6-de8d4f8406cb
+((3.0, "")) |> gApostrophe |> fApostrophe              # starts with '((3.0, ""))'
+# ==> (10.0, " g's 2nd method was called >>; f's 2nd method was called >>;") --> :)
+
+# ╔═╡ 77a5b609-4208-4eba-b379-d559e8c5ac05
+3.0 |> fApostrophe |> gApostrophe              # starts with '3.0'
+# ==> (14, " f's 1st method was called >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ 40acc2c3-e885-4d95-a74c-5b48675e6db8
+(3.0) |> fApostrophe |> gApostrophe              # starts with '(3.0)'
+# ==> (14, " f's 1st method was called >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ af80d503-7ede-485b-bed2-371f1f2a85df
+(3.0, "") |> fApostrophe |> gApostrophe              # starts with '(3.0, "")'
+# ==> (14, " f's 2nd method was called >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ ed596330-2d37-4747-a8fa-4f07d521914d
+((3.0, "")) |> fApostrophe |> gApostrophe              # starts with '((3.0, ""))'
+# ==> (14, " f's 2nd method was called >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ 6bb496ba-837a-4410-b378-8691075b1765
+md"
+---
+###### 3.6 *Lifting* of $f'$'s Input Type by Applying $bind$
+
+Because the *output* type of $g'$'s *first* method does not match the *input* type of $f'$'s *first* method $g'$'s *first* is not ordinary composable with $f'$'s *first* method. Unfortunately Piponi had no *multiple dispatch* at hand. So he proposed to *lift* or *upgrade* $f'$: *...we need to 'upgrade f' (Piponi, 2024, p.4)*, so that $bind\ f'$ is a new function with *same* input-output signature $(Float, String)$:
+
+$bind(\ f') :: (Float, String) \rightarrow (Float, String)$
+
+$\;$
+
+which *implies* that $bind$ takes a function $f'$ and *lifts it* to a new function which we call $f''$:
+
+$bind: f' \mapsto f''$
+
+$\;$
+
+$bind :: (Float \rightarrow (Float, String)) \mapsto ((Float, String) \rightarrow (Float, String)).$
+
+$\;$
+
+For comparison purposes we quote here Piponi's Haskell code of function $bind$ (Piponi, 2024, p.4):
+
+$bind\ f'\ (gx, gs) = let\ (fx, fs) = f'\ gx$
+$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; in\  (fx, gs\ \text{ ++ }\ fs)$
+
+$\;$
+
+In the Haskell code *variable* names are written in a short *mathematical* style. For documentary purposes we used longer self-explaining words in [*camelCase*](https://en.wikipedia.org/wiki/Camel_case) style. The *transpilation* of Piponi's Haskell code can be found here:
+
+$\;$
+
+"
+
+# ╔═╡ b5783895-509f-4080-8c30-f76527ab0a38
+function bind(fooApostrophe::Function)::Function 
+	function fooApostropheApostrophe(tuple::Tuple{Float, String})
+		fooApostropheApostrophe_t = " foo''s method was called >>;"
+		(gx::Float, gooApostrophe_s::String) = tuple::Tuple{Float, String}
+		(fgx, fooApostrophe_t) = fooApostrophe(gx)::Tuple{Float, String}
+		(fgx, gooApostrophe_s * fooApostropheApostrophe_t)::Tuple{Float, String}
+	end # function fApostropheApostrophe
+end # function bind(fApostrophe) 
+
 # ╔═╡ 8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
-bind(fApostrophe)::Function                  # ==> f''
+bind(fApostrophe)::Function                          # ==> our f''
+
+# ╔═╡ 7dc723ba-adf8-40b0-ab4c-875e379b78f5
+gApostrophe(3.0)::Tuple{Float, String}               # g'(3.0)         
+# ==> (6.0, " g's 1st method was called >>") --> :)
 
 # ╔═╡ 1cd0c1dd-0707-4d55-9cf9-7093faa52aff
-# bind(f')(g(3.0)) = f''(g(3.0))
-bind(fApostrophe)((6.0, " g was called >>"))::Tuple{Float, String} 
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# bind(f')(g(3.0)) = f''(g(3.0)) ==> f''((6.0, " g was called >>"))
+bind(fApostrophe)((6.0, " g was called >>>; "))::Tuple{Float, String} 
+# ==> (10.0, " g was called >>; f''s method was called >>;") --> :)   
 
 # ╔═╡ 1bc06da0-b2cd-4e6a-b65b-aa11f1a29b60
 fApostropheApostrophe = bind(fApostrophe)::Function   # ==> f''
@@ -379,21 +432,30 @@ fApostropheApostrophe::Function                       # f'' = bind(f')
 
 # ╔═╡ b8b96cf3-cae1-48f7-9f4a-61b5b5bd24d6
 # = f''(g(3.0))
-fApostropheApostrophe((6.0, " g was called >>"))::Tuple{Float, String}
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+fApostropheApostrophe((6.0, " g was called >>>; "))::Tuple{Float, String}
+# ==> (10.0, " g was called >>; f''s method was called >>;") --> :)   
 
 # ╔═╡ 5b1454ff-e2d7-477a-9631-e8e89153637f
 # f''(g'(3.0))
 fApostropheApostrophe(gApostrophe(3.0))               
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f''s method was called >>;") --> :) 
+
+# ╔═╡ 42868372-c96e-4bea-b723-ace73b010c29
+md"
+###### 3.7 Composition with $\circ$ 
+Piponi's: $bind\ f'.\ g' = f' * g'$ is equal to our $∘(f'', g') == f'' ∘ g'$
+"
+
+# ╔═╡ 3e22ebd1-0517-4383-8adf-a932b9aae202
+gApostrophe(3.0) # ==> (6.0, " g's 1st method was called >>") --> :)
 
 # ╔═╡ daff6c16-6d47-4f18-a032-be3eb461f98e
 # f''(g'(3.0))
 fApostropheApostrophe(gApostrophe(3.0))
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f''s method was called >>;") --> :)  
 
 # ╔═╡ 21e88360-b25c-4ed4-9d2b-48cbe24a5c15
-# Piponi's: f' * g' == our: ∘(f'', g') == f'' ∘ g'
+# Piponi's: f' * g' ==> our: ∘(f'', g') == f'' ∘ g'
 ∘(fApostropheApostrophe, gApostrophe)
 
 # ╔═╡ 1bb7614c-01c5-4f38-a27d-6567c2242412
@@ -401,46 +463,65 @@ typeof(∘(fApostropheApostrophe, gApostrophe)) <:Function   # ==> true --> :)
 
 # ╔═╡ 4ea33f22-4315-41bb-a5c1-81341bbc33d8
 ∘(fApostropheApostrophe, gApostrophe)(3.0)
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f''s method was called >>;") --> :) 
+
+# ╔═╡ dd32d77a-e578-4049-811e-5c8697b90151
+∘(fApostropheApostrophe, gApostrophe)((3.0, ""))
+# ==> (10.0, " g's 2nd method was called >>; f''s method was called >>;") --> :) 
+
+# ╔═╡ 695ac03e-5523-42ef-827b-3dfb6595fe9c
+md"
+###### 3.8 Pipelining with $\textit{|>}$
+"
 
 # ╔═╡ aa4f0d7e-9f82-4b29-a930-6434a8d4ef76
 3.0 |> gApostrophe |> fApostropheApostrophe
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# ==> (10.0, " g's 1st method was called >>; f''s method was called >>;") --> :)    success
 
 # ╔═╡ 28c1557f-87be-41d9-8c4a-9962ca8586af
 (3.0) |> gApostrophe |> fApostropheApostrophe
-# ==> (10.0, " g was called >> f was called...") --> :)    success)
+# ==> (10.0, " g's 1st method was called >>; f''s method was called >>;") --> :)  
+
+# ╔═╡ 9882727e-8dad-47a1-9ad1-4a5503cf2928
+md"
+###### 3.9 *Multiple-Dispatch* Lifting of $f'$ to $f''$
+Now we want to investigate whether we can abandon the $bind$ function when we take advantage of Julia's *multiple-dispatch* competence. We hope that the effect of the function $fApostrophe_g = bind(fApostrophe)$ can be achieved by a *new* 1-parameter method of function fApostrophe. This *single* parameter expects a *tuple* of type $::Tuple\{Float, String\}$.
+"
 
 # ╔═╡ d9160bae-da93-4181-9247-b17ae50fe401
 md"
-###### Composition with $\circ$ 
+###### 3.9.1 Composition with $\circ$ 
 "
 
 # ╔═╡ 6be88a33-0af3-4955-9be6-54faaf85a30f
 fApostrophe(gApostrophe(3.0))                            
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# (10.0, " g's 1st method was called >>; f's 2nd method was called >>; ") --> :)
 
 # ╔═╡ b164eb9a-9e78-4430-9344-b02a16c39243
 (fApostrophe ∘ gApostrophe)(3.0)                  
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# (10.0, " g's 1st method was called >>; f's 2nd method was called >>; ") --> :)
 
 # ╔═╡ 539e9c4f-d5ae-4c5a-a7a6-959c0e0ff1ec
-fgApostrophe1 = (fApostrophe ∘ gApostrophe)               # compositum with (..)
+fgApostrophe1 = (fApostrophe ∘ gApostrophe)               # compositum with (.∘.)
 
 # ╔═╡ ed674574-4de1-4d2e-8d94-ef090accfb57
 fgApostrophe1(3.0)                                
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# (10.0, " g's 1st method was called >>; f's 2nd method was called >>; ") --> :)
 
 # ╔═╡ 53c6a004-30b5-4133-8335-d47724dd7f37
-fgApostrophe2 = fApostrophe ∘ gApostrophe                  # compositum without (..)
+fgApostrophe2 = fApostrophe ∘ gApostrophe                 # compositum without (.∘.)
 
 # ╔═╡ 7bb9d1df-6e4e-468c-b62e-2f1edb521ade
 fgApostrophe2(3.0)                               # success !compositum without (..)  
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# (10.0, " g's 1st method was called >>; f's 2nd method was called >>; ")
+
+# ╔═╡ 83ac0dff-76f1-44e9-9f96-4f35670a9e01
+(gApostrophe ∘ fApostrophe)(3.0) 
+# (14.0, " f's 1st method was called >>; g's 2nd method was called >>; ") --> :)
 
 # ╔═╡ 03944647-c36d-4fec-b2d7-05b1b02f865d
 md"
-###### Pipelining with $\textit{|>}$
+###### 3.9.2 Pipelining with $\textit{|>}$
 "
 
 # ╔═╡ 73090d52-0cfd-4d2c-b70f-735fcc34d048
@@ -453,13 +534,222 @@ Here we demonstrate that by *multiple-dispatching* function $fApostrophe$  and *
 
 # ╔═╡ c8ab0b73-4931-48fe-a4f2-19821064a0f3
 3.0 |> gApostrophe |> fApostrophe                     
-# ==> (10.0, " g was called >> f was called...") --> :)    success
+# (10.0, " g's 1st method was called >>; f's 2nd method was called >>; ")
+
+# ╔═╡ b6b867c1-8c12-4f36-a2f4-2c7ba25a9326
+3.0 |> fApostrophe |> gApostrophe 
+# (14.0, " f's 1st method was called >>; g's 2nd method was called >>; ")
 
 # ╔═╡ 8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
 md"
 ---
----
+###### 3.10 Definition of *Identity* with $unit$
+
+According Piponi (2024, p.5) the *ordinary* identity has these properties:
+
+$f.id = f \text{ ; where . is the Haskell function composition operator }$
+
+$\;$
+
+$id.f = f.$
+
+$\;$
+
+*So we're look for a debuggable function, call it unit, such that*
+
+$unit * f = f * unit = f \text{ ; where * is the Pipony's function composition operator } f' * g' = bind\ f' .\ g'.$
+
+$\;$
+
+*Obviously we'd expect it to produce the empty debugging string and otherwise act a bit like the identity* (Pipony, 2024, p.5)
+
+$\;$
+
+We transpiled Piponi's: $f' * g'$ into our Julian $∘(f'', g') == f'' ∘ g'$, so that
+
+$\;$
+
+$unit * f = \circ(unit', f) = unit' \circ f = f$
+
+$\;$
+
+$f * unit = \circ(f', unit) = f' \circ unit = f'$
+
+$\;$
 "
+
+# ╔═╡ dd75021d-e603-48c9-87bf-969036dc8ddc
+unit(x::Float)::Float = x                          # function unit(x)
+
+# ╔═╡ 0cc55b80-a1d7-4ba0-9579-2de2bd5e17bc
+unit(5.0)                                          # ==> 5.0 --> :)
+
+# ╔═╡ 101fac9e-8049-4ab0-b1d7-d1334887670b
+md"
+###### Piponi's Specification $unit*f = f*unit = f.$
+"
+
+# ╔═╡ 387b33a8-cc57-42db-a79f-7fe179ac3769
+f(unit(5.0))                                       # ==> 9.0 --> :)
+
+# ╔═╡ d7643583-c014-4cf3-be47-be8e3503e2f4
+∘(unit, f)                                         # unit . f
+
+# ╔═╡ a1b166b0-0d47-415c-a702-b040bf402eb4
+∘(unit, f)(5.0)                                    # ==> 9.0 --> :)                  
+
+# ╔═╡ 3ebdb131-b95c-4d59-a7d2-1a3c34eea716
+∘(f, unit)(5.0)                                    # ==> 9.0 --> :) 
+
+# ╔═╡ 7bfc512b-d0bb-48fb-9a3a-e560abfbf715
+(unit ∘ f)(5.0)                                    # ==> 9.0 --> :) 
+
+# ╔═╡ 592bb869-fec1-40e0-984f-6842b09bebb6
+∘(f, unit)                                         # f . unit
+
+# ╔═╡ 792d4516-0402-4cdf-ac6c-349a168ccc17
+(f ∘ unit)(5.0)                                    # ==> 9.0 --> :) 
+
+# ╔═╡ c5b02af1-43ee-4d3b-8b66-a383803d7d9d
+5.0 |> f                                           # ==> 9.0 --> :)
+
+# ╔═╡ aa486207-f10b-4e55-b619-7c1e2f7e6adc
+5.0 |> f |> unit                                   # ==> 9.0 --> :)
+
+# ╔═╡ 7f1bef39-cd1f-4969-8cbd-d9a39bb1f428
+5.0 |> unit                                        # ==> 5.0 --> :)
+
+# ╔═╡ 210811c1-5fbf-4316-9dbf-cf6578ac5b8a
+5.0 |> unit |> f                                   # ==> 9.0 --> :)
+
+# ╔═╡ a7cc1a03-c339-45f0-894c-334e13e74bcf
+# first method of unitApostrophe
+unitApostrophe(x::Float)::Tuple{Float, String} = (x, " 1st_unit >>;")  # unit'
+
+# ╔═╡ 590ad684-193a-4a8e-98b9-f31727217368
+# 2nd method of unitApostrophe
+function unitApostrophe(floatStringTuple::Tuple{Float, String})
+	(x::Float, predecessor_s) = floatStringTuple
+	(x, predecessor_s * " 2nd_unit >>;" )
+end # function unitApostrophe
+
+# ╔═╡ 2aaee3cb-a50a-4705-a042-eb190a21a7de
+fApostrophe(5.0)
+# ==> (9.0, " f's 1st method was called >>;") --> :)
+
+# ╔═╡ e7d1bf6a-2f96-4af2-8bed-cdf3dfa0e2fd
+unitApostropheApostrophe = bind(unitApostrophe)
+
+# ╔═╡ df36dcf5-af51-4692-9f35-ae2491495535
+unitApostropheApostrophe(fApostrophe(5.0))         # foo == unit''
+# (9.0, " f's 1st method was called >>; foo''s method was called >>;") --> :)
+
+# ╔═╡ 7e84a46b-1d62-4dd4-9aa7-de73ad5ef73b
+fApostrophe(unit(5.0))
+# ==> (9.0, " f's 1st method was called >>;") --> :)
+
+# ╔═╡ ca79fca7-971e-46e0-831d-dd9fd12952a2
+fApostrophe(5.0)                                 
+# ==> (9.0, " f's 1st method was called >>;") --> :)       
+
+# ╔═╡ 5bb269af-aefe-4ce9-a6e8-0e2c24356b60
+∘(fApostrophe, unit)                               # ∘(f', unit)
+
+# ╔═╡ c57443b3-2a8b-4cca-bdb5-e0aab2e33a8f
+∘(fApostrophe, unit)(5.0)
+# ==> (9.0, " f's 1st method was called >>;") --> :)
+
+# ╔═╡ 61265fc3-9169-409a-a0ce-4b95a8bf9ff1
+(fApostrophe ∘ unit)(5.0) == fApostrophe(5.0)  # ==> true --> :)
+
+# ╔═╡ 372068a8-bc9a-48cc-b7f2-f607bce59752
+∘(unitApostrophe, fApostrophe)
+
+# ╔═╡ 5ba862bd-2960-4fd0-b355-14d739b727e8
+∘(bind(unitApostrophe), fApostrophe)(5.0)         # ==> unit'' == foo
+# (9.0, " f's 1st method was called >>; foo''s method was called >>;")
+
+# ╔═╡ 0dc4791e-a4ac-4e51-9dc7-6f1f77a08874
+∘(unitApostropheApostrophe, fApostrophe)(5.0)     # unit'' == foo
+# # (9.0, " f's 1st method was called >>; foo''s method was called >>;")
+
+# ╔═╡ da68c660-5105-4250-a85d-a178416dfabd
+∘(fApostrophe, unitApostrophe)(5.0)
+# ==> (9.0, " 1st_unit >>; f's 2nd method was called >>; ")
+
+# ╔═╡ 10a438c4-1e96-4c59-a79d-35a289ff1dae
+5.0 |> fApostrophe |> unitApostropheApostrophe    # unit'' = foo
+# ==> (9.0, " f's 1st method was called >>; foo''s method was called >>;")
+
+# ╔═╡ 6c1f5f24-9b05-4478-8ba4-2984a5882ad5
+(5.0) |> fApostrophe |> unitApostropheApostrophe  # unit'' = foo
+# ==> (9.0, " f's 1st method was called >>; foo''s method was called >>;")
+
+# ╔═╡ ec9e0b3c-505e-4911-abed-2d251085ea75
+fApostrophe(5.0)
+# ==> (9.0, " f's 1st method was called >>;")  --> ;)
+
+# ╔═╡ 2774e120-87f2-411d-9efc-d9efbe6b0585
+∘(fApostrophe, unitApostrophe)(5.0)
+# ==> (9.0, " 1st_unit >>; f's 2nd method was called >>; ") --> ;)
+
+# ╔═╡ b6107bcf-08cb-47c9-8965-550948ca8c64
+(5.0) |> fApostrophe |> unitApostrophe
+# ==> (9.0, " f's 1st method was called >>; 2nd_unit >>;") --> ;)
+
+# ╔═╡ d498d32c-7b75-4a99-8af4-b6719ce39bb5
+(5.0) |> fApostrophe |> unitApostropheApostrophe       # unit'' = foo''
+# (9.0, " f's 1st method was called >>; foo''s method was called >>;") --> :)
+
+# ╔═╡ a65a6c85-2234-4996-b8f4-7e43d8c875f2
+5.0 |> fApostrophe |> unitApostrophe
+# ==> (9.0, " f's 1st method was called >>; 2nd_unit >>;") --> :)
+
+# ╔═╡ 3f7ddf35-e14d-433e-b228-dd57d756e7dc
+5.0 |> fApostrophe |> unitApostropheApostrophe
+# (9.0, " f's 1st method was called >>; foo''s method was called >>;") --> :)
+
+# ╔═╡ 5d69885c-cd1a-4e20-9d13-b8aecddd9ad4
+(5.0) |> unitApostrophe |> fApostrophe 
+# ==> (9.0, " 1st_unit >>; f's 2nd method was called >>; ") --> :)
+
+# ╔═╡ 2dfb956f-934c-442c-9fa3-cb9d2f037341
+(5.0, "") |> unitApostropheApostrophe |> fApostrophe   # input is (5.0, "") !
+# ==> (9.0, " foo''s method was called >>; f's 2nd method was called >>; ") --> :)
+
+# ╔═╡ bfaf88fd-11fe-4e5a-8309-5fddb71a0208
+5.0 |> unitApostrophe |> fApostrophe 
+# ==> (9.0, " 1st_unit >>; f's 2nd method was called >>; ") --> :)
+
+# ╔═╡ d1c64d0b-4cd2-47e3-bec8-5c75df65f556
+(3.0) |> unitApostrophe 
+# ==> (3.0, " 1st_unit >>;") --> :)
+
+# ╔═╡ 8096e9b6-d876-49dc-b7a4-77a61d22cfd7
+3.0 |> unitApostrophe 
+# ==> (3.0, " 1st_unit >>;") --> :)
+
+# ╔═╡ 95173633-2afe-4e35-a8ab-5b3f7fe0023d
+(3.0) |> unitApostrophe |> gApostrophe
+# ==> (6.0, " 1st_unit >>; g's 2nd method was called >>; ") --> :)
+
+# ╔═╡ df608a43-de53-4766-a4b1-07e878d591a8
+(3.0) |> unitApostrophe |> gApostrophe |> fApostrophe
+
+# ╔═╡ b3073be4-53dd-4551-b510-ee030b7a9619
+(3.0) |> unitApostrophe |> gApostrophe |> fApostrophe |> unitApostrophe
+
+# ╔═╡ 7fdadcfb-263c-445b-9387-61fce9a08263
+(3.0, "") |> unitApostrophe |> gApostrophe |> fApostrophe |> unitApostrophe
+
+# ╔═╡ fef4e34a-eb6d-40b5-8db2-f861ccb75a20
+3.0 |> unitApostrophe |> gApostrophe |> fApostrophe |> unitApostrophe
+
+# ╔═╡ ead0d1ad-e269-45ef-a5ce-63678f9a8474
+(3.0) |> unitApostrophe |> fApostrophe |> gApostrophe |> unitApostrophe
+
+# ╔═╡ 246ea372-2169-41b7-a661-f6db47e41503
+(3.0, "Start >>>; ") |> unitApostrophe |> fApostrophe |> gApostrophe |> unitApostrophe
 
 # ╔═╡ 0f062f15-86a1-4540-80e9-bb61d4c3b109
 md"
@@ -478,6 +768,8 @@ md"
 - **Piponi, D.**; [*You Could Have Invented Monads*](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) ! (*And Maybe You Already have*.); [Github 2006, 2024](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf); last visit 2024/12/14
 
 - **uml-diagrams.org**; [*Activity Diagrams*](https://www.uml-diagrams.org/activity-diagrams.html); last visit 2024/12/18
+
+- **Wikipedia**; [*camelCase*](https://en.wikipedia.org/wiki/Camel_case); last visit 2024/12/21
 
 - **Wikipedia**; [*Monad (Functional Programming)*](https://en.wikipedia.org/wiki/Monad_(functional_programming)); last visit 2024/12/14
 "
@@ -1962,24 +2254,35 @@ version = "1.4.1+1"
 # ╟─759bb009-c878-48bb-8378-6d5dc3fb3001
 # ╟─6392590c-642d-4c81-9b29-9b9ff689a392
 # ╠═7f3b3217-e947-49fd-af32-c694b71305d5
+# ╠═062181b9-3d55-4041-aeb1-aecb70ea1ae0
 # ╠═f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
 # ╠═a9577f41-3ea3-48c5-9cba-5dce82f1208d
-# ╠═062181b9-3d55-4041-aeb1-aecb70ea1ae0
 # ╠═770767ec-d109-4f53-aed9-a16e5380b338
 # ╠═aa28c8fe-2c84-45e7-8b5a-881a5df4d5fb
 # ╠═3c657371-13ab-40ec-8111-55ad286d7668
-# ╟─3ab20dc7-b53b-4533-9475-f03e3e83d71c
 # ╟─5e9a1ea6-07e5-4de3-b13a-ba0f680dbaf4
+# ╠═dd416472-545f-4b0f-a910-dfc07116ac7f
+# ╠═7eea8c69-3a4d-4f87-88e7-c9687137769e
+# ╠═4f1a1d63-7249-478a-b970-a05b1949e4a0
 # ╠═185f027c-a385-411c-9280-b9cf8094f6fd
 # ╠═1a2bd5f3-a6a4-44e4-98ab-9eb01e7e52c7
 # ╠═ece1a024-dba3-4931-8466-b403491b6dfe
 # ╠═152d303b-4ee6-400e-b15d-af34ca006267
 # ╠═0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
+# ╠═4584a752-7b7e-460d-bf36-b3ed7bb424a5
+# ╠═a2f6461a-2a64-4f1e-98ab-14d62b8c299b
+# ╠═92ac4efa-ad2d-4647-b6f4-97648484722f
 # ╟─f21c5390-a1bd-4fe8-9b5b-ccb87c83635c
 # ╠═81e64564-344a-4df1-90c5-f7cfde4cde4c
 # ╠═9b6b8944-b6dc-4fc7-91c7-2b55b1fc3e24
 # ╠═c474a179-fb95-477c-9795-de298e2b7a08
 # ╠═ba621366-d49b-4e9a-874d-dab2d4dca1d8
+# ╠═b54308ed-2f9c-4ee3-af4f-4b8a7e1f449e
+# ╠═d295a9da-60f6-4788-8df6-de8d4f8406cb
+# ╠═77a5b609-4208-4eba-b379-d559e8c5ac05
+# ╠═40acc2c3-e885-4d95-a74c-5b48675e6db8
+# ╠═af80d503-7ede-485b-bed2-371f1f2a85df
+# ╠═ed596330-2d37-4747-a8fa-4f07d521914d
 # ╟─6bb496ba-837a-4410-b378-8691075b1765
 # ╠═b5783895-509f-4080-8c30-f76527ab0a38
 # ╠═8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
@@ -1995,11 +2298,11 @@ version = "1.4.1+1"
 # ╠═21e88360-b25c-4ed4-9d2b-48cbe24a5c15
 # ╠═1bb7614c-01c5-4f38-a27d-6567c2242412
 # ╠═4ea33f22-4315-41bb-a5c1-81341bbc33d8
+# ╠═dd32d77a-e578-4049-811e-5c8697b90151
 # ╟─695ac03e-5523-42ef-827b-3dfb6595fe9c
 # ╠═aa4f0d7e-9f82-4b29-a930-6434a8d4ef76
 # ╠═28c1557f-87be-41d9-8c4a-9962ca8586af
 # ╟─9882727e-8dad-47a1-9ad1-4a5503cf2928
-# ╠═4f1a1d63-7249-478a-b970-a05b1949e4a0
 # ╟─d9160bae-da93-4181-9247-b17ae50fe401
 # ╠═6be88a33-0af3-4955-9be6-54faaf85a30f
 # ╠═b164eb9a-9e78-4430-9344-b02a16c39243
@@ -2007,11 +2310,61 @@ version = "1.4.1+1"
 # ╠═ed674574-4de1-4d2e-8d94-ef090accfb57
 # ╠═53c6a004-30b5-4133-8335-d47724dd7f37
 # ╠═7bb9d1df-6e4e-468c-b62e-2f1edb521ade
+# ╠═83ac0dff-76f1-44e9-9f96-4f35670a9e01
 # ╟─03944647-c36d-4fec-b2d7-05b1b02f865d
 # ╠═73090d52-0cfd-4d2c-b70f-735fcc34d048
 # ╟─b04198c2-665b-4e0d-b618-4be374952810
 # ╠═c8ab0b73-4931-48fe-a4f2-19821064a0f3
+# ╠═b6b867c1-8c12-4f36-a2f4-2c7ba25a9326
 # ╟─8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
+# ╠═dd75021d-e603-48c9-87bf-969036dc8ddc
+# ╠═0cc55b80-a1d7-4ba0-9579-2de2bd5e17bc
+# ╟─101fac9e-8049-4ab0-b1d7-d1334887670b
+# ╠═387b33a8-cc57-42db-a79f-7fe179ac3769
+# ╠═d7643583-c014-4cf3-be47-be8e3503e2f4
+# ╠═a1b166b0-0d47-415c-a702-b040bf402eb4
+# ╠═3ebdb131-b95c-4d59-a7d2-1a3c34eea716
+# ╠═7bfc512b-d0bb-48fb-9a3a-e560abfbf715
+# ╠═592bb869-fec1-40e0-984f-6842b09bebb6
+# ╠═792d4516-0402-4cdf-ac6c-349a168ccc17
+# ╠═c5b02af1-43ee-4d3b-8b66-a383803d7d9d
+# ╠═aa486207-f10b-4e55-b619-7c1e2f7e6adc
+# ╠═7f1bef39-cd1f-4969-8cbd-d9a39bb1f428
+# ╠═210811c1-5fbf-4316-9dbf-cf6578ac5b8a
+# ╠═a7cc1a03-c339-45f0-894c-334e13e74bcf
+# ╠═590ad684-193a-4a8e-98b9-f31727217368
+# ╠═2aaee3cb-a50a-4705-a042-eb190a21a7de
+# ╠═e7d1bf6a-2f96-4af2-8bed-cdf3dfa0e2fd
+# ╠═df36dcf5-af51-4692-9f35-ae2491495535
+# ╠═7e84a46b-1d62-4dd4-9aa7-de73ad5ef73b
+# ╠═ca79fca7-971e-46e0-831d-dd9fd12952a2
+# ╠═5bb269af-aefe-4ce9-a6e8-0e2c24356b60
+# ╠═c57443b3-2a8b-4cca-bdb5-e0aab2e33a8f
+# ╠═61265fc3-9169-409a-a0ce-4b95a8bf9ff1
+# ╠═372068a8-bc9a-48cc-b7f2-f607bce59752
+# ╠═5ba862bd-2960-4fd0-b355-14d739b727e8
+# ╠═0dc4791e-a4ac-4e51-9dc7-6f1f77a08874
+# ╠═da68c660-5105-4250-a85d-a178416dfabd
+# ╠═10a438c4-1e96-4c59-a79d-35a289ff1dae
+# ╠═6c1f5f24-9b05-4478-8ba4-2984a5882ad5
+# ╠═ec9e0b3c-505e-4911-abed-2d251085ea75
+# ╠═2774e120-87f2-411d-9efc-d9efbe6b0585
+# ╠═b6107bcf-08cb-47c9-8965-550948ca8c64
+# ╠═d498d32c-7b75-4a99-8af4-b6719ce39bb5
+# ╠═a65a6c85-2234-4996-b8f4-7e43d8c875f2
+# ╠═3f7ddf35-e14d-433e-b228-dd57d756e7dc
+# ╠═5d69885c-cd1a-4e20-9d13-b8aecddd9ad4
+# ╠═2dfb956f-934c-442c-9fa3-cb9d2f037341
+# ╠═bfaf88fd-11fe-4e5a-8309-5fddb71a0208
+# ╠═d1c64d0b-4cd2-47e3-bec8-5c75df65f556
+# ╠═8096e9b6-d876-49dc-b7a4-77a61d22cfd7
+# ╠═95173633-2afe-4e35-a8ab-5b3f7fe0023d
+# ╠═df608a43-de53-4766-a4b1-07e878d591a8
+# ╠═b3073be4-53dd-4551-b510-ee030b7a9619
+# ╠═7fdadcfb-263c-445b-9387-61fce9a08263
+# ╠═fef4e34a-eb6d-40b5-8db2-f861ccb75a20
+# ╠═ead0d1ad-e269-45ef-a5ce-63678f9a8474
+# ╠═246ea372-2169-41b7-a661-f6db47e41503
 # ╟─0f062f15-86a1-4540-80e9-bb61d4c3b109
 # ╟─cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
 # ╟─28d1564f-2e8f-4aff-b0a6-f6fd381078ee
