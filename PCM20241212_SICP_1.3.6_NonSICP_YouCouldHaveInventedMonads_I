@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.3.6 NonSICP: [You Could Have Invented Monads I](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
 ##### file: PCM20241212\_SICP\_1.3.6\_NonSICP\_YouCouldHaveInventedMonads\_I
-##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM  **** 2024/12/23 ****
+##### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM  **** 2024/12/25 ****
 
 ==================================================================================
 "
@@ -46,6 +46,12 @@ md"
 - *Parametrized* types (e.g. $Tuple\{Float, String\}$)
 - *UML-activity* diagram
 - *Dataflow* diagram
+- *Sequence* of effects in a *pure* functional language
+- *Multiple dispatch* and *composition* $\circ$
+- *Multiple dispatch* and *pipelining* $\textit{ |> }$
+- *Lifting* of *input* and *output* types
+- *unit* of *composition*
+- *monad* 
 "
 
 # ╔═╡ ec45bd94-23b6-4993-bcec-64492cb499a3
@@ -644,7 +650,7 @@ f(unit(5.0))                                       # ==> 9.0 --> :)
 
 # ╔═╡ d1f245b8-b826-42ba-a89c-bc08d9f911d0
 md"
-###### 3.10.3 *Augmented* $unit'(x::Float)$ and $unit'(tuple::Tuple\{Float, String\})$
+###### 3.10.3 *Augmented* $unit$ is: $unit'(x::Float)$ and $unit'(tuple::Tuple\{Float, String\})$
 
 "
 
@@ -788,13 +794,141 @@ md"
 (3.0, "") |> unitApostrophe |> fApostrophe |> gApostrophe |> unitApostrophe
 # (14.0, " .. >>; f's 2nd method was called >>;  g's 2nd method was called >>;  .. >>;")
 
+# ╔═╡ aabfd83b-dc7f-4478-880c-1444c482b702
+md"
+---
+###### 3.10.6 *Lifting*
+Piponi's $lift$ function is called here $liftOut$ because only the *output* of$f$ is lifted from type $Float$ to $Tuple\{Float, String\}$
+
+$liftOut(f) :: (Float \rightarrow Float) \Rightarrow (Float \rightarrow Tuple\{Float, String\})$
+
+$\;$
+
+Consequently we defined another function $liftInAndOut$ which lifts both *input* and *output*:
+
+$liftInAndOut(f) :: (Float \rightarrow Float) \Rightarrow (Tuple\{Float, String\} \rightarrow Tuple\{Float, String\})$
+
+$\;$
+
+"
+
+# ╔═╡ de0d0934-26c5-432c-bb07-6fb5f84ba35d
+liftOut(f) =                              # lift only the output
+	x -> (f(x), " . >>;")
+
+# ╔═╡ d81c998b-144b-4d59-b31a-2ed2976a492b
+liftInAndOut(f) =                         # lift of input and output
+	tuple ->
+		let
+			(x, string) = tuple
+			(f(x), string * " . >>;")
+		end # let
+
+# ╔═╡ fc1008d8-e931-4e4a-a9c7-8241e1acd7e0
+square(x::Float) = *(x, x)
+
+# ╔═╡ 8232c197-797b-4cb6-a2f3-9282560db7f3
+square(x::Int)   = *(x, x)
+
+# ╔═╡ e8cec246-0a9c-4987-8790-88b302919d6a
+square(5)
+
+# ╔═╡ c2ceb959-d070-4caf-aa2e-0ee39665dfdc
+squareOutLifted = liftOut(square)
+
+# ╔═╡ bd6c3174-87f5-437d-b1da-81edd88dd689
+squareOutLifted(5.0)
+
+# ╔═╡ 03979992-3fe2-47a3-b969-b5c37ad5e703
+squareInAndOutLifted = liftInAndOut(square)
+
+# ╔═╡ 3ea1ecfd-2917-409a-b5f2-b9f0f9e147b5
+squareInAndOutLifted((5, " > "))
+
+# ╔═╡ 18330ff7-3944-4a87-b472-954816fc57ac
+md"""
+###### 3.10.7 Specification of Higher-order Function $lift$
+Piponi's specifications in Haskell are :
+
+$unit\ x = (x, "")$
+
+$\;$
+
+$f\ x = (f\ x, "")$
+
+$\;$
+
+$lift\ f = unit\ .\ f$
+
+$\;$
+
+*The lifted version does much the same as the original function and, quite resonably, it produces the empty string as a side effect.*(Pipony, 2024, p.5)
+
+"""
+
+# ╔═╡ fdad9f15-c40e-4ef6-9623-9b5cb7d7b1ae
+unit(7.0)
+
+# ╔═╡ 4e158838-96d5-4f4a-9195-c7e44a80cd40
+md"
+Piponi's $unit\ x$ is our $unit'(x) = unitApostrophe(x)$
+"
+
+# ╔═╡ c2b74ddb-3d18-4f60-8325-91bb2f584833
+unitApostrophe(7.0)
+
+# ╔═╡ 82a0b8bf-0248-43e9-8d11-8b0f90319e3a
+let f = square
+	∘(unit, f)(5.0) 
+end # let
+
+# ╔═╡ 13c34b95-eca6-4e48-9be0-4671b96c823b
+let f = square
+	∘(unitApostrophe, f)(5.0) 
+end # let
+
+# ╔═╡ fbedd437-8832-443f-9ce0-914acd5666a9
+md"
+Piponi's $unit\ .\ f$ is our $\circ(unit'(x), f) = \circ(unitApostrophe(x), f)$
+"
+
+# ╔═╡ 561b1ef5-e469-4ab9-a9e7-24df494fbbe6
+let f = square
+	liftOut(f)(6.0)
+end # let
+
+# ╔═╡ 6a7233b6-604f-4afb-a815-50a907420a59
+let f = square
+	liftOut(f)(6.0) == (unitApostrophe ∘ f)(6.0)
+end # let
+
+# ╔═╡ add16889-68f3-4cc5-b40b-11a4594c24fc
+liftOut(square)
+
+# ╔═╡ 813a9320-bd99-4007-a581-42216b67f973
+liftOut(square)(6.0)
+
+# ╔═╡ 77238236-0090-4e73-a046-08cafd4d7acb
+(square |> liftOut)(6.0)
+
+# ╔═╡ 9aa13d61-cc49-47d0-a970-0afe3e49e6e1
+square |> liftOut |> f -> f(6.0)               # ==> fully lifted and piped --> :)
+
+# ╔═╡ 0ebe2a14-233a-4d2b-b9c4-8d17b2675f97
+liftInAndOut(square)((6.0, ""))
+
+# ╔═╡ eb5fbd97-726b-454e-96be-bb942572790f
+(square |> liftInAndOut)((6.0, ""))
+
+# ╔═╡ ddc868fa-7105-4c23-93ae-37703ecb9107
+square |> liftInAndOut |> f -> f((6.0, ""))    # ==> fully lifted and piped --> :)
+
 # ╔═╡ 0f062f15-86a1-4540-80e9-bb61d4c3b109
 md"
 ---
 ##### 4. Summary
-We transpiled Piponi's Haskell code into functional Julia. Beside that we introduced a new function $myCompose(f', g')$ which made it possible to *compose* functions with nonmatching *output* type (here $g'$'s $Tuple\{Float, String\}$) and *input* type (here $f'$'s $Float$). 
+*Believe it or not ... you have defined your first monad* (Piponi, 2024, p.5). Up to now it is not perfectly clear what the structure of a monad is. But we can be certain that we can define it in *functional* Julia.
 
-Furthermore it could be demonstrated that when we define a *second* method for function $f'$ with *lifted* input type $Tuple\{Float, String\}$ we can exploit *multiple dispatch* and *compose* or *pipeline* $f'$ and $g'$ with *standard* Julian operators $\circ$ or $\textit{|>}$ *without* Piponi's $bind$ function.
 "
 
 # ╔═╡ cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
@@ -2404,6 +2538,32 @@ version = "1.4.1+1"
 # ╠═fef4e34a-eb6d-40b5-8db2-f861ccb75a20
 # ╠═ead0d1ad-e269-45ef-a5ce-63678f9a8474
 # ╠═246ea372-2169-41b7-a661-f6db47e41503
+# ╟─aabfd83b-dc7f-4478-880c-1444c482b702
+# ╠═de0d0934-26c5-432c-bb07-6fb5f84ba35d
+# ╠═d81c998b-144b-4d59-b31a-2ed2976a492b
+# ╠═fc1008d8-e931-4e4a-a9c7-8241e1acd7e0
+# ╠═8232c197-797b-4cb6-a2f3-9282560db7f3
+# ╠═e8cec246-0a9c-4987-8790-88b302919d6a
+# ╠═c2ceb959-d070-4caf-aa2e-0ee39665dfdc
+# ╠═bd6c3174-87f5-437d-b1da-81edd88dd689
+# ╠═03979992-3fe2-47a3-b969-b5c37ad5e703
+# ╠═3ea1ecfd-2917-409a-b5f2-b9f0f9e147b5
+# ╟─18330ff7-3944-4a87-b472-954816fc57ac
+# ╠═fdad9f15-c40e-4ef6-9623-9b5cb7d7b1ae
+# ╟─4e158838-96d5-4f4a-9195-c7e44a80cd40
+# ╠═c2b74ddb-3d18-4f60-8325-91bb2f584833
+# ╠═82a0b8bf-0248-43e9-8d11-8b0f90319e3a
+# ╠═13c34b95-eca6-4e48-9be0-4671b96c823b
+# ╟─fbedd437-8832-443f-9ce0-914acd5666a9
+# ╠═561b1ef5-e469-4ab9-a9e7-24df494fbbe6
+# ╠═6a7233b6-604f-4afb-a815-50a907420a59
+# ╠═add16889-68f3-4cc5-b40b-11a4594c24fc
+# ╠═813a9320-bd99-4007-a581-42216b67f973
+# ╠═77238236-0090-4e73-a046-08cafd4d7acb
+# ╠═9aa13d61-cc49-47d0-a970-0afe3e49e6e1
+# ╠═0ebe2a14-233a-4d2b-b9c4-8d17b2675f97
+# ╠═eb5fbd97-726b-454e-96be-bb942572790f
+# ╠═ddc868fa-7105-4c23-93ae-37703ecb9107
 # ╟─0f062f15-86a1-4540-80e9-bb61d4c3b109
 # ╟─cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
 # ╟─28d1564f-2e8f-4aff-b0a6-f6fd381078ee
