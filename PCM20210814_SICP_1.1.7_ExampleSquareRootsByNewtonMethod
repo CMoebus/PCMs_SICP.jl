@@ -8,10 +8,14 @@ using InteractiveUtils
 begin 
 	using Pluto
 	using Plots	
+	using LaTeXStrings
+	using Statistics
 	using GraphRecipes
 	#----------------------------------------------------------------
 	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
 	println("pkgversion(Plots)         = ", pkgversion(Plots))
+	println("pkgversion(LaTeXStrings)  = ", pkgversion(LaTeXStrings))
+	println("pkgversion(Statistics)    = ", pkgversion(Statistics))
 	println("pkgversion(GraphRecipes)  = ", pkgversion(GraphRecipes))
 end # begin
 
@@ -22,7 +26,7 @@ md"
 
 ###### file: PCM20210814\_SICP\_1.1.7\_ExampleSquareRootsByNewtonMethod.jl
 
-###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2025/01/02 ***
+###### Julia/Pluto.jl-code (1.11.2/0.20.3) by PCM *** 2025/01/03 ***
 ======================================================================================
 "
 
@@ -53,7 +57,8 @@ md"
 - *top-down* design
 - *self-documenting* style
 - *iteration* by *tail-recursion*
-- *builtin* √, $sqrt$
+- *libraries* $Plots, Statistics$
+- *builtin* √, $sqrt, mean$
 "
 
 # ╔═╡ e6b6d69e-ccaf-4419-b5c4-ded5294c0649
@@ -315,6 +320,39 @@ $\;$
 
 "
 
+# ╔═╡ 7624e7bf-94f0-4cc4-b626-6d7cfebf32f8
+function newtonSqrtPlot(s)
+	#------------------------------------------------------------------
+	f(x) = x^2 - s                          # specification of sqrt(x)
+	fDeriv(x) = 2.0 * x                     # derivative in x
+	#------------------------------------------------------------------
+	x_max = 6.0
+	x_min = 0.0
+	x_n,  = 5.0                             # step x_n
+	fx_n  = f(x_n)
+	x_nPlus1 = mean([x_n, s/x_n])           # step x_(n+1)
+	xs = [  x  for x in x_min:0.25:x_max]
+	ysline = [x * fDeriv(2.0) - s for x in xs]
+	plot(xs, x->f(x), size=(500*1.2, 600*1.2), lw=2, label=L"f(x) = x^2 - 4 = 0", title="Fig. 1.1.7.1 Polynomial Specification and Step Computation", titlefontsize=12)
+	# line plot of derivative f'(x_n)
+	plot!([x_n, x_nPlus1], [fx_n, 0.0], color=:red, label=L"f'(x)=2x", lw=2)# f'(x)  
+	plot!([x_n, x_nPlus1], [0.0, 0.0], arrow=true, color=:green, lw=3, label=L"x_n\rightarrow x_{n+1}") # horizontal arrow
+	plot!([x_max, x_min], [0.0, 0.0], color=:black, label=false) # horizontal arrow
+	plot!([x_n, x_n], [fx_n, 0.0], color=:red, ls=:dash, label=false) # vertical line
+	scatter!([x_nPlus1, x_n, x_n],[0.0, fx_n, 0.0], color=:black, label=false)
+	annotate!(x_n + 0.8, fx_n, L"(x_n, f(x_n))", 12)
+	annotate!(x_n + 0.0, - 1.6, L"(x_n, 0.0)", 12)
+	annotate!(x_nPlus1 + 0.2, -1.6, L"(x_{n+1}, 0.0)", 12)
+end # function newtonSqrtPlot
+
+# ╔═╡ c18910a0-7a03-4d32-900b-fc8ba4e9fcc1
+newtonSqrtPlot(4.0)
+
+# ╔═╡ 8de646d6-94d0-4fba-bcb0-9435c3e009bd
+md"
+###### Fig. 1.1.7.1 Construction of Next Iteration Step by Derivative $f'(x_{n})$
+"
+
 # ╔═╡ 023414da-edc9-405a-b4d9-9237372f69c1
 md"
 SICP's algorithm is developed *top-down*: code is written in a *self-documenting* style.
@@ -492,13 +530,17 @@ This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 Internat
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 GraphRecipes = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 GraphRecipes = "~0.5.13"
+LaTeXStrings = "~1.4.0"
 Plots = "~1.40.8"
 Pluto = "~0.20.3"
+Statistics = "~1.11.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -507,7 +549,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "bb715c7a4c4df1b360252d689155579af0186e87"
+project_hash = "c0c25cf800f102cd639d74d1f015b8d2cd203a42"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -1974,6 +2016,9 @@ version = "1.4.1+1"
 # ╠═77f771f2-bb4e-4d64-8e2e-b5a4910a7082
 # ╟─15da8583-b546-4331-a3a8-17017c2d860d
 # ╟─ade057ad-843c-420e-920c-9c37cf3ff39f
+# ╟─7624e7bf-94f0-4cc4-b626-6d7cfebf32f8
+# ╠═c18910a0-7a03-4d32-900b-fc8ba4e9fcc1
+# ╟─8de646d6-94d0-4fba-bcb0-9435c3e009bd
 # ╟─023414da-edc9-405a-b4d9-9237372f69c1
 # ╠═f794e8e7-7fbe-4152-89a2-5fe1efc279e7
 # ╠═20876704-415e-4486-9c45-5899cbf56005
