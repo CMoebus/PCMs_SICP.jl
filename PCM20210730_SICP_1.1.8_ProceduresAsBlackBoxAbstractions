@@ -26,7 +26,7 @@ md"
 
 ##### file: PCM20210730\_SICP\_1.1.8\_ProceduresAsBlackBoxAbstractions
 
-##### Julia/pluto-code (1.11.2/0.20.3) by PCM *** 2025/01/05 ***
+##### Julia/pluto-code (1.11.2/0.20.3) by PCM *** 2025/01/06 ***
 ====================================================================================
 "
 
@@ -47,8 +47,8 @@ md"
 - type *hierarchy*
 - *abstract* types $AbstractFloat, Signed, Real$
 - removing of *tail-recursion* by *while* loop
-- *lbrary* function $mean$
-- *tuple* $(.,.)$ as *iterable*
+- *library* function $mean$ 
+- *slurping* parameter $xs...$ to construct $xs$ as as an *iterable* tuple $(.,.)$ 
 - *base* function $sqrt(.), √(.), √., isapprox, convert$
 - *keyword* parameters
 
@@ -392,7 +392,10 @@ md"
 # idiomatic JULIA with 'while' instead of tail-recursive sqrt_iter
 # Supressing local variable *x* from *good_enough*, *improve*, and *sqrt_iter*
 # function $mean$ instead of self defined $average$
-# removal of intermediate $average$
+# function $average$ with slurping xs... 
+# $xs$ is then an iterable tuple with two numbers, which can be an argument of
+#    Statistics.mean
+# 
 #--------------------------------------------------------------------------
 function sqrtSICP4(x::Real)::Real
 	eps = 1.0E-3
@@ -401,9 +404,13 @@ function sqrtSICP4(x::Real)::Real
 	goodEnough(guess) = isapprox(guess^2, x, atol=eps)
 	# 	abs(guess^2 - x) < 0.001
 	#----------------------------------------------------------------------
-	improve(guess) = mean((guess, x/guess))     # (.,.) tuple as iteratible
+	average(xs...) = mean(xs)                    # slurping parameter xs
+		# /(+(x, y), 2)                          # xs = (...,...)
 	#----------------------------------------------------------------------
-
+	# arguments get slurped into parameter xs... and packed into a tuple,
+	#    which is an iterable
+	improve(guess) = average(guess, x/guess)     
+	#----------------------------------------------------------------------
 	while !goodEnough(guess)
 		guess = improve(guess)
 	end
