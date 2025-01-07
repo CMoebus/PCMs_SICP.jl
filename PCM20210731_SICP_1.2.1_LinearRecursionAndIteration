@@ -129,12 +129,12 @@ md"
 $\;$
 
 $5040 = \cases{
-7 * fact(6) \cr 
-7 * (6 * fact(5)) \cr
-7 * (6 * (5 * fact(4))) \cr
-7 * (6 * (5 * (4 * fact(3)))) \cr
-7 * (6 * (5 * (4 * (3 * fact(2))))) \cr
-7 * (6 * (5 * (4 * (3 * (2 * fact(1)))))) \cr
+7 * factorial(6) \cr 
+7 * (6 * factorial(5)) \cr
+7 * (6 * (5 * factorial(4))) \cr
+7 * (6 * (5 * (4 * factorial(3)))) \cr
+7 * (6 * (5 * (4 * (3 * factorial(2))))) \cr
+7 * (6 * (5 * (4 * (3 * (2 * factorial(1)))))) \cr
 7 * (6 * (5 * (4 * (3 * (2 * 1)))))) \cr
 7 * (6 * (5 * (4 * (3 * 2)))) \cr
 7 * (6 * (5 * (4 * 6))) \cr
@@ -163,7 +163,7 @@ $\;$
 
 # ╔═╡ e469a12c-c66e-4111-ab7a-d1a71281f64a
 md"
-**Fig. 1.2.1.1**: A *linear* recursive *computation* process with *complexity* *O(n)* for computing $7!$ (c.f. Fig. 1.3, SICP, 1996)
+**Fig. 1.2.1.1**: A *linear* recursive *computation* process with *time* (vertical axis) and *space* (horizontal axis) *complexity* *O(n)* for computing $7!$ (c.f. Fig. 1.3, SICP, 1996)
 "
 
 # ╔═╡ 27d1c562-2b1c-41a0-aec9-787834d9d8b4
@@ -193,6 +193,41 @@ factorial2(6)
 
 # ╔═╡ bac2caf9-bf94-4aa0-9ce4-2ea462f4f345
 factorial2(6.0)       
+
+# ╔═╡ cf1c416b-e4f9-4f24-bf3f-57a28fc67016
+md"
+$\;$
+
+$5040 = \cases{
+factorial(7) \cr 
+fact\_iter(1, 1, 7) \cr
+fact\_iter(1, 2, 7) \cr
+fact\_iter(2, 3, 7) \cr
+fact\_iter(6, 4, 7) \cr
+fact\_iter(24, 5, 7) \cr
+fact\_iter(120, 6, 7) \cr
+fact\_iter(720, 7, 7) \cr
+fact\_iter(5040, 8, 7) \cr
+5040
+}$
+
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+
+"
+
+# ╔═╡ c05ac12d-976d-469d-bb79-2f3fdd7341bc
+md"
+**Fig. 1.2.1.2**: A *tail* recursive *computation* process with *O(n) time complexity* (vertical axis) and *O(1)* or *O(n) space complexity* (horizontal axis) for computing $7!$ (c.f. Fig. 1.4, SICP, 1996) depending on *TCO*
+"
 
 # ╔═╡ b484fc01-b9a3-41c0-a844-18efc2c2a800
 md"
@@ -361,7 +396,7 @@ $\;$
 $\;$
 $\;$
 
-**Fig. 1.2.1.2**: Relation between *Code, TCO*, and *Complexity*
+**Fig. 1.2.1.3**: Relation between *Code, TCO*, and *Complexity*
 
 "
 
@@ -1860,6 +1895,8 @@ version = "1.4.1+1"
 # ╠═4a17ecb7-9460-48cb-855f-4a49a21bbc9d
 # ╠═d746cb2f-2768-4917-b214-583080b0cd1b
 # ╠═bac2caf9-bf94-4aa0-9ce4-2ea462f4f345
+# ╟─cf1c416b-e4f9-4f24-bf3f-57a28fc67016
+# ╟─c05ac12d-976d-469d-bb79-2f3fdd7341bc
 # ╟─b484fc01-b9a3-41c0-a844-18efc2c2a800
 # ╠═68a5453c-9c25-4539-a3f8-2d4948dca25d
 # ╠═b1d0cf2b-dde7-48c9-8cb4-99a37576a85a
