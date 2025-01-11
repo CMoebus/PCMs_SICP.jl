@@ -20,7 +20,7 @@ md"
 ====================================================================================
 #### SICP: [1.1.1_Expressions](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.11.2/0.20.4 by PCM *** 2025/01/10 ***
+##### Julia/Pluto.jl: 1.11.2/0.20.4 by PCM *** 2025/01/11 ***
 
 ====================================================================================
 "
@@ -29,8 +29,12 @@ md"
 # ╔═╡ 53196c5e-41a1-4e37-9405-5e2ee4d8c58e
 md"
 ##### 0. Introduction
-First we try to be code Julia as close as possible to the *functional* style of SICP in [*MIT-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme) and especially [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)), then we introduce *idiomatic* Julia elements.
-In case of any doubt you can consult the [Julia doc](https://docs.julialang.org/en/v1/).
+*One easy way to get started at programming is to examine some typical interactions with* ... a Julia/Pluto compiler/notebook system. *Imagine that you are sitting at a computer terminal. You type an expression, and the* Julia/Pluto system *responds by displaying the result of its evaluating that expression.*(SICP, 1996, with some modifications by us)
+
+First we try to be code Julia as close as possible to the *functional* style of SICP in [*MIT-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme) and especially [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)), then we introduce *idiomatic* Julia elements to document its the elegance and expressiveness.
+
+In case of any doubt regarding *syntax* and *semantics* of Julia's constructs you can consult the [Julia doc](https://docs.julialang.org/en/v1/).
+
 
 "
 
@@ -41,20 +45,23 @@ md"
 
 *Topics* dealt are:
 
-- [*Numeral*](https://en.wikipedia.org/wiki/Numeral_system), *Number*
-- *combination*, *expression*
-- [*Types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
+- [*expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *evaluation*, *value*
+- [*numeral*](- https://en.wikipedia.org/wiki/Numeral_system), *Number*
+- [*literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming))
+- [*types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
 - *dynamic*, *static* types
-- *Supertype, Subtypes, Type hierarchy*
-- [*Expression*](https://en.wikipedia.org/wiki/Expression_(computer_science)), *Evaluation*
-- *Function call*
-- *dynamic* typing
-- [*Operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
-- [*Operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity), *left*-associativity, *right*-associativity 
-- Tests of *identity*: $==$, $===$
+- *combination*, *compound expression*
+- *function call*, [*operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
+- *prefix*, *infix* and *postfix* notation
+- [*Polish notation*](https://en.wikipedia.org/wiki/Polish_notation)
+- [*infix* notation](https://en.wikipedia.org/wiki/Infix_notation)
+- [*reverse Polish notation*](https://en.wikipedia.org/wiki/Reverse_Polish_notation)
+- *Kantorovic* trees, [*algebraic expression* tree](https://en.wikipedia.org/wiki/Binary_expression_tree)
+- type *conversion*
+- tests of *identity*: $==$, $===$
+- [*operator associativity*](https://en.wikipedia.org/wiki/Operator_associativity), *left*-associativity, *right*-associativity 
+- *supertype, subtypes, type hierarchy*
 - *built-in* functions: $typeof(.), typejoin(.,.), typemin(.), typemax(.)$
-- Type *conversion*
-- *Kantorovic* trees
 
 "
 
@@ -74,7 +81,7 @@ md"
 
 $evaluation: <expression> \mapsto <value> \square$
 
-When *numeric* expressions are *simple* they are *numerals* and evaluated to *numbers*:
+When *numeric* expressions are *simple* they are *numerals* (a special kind of [*literals*](https://en.wikipedia.org/wiki/Literal_(computer_programming))) and evaluated to *numbers*:
 
 $<expression> ::= <numeric\ expression> | <nonnumeric\ expression>.$
 
@@ -83,11 +90,13 @@ $<simple\ numeric\ expression> | <numeric\ combination>.$
 
 $<simple\ numeric\ expression> ::= <numeral>.$
 
+$evaluation: <simple\ numeric\ expression> \mapsto <number> \square$
+
 $evaluation: <numeral> \mapsto <number> \square$
 
 Concepts enclosed in $<...>$ are *nonterminals* symbols; they are replaced by *terminals* of a *grammatic*, like:
 
-$<value> ::= 12 | 13.0 | 23E-5 | 23.f0 | ...$
+$<value>\ ::=\ 12\ |\ 13.0\ |\ 23E-5\ |\ 23.f0\ |\ ...$
 
 When they are *numeric combinations* they are evaluated in *several* steps to a *number*:
 
@@ -100,11 +109,11 @@ md"
 ---
 ###### 3.2 Simple Numeric Expressions: *Numeral* $\mapsto$ *Number*
 
-Numerals in Julia are *dynamic* typed. [Types](https://en.wikipedia.org/wiki/Type_system) are sets of *possible* elements of *one* kind declared by the programmer. 
+Numerals in Julia are *dynamic* typed. [Types](https://en.wikipedia.org/wiki/Type_system) are sets of elements of a kind *declared* by the programmer. 
 
-*Dynamic* types are *not* declared *in the code* but appear *in the evaluation process* (e.g. *with* or *without* decimal point). In contrast to that are *static* types explicitly declared in the code. 
+*Dynamic* types are *not* declared *in the code* but appear *in the evaluation process* (e.g. *with* or *without* decimal point when a numeric type). In contrast to that *static* types are explicitly declared in the code *before* the computation process starts. 
 
-Languages with *dynamic* types are e.g. Scheme, Javascript and Smalltalk, wheras *static* types appear in Java, C++, etc. Julia code can be written in *both* styles.
+Languages with *dynamic* typing are e.g. Scheme, Javascript and Smalltalk, wheras *static* types appear in Java, C++, etc. *Julia* code can be written in *both* styles.
 "
 
 # ╔═╡ 198ce2f2-988c-4387-a73d-60f5d785c3bc
@@ -134,40 +143,45 @@ typeof(486E0)                                           #  dynamic typed ==> Flo
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
 ###### 3.3 *Compound Prefix* Expressions (= *Combinations*) are *Function Calls*
-*Flat (= non-nested)* and *nested* expressions have several names. They are called *compound prefix* expressions or *combinations*. We shall evaluate them like *function calls*. 
+*Flat (= non-nested)* and *nested* expressions have several names. They are called *compound prefix* expressions or *combinations*. They have the *syntax* and *semantics* of *function calls*. 
 
-These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT Scheme*) accepts only *prefix* expressions, Julia also understands the *infix* notation learnt in school when dealing with arithmetic expressions. Parentheses are used to control the evaluation process.
+These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT Scheme*) accepts only *prefix* expressions, *postfix* notation is used in some pocket calculators. 
 
-When they are *numeric combinations* they are evaluated in several steps to a *number*:
+Julia also understands the *infix* notation learnt in school when dealing with arithmetic expressions. This makes mathematical expressions and formulae coded in Julia easy to understand for non-CS domain experts. Parentheses are used to control the evaluation process.
+
+When they are *numeric combinations* they are evaluated in *several* steps to a *number*:
 
 $evaluation: <numeric\ combination> \mapsto <number> \square$
 
-*Numeric combinations* are *function calls* with at least *one* operand:
+*Numeric combinations* are *numeric function calls* with at least *one* operand. This constraint can be tested by yourself (see below):
 
-$<numeric\ combination> ::= <function\ call>$
+$<numeric\ combination> ::= <numeric\ function\ call>$
 
-###### 3.3.1 *Flat* Expressions
+###### 3.3.1 *Flat* Numeric Expressions (= *Flat Numeric Combinations*)
 
-The *function call* consists of the *function symbol* or *function name* (= $<operator>$) and one or more *arguments* (= $<operands>$):
+The *numeric function call* consists of the *numeric function symbol* or *numeric function name* (= $<operator>$) and one or more *arguments* (= $<operands>$):
 
-$<function\ call> ::= <operator> \left(<operand>...\right).$
+$<numeric\ function\ call> ::= <numeric\ operator> \left(<operand>...\right).$
 
-$evaluation: <operator>\left(<operand>\right) \mapsto <number> \square$
+$evaluation: <numeric\ operator>\left(<operand>\right) \mapsto <number> \square$
 
-$evaluation: <operator>\left(<operand>,...\right)\; \mapsto \; <number> \square$
+$evaluation: <numeric\ operator>\left(<operand>,...\right)\; \mapsto \; <number> \square$
 
 "
 
 # ╔═╡ 866f4a84-5479-44aa-b915-4c3e10a16d48
 md"
-###### 3.3.2 *Nested* Expressions (= *Combinations*)
+###### 3.3.2 *Nested* Numeric Expressions (= *Nested Numeric Combinations*)
 
-$evaluation: <operator>\left(..., <operator>\left(\right),...\right)\; \mapsto \; <number>\square$
+*Nested* numeric combinations contain a *numeric function call* in the place of an *operand*.
 
-$evaluation: <operator>\left(..., <operator>\left(<operand>,...\right),...\right)\;\mapsto$
-$\; \mapsto\; <number>\square$
+$evaluation:$
+$<numeric\ operator>\left(..., <operator>\left(<operand>\right),...\right)\; \mapsto \; <number>\square$
 
-$<operator> ::= +, -, ..., sin, ...$
+$evaluation:$
+$<numeric\ operator>\left(..., <operator>\left(<operand>,...\right),...\right)\;\mapsto\; <number>\square$
+
+$<numeric\ operator> ::= +, -, ..., sin, ...$
 
 $<operand> ::= e.g.: -3, 1, -2.0, 3.141, ...$
 
@@ -178,7 +192,7 @@ $<number> ::= e.g.: -1, 4.0, -6.2, 8.2, ...$
 # ╔═╡ 015dbbd5-a3b0-407a-9ff9-b5a0bee3713a
 md"
 ---
-###### 3.4 *Flat* Expressions
+###### 3.4 *Flat Numeric* Expressions
 "
 
 # ╔═╡ e7125587-8e19-4201-9faf-e5fcc6d9f0bd
@@ -258,7 +272,11 @@ div(10, 5)                                                # ==> 2 --> :)
 
 # ╔═╡ db568d2c-ac58-425d-acbe-553a072d941d
 md"
-###### *Boolean* Expressions
+###### *Boolean* Expressions  
+$evaluation: (Number, Number, ==) \rightarrow Boolean$
+$evaluation: (Number, Number, ===) \rightarrow Boolean$
+$Boolean = \{true, false\}$
+
 "
 
 # ╔═╡ 20850ab6-70a9-44a3-a6f0-de55c071309e
@@ -276,6 +294,7 @@ md"
 # ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
 md"
 ###### Type conversion
+$evaluation: (Float64, Int64, /) \rightarrow Float64$
 "
 
 # ╔═╡ 9f83cded-8b07-459b-847e-87e3aca59da5
@@ -287,12 +306,12 @@ md"
 # ╔═╡ b3af6b38-3b06-4966-8e88-3da2fe720e3e
 md"
 ---
-###### 3.5 *Nested* (*Compound*) Combinations
+###### 3.5 *Nested  Numeric* Expressions (*Compound* Combinations)
 
-$<combination> ::=$ 
-$<operator>\left(<operand>,..., <operator>\left(\right),...\right)\;|$
+$<numeric\ combination> ::=$ 
+$<numeric\ operator>\left(<operand>,..., <operator>\left(<operand>\right),...\right)\;|$
 
-$<operator>\left(<operand>,..., <operator>\left(<operand>,...\right),...\right).$
+$<numeric\ operator>\left(<operand>,..., <operator>\left(<operand>,...\right),...\right).$
 
 "
 
@@ -343,7 +362,7 @@ md"
 #	           6))                                      ==> 57
 #
 # prefix Julia:
-+( *(3, +( *(2, 4), +(3, 5))), +( -(10, 7), 6))
++( *(3, +( *(2, 4), +(3, 5))), +( -(10, 7), 6))       # ==> 57
 
 # ╔═╡ 07d566e1-77a2-45b1-be22-5521d1f65d2e
 md"
@@ -413,15 +432,15 @@ end # begin
 md"
 ###### Fig. 1.1.1.1: *Kantorovic* tree (Bauer & Wössner, 1981, p.21)
 
-The abstract representation of an expression in *linear* form is the *nonlinear* graphic *Kantorovic* tree. By various search strategies we can generate the *linear surface* representation of the expression.
+The abstract representation of an expression in *linear* form is the *nonlinear* graphic *Kantorovic* tree. By various *search* strategies in the *expression tree* we can generate the *linear surface* representation of the expression.
 
-- *prefix*-expression (from root to leaves): 
+- [*prefix*-expression]((https://en.wikipedia.org/wiki/Polish_notation)) (from root to leaves): 
 $+( *(3, +( *( 2, 4), +(3, 5))), +( -(10, 7), 6))$
 
-- *infix*-expression (from leaf to root to leaf):
+- [*infix*-expression](https://en.wikipedia.org/wiki/Infix_notation) (from leaf to root to leaf):
 $(((2*4)+(3+5))*3)+((10-7)+6)$
 
-- *postfix*-expression (from leaves to root):
+- [*postfix*-expression](https://en.wikipedia.org/wiki/Reverse_Polish_notation) (from leaves to root):
 $((3,((2,4)*,(3, 5)+)+)*,((10,7)-,6)+)+$
 
 "
@@ -429,8 +448,8 @@ $((3,((2,4)*,(3, 5)+)+)*,((10,7)-,6)+)+$
 # ╔═╡ 36ceefbb-a164-49cf-a499-19c6c336be23
 md"
 ---
-##### 4. Idiomatic Julia
-###### Type Hierarchy, Infix Operators and Expressions, *Inbuilt* Functions
+##### 4. *Idiomatic* Julia
+###### 4.1 *Numeric* type *hierarchy*, *builtin* functions $typejoin, subtypes,...$
 "
 
 # ╔═╡ 751b2fc4-298b-479f-9974-67578d4c5f24
@@ -465,14 +484,20 @@ isprimitivetype(Int64)
 # ╔═╡ 7e379802-13ac-4f26-97ad-644aa42b0b82
 isprimitivetype(Float64)
 
-# ╔═╡ 45269af2-373c-4178-a527-b0d0064f5a06
-isprimitivetype(Function)
-
 # ╔═╡ ba6e6b36-3e29-47cc-b89d-81044f1e21be
 typemin(Int64), typemax(Int64)
 
 # ╔═╡ 69ed7655-db45-4075-8041-1f86b8c0ce67
 typemin(Float64), typemax(Float64)
+
+# ╔═╡ 1b51d453-6197-46ea-8aaa-545bbbcbf332
+md"
+---
+###### 4.2 *Type* tree of *functions*
+"
+
+# ╔═╡ 45269af2-373c-4178-a527-b0d0064f5a06
+isprimitivetype(Function)
 
 # ╔═╡ 049a95bf-3f4d-4e07-9ae2-97718475c3b3
 typeof(+)
@@ -505,6 +530,12 @@ end # function makeMyTypeTreeFunction
 
 # ╔═╡ 7adbad5d-6f70-4b63-93dc-977e71bff457
 makeMyTypeTreeFunction()
+
+# ╔═╡ a270e918-1d26-4d66-92bd-54faeb0b4005
+md"
+---
+###### 4.3 *Infix* operators and expressions
+"
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
 # Math: 137 + 349                                         # ==> 486
@@ -621,9 +652,9 @@ md"
 ---
 ##### 5. Summary
 
-We have evaluated *flat (= non-nested)* and *nested* expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation already learnt in school. Parentheses are used to control the evaluation process.
+We have evaluated *flat (= non-nested)* and *nested* numeric expressions by interpreting expressions as *function calls*. These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT schema*) only knows *prefix* expressions, Julia also understands the *infix* notation already learnt in school. Parentheses are used to control the evaluation process.
 
-As an alternative to the *linear* form, expressions can also be documented in *non-linear* graphical, parenthesis-free form with *Kantorovic* trees. The three linear forms can be read from this tree using various search strategies. In Kantorovic trees, the evaluation process is controlled by the edges of the graph.
+As an alternative to the *linear* form, expressions can also be documented in *non-linear* graphical, parenthesis-free form with *Kantorovic* (= *algebraic* expression) trees. The three linear forms can be read from these trees using various *search* strategies. The evaluation process is here controlled by the edges of the graph.
 
 As a further topic, we discussed a small excerpt from Julia's type hierarchy. In our calculations, we came across $Int64, Float64$, and $Function$. The first and second are subtypes of the supertype $Real$.
 
@@ -641,6 +672,8 @@ md"
 - **Bauer, F.L. & Wössner, H.**; *Algorithmic Language and Program Development*, Heidelberg: Springer, 1981
 
 - **JuliHub**; [*Julia doc*](https://docs.julialang.org/en/v1/); last visit 2025/01/09
+
+- **Wikipedia**; [*Literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming)); last visit 2025/01/11
 
 - **Wikipedia**; [*MIT/GNU-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme); last visit 2024/12/04
 
@@ -2156,7 +2189,7 @@ version = "1.4.1+2"
 # ╠═8c64d38b-98e2-4b45-bdc7-e1772efdc965
 # ╟─d955da7c-2570-4808-8e6b-cb8564c2f0cd
 # ╠═9f83cded-8b07-459b-847e-87e3aca59da5
-# ╠═b3af6b38-3b06-4966-8e88-3da2fe720e3e
+# ╟─b3af6b38-3b06-4966-8e88-3da2fe720e3e
 # ╟─62a20957-b08b-48a9-968b-e65038cc520a
 # ╠═2507313b-a2c7-452e-9288-a4da8bfb0ff9
 # ╠═aaa8d90b-b0d9-4e8b-aff6-a286910afc65
@@ -2175,9 +2208,10 @@ version = "1.4.1+2"
 # ╟─f3d35d58-5889-44b8-be7c-4ca3c838bf86
 # ╠═34265915-b300-4291-a327-4b2f512950fc
 # ╠═7e379802-13ac-4f26-97ad-644aa42b0b82
-# ╠═45269af2-373c-4178-a527-b0d0064f5a06
 # ╠═ba6e6b36-3e29-47cc-b89d-81044f1e21be
 # ╠═69ed7655-db45-4075-8041-1f86b8c0ce67
+# ╟─1b51d453-6197-46ea-8aaa-545bbbcbf332
+# ╠═45269af2-373c-4178-a527-b0d0064f5a06
 # ╠═049a95bf-3f4d-4e07-9ae2-97718475c3b3
 # ╟─c680cf4f-15ec-4f40-aa9b-68ca83447efb
 # ╠═c97ebd78-ff4f-46f1-b2d4-bb2a87f268f9
@@ -2185,6 +2219,7 @@ version = "1.4.1+2"
 # ╠═b53099c7-267f-4f3e-aac3-b01f00ba814e
 # ╟─3a215113-f3da-4675-80cd-78e3c0742225
 # ╟─7adbad5d-6f70-4b63-93dc-977e71bff457
+# ╟─a270e918-1d26-4d66-92bd-54faeb0b4005
 # ╠═9e498769-9f09-4a0b-9cb9-e01b03706f20
 # ╠═fe4ea16b-98a9-4ca6-84d9-071e3c16fb9b
 # ╠═ae1d20ae-8738-412b-bfc9-3ee4a670360f
