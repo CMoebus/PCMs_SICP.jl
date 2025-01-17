@@ -24,7 +24,7 @@ md"
 
 ##### file: PCM20210801\_SICP\_1.2.2\_Tree\_Recursion.jl
 
-##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/16 ***
+##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/17 ***
 ==================================================================================
 "
 
@@ -209,11 +209,17 @@ $f_{fib}(n) := \left[\frac{\phi^n}{\sqrt{5}}\right] \text{ for } n \ge 0$
 
 where:
 
-$\phi := \frac{1-\sqrt{5}}{2}$
+$\phi := \frac{1-\sqrt{5}}{2} = 1.618033988749895$
 
 more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number). From the formula for $f_{fib}(n)$ we see that the *space complexity* is $O(1)$ and *time compexity* $O(n)$.
 
 "
+
+# ╔═╡ d18098af-8fbb-4579-baef-b8579a33c02b
+ϕ   = (1 + √5) / 2.0              # golden ratio
+
+# ╔═╡ 3e99e00e-50fb-4ebf-a233-a523377eedb9
+ϕ^2 ≈ ϕ + 1                       # golden ratio
 
 # ╔═╡ 59f4bd16-f5fd-43a0-9130-733b318bb850
 function fib2(n)                  # in infix notation
@@ -1885,6 +1891,8 @@ version = "1.4.1+2"
 # ╟─66bd9d13-4274-492e-8980-b9ea687e223a
 # ╟─ed4e99e9-69fc-4324-a2f9-28991de01953
 # ╟─9d2d9e38-a34d-4df9-9b98-8bae8a251052
+# ╠═d18098af-8fbb-4579-baef-b8579a33c02b
+# ╠═3e99e00e-50fb-4ebf-a233-a523377eedb9
 # ╠═59f4bd16-f5fd-43a0-9130-733b318bb850
 # ╠═45e8c4f6-c97a-4253-9913-5bdcb51ab6c9
 # ╠═7270c38a-d48b-46ae-a3cd-b713c45e57fb
