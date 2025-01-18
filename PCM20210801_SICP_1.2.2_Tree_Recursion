@@ -24,7 +24,7 @@ md"
 
 ##### file: PCM20210801\_SICP\_1.2.2\_Tree\_Recursion.jl
 
-##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/17 ***
+##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/18 ***
 ==================================================================================
 "
 
@@ -97,19 +97,19 @@ function fib(n)
 end # function fib
 
 # ╔═╡ 739f010a-7623-411b-9376-9222b3183039
-fib(0)
+fib(0)                             # ==>    0 --> :)
 
 # ╔═╡ 16dc2f1b-99f4-4a67-894a-523666117feb
-fib(1)
+fib(1)                             # ==>    1 --> :)
 
 # ╔═╡ 90de1d05-0121-4e85-8674-00f18b4a0a9e
-fib(4)
+fib(4)                             # ==>    3 --> :)
 
 # ╔═╡ 36b39dd5-076c-4d36-a8f7-ed6a47a5b870
-fib(5)
+fib(11)                            # ==>   89 --> :)
 
 # ╔═╡ 1400c2fa-1c83-4aa9-baa6-4f319bd0bca2
-fib(11)
+fib(19)                            # ==> 4181 --> :)
 
 # ╔═╡ 66bd9d13-4274-492e-8980-b9ea687e223a
 let
@@ -201,25 +201,25 @@ md"
 ---
 ###### 3.3 *Space* and *Time Complixity* of Closed Form Fibonacci Approximation
 
-A *nonrecursive* approximation to $fib(n)$ is its closest integer $f_{fib}(n)$:
+A *nonrecursive* approximation to $fib(n)$ is its nearest integer $f_{fib}(n)$:
 
 $f : \mathbb N \rightarrow \mathbb N$
 $f : n \mapsto f_{fib}(n)$
-$f_{fib}(n) := \left[\frac{\phi^n}{\sqrt{5}}\right] \text{ for } n \ge 0$
+$f_{fib}(n) := \left\lceil\frac{\psi^n}{\sqrt{5}}\right\rfloor \text{ for } n \ge 0$
 
 where:
 
-$\phi := \frac{1-\sqrt{5}}{2} = 1.618033988749895$
+$\psi := \frac{1+\sqrt{5}}{2} = 1.618033988749895$
 
 more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number). From the formula for $f_{fib}(n)$ we see that the *space complexity* is $O(1)$ and *time compexity* $O(n)$.
 
 "
 
 # ╔═╡ d18098af-8fbb-4579-baef-b8579a33c02b
-ϕ   = (1 + √5) / 2.0              # golden ratio
+ψ   = (1 + √5) / 2.0              # golden ratio
 
 # ╔═╡ 3e99e00e-50fb-4ebf-a233-a523377eedb9
-ϕ^2 ≈ ϕ + 1                       # golden ratio
+ψ^2 - ψ - 1 ≈ 0.0                 # ψ is root of polynomial
 
 # ╔═╡ 59f4bd16-f5fd-43a0-9130-733b318bb850
 function fib2(n)                  # in infix notation
@@ -242,10 +242,10 @@ fib2(4)
 fib2(4.0)
 
 # ╔═╡ f3d63b59-55b7-48a6-94c4-8386c64d835a
-fib2(5)
+fib2(11)                            # ==>   89 --> :)
 
 # ╔═╡ 30cf0005-7427-498e-b8f0-81b30fc05978
-fib2(11)
+fib2(19)                            # ==> 4181 --> :)
 
 # ╔═╡ 6e08bc0c-a556-4f7a-b656-7bcf3326a065
 md"
@@ -275,10 +275,10 @@ fib3(0)
 fib3(1)
 
 # ╔═╡ ee6c42f5-39ae-4c1e-a07b-ef344329d33e
-fib3(4)
+fib3(11)
 
 # ╔═╡ ec4a7ae0-7a9b-476a-bcaf-24bda07b34c8
-fib3(11)
+fib3(19)
 
 # ╔═╡ 1fe5189b-ae8c-4d53-af87-9512738988b3
 subtypes(Signed)
@@ -301,13 +301,13 @@ fib4(0)
 fib4(1)
 
 # ╔═╡ da71e085-d3b1-403b-9ab3-05b376d88b6a
-fib4(4)
-
-# ╔═╡ 381d538b-43a5-443e-91b8-805c7789bf41
 fib4(11)
 
+# ╔═╡ 381d538b-43a5-443e-91b8-805c7789bf41
+fib4(19)
+
 # ╔═╡ 3374ddbc-5462-4d89-a36a-66366a2813db
-fib4(11.0)                          # ==> blocked for Floats
+fib4(19.0)                          # ==> blocked for Floats
 
 # ╔═╡ 48e7629b-44f0-43a1-b94c-16df29f82ce6
 function fib5(n::Signed)::Signed
@@ -328,10 +328,10 @@ fib5(0)
 fib5(1)
 
 # ╔═╡ 8d8a9763-b9d4-45b2-aba2-28faa57c78e8
-fib5(4)
+fib5(11)
 
 # ╔═╡ 89658567-4c8e-4f01-9a18-ffa2d8c4b037
-fib5(11)
+fib5(19)
 
 # ╔═╡ 3725f0ec-af0c-4c09-b124-0370d4bd8735
 md"
@@ -443,10 +443,10 @@ fib6(0)
 fib6(1)
 
 # ╔═╡ 3f0ed8a8-c55a-4b25-9be3-0c937a82f2c7
-fib6(4)
+fib6(11)
 
 # ╔═╡ ec9121dd-b356-4abf-bb66-cb5a3d2135a8
-fib6(11)
+fib6(19)
 
 # ╔═╡ d86a5807-c5a9-4013-b9b2-34ff55cdbdb3
 md"
@@ -473,10 +473,10 @@ fib7(0)
 fib7(1)
 
 # ╔═╡ c0786dd7-c833-4218-9fc1-3c05ee85df0e
-fib7(4)
+fib7(11)
 
 # ╔═╡ 39f932a8-6d42-4c25-9f30-e19e0b262a6c
-fib7(11)
+fib7(19)
 
 # ╔═╡ 5c44c7be-fd22-4859-8a03-434eb6564942
 md"
@@ -501,13 +501,16 @@ fib8(0)
 fib8(1)
 
 # ╔═╡ 7b75e150-69a0-4754-b47c-55f20396c2a1
-fib8(4.0)
-
-# ╔═╡ 3d3f7a93-dfa9-4424-8032-e4eeb792fece
 fib8(11)
 
-# ╔═╡ ae8463f2-09d6-442d-bbc7-cd4faf310fd9
+# ╔═╡ 3d3f7a93-dfa9-4424-8032-e4eeb792fece
 fib8(11.0)
+
+# ╔═╡ fc9eebe4-9c4a-478b-94bb-5e0c01017122
+fib8(19)
+
+# ╔═╡ ae8463f2-09d6-442d-bbc7-cd4faf310fd9
+fib8(19.0)
 
 # ╔═╡ 01193090-2008-4ebf-a72a-9bb6a13b4c00
 md"
@@ -1950,6 +1953,7 @@ version = "1.4.1+2"
 # ╠═c1aa2447-bc4d-482a-887a-4ece1a2c72e9
 # ╠═7b75e150-69a0-4754-b47c-55f20396c2a1
 # ╠═3d3f7a93-dfa9-4424-8032-e4eeb792fece
+# ╠═fc9eebe4-9c4a-478b-94bb-5e0c01017122
 # ╠═ae8463f2-09d6-442d-bbc7-cd4faf310fd9
 # ╟─01193090-2008-4ebf-a72a-9bb6a13b4c00
 # ╟─641439d6-9442-4e2a-9696-3153d1fd27f7
