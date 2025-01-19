@@ -24,7 +24,7 @@ md"
 
 ##### file: PCM20210801\_SICP\_1.2.2\_Tree\_Recursion.jl
 
-##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/18 ***
+##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/19 ***
 ==================================================================================
 "
 
@@ -42,7 +42,8 @@ md"
 - *Fibonacci* numbers
 - *Generic* (*polymorphic*) method
 - *Guard*
-- *space* and time complexity* 
+- *space* and *time complexity* 
+- *big O*-notation: $O(g)$
 - begin ... end
 - *TCO* (= tail call optimization)
 - *type* $Signed$
@@ -64,7 +65,16 @@ md"
 md"
 ---
 ##### 3. SICP-Scheme-like *functional* Julia
-###### 3.1 Definition: [*Fibonacci* Numbers](https://en.wikipedia.org/wiki/Fibonacci_sequence)
+###### 3.1 Formal Definition of $O(g)$
+*Analysis of algorithms* is done by applying diverse measures of growth as a function of input length $n$. One of these measure is $O(g)$:
+
+*Definition*: $f$ is $O(g)$ if there are constants $c$ and $n_0$ such that $|f(n)| \le cg(n)$ for all $n \ge n_0.$ (Sanella et al., 2021, p.191)
+"
+
+# ╔═╡ 249acfdd-6050-4451-862e-0437a6e18463
+md"
+---
+###### 3.2 Definition: [*Fibonacci* Numbers](https://en.wikipedia.org/wiki/Fibonacci_sequence)
 
 Each number is the *sum* of its *two* predessors starting with $0, 1$:
 
@@ -77,17 +87,6 @@ fib(n-1) + fib(n-2) \cr
 }$
 
 "
-
-# ╔═╡ 14c0a735-b556-41fc-a5f9-e57ae206c046
-md"
----
-###### 3.2 *Space* and *Time* Complexity of Fibonacci Tree Recursive Process
-From Fig. 1.2.2.1 we see that the *space complexity* is $O(n)$ and the *time complexity* is $O(2^n)$. *Space complexity* is a function of the *height* of the *process tree*, whereas *time complexity* a function of the *width* of the tree.
-
-The computation process is highly inefficient. The right subtree $fib(3)$ appears identically as a subtree in the left subtree of $fib(4)$. Furthermore e.g. $fib(2)$ is computed three times.
-
-"
-
 
 # ╔═╡ b8bc83b5-a720-4f33-a32a-8284129b5fd9
 function fib(n) 
@@ -196,10 +195,22 @@ md"
 
 "
 
+# ╔═╡ 14c0a735-b556-41fc-a5f9-e57ae206c046
+md"
+---
+###### 3.3 *Space* and *Time* Complexity of Fibonacci Tree Recursive Process
+
+From Fig. 1.2.2.1 we see that the *space complexity* is $O(n)$ and the *time complexity* is $O(2^n)$. *Space complexity* is a function of the *height* of the *process tree*, whereas *time complexity* a function of the *width* of the tree.
+
+The computation process is highly inefficient. The right subtree $fib(3)$ appears identically as a subtree in the left subtree of $fib(4)$. Furthermore e.g. $fib(2)$ is computed three times.
+
+"
+
+
 # ╔═╡ 9d2d9e38-a34d-4df9-9b98-8bae8a251052
 md"
 ---
-###### 3.3 *Space* and *Time Complixity* of Closed Form Fibonacci Approximation
+###### 3.4 *Space* and *Time Complixity* of Closed Form Fibonacci Approximation
 
 A *nonrecursive* approximation to $fib(n)$ is its nearest integer $f_{fib}(n)$:
 
@@ -209,17 +220,16 @@ $f_{fib}(n) := \left\lceil\frac{\psi^n}{\sqrt{5}}\right\rfloor \text{ for } n \g
 
 where:
 
-$\psi := \frac{1+\sqrt{5}}{2} = 1.618033988749895$
+$\psi := \frac{1+\sqrt{5}}{2} = 1.618033988749895 \text{ (golden ratio )}$
 
-more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number). From the formula for $f_{fib}(n)$ we see that the *space complexity* is $O(1)$ and *time compexity* $O(n)$.
+$\psi = \lim\limits_{x \to \infty}\frac{f_{fib}(n+1)}{f_{fib}(n)}$
+
+more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number). From the formula for $f_{fib}(n)$ we see that the *space complexity* is $O(1)$ and *time complexity* $O(\psi^n)$.
 
 "
 
 # ╔═╡ d18098af-8fbb-4579-baef-b8579a33c02b
-ψ   = (1 + √5) / 2.0              # golden ratio
-
-# ╔═╡ 3e99e00e-50fb-4ebf-a233-a523377eedb9
-ψ^2 - ψ - 1 ≈ 0.0                 # ψ is root of polynomial
+ψ = (1 + √5) / 2.0                # golden ratio
 
 # ╔═╡ 59f4bd16-f5fd-43a0-9130-733b318bb850
 function fib2(n)                  # in infix notation
@@ -247,10 +257,54 @@ fib2(11)                            # ==>   89 --> :)
 # ╔═╡ 30cf0005-7427-498e-b8f0-81b30fc05978
 fib2(19)                            # ==> 4181 --> :)
 
+# ╔═╡ 966a7b04-9c19-4e0a-b1bb-f8ed1a5c53c3
+md"
+---
+###### 3.5 Closed Form Fibonacci Approximation: [*Binet*'s Formula](https://en.wikipedia.org/wiki/Fibonacci_sequence)
+
+Binet's formula is also a *nonrecursive* approximation to $fib(n)$ is its nearest integer $f_{fib}(n)$:
+
+$f : \mathbb N \rightarrow \mathbb N$
+$f : n \mapsto f_{fib}(n)$
+$f_{fib}(n) := \left\lceil\frac{\psi^n - \phi^n}{\sqrt{5}}\right\rfloor \text{ for } n \ge 0$
+
+where:
+
+$\psi := \frac{1+\sqrt{5}}{2} =  1.618033988749895$
+$\phi := \frac{1-\sqrt{5}}{2} = -0.6180339887498949$
+
+more info can be found [here](https://en.wikipedia.org/wiki/Fibonacci_number). From the formula for $f_{fib}(n)$ we see that the *space complexity* is $O(1)$ and *time compexity* $O(n)$.
+
+"
+
+# ╔═╡ 7e5093aa-15f8-480b-a164-a7d73bd33486
+ϕ = (1 - √5) / 2.0 
+
+# ╔═╡ be5953f4-8ee2-4b8e-a6d4-f93eb8b9971e
+function fib3new(n)                  # in infix notation
+	sqrtOf5 = √5
+	ψ   = (1 + sqrtOf5) / 2.0        # golden ratio ≈ 1.6180 as a Float
+	ϕ   = (1 - sqrtOf5) / 2.0        # conjugate value of ψ ≈ -0.618034
+	f_n = (ψ^n - ϕ^n) / sqrtOf5      # a Float number is generated
+	convert(Int64, round(f_n))
+end # function fib3new
+
+# ╔═╡ ddf50581-6684-47f4-aafa-6fbb6b6965a1
+fib3new(0)
+
+# ╔═╡ cf93c252-5d12-4713-8fd1-d6211c064a59
+fib3new(1)
+
+# ╔═╡ 0c40e44a-d71c-472c-b436-ee33f2155d3f
+fib3new(11)
+
+# ╔═╡ aabe9aad-2097-4417-a6ac-a9c885a75923
+fib3new(19)
+
 # ╔═╡ 6e08bc0c-a556-4f7a-b656-7bcf3326a065
 md"
 ---
-###### 3.4 *Space* and *Time Complixity* of Tail Recursive Fibonacci Process
+###### 3.6 *Space* and *Time Complixity* of Tail Recursive Fibonacci Process
 *Space* complexity of $fib3$ without TCO is $O(n)$ and *time* complexity is $O(n)$. With *TCO* (like in Scheme) both complexities are $O(1)$ and $O(n)$.
 "
 
@@ -1884,7 +1938,7 @@ version = "1.4.1+2"
 # ╟─748739c5-99b5-4fbd-8cad-acf71f2b9504
 # ╠═f2774a0c-968e-4e0c-a04a-47827ccafba2
 # ╟─0ea20de0-b278-4341-a176-b42f57530174
-# ╟─14c0a735-b556-41fc-a5f9-e57ae206c046
+# ╟─249acfdd-6050-4451-862e-0437a6e18463
 # ╠═b8bc83b5-a720-4f33-a32a-8284129b5fd9
 # ╠═739f010a-7623-411b-9376-9222b3183039
 # ╠═16dc2f1b-99f4-4a67-894a-523666117feb
@@ -1893,9 +1947,9 @@ version = "1.4.1+2"
 # ╠═1400c2fa-1c83-4aa9-baa6-4f319bd0bca2
 # ╟─66bd9d13-4274-492e-8980-b9ea687e223a
 # ╟─ed4e99e9-69fc-4324-a2f9-28991de01953
+# ╟─14c0a735-b556-41fc-a5f9-e57ae206c046
 # ╟─9d2d9e38-a34d-4df9-9b98-8bae8a251052
 # ╠═d18098af-8fbb-4579-baef-b8579a33c02b
-# ╠═3e99e00e-50fb-4ebf-a233-a523377eedb9
 # ╠═59f4bd16-f5fd-43a0-9130-733b318bb850
 # ╠═45e8c4f6-c97a-4253-9913-5bdcb51ab6c9
 # ╠═7270c38a-d48b-46ae-a3cd-b713c45e57fb
@@ -1903,6 +1957,13 @@ version = "1.4.1+2"
 # ╠═0ad1f4c3-a4aa-4c1b-ac1c-fe18b42f6cdb
 # ╠═f3d63b59-55b7-48a6-94c4-8386c64d835a
 # ╠═30cf0005-7427-498e-b8f0-81b30fc05978
+# ╟─966a7b04-9c19-4e0a-b1bb-f8ed1a5c53c3
+# ╠═7e5093aa-15f8-480b-a164-a7d73bd33486
+# ╠═be5953f4-8ee2-4b8e-a6d4-f93eb8b9971e
+# ╠═ddf50581-6684-47f4-aafa-6fbb6b6965a1
+# ╠═cf93c252-5d12-4713-8fd1-d6211c064a59
+# ╠═0c40e44a-d71c-472c-b436-ee33f2155d3f
+# ╠═aabe9aad-2097-4417-a6ac-a9c885a75923
 # ╟─6e08bc0c-a556-4f7a-b656-7bcf3326a065
 # ╠═584371d1-31bc-474b-b2bd-8bdfadecf398
 # ╠═b3bf7014-b05b-4bb4-8201-338763dccb77
