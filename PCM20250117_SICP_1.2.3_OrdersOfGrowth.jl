@@ -22,7 +22,7 @@ md"
 ==================================================================================
 #### SICP: [1.2.3 Orders of Growth](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-11.html#%_sec_1.2.3)
 ##### file: PCM20250117\_SICP\_1.2.3\_OrdersOfGrowth.jl
-##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/18 ***
+##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/20 ***
 
 ==================================================================================
 "
@@ -34,6 +34,8 @@ md"
 
 *Order of growth* is a concept in the [analysis of algorithms](https://en.wikipedia.org/wiki/Analysis_of_algorithms) a subdiscipline of CS:
 *Informally, an algorithm can be said to exhibit a growth rate on the order of a mathematical function if beyond a certain input size n, the function f(n) times a positive constant provides an upper bound or limit for the run-time of that algorithm. In other words, for a given input size n greater than some $n_0$ and a constant $c$, the run-time of that algorithm will never be larger than $c × f(n)$. This concept is frequently expressed using Big O notation.*[(Wikipedia, 2025)](https://en.wikipedia.org/wiki/Analysis_of_algorithms)
+
+Whereas the meaning of $O(g)$ can be informally verbalized as '*no faster than g*' (Rawlins, 1992, p.43) SICP prefers a tighter measure $\Theta(g)$ with an informal meaning of '*about as fast as g*' (Rawlins, 1992, p.43). 
 "
 
 # ╔═╡ 3dbc81dc-0042-48b3-a381-dbd097cf49fb
@@ -54,15 +56,20 @@ md"
 # ╔═╡ 3e774c8f-75a1-4451-8009-38aea333fd19
 md"
 ---
-##### 3. [*Big-O*-Notation](https://en.wikipedia.org/wiki/Big_O_notation)
+##### 3. [*Big-O*-](https://en.wikipedia.org/wiki/Big_O_notation) and *big* $\Theta$-Notation
 *Big O notation is a mathematical notation that describes the limiting behavior of a function when the argument tends towards a particular value or infinity. Big O is a member of a family of notations invented by German mathematicians [Paul Bachmann](https://en.wikipedia.org/wiki/Paul_Gustav_Heinrich_Bachmann), [Edmund Landau](https://en.wikipedia.org/wiki/Edmund_Landau) and others, collectively called Bachmann–Landau notation or asymptotic notation. The letter O was chosen by Bachmann to stand for Ordnung, meaning the order of approximation.*[Wikipedia(2025)](https://en.wikipedia.org/wiki/Big_O_notation)
+
+*Big* $\Theta$-notation used in SICP provides not only an upper bound on $f$ but also a lower bound: $f$ grows *as fast as* $g$ (Rawlins, 1992, p. 43).
+
 "
 
 # ╔═╡ ff99535f-dba4-45fc-aa5f-66764bb21576
 md"
 ---
-###### 3.1 Formal Definition
-Definition: $f$ is $O(g)$ if there are constants $c$ and $n_0$ such that $|f(n)| \le cg(n)$ for all $n \ge n_0.$ (Sanella et al., 2021, p.191)
+###### 3.1 Formal Definitions
+- *Definition* of $O(g)$: $f$ is $O(g)$ if there are constants $c$ and $n_0$ such that $|f(n)| \le cg(n)$ for all $n \ge n_0.$ (Sanella et al., 2021, p.191)
+
+- *Definition* of $\Theta(g)$: *We say that $f(n)$ has order of growth $\Theta(g(n))$, written $f(n) = \Theta(g(n))$ (pronounced 'Theta of* $f(n)$'), *if there are positive constants $k_1$ and $k_2$ independent of $n$ such that $k_1g(n) \le f(n) \le k_2g(n)$ for any sufficiently large value of $n$. (In other words, for large $n$, the value $f(n)$ is sandwiched between $k_1g(n)$ and $k_2g(n)$.*) (SICP, 1996, 2016; math.symbols adapted)
 
 "
 
@@ -76,11 +83,11 @@ $\begin{array}{c|c|c|c}
 \hline  
 \mbox{constant}    & O(1)      & fac & \mbox{lin. recursive (space when tco); iterative } \\
 \mbox{}            &           & fib & \mbox{nonrecursive (space) }           \\
-\mbox{logarithmic} & O(log\ n) &     & ??? \\
+\mbox{logarithmic} & O(log\ n) &     &                                        \\
 \mbox{linear}      & O(n)      & fac & \mbox{lin. recursive (space when no tco, time) } \\
 \mbox{}            &           & fib & \mbox{tree recursive (space) }         \\
-\mbox{quadratic}   & O(n^2)    &     & ??? \\
-\mbox{cubic}       & O(n^3)    &     & ??? \\
+\mbox{quadratic}   & O(n^2)    &     &                                        \\
+\mbox{cubic}       & O(n^3)    &     &                                        \\
 \mbox{exponential} & O(2^n)    & fib & \mbox{tree recursive (time) }          \\
 \mbox{}            & O(\psi^n) & fib & \mbox{nonrecursive (time) }            \\
 \mbox{}            & O(\psi^n) &     & \mbox{with } ψ = 1.618033988749895     \\
@@ -92,7 +99,7 @@ $\begin{array}{c|c|c|c}
 function plotOfComplexities()
 	let ns = [n for n in 1:0.1:10]
 		ψ = 1.618033988749895
-		plot(size=(600, 600), title=L"resources: $n \mapsto r(n)$", titlefontsize=12, xlabel=L"input size $n$", ylabel=L"$r(n)$ resources used")
+		plot(size=(600, 600), title=L"resources: $n \mapsto g(n)$", titlefontsize=12, xlabel=L"input size $n$", ylabel=L"$r(n)$ resources used")
 		plot!(n -> 1, ns, label=L"O(1)")              # O(1)
 		plot!(n -> log(n), ns, label=L"O(log\ n)")    # O(log n)
 		plot!(n -> n,   ns, label=L"O(n)")            # O(n)
@@ -118,6 +125,8 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2025/01/17
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/17
+
+- **Rawlins, G.J.E.**; *Compared To What?*, New York: Computer Science Press, 1992
 
 - **Sanella, D., Fourman, M., Peng, H. & Wadler, Ph.**; *Introduction to Computation: Haskell, Logic, and Automata*; Cham, Switzerland: Springer, 2021
 
@@ -1609,7 +1618,7 @@ version = "1.4.1+2"
 # ╟─ff99535f-dba4-45fc-aa5f-66764bb21576
 # ╟─14ef0a40-d487-451c-8588-6ca4ea7daebc
 # ╟─e7e8b8c9-76f4-4f14-92d3-4d209088a4aa
-# ╟─c689d959-8c3d-446b-ae34-f39d843f39bc
+# ╠═c689d959-8c3d-446b-ae34-f39d843f39bc
 # ╟─7340f0fe-6a39-4a6e-bf7e-f05783c2a663
 # ╟─6cde716e-65ee-4e3b-bf51-c3fdf2f036a7
 # ╟─c8be37e4-3a59-4fbb-a6c9-3f72b4cdeb48
