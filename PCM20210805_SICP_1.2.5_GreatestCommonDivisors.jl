@@ -31,7 +31,7 @@ md"
 # ╔═╡ 42c23ec6-f975-4e6a-bb57-b241df46bf43
 md"
 ##### 0. Introduction
-*... the Euclidean algorithm, ... or Euclid's algorithm, is an efficient method for computing the greatest common divisor (GCD) of two integers, the largest number that divides them both without a remainder. It is named after the ancient Greek mathematician Euclid, who first described it in his Elements (c. 300 BC). It is an example of an algorithm, a step-by-step procedure for performing a calculation according to well-defined rules, and is one of the oldest algorithms in common use. It can be used to reduce fractions to their simplest form, and is a part of many other number-theoretic and cryptographic calculations.([*Wikipedia*](https://en.wikipedia.org/wiki/Euclidean_algorithm))
+*... the Euclidean algorithm, ... or Euclid's algorithm, is an efficient method for computing the greatest common divisor (GCD) of two integers, the largest number that divides them both without a remainder. It is named after the ancient Greek mathematician Euclid, who first described it in his Elements (c. 300 BC). It is an example of an algorithm, a step-by-step procedure for performing a calculation according to well-defined rules, and is one of the oldest algorithms in common use. It can be used to reduce fractions to their simplest form, and is a part of many other number-theoretic and cryptographic calculations.*([*Wikipedia*](https://en.wikipedia.org/wiki/Euclidean_algorithm))
 "
 
 # ╔═╡ 491a8572-cfa8-4bbb-89f6-c5fa6de0e633
@@ -74,17 +74,16 @@ This definition leaves out the case where $gcd(0, 0)$:
 
 - *The above definition is unsuitable for defining $gcd(0, 0)$, since there is no greatest integer $n$ such that $0 × n = 0$. However, zero is its own greatest divisor if greatest is understood in the context of the divisibility relation, so $gcd(0, 0)$ is commonly defined as $0$.*([Wikipedia](https://en.wikipedia.org/wiki/Greatest_common_divisor))
 
-Now we can combine all cases:
+Now we can combine all cases for $a, b, d, e, f \in \mathbb N$:
 
 $gcd(a, b) =
 \begin{cases}
 0    & \text{if } a = b = 0 \\
-|b|  & \text{if } a = 0     \\
-|a|  & \text{if } b = 0     \\
+b  & \text{if } a = 0     \\
+a  & \text{if } b = 0     \\
 arg\underset{d}max \left(a = d\cdot e, b = d \cdot f \right)
 \end{cases}$
 
-where $d \in \mathbb N \text{ and } a, b, e, f \in \mathbb Z.$
 "
 
 # ╔═╡ 401f5a11-12b2-4733-8c10-109f0d9abacc
@@ -105,31 +104,35 @@ $arg\underset{d}max \left(a - b = d(e - f), b = d f \right).$
 
 This leads directly to a *tail recursive* algorithm with *subtraction* as a main *decreasing* operation.
 
-This function is correct for $a, b \in \mathbb N$. It *will keep subtracting the smaller argument from the larger until hitting a boundary* (Rawlins, 1992, p.363)
+This function is correct for $a, b \in \mathbb N \text{ with } a \ge b > 0$. It *will keep subtracting the smaller argument from the larger until hitting a boundary* (Rawlins, 1992, p.363)
 
 $gcd_{Euclid}(a, b) :=
 \begin{cases}
-0    & \text{if } a = b = 0 \\
-|b|  & \text{if } a = 0     \\
-|a|  & \text{if } b = 0     \\
-1    & \text{if } (a = 1) \lor (b = 1) \\
+0  & \text{if } a = b = 0 \\
+b  & \text{if } a = 0     \\
+a  & \text{if } b = 0     \\
+1  & \text{if } (a = 1) \lor (b = 1) \\
 gcd_{Euclid}(-(a, b), b) & \text{if } a \ge b > 1 \\
 gcd_{Euclid}(a, -(b, a)) & \text{if } b \ge a > 1 \\
 \end{cases}$
 
 Using *subtraction* is not very efficient in languages without [*tco*](https://en.wikipedia.org/wiki/Tail_call) because the danger of *stack overflow*.
+
+The implementation is:
+
 "
 
 # ╔═╡ bba620c5-3ec8-4c1c-be62-3ee5d4610555
-function myEuklidsGCD(a, b)   # fails, e.g. when b is negative or (a < 0) and (b = 0)
-	#--------------------------------------------------------------------------------
+function myEuklidsGCD(a, b)                       # a ≥ b ≥ 0
+	#--------------------------------------------------------------------------
 	==(a, 0) && ==(b, 0) ? 0 : 
 	==(a, 0) ? b :
 	==(b, 0) ? a :
 	==(a, 1) || ==(b, 1) ? 1 :
 	≥(a, b) && >(b, 1) ? myEuklidsGCD(-(a, b), b) :
-    ≥(b, a) && >(a, 1) ? myEuklidsGCD(a, -(b, abs(a))) : error("missing case")
-	#--------------------------------------------------------------------------------
+    ≥(b, a) && >(a, 1) ? myEuklidsGCD(a, -(b, abs(a))) : 
+		error("condition a ≥ b ≥ 0 ignored")
+	#--------------------------------------------------------------------------
 end # function EuklidsGCD
 
 # ╔═╡ 15e862ef-8cc7-4bc9-add5-9f9856c2c17e
@@ -181,7 +184,7 @@ This function is correct for $a, b \in \mathbb Z$ and even $a, b \in \mathbb Q$ 
 
 $gcd_{SICP}(a, b) :=
 \begin{cases}
-a  & \text{if } b = 0 \\
+|a|  & \text{if } b = 0 \\
 gcd_{SICP}(b, r(a, b)) & \text{where } r = remainder(a, b) = a \mod b \\
 \end{cases}$
 
@@ -204,22 +207,28 @@ end # function SICPsGCD
 sicpGCD(0, 0)
 
 # ╔═╡ 28f7b82d-780d-43c9-83aa-ceb9e579817d
-sicpGCD(6, 0), sicpGCD(-6, 0)               # ==> (6, 6) --> :)
+sicpGCD(6, 0), sicpGCD(-6, 0)                   # ==> (6, 6) --> :)
 
 # ╔═╡ 9383d9cf-3ef4-4696-a0df-273d6b1372bb
-sicpGCD(0, 6), sicpGCD(0, -6)               # ==> (6, 6) --> :)
+sicpGCD(0, 6), sicpGCD(0, -6)                   # ==> (6, 6) --> :)
 
 # ╔═╡ 84067cf7-71c5-4183-ac1c-37bf761f33ce
-sicpGCD(6, 9), sicpGCD(-6, 9)               # ==> (3, 3) --> :)
+sicpGCD(6, 9), sicpGCD(-6, 9)                   # ==> (3, 3) --> :)
 
 # ╔═╡ ba182453-1e0a-4ddb-8347-21528a9cf4e0
-sicpGCD(6, 9), sicpGCD(6, -9)               # ==> (3, 3) --> :)
+sicpGCD(6, -9), sicpGCD(-6, 9), sicpGCD(-6, -9) # ==> (3, 3, 3) --> :)
 
 # ╔═╡ 82c3d9ae-8614-4ade-a461-af3cbfe19463
-sicpGCD(-6, -9)                             # ==> 3 --> :)
+sicpGCD(9, 6), sicpGCD(-9, 6)                   # ==> (3, 3) --> :)
+
+# ╔═╡ 23c81845-b61c-4cc6-881b-fc37a4793dbf
+sicpGCD(9, -6), sicpGCD(-9, 6), sicpGCD(-9, -6) # ==> (3, 3, 3) --> :)
 
 # ╔═╡ 8ee624a2-2069-42ba-8591-f69ae9e885c9
-sicpGCD(206, 40)                            # ==> 2 --> :)  SICP's example
+sicpGCD(206, 40)                                # ==> 2 --> :)  SICP's example
+
+# ╔═╡ d1cc56d5-3fec-4cd5-a4d0-788c8a2e56db
+sicpGCD(40, 206)                                # ==> 2 --> :)  SICP's example
 
 # ╔═╡ 10448f52-1fc8-409b-b4bc-9ef231155b8c
 md"
@@ -259,11 +268,14 @@ sicpGCD(2//3, 2), sicpGCD(2//3, -2)         # ==> (2//3, 2//3) --> :)
 # ╔═╡ 51ef4341-3263-4c89-b8e7-78a8fb8ec6c1
 sicpGCD(-2//3, 2), sicpGCD(-2//3, -2)       # ==> (2//3, 2//3) --> :)
 
+# ╔═╡ c1b1f764-02da-487b-be8a-1e4582643806
+sicpGCD(72//120, 42//70)                  # ==> 3//5
+
 # ╔═╡ f9f7dfe7-c3db-47be-b079-62fa873f8f4b
 md"
-###### 3.4 *Generic* (*Polymorphic*) *Tail-recursive* $gcd$ for *Integer* Inputs (Definition 3.2)
+###### 3.4 *Generic* (*Polymorphic*) *Tail-recursive* $gcd$ for *Integer* and *Rational* Inputs (Definition 3.2)
 
-This function is correct for *integers* $a, b \in \mathbb Z$ and even for *rational* numbers $a, b \in \mathbb Q$.
+This specification is an extension of the specification in *3.1*. It is correct for *integers* $a, b \in \mathbb Z$ and even for *rational* numbers $a, b \in \mathbb Q$. We transform the *negation* of the four *stop* conditions into the *run* condition of the the iterative $while$ loop in *4,1, 4.2*.
 
 $gcd(a, b) =
 \begin{cases}
@@ -569,6 +581,22 @@ gcd(6, 9), gcd(6, -9)                         # ==> (3, 3) --> :)
 
 # ╔═╡ 105ab626-3b06-4e19-b112-630caa7546cf
 gcd(206, 40)                                  # ==> 2 --> :)  SICP's example
+
+# ╔═╡ 46f83d7a-4690-43a3-9737-66ddf5de6b2b
+md"
+**269, 271** ; both are *adjacent* [prime numbers](https://en.wikipedia.org/wiki/List_of_prime_numbers)
+"
+
+# ╔═╡ 402c9d2f-480a-43f6-8b28-a39a286d2359
+gcd(7907, 7919), gcd(-7907, 7919), gcd(7907, -7919), gcd(-7907, -7919)
+
+# ╔═╡ 66151e66-3136-48b6-81f4-e1e5ff7ffc2b
+md"
+**7907 	7919** ; both are *adjacent* [prime numbers](https://en.wikipedia.org/wiki/List_of_prime_numbers)
+"
+
+# ╔═╡ 8bf38756-d278-4f71-ad07-1a5905e3b488
+gcd(7919, 7907), gcd(7919, -7907), gcd(-7919, 7907), gcd(-7919, -7907)
 
 # ╔═╡ f4655616-a0a7-470f-8688-43098165d802
 md"
@@ -2122,7 +2150,9 @@ version = "1.4.1+2"
 # ╠═84067cf7-71c5-4183-ac1c-37bf761f33ce
 # ╠═ba182453-1e0a-4ddb-8347-21528a9cf4e0
 # ╠═82c3d9ae-8614-4ade-a461-af3cbfe19463
+# ╠═23c81845-b61c-4cc6-881b-fc37a4793dbf
 # ╠═8ee624a2-2069-42ba-8591-f69ae9e885c9
+# ╠═d1cc56d5-3fec-4cd5-a4d0-788c8a2e56db
 # ╟─10448f52-1fc8-409b-b4bc-9ef231155b8c
 # ╠═1fbfa230-9209-4506-9bae-88cd25820bae
 # ╟─6ebf2de0-13f2-46f3-b713-fbf01af53080
@@ -2133,6 +2163,7 @@ version = "1.4.1+2"
 # ╟─f17491ba-332e-47ff-a550-0f3e9d0f5b4a
 # ╠═e1163af9-2c3f-4361-964d-1febb18c0b10
 # ╠═51ef4341-3263-4c89-b8e7-78a8fb8ec6c1
+# ╠═c1b1f764-02da-487b-be8a-1e4582643806
 # ╟─f9f7dfe7-c3db-47be-b079-62fa873f8f4b
 # ╠═b7bb02fa-22ad-46f5-9e1b-30fe6e37b157
 # ╠═82564968-efcf-4656-a81b-dd30e365bcc1
@@ -2201,6 +2232,10 @@ version = "1.4.1+2"
 # ╠═758904df-59f0-4d6c-83de-e41dba2c0702
 # ╠═219b1495-2f60-4f6c-aa65-a57433d57218
 # ╠═105ab626-3b06-4e19-b112-630caa7546cf
+# ╟─46f83d7a-4690-43a3-9737-66ddf5de6b2b
+# ╠═402c9d2f-480a-43f6-8b28-a39a286d2359
+# ╟─66151e66-3136-48b6-81f4-e1e5ff7ffc2b
+# ╠═8bf38756-d278-4f71-ad07-1a5905e3b488
 # ╟─f4655616-a0a7-470f-8688-43098165d802
 # ╠═1fbfb94a-3167-41f3-a4c5-b5df441e02eb
 # ╠═7eb9b02f-deb0-48bb-b309-1969754095fb
