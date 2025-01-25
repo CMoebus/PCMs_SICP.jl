@@ -22,7 +22,7 @@ md"
 ==================================================================================
 #### SICP: [1.2.3 Orders of Growth](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-11.html#%_sec_1.2.3)
 ##### file: PCM20250117\_SICP\_1.2.3\_OrdersOfGrowth.jl
-##### Julia/Pluto.jl-code (1.11.2/0.20.4) by PCM *** 2025/01/20 ***
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/01/25 ***
 
 ==================================================================================
 "
@@ -33,9 +33,9 @@ md"
 *The previous examples illustrate that processes can differ considerably in the rates at which they consume computational resources. One convenient way to describe this difference is to use the notion of [order of growth](https://en.wikipedia.org/wiki/Analysis_of_algorithms) to obtain a gross measure of the resources required by a process as the inputs become larger.*(SICP, 1996, 2016).
 
 *Order of growth* is a concept in the [analysis of algorithms](https://en.wikipedia.org/wiki/Analysis_of_algorithms) a subdiscipline of CS:
-*Informally, an algorithm can be said to exhibit a growth rate on the order of a mathematical function if beyond a certain input size n, the function f(n) times a positive constant provides an upper bound or limit for the run-time of that algorithm. In other words, for a given input size n greater than some $n_0$ and a constant $c$, the run-time of that algorithm will never be larger than $c × f(n)$. This concept is frequently expressed using Big O notation.*[(Wikipedia, 2025)](https://en.wikipedia.org/wiki/Analysis_of_algorithms)
+*Informally, an algorithm can be said to exhibit a growth rate on the order of a mathematical function if beyond a certain input size n, the function f(n) times a positive constant provides an upper bound or limit for the run-time of that algorithm. In other words, for a given input size n greater than some $n_0$ and a constant $c$, the run-time of that algorithm will never be larger than $c × f(n)$. This concept is frequently expressed using big-$O$ notation*.[(Wikipedia, 2025)](https://en.wikipedia.org/wiki/Analysis_of_algorithms)
 
-Whereas the meaning of $O(g)$ can be informally verbalized as '*no faster than g*' (Rawlins, 1992, p.43) SICP prefers a tighter measure $\Theta(g)$ with an informal meaning of '*about as fast as g*' (Rawlins, 1992, p.43). 
+Whereas the meaning of $O(g)$ can be informally verbalized as '*no faster than g*' (Rawlins, 1992, p.43) SICP prefers a tighter measure *big*-$\Theta(g)$ with an informal meaning of *approximately* or '*about as fast as g*' (Rawlins, 1992, p.43). 
 "
 
 # ╔═╡ 3dbc81dc-0042-48b3-a381-dbd097cf49fb
@@ -78,19 +78,27 @@ md"
 ---
 ##### 3.2 Survey of Common Complexities
 
+Here we display *worst* *big*-$O$ orders wheras SICP presents *approximate*  *big*-$\Theta$ orders.
+
 $\begin{array}{c|c|c|c}
 \mbox{time, space complexity} & \mbox{order} & \mbox{function} & \mbox{description}\\
 \hline  
-\mbox{constant}    & O(1)      & fac & \mbox{lin. recursive (space when tco); iterative } \\
-\mbox{}            &           & fib & \mbox{nonrecursive (space) }           \\
-\mbox{logarithmic} & O(log\ n) &     &                                        \\
-\mbox{linear}      & O(n)      & fac & \mbox{lin. recursive (space when no tco, time) } \\
-\mbox{}            &           & fib & \mbox{tree recursive (space) }         \\
-\mbox{quadratic}   & O(n^2)    &     &                                        \\
-\mbox{cubic}       & O(n^3)    &     &                                        \\
-\mbox{exponential} & O(2^n)    & fib & \mbox{tree recursive (time) }          \\
-\mbox{}            & O(\psi^n) & fib & \mbox{nonrecursive (time) }            \\
-\mbox{}            & O(\psi^n) &     & \mbox{with } ψ = 1.618033988749895     \\
+\mbox{constant}    & O(1)      & fac(n)   & \mbox{lin.recursive (space, tco); iterative } \\
+\mbox{}            &           & fib(n)   & \mbox{nonrecursive (space) }           \\
+\mbox{}            &           & gcd(n, m)) & \mbox{(non)recursive (space) }       \\
+\hline
+\mbox{logarithmic (n > m)} & O(log\ n) & gcd(n,m) & \mbox{lin.recursive (time); iterative}        \\
+\hline
+\mbox{linear}      & O(n)      & fac(n)   & \mbox{lin. recursive (space, no tco, time) }           \\
+\mbox{}            &           & fib(n)   & \mbox{tree recursive (space) }         \\
+\hline
+\mbox{quadratic}   & O(n^2)    &          &                                        \\
+\hline
+\mbox{cubic}       & O(n^3)    &          &                                        \\
+\hline
+\mbox{exponential} & O(2^n)    & fib(n)   & \mbox{tree recursive (time) }          \\
+\mbox{}            & O(\psi^n) & fib(n)   & \mbox{nonrecursive (time) }            \\
+\mbox{}            & O(\psi^n) &          & \mbox{with } ψ = 1.618033988749895     \\
 \hline 
 \end{array}$
 "
@@ -170,7 +178,7 @@ Pluto = "~0.20.4"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.2"
+julia_version = "1.11.3"
 manifest_format = "2.0"
 project_hash = "2361d1a808db1daa1baaa2da4ba0784d61fe348d"
 
