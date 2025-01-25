@@ -24,7 +24,7 @@ md"
 
 ##### file: PCM20210805\_SICP\_1.2.5\_GreatestCommonDivisors
 
-##### Julia/Pluto.jl (1.11.3/0.20.4) code by PCM *** 2025/01/24 ***
+##### Julia/Pluto.jl (1.11.3/0.20.4) code by PCM *** 2025/01/25 ***
 ===================================================================================
 "
 
@@ -43,6 +43,11 @@ md"
 - *type* $Rational$
 - *parametrized* type $Rational\{Int64\}$
 - *transformation* of *Boolean* expressions
+- *Lamé's theorem*
+- *big*-$O$ of $gcd(n, m)$
+- case analysis $if ... else ... end$
+- *output* $println$
+- string *interpolation* with $
 "
 
 # ╔═╡ 86fe0183-5901-4199-a33e-ad7919fbbadb
@@ -198,7 +203,7 @@ function sicpGCD(a, b)   # fails, e.g. when b is negative or (a < 0) and (b = 0)
 	remainder = rem                     # local renaming
 	#-----------------------------------------------------------------------------
 	==(b, 0) ? 
-		abs(a) :                        # nonSICP: eplacement of a by abs(a)
+		abs(a) :                        # nonSICP: replacement of a by abs(a)
 		sicpGCD(b, remainder(a, b))
 	#-----------------------------------------------------------------------------
 end # function SICPsGCD
@@ -223,6 +228,9 @@ sicpGCD(9, 6), sicpGCD(-9, 6)                   # ==> (3, 3) --> :)
 
 # ╔═╡ 23c81845-b61c-4cc6-881b-fc37a4793dbf
 sicpGCD(9, -6), sicpGCD(-9, 6), sicpGCD(-9, -6) # ==> (3, 3, 3) --> :)
+
+# ╔═╡ 316cca38-a8e4-4a30-9635-0b3c0c19808d
+sicpGCD(21, 13)
 
 # ╔═╡ 8ee624a2-2069-42ba-8591-f69ae9e885c9
 sicpGCD(206, 40)                                # ==> 2 --> :)  SICP's example
@@ -368,7 +376,7 @@ myGCD(72//120, 42//70)                  # ==> 3//5
 md"
 ---
 ##### 4. Idiomatic *Imperative* Julia 
-###### 4.1 Iterative Algorithm 
+###### 4.1 Iterative Algorithm $myGCD2$
 ... with $while$ and parallel assignment
 
 To get the *iterative* transformation of the *tail-recursive* function $myGCD$ in *3.4* we have to transform the *stop-conditions* of $myGCD$ into the *run-condition* of the $while$-loop here. The *run*-condition is the negation of the *stop*-condition:
@@ -479,7 +487,7 @@ myGCD2(72//120, 42//70)                       # ==> 3//5
 # ╔═╡ 15bc2039-0a35-4071-bfce-54932b75959a
 md"
 ---
-###### 4.2 Iterative Algorithm 
+###### 4.3 Iterative Algorithm $myGCD3$
 ... with $isone, iszero$ and parallel assignment
 "
 
@@ -564,7 +572,7 @@ myGCD3(72//120, 42//70)                       # ==> 3//5
 # ╔═╡ 736211ef-956b-4168-83a4-57bbc444d7e6
 md"
 ---
-###### 4.2 Julia's Builtin [*Base.gcd*](https://docs.julialang.org/en/v1/base/math/#Base.gcd)
+###### 4.4 Julia's Builtin [*Base.gcd*](https://docs.julialang.org/en/v1/base/math/#Base.gcd)
 "
 
 # ╔═╡ 35b018b5-fadd-4f42-abe3-1c0d2d206017
@@ -626,11 +634,84 @@ gcd(-2//3, 2), gcd(-2//3, -2)                 # ==> (2//3, 2//3) --> :)
 # ╔═╡ db327c24-5443-481d-b2c9-ba7c01b2e46e
 typeof(gcd(2//3, 2))                          # parametrized type
 
+# ╔═╡ 46897383-0c6c-4c18-b1d7-5e1c6a63dbe0
+md"
+---
+##### 5. *big*-$O$ *complexity* of recursive $gcd$ with $remainder$-*reduction*
+###### 5.1 Derivation
+By use of [*Lamé*](https://en.wikipedia.org/wiki/Gabriel_Lam%C3%A9)'s theorem (c.f. SICP, 1996, 2016) we can determine an *upper limit* for the number of steps $k = \#steps(gcd(n, m)) \;;\; n>m$ the tail-recursive gcd(n, m) needs computing the *greatest common divisor* of $n, m\;;\; n>m$.
+From this *upper limit* for any $k$ we can determine *big*-$O(\#steps(gcd(n, m)))= O(\log_\phi m) = O(\log m)$.
+"
+
+# ╔═╡ cc0d5940-5a9b-4515-bdb0-a01e15a975d4
+md"
+*Lamé*'s theorem states (SICP, 1996, 2016):
+
+$\text{ If } \#steps(gcd(n, m)) = k$
+$\text{ then } min(n, m) \ge fib(k).$
+
+As we have seen before we can approximate $fib(k)$ by a *closed* expression:
+
+$min(n, m) \ge fib(k) \approx \left\lceil \frac{\phi^k}{\sqrt 5} \right\rfloor.$
+
+Taking *logarithms* is:
+
+$\log min(n, m) \ge \left\lceil k \log \phi - \log \sqrt 5 \right\rfloor$
+
+and
+
+$\log min(n, m) + \log \sqrt 5 \ge \left\lceil k \log \phi \right\rfloor$
+
+which is:
+
+$\frac{\log min(n, m)}{\log \phi} + \frac{\log \sqrt 5}{\log \phi} \ge \left\lceil k \right\rfloor$
+
+Changing the basis of *logarithms*:
+
+$\log_\phi min(n, m) + \log_\phi \sqrt 5\ge \left\lceil k \right\rfloor$
+
+So 
+
+$O(\log_\phi min(n,m) = O(\log min(n,m)) \ge \#steps(gcd(n,m)) = k.$
+
+"
+
+# ╔═╡ 10766977-40bd-4d71-856e-fa22f4b97b44
+md"
+###### 5.2 Example
+
+For $gcd(21, 13)$ the number of *reduction* steps is $\#steps(gcd, 13) = k = 6$.
+And $min(21, 13) = 13 \ge fib(6) = 8$.
+
+Now, we compute the reduction steps with $sicpGCD2:$
+
+"
+
+
+# ╔═╡ 2eb0ec22-3e4a-4f8f-a38a-042817d13c8b
+function sicpGCD2(n, m, reduct_nr)
+	#-----------------------------------------------------------------------------
+	remainder = rem                         # local renaming
+	#-----------------------------------------------------------------------------
+	if iszero(m)
+		abs(n)                              # nonSICP: replacement of a by abs(a)
+	else
+		reduct_nr += 1
+		r = remainder(n, m)
+		println("reduct_nr = $reduct_nr ; n = $n, m = $m, r = $r ;") # interpolation 
+		sicpGCD2(m, r, reduct_nr)
+	end # if
+	#-----------------------------------------------------------------------------
+end # function SICPsGCD
+
+# ╔═╡ f5fbb73e-7f2f-4d9a-810e-8b9d1f236207
+sicpGCD2(21, 13, 0)
+
 # ╔═╡ 2d4206e3-6231-48e9-96fa-89d7a8aaeebd
 md"
 ---
-##### 5. Summary
-We presented different simple $gcd$-algorithms for *natural*, *integer* and even *rational* numbers.
+##### 6. Summary
+We presented different simple $gcd$-algorithms for *natural*, *integer* and even *rational* numbers. Furthermore we demonstrated how to compute the complexity of *Euclid's algorithm* which is $O(\log min(n, m))$.
 
 "
 
@@ -647,6 +728,8 @@ md"
 - **Wikipedia**; [*Euclidean Algorithm*](https://en.wikipedia.org/wiki/Euclidean_algorithm); last visit 2025/01/21
 
 - **Wikipedia**; [*Greatest Common Divisor*](https://en.wikipedia.org/wiki/Greatest_common_divisor); last visit 2025/01/21
+
+- **Wikipedia**; [*Lamé, Gabriel*](https://en.wikipedia.org/wiki/Gabriel_Lam%C3%A9); last visit 2025/01/25
 
 - **Wikipedia**; [*List of Prime Numbers*](https://en.wikipedia.org/wiki/List_of_prime_numbers); last visit 2025/01/21
 
@@ -2151,6 +2234,7 @@ version = "1.4.1+2"
 # ╠═ba182453-1e0a-4ddb-8347-21528a9cf4e0
 # ╠═82c3d9ae-8614-4ade-a461-af3cbfe19463
 # ╠═23c81845-b61c-4cc6-881b-fc37a4793dbf
+# ╠═316cca38-a8e4-4a30-9635-0b3c0c19808d
 # ╠═8ee624a2-2069-42ba-8591-f69ae9e885c9
 # ╠═d1cc56d5-3fec-4cd5-a4d0-788c8a2e56db
 # ╟─10448f52-1fc8-409b-b4bc-9ef231155b8c
@@ -2244,6 +2328,11 @@ version = "1.4.1+2"
 # ╠═a071d0e3-f252-401c-b16b-1f56f581c313
 # ╠═44554b30-90e5-45dd-93ee-8490dc0cb450
 # ╠═db327c24-5443-481d-b2c9-ba7c01b2e46e
+# ╟─46897383-0c6c-4c18-b1d7-5e1c6a63dbe0
+# ╟─cc0d5940-5a9b-4515-bdb0-a01e15a975d4
+# ╟─10766977-40bd-4d71-856e-fa22f4b97b44
+# ╠═2eb0ec22-3e4a-4f8f-a38a-042817d13c8b
+# ╠═f5fbb73e-7f2f-4d9a-810e-8b9d1f236207
 # ╟─2d4206e3-6231-48e9-96fa-89d7a8aaeebd
 # ╟─5cd5cdec-238c-47ae-b079-c25804c6c42e
 # ╟─96313012-0e76-42e5-8f76-548c0da1535a
