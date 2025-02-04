@@ -1,0 +1,3874 @@
+### A Pluto.jl notebook ###
+# v0.20.4
+
+using Markdown
+using InteractiveUtils
+
+# ╔═╡ b58f3d47-bc97-4b54-ad3e-19b775e6849c
+begin 
+	using Pluto
+	using Plots	
+	using LaTeXStrings
+	using GraphRecipes
+	using Primes
+	#----------------------------------------------------------------
+	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
+	println("pkgversion(Plots)         = ", pkgversion(Plots))
+	println("pkgversion(LaTeXStrings)  = ", pkgversion(LaTeXStrings))
+	println("pkgversion(GraphRecipes)  = ", pkgversion(GraphRecipes))
+	println("pkgversion(Primes)        = ", pkgversion(Primes))
+end # begin
+
+# ╔═╡ fcaf83d0-f611-11eb-1bc9-31384cf290cb
+md"
+==================================================================================
+#### SICP: [1.2.6 Example: Testing for Primality I](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html)
+
+##### file: PCM20210805_SICP\_1.2.6\_Example\_Testing\_for\_Primality\_I
+
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/04 ***
+==================================================================================
+"
+
+# ╔═╡ 6d09aba9-b862-4e38-a4a9-fd718d4744c4
+md"
+##### 0. Introduction
+*Since ancient times, mathematicians have been fascinated by problems concerning prime numbers, and many people have worked on the problem of determining ways to test if numbers are prime.*(SICP, 1996, 2016)
+"
+
+# ╔═╡ 23534646-17d3-4cba-8505-10991158a47c
+md"
+---
+##### 1. Topics
+- *exponentiation* with ^
+- *case* analysis by $if$ <condition> <epression> $elseif$ <condition> <epression> $else$ <epression> $end$
+- function-wide *scope*
+- *jumps* by $break$
+- *Fermat*'s Little Theorem
+- *coprimes*
+- *package* $Primes$
+
+"
+
+# ╔═╡ b64b7617-c882-44b3-9400-863138f3678e
+md"
+---
+##### 2. Libraries
+"
+
+# ╔═╡ 35a00708-a1ff-4b0c-a4eb-50452e394e06
+md"
+---
+##### 3. SICP-Scheme-like *functional* Julia
+###### 3.1 *Generic* (*Polymorphic*) function $isprime$: Searching for *Divisors* (= *Factors*)
+*One way to test if a number is prime is to find the number's divisors. The following program finds the smallest integral divisor (greater than $1$) of a given number $n$. It does this in a straightforward way, by testing $n$ for divisibility by successive integers starting with* $2$.(SICP, 1996, 2016)
+
+"
+
+# ╔═╡ fc96aecc-a50e-4b17-aeda-1294bdf2ec0b
+md"
+---
+###### Requirement: function $square$
+"
+
+# ╔═╡ 66a32388-59bf-4cda-946d-a299487c8760
+^(3, 3)              # prefix exponential operator '^'; ==> 27 --> :)
+
+# ╔═╡ da94c3aa-381d-4604-bdd8-298f74ccd998
+square(x) = ^(x, 2)  # definition of square
+
+# ╔═╡ 6dce0f0d-290f-429b-8c4d-d9a3e9ea5357
+square(11), typeof(square(11))           # for Int64
+
+# ╔═╡ 22f5327d-b4ea-4eae-badb-cf8a139b4bd3
+square(11.), typeof(square(11.))         # for Float64
+
+# ╔═╡ d123c9b7-7473-40b3-981c-03a4c88e2126
+md"
+---
+###### Requirement: function $remainder$ ...
+... *from Euclidean division, returning a value of the same sign as $x$, and smaller in magnitude than* $y$. (see Julia-doc) 
+"
+
+# ╔═╡ 414fada3-20bd-4085-9dcc-ae279600ad30
+remainder = rem
+
+# ╔═╡ 038c0c86-ec82-4f7d-a271-a06490995528
+%(3, 9), rem(3, 9), remainder(3, 9)
+
+# ╔═╡ 3107665f-2e0e-493e-aec8-e536ccea0492
+%(9, 3), rem(9, 3), remainder(9, 3)
+
+# ╔═╡ fc40132c-b9b4-4c04-a67a-88f382482189
+%(13, 9), rem(13, 9), remainder(13, 9)
+
+# ╔═╡ c14293eb-0a71-4e59-8a85-d65354ca1db0
+%(9, 13), rem(9, 13), remainder(9, 13)
+
+# ╔═╡ 9b30ad81-9829-48f6-b125-9a61ee3bcc05
+%(13.0, 9.0), rem(13.0, 9.0), remainder(13.0, 9.0)
+
+# ╔═╡ 4c9de0d0-dd9d-4371-9a1b-9523d641ad32
+%(9.0, 13.0), rem(9.0, 13.0), remainder(9.0, 13.0)
+
+# ╔═╡ d50c7a2f-a7cf-4b1a-8b07-c3cdf96024d0
+md"
+---
+###### Requirement: function $divides$ ... 
+"
+
+# ╔═╡ 452f1c9a-d2b5-46bf-adcc-af9f80b62d68
+divides(a, b) = ==(remainder(b, a), 0)
+
+# ╔═╡ 19cf97ec-4c9a-4069-9dce-fa265bb904e5
+divides(3, 9)
+
+# ╔═╡ d56f43ca-11dc-491f-b6ad-f332a2e2731c
+divides(3, 10)
+
+# ╔═╡ c37fb2db-62ef-4eeb-a7cf-27a3cde6bb64
+md"
+---
+###### Requirement: function $smallest\text{-}divisor$
+(SICP, 1996; 2016, p.65f)
+"
+
+# ╔═╡ e78e17f2-c9fa-4f5b-aefc-8c3e580f117f
+function find_divisor(n, test_divisor)
+	>(square(test_divisor), n) ? n :            # stop condition
+	divides(test_divisor, n) ? test_divisor :
+		find_divisor(n, +(test_divisor, 1))     # tail recursive call
+end # function find_divisor
+
+# ╔═╡ afcd5e13-b61a-491a-bf4f-47ea59fe112d
+smallest_divisor(n) = find_divisor(n, 2)
+
+# ╔═╡ c1fd79b5-abfa-44b6-bc10-783f4b1c9924
+smallest_divisor(1)             # ==> 1 --> :)
+
+# ╔═╡ f1aa9700-1c4a-4a7d-8563-595984bd4a19
+smallest_divisor(7)             # ==> 7 --> :), because 7 is prime
+
+# ╔═╡ 5504eb77-0e64-4321-8db9-6449deaa401f
+smallest_divisor(11)            # ==> 11 --> :), because 11 is prime
+
+# ╔═╡ b8e74e16-deed-4903-aaea-d68e3e9d6024
+smallest_divisor(15)            # ==> 3 --> :)
+
+# ╔═╡ 46cc1617-f160-4041-bd79-193d311afb61
+smallest_divisor(97)            # ==> 97 --> :), because 97 is prime
+
+# ╔═╡ db02e8a1-4131-4c0f-9975-6223dafd1631
+md"
+---
+###### *Generic* (*Polymorphic*) function $isprime$
+(SICP, 1996; 2016, p.66)
+
+The [first 25 primes](https://en.wikipedia.org/wiki/Prime_number) are: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+
+"
+
+# ╔═╡ 768cc486-5e6e-4ce1-bf2c-a35151a4793f
+myIsprime(n) = ==(n, smallest_divisor(n)) 
+
+# ╔═╡ dac9cfc1-6b2d-4458-82a6-cf9e2c79fcc1
+myIsprime(1)                    # ==> true --> :); some say 1 is not a prime
+
+# ╔═╡ b5b5a466-e78e-49c0-8ee9-765644596e27
+myIsprime(2)                    # ==> true --> :); 2 is prime
+
+# ╔═╡ 56beed19-5ee7-458b-bd50-3afb9e38e342
+myIsprime(3)                    # ==> true --> :); 3 is prime
+
+# ╔═╡ a344aaaa-af28-4345-8e96-a6b735fb6023
+myIsprime(4)                    # ==> false --> :)
+
+# ╔═╡ eb89783e-e948-42d8-b7d5-857a719da9b4
+myIsprime(5)                    # ==> true --> :); 5 is prime
+
+# ╔═╡ 2754573a-24ea-4a7b-85c3-303004aec2e2
+myIsprime(6)                    # ==> false --> :)
+
+# ╔═╡ 2a3be054-6361-4b44-9ceb-465547ce3803
+myIsprime(97)                   # ==> true --> :); 97 is prime
+
+# ╔═╡ 6bd55608-02f5-4b95-8ad9-597abdf106b6
+md"
+###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+"
+
+# ╔═╡ 4d06eb30-b117-4b02-b04c-6c459a73bcd8
+myIsprime(99989)                # ==> true --> :)
+
+# ╔═╡ 33fb902c-bece-4876-a731-3eaf7ffe2ff4
+myIsprime(99991)                # ==> true --> :)
+
+# ╔═╡ 9bc0eb42-79b0-4d7b-b472-07abae671439
+myIsprime(99993)                # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 57187f78-2aeb-4284-90da-b529a298eb91
+myIsprime(100003)               # ==> true --> :)
+
+# ╔═╡ 8d69e081-99d6-404a-805a-5d12821c5f5a
+md"
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $myIsprime$ is searching divisors *exhausively*, so its perfect but not effective. *...there are $20.138.200$ Carmichael numbers between $1$ and $10^{21}$*. [(*Wikipedia*)](https://en.wikipedia.org/wiki/Carmichael_number)
+
+The first *seven* Carmichael numbers *were all found by the Czech mathematician Václav Šimerka in 1885* ([*Wikipedia*](https://en.wikipedia.org/wiki/Carmichael_number)):
+$561, 1105, 1729, 2465, 2821, 6601, 8911$
+"
+
+# ╔═╡ 6a7a2391-9cbc-44ef-83f8-5252c1454ac2
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ fa620300-3307-4bda-97de-1c49fbf58d61
+myIsprime(561)                  # ==> false --> :)
+
+# ╔═╡ b5278a66-dbca-44d0-96ad-bd8e24e90ee3
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 81147945-ae09-4fa3-a9ef-288a8c42744e
+myIsprime(1105)                 # ==> false --> :)
+
+# ╔═╡ e555ade7-e8f8-4158-8b68-0af132d8861a
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ a37e9857-fc51-4fdc-b8a5-50f6607f52bf
+myIsprime(1729)                 # ==> false --> :)
+
+# ╔═╡ d641ab56-f97a-4cab-820d-2d1ce7b3c546
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ 04a9798b-fc72-455e-be71-62842167b292
+myIsprime(2465)                 # ==> false --> :)
+
+# ╔═╡ 1c6fbf70-c098-44cc-ac84-28acc220da7d
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ af7c8d34-5bf3-4e5a-851e-4b7d13b5f6b4
+myIsprime(2821)                 # ==> false --> :)
+
+# ╔═╡ 8cec6bc7-37fd-43b0-81de-863d6a93e153
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ 28eca35a-ff7a-4f07-84dd-08d8329f8fd2
+myIsprime(6601)                 # ==> false --> :)
+
+# ╔═╡ fbc3c07c-7db4-4c69-add6-5135d33c2ebd
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ eb73d8b4-c26f-49a7-9790-49c72fbf85e9
+myIsprime(8911)                 # ==> false --> :)
+
+# ╔═╡ 113f62c9-e1b7-44f9-a113-d90be226ef51
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ 25dad7c6-453d-4849-aeb1-cc56ac1c6faa
+myIsprime(10585)                # ==> false --> :)
+
+# ╔═╡ d6bc8877-7093-4c3c-a256-ab1409183866
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ 3e9d4b35-0e9d-4a23-874c-82ed4edee8fb
+myIsprime(15841)                # ==> false --> :)
+
+# ╔═╡ be8ba70d-fd85-40d9-bd91-79907b148439
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ 26c58152-1e0a-45e4-bbf9-effefff6c695
+myIsprime(29341)                # ==> false --> :)
+
+# ╔═╡ 7d4832ca-cd8c-49af-aa3e-df0104dc677c
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ ac8e5704-a619-4545-95c3-313f4e8d6585
+myIsprime(41041)                # ==> false --> :)
+
+# ╔═╡ 714d49ef-ede2-439a-acac-d8065ca22771
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ 6811e773-beb5-442a-88b6-61de219eb71d
+myIsprime(46657)                # ==> false --> :)
+
+# ╔═╡ 534db6f2-c7ea-4e67-9a29-66a1063a3722
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 6e8b2888-2c41-4868-a451-0f68a0256056
+myIsprime(52633)                # ==> false --> :)
+
+# ╔═╡ 376f22c8-6323-4f4f-ba68-d4066b0c08f5
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ b9994c20-d8b9-43e0-839f-0727c2280868
+myIsprime(62745)                # ==> false --> :)
+
+# ╔═╡ 38ac1686-0f3a-4969-907d-16e9ab98ea65
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ dcc6e279-3775-404e-adec-23fe32388032
+myIsprime(63973)                # ==> false --> :)
+
+# ╔═╡ 42f795ad-acd6-49a1-8328-61217325c991
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ 148f7d98-dbd5-473c-ab4a-6fa0559f8413
+myIsprime(75361)                # ==> false --> :)
+
+# ╔═╡ e698ce81-6cd0-4a9a-931a-5994bf91dc39
+md"
+---
+###### 3.2 Variation $isprime2$ of $isprime$: *Generic* (*Polymorphic*) function 
+with *local* function definitions
+"
+
+# ╔═╡ 9979c1e4-349b-4e0a-87a0-39de45ecdf4c
+function myIsprime2(n) 
+	#-------------------------------------------
+	remainder = %          # idiomatic Julia '%'
+	#-------------------------------------------
+	square(x) = ^(x, 2)    # infix operator '^'
+	#-------------------------------------------
+	divides(a, b) = ==(remainder(b, a), 0)
+	#-------------------------------------------
+	smallest_divisor() = find_divisor(2)
+	#-----------------------------------------------------------------------------
+	function find_divisor(test_divisor)  
+		>(square(test_divisor), n) ? n : 
+		divides(test_divisor, n) ? test_divisor : 
+			find_divisor( +(test_divisor, 1))
+	end # function find_divisor
+	#-----------------------------------------------------------------------------
+	n == smallest_divisor() 
+end # function myIsprime2
+
+# ╔═╡ e6ac837a-adc0-4114-9b09-edb43ab4d5bb
+myIsprime2(1)                         # ==> true --> :); some say 1 is not a prime
+
+# ╔═╡ c5ed48aa-74b8-4a68-958f-10aca604ea5b
+myIsprime2(2)                         # ==> true --> :)
+
+# ╔═╡ dca62763-1e1d-48c8-97dc-bc47bca6f2d3
+myIsprime2(3)                         # ==> true --> :)
+
+# ╔═╡ 692e04a0-ea2c-4ce4-bee2-2d3d4736259b
+myIsprime2(4)                         # ==> false --> :)
+
+# ╔═╡ df838016-92fc-4255-be0a-85fb0990bce7
+myIsprime2(5)                         # ==> true --> :)
+
+# ╔═╡ cb61b117-245b-4845-808c-70deb40f7061
+myIsprime2(6)                         # ==> false --> :)
+
+# ╔═╡ f2741526-1906-4ea4-8800-17d27a74ed18
+myIsprime2(97)                        # ==> true --> :)
+
+# ╔═╡ 218cc9d7-3c37-44a6-82b8-fecdf8e6fc02
+myIsprime2(99989)                     # ==> true --> :)
+
+# ╔═╡ d803272a-0090-495d-93a2-d56d2d9b6858
+myIsprime2(99991)                     # ==> true --> :)
+
+# ╔═╡ 23cdee96-73a6-4bdc-ba7d-627f84821ea5
+myIsprime2(99993)                     # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 01ba9d22-919c-4887-919e-88dcfbc7a03c
+myIsprime2(100003)                    # ==> true --> :)
+
+# ╔═╡ 4cb5f5b4-c0a5-4bac-93e8-1b5069e3863a
+md"
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $myIsprime2$ is searching divisors *exhausively*, so its perfect but not effective.
+"
+
+# ╔═╡ c9f0881e-95d4-44ab-8a1b-84b9b1636478
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ 894d5371-66dd-4cfa-83ad-a1a5ef96fe81
+myIsprime2(561)                       # ==> false --> :)
+
+# ╔═╡ 9ccc6095-fb94-4bbe-8b79-adf38cacadcf
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 000041cd-e527-46ba-bdbb-c899ccc0567d
+myIsprime2(1105)                      # ==> false --> :)
+
+# ╔═╡ d90c320e-c578-45ea-bc98-f54b63a83a4b
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ b7f68f0f-6dc4-4131-947e-ec88ad3827b3
+myIsprime2(1729)                      # ==> false --> :)
+
+# ╔═╡ 0ed8c711-5530-454f-8c7f-8f72fe90032b
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ bfaca850-d65f-4354-9149-1d97f23cad8b
+myIsprime2(2465)                      # ==> false --> :)
+
+# ╔═╡ b9fee51c-774b-474d-a508-962df966b5b0
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ 7906ee7f-c102-42c6-beff-aa08d6f2ebdf
+myIsprime2(2821)                      # ==> false --> :)
+
+# ╔═╡ 977e806a-b361-4d54-bf12-ea7e46e64bc6
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ 5eed380c-d7f3-4a64-ab58-b2598e4925e1
+myIsprime2(6601)                      # ==> false --> :)
+
+# ╔═╡ f0189ee0-ee8f-450f-a909-73050adfb965
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ c7159488-3e73-4327-bd66-0f80cdc5937b
+myIsprime2(8911)                      # ==> false --> :)
+
+# ╔═╡ c6a5e5cb-c266-4315-88a6-e02990d7e21c
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ 29d544ec-ca31-403e-bb47-ac2cb75bb211
+myIsprime2(10585)                     # ==> false --> :)
+
+# ╔═╡ 2febaefa-c436-4b93-b312-30c2dfda4f9a
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ a2800255-5583-448f-9b89-8ec4b1bdfe47
+myIsprime2(15841)                     # ==> false --> :)
+
+# ╔═╡ 1624efd8-abb1-47b4-b42d-b190c0a93099
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ 7297f795-c99d-46f0-bf6b-30ba3954b4d4
+myIsprime2(29341)                     # ==> false --> :)
+
+# ╔═╡ 8edd5779-2050-4255-aee0-1b28edff2540
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ b1cc4859-166c-4836-817f-6bfe480978ca
+myIsprime2(41041)                     # ==> false --> :)
+
+# ╔═╡ ec478f2e-1b78-44f6-a99f-7822fb1594b8
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ 186e941a-d81b-4f64-a974-346268d74654
+myIsprime2(46657)                     # ==> false --> :)
+
+# ╔═╡ e5fa1992-0f35-467f-a113-66a0f6a45b48
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ f7288e68-eb85-4a4a-b744-d7fb82446d17
+myIsprime2(52633)                     # ==> false --> :)
+
+# ╔═╡ b9732f72-9344-45f4-9b44-09ff50c1c373
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 0e33cbc9-159f-4d26-b945-490e3922037a
+myIsprime2(62745)                     # ==> false --> :)
+
+# ╔═╡ f150a27b-728c-47ef-945d-62331de9f474
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ ecb30694-9742-4519-8b51-c1d520a7335e
+myIsprime2(63973)                     # ==> false --> :)
+
+# ╔═╡ 6cece608-0153-4415-963f-e94bc54c32c2
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ 134fb4b5-29d2-41be-8ccd-5dff7a7d6cf0
+myIsprime2(75361)                     # ==> false --> :)
+
+# ╔═╡ 374eccff-3888-4760-9ce7-09b388beaed0
+md"
+---
+###### 3.3 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem) (SICP version)
+
+*If $n$ is a prime number and $a$ is any positive integer less than $n$, then $a$ raised to the $n$th power is congruent to $a$ modulo $n$* (SICP, 1996; [2016, p.67](https://web.mit.edu/6.001/6.037/sicp.pdf); Cormen et. al., 2022, p.932, 944):
+
+$\boxed{\text{If } isprime(n) \text{ then } \forall a \in \{a|1 < a < n\}: a^n \equiv a\ (\bmod n)}$
+
+where $a$ is called *basis* and where:
+
+$a^n \equiv a\ (\bmod n) \text{ is an abbreviation for: } a^n\ (\bmod n) = a\ (\bmod n).$
+
+Below is another (shorter) version of the theorem, which is *almost perfect* (Cormen et al., 2022, p.944). 
+
+"
+
+# ╔═╡ 84499038-4ed6-46fc-a6d1-70a5964c3f3e
+md"
+---
+###### 3.3.1 *Modular-Exponentiation* $expmod1$
+*To implement the Fermat test, we need a procedure that computes
+the exponential of a number modulo another number* (SICP, 1996; 2016, p.67; Cormen et al., 2022, p.934):
+
+$a^b\ (\bmod n) = \cases{1   \;\;\;\;\;\;\;\;\;\;\,\text{ if }\ b = 0 \\(a^{b/2})^2  \;\;\text{ if } (b > 0) \land iseven(b) \\ a \cdot a^{b-1} \;\text{ if }(b > 0) \land isodd(b)}$
+"
+
+# ╔═╡ 99f32ce2-e7c5-4a0a-b466-d7ecf5ef6af4
+md"
+... with *self-defined* type FloatOrSigned
+"
+
+# ╔═╡ 8bbdd3d4-9a2b-478d-8ba4-7ca3a10aa86e
+FloatOrInteger = Union{AbstractFloat, Signed}
+
+# ╔═╡ 0af40eda-a6fd-4fb3-9d77-129c02d66b79
+# a^b mod n or baseA^expB mod n
+#idiomatic Julia-code '%', '^2'
+function expmod1(baseA::Signed, expB::FloatOrInteger, modN::Signed)
+	#---------------------------------------------------------
+	square(x) = x^2
+	#---------------------------------------------------------
+	remainder = %
+	#---------------------------------------------------------
+	even(n)::Bool = remainder(n, 2) == 0
+	#---------------------------------------------------------
+	if expB == 0
+		1
+	elseif even(expB)
+		remainder(square(expmod1(baseA, expB/2, modN)), modN)
+	else
+		remainder(baseA * expmod1(baseA, expB-1, modN), modN)
+	end # if
+end # function expmod1
+
+# ╔═╡ bff175b8-7637-40ae-84a5-3047a5c71d30
+md"
+$2^3\ (\bmod 3)= 8\ (\bmod 3) = 2$
+"
+
+# ╔═╡ 5ee7549a-dff7-4809-b63c-ebf572ad10eb
+expmod1(2, 3, 3)
+
+# ╔═╡ 65c473e2-c57a-4045-bd41-1f0ee046ef0f
+md"
+$2^5\ (\bmod 5)= 32\ (\bmod 5) = 2$
+"
+
+# ╔═╡ 770100ce-9cd8-4892-a3c0-d15c97192b5b
+expmod1(2, 5, 5)
+
+# ╔═╡ d83d7003-094c-4e99-8762-d642156581d0
+md"
+$3^5\ (\bmod 5)= 243\ (\bmod 5) = 3$
+"
+
+# ╔═╡ 247589bd-70b9-4677-bf8f-472aa4d57804
+expmod1(3, 5, 5)
+
+# ╔═╡ 24479ece-4777-4c18-a846-682c2364486d
+md"
+---
+###### 3.3.2 *Modular-Exponentiation* $expmod2$
+"
+
+# ╔═╡ 708d6883-e125-489e-bbe7-76ff0fa59aa6
+#idiomatic Julia-code '%', '^2', 'convert'
+function expmod2(baseA::Signed, expB::FloatOrInteger, modN::Signed)::Signed
+	even(x) = x%2 == 0
+	if expB == 0
+		1
+	elseif even(expB)
+		%(expmod2(baseA, expB/2, modN)^2, modN)
+	else
+		%(baseA * expmod2(baseA, expB-1, modN), modN)
+	end # if
+end # function expmod2
+
+# ╔═╡ 80174e42-0389-4efe-b80a-97625860c4dd
+expmod2(2, 3, 3)                   # ==> 2 --> :)
+
+# ╔═╡ 18bcfbd7-be4e-45d3-8e80-0953a422368d
+expmod1(2, 5, 5)                   # ==> 2 --> :)
+
+# ╔═╡ d3002fe5-3fc9-493e-93ca-e0e243845d68
+expmod2(3, 5, 5)                   # ==> 3 --> :)
+
+# ╔═╡ cebc2513-0f94-41df-ab52-9bfe6815bb8d
+md"
+---
+###### 3.3.3 *Fermat Test* (SICP, 1996; 2016, p.68) $fermat\_test1$
+*The Fermat test is performed by choosing at random a number a between 1 and n - 1 inclusive and checking whether the remainder modulo n of the nth power of a is equal to a. The random number a is chosen using the procedure random, which we assume is included as a primitive in Scheme. Random returns a nonnegative integer less than its integer input. Hence, to obtain a random number between 1 and n - 1, we call random with an input of n - 1 and add 1 to the result:* (SICP, 1996; 2016, p.68)
+"
+
+# ╔═╡ e57b3eb9-a394-4253-8f23-76ff51bc1998
+histogram([rand(1:10) for i in 1:10E2], bins=1:11)                
+
+# ╔═╡ 8d905cbe-ca91-413c-ae68-0c7613685b5b
+rand(1:3)
+
+# ╔═╡ 7079c8a5-af5b-4083-b494-aaaf0ed1336a
+# idiomatic Julia-code with 'rand'
+function fermat_test1(n::Signed)::Bool 
+	#--------------------------------------------------------------------
+	random(n) = rand(1:n) - 1 # MIT-Scheme: 0 ≤ random(n) ≤ n-1
+	#--------------------------------------------------------------------
+	# try_it(a) = expmod2(a, n, n) == a  # short form as in SICP
+	try_it(a) = expmod2(a, n, n) == mod(a, n) # long form as in theorem
+	#--------------------------------------------------------------------
+	try_it(1 + random(n-1))
+end # fermat_test1
+
+# ╔═╡ cd1ed62c-086a-4d92-b625-dfce3362f1c6
+fermat_test1(2)             # ==> true --> :)
+
+# ╔═╡ f3dc6cb1-d360-4684-a860-09da9180456a
+fermat_test1(3)             # ==> true --> :)
+
+# ╔═╡ f22888d3-26a2-4dc5-af18-4f9e5e05ba91
+fermat_test1(4)             # ==> false --> :) ; switches between true / false
+
+# ╔═╡ e7b85f55-93e2-41d5-8a0c-2948e943c3f2
+fermat_test1(5)             # ==> true --> :)
+
+# ╔═╡ ac859543-dae4-49de-9afc-ea9c5d6600e8
+fermat_test1(6)             # ==> false --> :) ; switches between true / false
+
+# ╔═╡ 49ad573f-078e-4ebb-a1e2-da27e6c46a1d
+fermat_test1(7)             # ==> true --> :)
+
+# ╔═╡ 643e4865-a682-4ef5-9c04-1e058d60f01b
+fermat_test1(9)             # ==> false --> :)
+
+# ╔═╡ 6d344ac0-c073-45ae-8d74-532ae7001a92
+fermat_test1(97)            # ==> true --> :)
+
+# ╔═╡ c9403479-b7e2-4391-a058-541501434de0
+md"
+---
+###### 3.3.4 *Fermat Test* with *Replications*: $fast\_prime1$ 
+*The following procedure runs the test a given number of times, as specified by a parameter. Its value is true if the test succeeds every time, and false otherwise.* (SICP, 1996; 2016, p.68)
+"
+
+# ╔═╡ 8a3e42bf-6c51-4201-b894-a96bc3b8c6b6
+function fast_prime1(n::Signed, times::Signed)::Bool
+	if 	times == 0
+		true
+	elseif fermat_test1(n)
+		fast_prime1(n, times-1)
+	else 
+		false
+	end # if
+end # fast_prime1
+
+# ╔═╡ cbdc8f90-774b-49ad-8736-033e4d98fbd3
+fast_prime1(2, 10)          # ==> true --> :)
+
+# ╔═╡ ce83ac3a-974f-4c2a-b407-16f89055c66c
+fast_prime1(3, 10)          # ==> true --> :)
+
+# ╔═╡ b90b682f-e083-44b9-93e8-2d7f143c8386
+fast_prime1(4, 10)          # ==> false --> :)
+
+# ╔═╡ ff66c235-6d17-42ad-bbfd-7b4cd5dd0bac
+fast_prime1(4, 100)         # ==> false --> :)
+
+# ╔═╡ a8d176f8-af2e-4fbe-a4ae-2588443f80e1
+fast_prime1(5, 10)          # ==> true --> :)
+
+# ╔═╡ 2408748e-f577-48b4-8828-e8bc59914a7a
+fast_prime1(6, 10)          # ==> false --> :)
+
+# ╔═╡ 13d75f8a-edc4-4042-8473-7eb24764b404
+fast_prime1(7, 10)          # ==> true --> :)
+
+# ╔═╡ 5474b2e3-ca51-42ce-9a61-f8a22420a162
+fast_prime1(9, 19)          # ==> false --> :)
+
+# ╔═╡ e2116f5a-636b-4194-9e5f-acffa2656a1c
+fast_prime1(11, 10)         # ==> true --> :)
+
+# ╔═╡ b2432745-1d5e-4f47-8c8e-dfa360bf3923
+fast_prime1(97, 10)         # ==> true --> :)
+
+# ╔═╡ 4ca1868f-c694-47fe-be38-6f1899c8e902
+fast_prime1(99989, 10)      # ==> true --> :)
+
+# ╔═╡ 41e11d01-7a92-4663-8b79-3d7302cbc985
+fast_prime1(99991, 10)      # ==> true --> :)
+
+# ╔═╡ 2275dc7a-43d9-47aa-a5ab-e1b53a8c7df2
+fast_prime1(99993, 10)      # ==> false --> :); 99993 = 3*33331
+
+# ╔═╡ 442e1767-4055-4a49-9f46-665240a0537d
+fast_prime1(100003, 10)     # ==> true --> :)
+
+# ╔═╡ cac5241d-8e7c-4c78-87ff-9df4d12632af
+md"
+###### Carmichael numbers fool Fermat's Test
+"
+
+# ╔═╡ 8cbdd3f2-e7d5-4e78-9d0b-34b43ac14b40
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ eb712016-f15a-43aa-96b0-e129bff835f8
+fast_prime1(561, 100)        # ==> true --> :( ; test was fooled
+
+# ╔═╡ f7513770-7b6c-4bc8-b9fb-ca306f0cb9d8
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ f05ef05e-f1be-4706-b950-77e273c7884e
+fast_prime1(1105, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ c433c8bd-43e4-463a-8ff2-7b6bb70aaef3
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ 681da4df-ecb6-40ec-a5b8-03d49b25822c
+fast_prime1(1729, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ 5bcdaf47-9be0-4824-bd99-da274e30a360
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ cb5d584d-5928-4223-9daf-139397b2e380
+fast_prime1(2465, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ 72c045cb-9655-4f2c-8340-4d9b19e11fce
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ 6882300e-3e56-4eac-b7de-b6dd78a4d5cb
+fast_prime1(2821, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ 3351208c-94a4-4cc4-a3d0-851b0986010a
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ 55293415-c1d3-4f8d-ab45-098e4a86d295
+fast_prime1(6601, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ 8408cbef-007b-4b64-a7d3-be4944113217
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ 2a484f43-8e7b-4e6e-88c0-1d27a45cf4aa
+fast_prime1(8911, 100)       # ==> true --> :( ; test was fooled
+
+# ╔═╡ 076c461a-7a4b-42d7-a7fd-1006a8fa0f89
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ 182fe756-65b6-43ee-8238-a8e6bd7950ee
+fast_prime1(10585, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ caef03c1-fe96-4504-a100-3478312e79c0
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ bd896dca-d317-431a-89f3-a57dfef64f8f
+fast_prime1(15841, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 742b6b98-d66b-41e5-96bf-8f3882047e6a
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ ca245186-4ad0-4fd1-8cbb-7310f455b3cb
+fast_prime1(29341, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 9d643e66-9504-4a40-81d3-690c2df98c5f
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ 7aab20ba-4685-47fe-8337-1037c686909f
+fast_prime1(41041, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 7477cc56-adfd-44bb-959b-819dc63fba9c
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ 8b82b7b8-ba1f-4f7f-897e-c13f78cdf847
+fast_prime1(46657, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 7c3b5bfb-fb6e-4d63-80f6-7a8a7dd1c0a6
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 8fcf9b3f-e7d3-4e33-b671-da484cfa07cc
+fast_prime1(52633, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 96f3e1b1-442e-47ef-9306-b1debafb1e5c
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 1e6174e0-ed2e-4167-8a5f-0361b6b2ff1b
+fast_prime1(62745, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 060e3768-239c-4e18-a8d9-bfb585e6c17e
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ b0fe5cd7-e660-4dae-bd09-c826cfcd60f2
+fast_prime1(63973, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ 31b1939d-94bc-4c06-ace7-dbe70e2fb5cb
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ a3febf5c-1b67-499a-96c3-77d94d7eaae2
+fast_prime1(75361, 100)      # ==> true --> :( ; test was fooled
+
+# ╔═╡ f3e9ad78-79f2-4aeb-8113-c8f50d05e68e
+md"
+---
+###### 3.6 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem) (short version, e.g. Cormen et al., 2022, p.932)
+
+If *basis* $a$ and *test candidate* $n$ are *coprime* then $gcd(a, n)==1$. In this case we can divide both sides of the equation 
+
+$a^n\ (\bmod n) = a\ (\bmod n)$ 
+
+by $a\ (\bmod n)$. Now, we get:
+
+$a^{n-1}\ (\bmod n) = a^{1-1}\ (\bmod n) = a^0\ (\bmod n) = 1\ (\bmod n) = 1.$
+
+So:
+
+$a^{n-1}\ (\bmod n) = 1.$
+
+We can include the condition $gcd(n, a) = 1$ as a precondition in *Fermat*'s test. If we *know* that $isprime(n)$ is *true* this check is redundant. In other cases we can use it as a *quick-check*. If $gcd(n, a) > 1$ then we know that $isprime(n)$ is *false* and $n$ is *composite*. Otherwise we are *uncertain* whether $n$ is *prime* or *pseudoprime* (=*Carmichael*) and we have to go on with testing.
+
+Now we can write the *short* version of *Fermat's Little Theorem* as:
+
+$\boxed{\text{If } isprime(n) \text{ then } \forall a \in \{a|(gcd(n, a) = 1) \land (1 < a < n) \}: a^{n-1}\  (\bmod n) = 1}$
+
+When we abbreviate the conclusion $\text{ then } ... 1$ as:
+
+$FTest(+|n, \forall a) =_{def} \forall a \in \{a|(gcd(n, a) = 1) \land (1 < a < n) \}: a^{n-1} (\bmod n) = 1.$
+
+We can write the *short* version of *Fermat*'s Little Theorem as:
+
+$\boxed{\text{If } isprime(n) \text{ then } FTest(+|n, \forall a)}.$
+
+"
+
+# ╔═╡ 88f02453-317c-4162-bb18-764715015a0b
+# idiomatic Julia-code with 'rand'
+function fermat_test2(n::Signed)::Bool 
+	#--------------------------------------------------------------------
+	random(n) = rand(1:n) - 1 # MIT-Scheme: 0 ≤ random(n) ≤ n-1
+	#--------------------------------------------------------------------
+	# try_it(a) = expmod2(a, n, n) == a  # short form as in SICP
+	try_it(a) = (gcd(n, a) == 1) && (expmod2(a, n-1, n) == 1) 
+	#--------------------------------------------------------------------
+	try_it(1 + random(n-1))
+end # fermat_test2
+
+# ╔═╡ 5b9a1a53-2081-4778-aab6-a60fcfbef3b6
+function fast_prime2(n::Signed, times::Signed)::Bool
+	if 	times == 0
+		true
+	elseif fermat_test2(n)
+		fast_prime2(n, times-1)
+	else 
+		false
+	end # if
+end # fast_prime2
+
+# ╔═╡ d77a7757-c72d-4e8f-93c9-3009700ab975
+fast_prime2(2, 100)           # ==> true --> :)
+
+# ╔═╡ 595b9dda-541b-4732-a294-affce2b0c4e5
+fast_prime2(3, 100)           # ==> true --> :)
+
+# ╔═╡ c8d3613a-6d2b-4901-9321-aad8a99179cb
+fast_prime2(4, 100)           # ==> false --> :)
+
+# ╔═╡ fda84f34-1d43-446b-8c27-145b51812455
+fast_prime2(5, 100)           # ==> true --> :)
+
+# ╔═╡ 9a45cf8d-4d2b-48cc-9fc9-e0c4fd9468da
+fast_prime2(6, 100)           # ==> false --> :)
+
+# ╔═╡ 02659ecf-235a-4391-9998-167a69f6714e
+fast_prime2(7, 100)           # ==> true --> :)
+
+# ╔═╡ 7b7b0882-61be-4b76-96e8-18cb0d872ef6
+fast_prime2(9, 100)           # ==> false --> :)
+
+# ╔═╡ 2a6189a7-885d-42c1-bddb-c53891cfe972
+fast_prime2(11, 100)          # ==> true --> :)
+
+# ╔═╡ 0d3af18b-2cb0-4d25-b0b0-9df9f64caf9c
+fast_prime2(97, 100)          # ==> true --> :)
+
+# ╔═╡ 8e12127d-e814-4001-9100-77f679ed4c65
+fast_prime2(99989, 100)       # ==> true --> :)
+
+# ╔═╡ 293c9a6d-74cc-4e48-9386-4a3b946d5f20
+fast_prime2(99991, 100)       # ==> true --> :)
+
+# ╔═╡ 9a08b4be-03d3-4dee-aa7c-233a0427da15
+fast_prime2(99993, 100)       # ==> false --> :), because 3*33331 = 99993
+
+# ╔═╡ fa52d319-05b9-4798-9b9b-91d6ff907569
+fast_prime2(100003, 100)      # ==> true --> :)
+
+# ╔═╡ f64f11be-05fa-44a5-a14f-28044bac53aa
+md"
+###### Carmichael numbers *usually* fool Fermat's Test, but not $fast\_prime2$
+"
+
+# ╔═╡ 864506fb-9979-4cf9-a17d-fdfb0d88f5bf
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ d021796a-f02e-42ab-911f-b018e13797b8
+fast_prime2(561, 100)        # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ baf18a7f-7661-4fba-8cfa-5add5ea6d5e2
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 53840c6f-68c9-42c3-b64f-123bce53b094
+fast_prime2(1105, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 42718dc3-6ccc-407f-a2c4-0163f4bcd422
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ 755421d0-9011-4e69-95c3-84f00e21b8ea
+fast_prime2(1729, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 9639eb4f-ae74-4310-8be5-cd8a546f9fea
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ 7a05e505-cd9a-4719-9f04-ccbb48073847
+fast_prime2(2465, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 1d1da0d5-81ce-47dd-ad37-aa4156c02268
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ 49802eb0-597c-4b67-bf32-a98bd21e3039
+fast_prime2(2821, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 32e1dc38-d2a6-4c6b-b817-fb958451b6a1
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ f0f344a2-3a74-4bdb-a6a1-813376791e7e
+fast_prime2(6601, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 7c352835-0f7f-44ec-bbd4-2b8aee7d4fac
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ 33f9961f-1236-465e-b182-13b4efdb5ab5
+fast_prime2(8911, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ b4b175bf-7515-471f-a649-d10763f0914e
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ bfb82d1d-b568-417a-84fb-ce96978aaa3e
+fast_prime2(10585, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 1e0703f3-cdbf-4add-a853-986ae459844b
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ b48b09c3-a076-419d-95e4-67446d6c9ac7
+fast_prime2(15841, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 1e3a90f8-a5fc-4ae3-aaae-5464d8fc23f3
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ 223b1199-7cc0-4757-bbbc-5c5b02458c34
+fast_prime2(29341, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 3f71753e-39e3-4bf3-9c5b-0b3e142e8c8d
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ bf1e0bb2-3a5c-4c4b-8ce3-e0823a44df07
+fast_prime2(41041, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 0eb07be2-3635-44f3-9a2a-4a51c0eb34cd
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ fd4330e0-095c-4408-8617-7484c8e31b69
+fast_prime2(46657, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 0e429c35-a5d2-47a6-a42b-69c80926f867
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 2036003b-dfc1-421d-85c6-a3e3491e7b27
+fast_prime2(52633, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 95f53a85-dd50-4c15-9857-d1052fa00550
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 2c6cce53-42f4-407e-a5ab-531eb8098888
+fast_prime2(62745, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 070fee56-07a4-4f68-8020-e45834c9a98e
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ 9d9d29fa-ce2e-4ab9-922d-94d513d274e1
+fast_prime2(63973, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 62199cc9-a4a6-4cf1-96c3-2594d891f392
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ e53068ab-05d0-41d2-890d-47c4da7e3a79
+fast_prime2(75361, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 295d258d-3633-4c3f-acf4-f277679e4d2a
+md"
+---
+##### 4. Idiomatic *imperative* Julia ...
+... with types $Signed, Bool$ and  $%, while$, and $n^2$
+"
+
+# ╔═╡ 682dab37-9f5f-4f92-9795-c7d1c1d2179f
+md"
+###### 4.1 Iterative Function $isprime3$ 
+with localized definitions and function-wide scope of $n$
+
+"
+
+# ╔═╡ 36ccf5f4-2106-4055-a255-457fe6e88185
+# 'n' in local functions suppressed (but not in divides)
+function myIsprime3(n::Signed)::Bool
+	#-----------------------------------------------------------
+	divides(a, b) = rem(b, a) == 0 
+	#-----------------------------------------------------------
+	smallest_divisor()::Signed = find_divisor(2)::Signed
+	#-----------------------------------------------------------
+	function find_divisor(test_divisor::Signed)::Signed  
+	  while !((test_divisor^2 > n) || divides(test_divisor, n))
+			test_divisor += 1
+	  end # while
+	  (test_divisor^2 > n) ? n : test_divisor
+	end # function find_divisor
+	#-----------------------------------------------------------
+	n == smallest_divisor()::Signed
+end # function myIsprime3
+
+# ╔═╡ dcb6c753-3b16-4283-b445-86d1d8b97597
+myIsprime3(1)                        # ==> true --> :)
+
+# ╔═╡ 982407df-7197-4999-a674-fdfb17cacd4a
+myIsprime3(2)                        # ==> true --> :)
+
+# ╔═╡ 5a5c83a9-6916-4aeb-901a-42485cde0798
+myIsprime3(3)                        # ==> true --> :)
+
+# ╔═╡ 03af5d66-77d1-4a7c-bba6-6982ddef3595
+myIsprime3(4)                        # ==> false --> :)
+
+# ╔═╡ 74025279-68a4-4370-81f2-d68cf8002505
+myIsprime3(5)                        # ==> true --> :)
+
+# ╔═╡ d226bb12-6728-471b-8281-4e6d22e2c75a
+myIsprime3(6)                        # ==> false --> :)
+
+# ╔═╡ d9f2f821-8d37-40df-b810-92c4bba4d0bd
+myIsprime3(97)                       # ==> true --> :)
+
+# ╔═╡ e4bfcf03-0fed-489e-b582-d63eb339651e
+myIsprime3(99989)                    # ==> true --> :)
+
+# ╔═╡ 85683cc3-a96a-40e5-9136-7e954bca0be7
+myIsprime3(99991)                    # ==> true --> :)
+
+# ╔═╡ bbc0425b-076b-4a5a-8fce-853845c5a26e
+myIsprime3(99993)                    # ==> false --> :)
+
+# ╔═╡ e7e74706-cdf4-46d0-945d-807e0d13312c
+myIsprime3(100003)                   # ==> true --> :)
+
+# ╔═╡ 661f9a76-4a93-4cd8-85d5-7cc670027be6
+md"
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isprime3$ is searching divisors *exhausively*, so its perfect but not effective.
+"
+
+# ╔═╡ 3e1f9d8e-8e07-42b6-b163-5721e219e0d7
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ 5e1b7f4e-837c-4b87-9da8-0641b0f3a71b
+myIsprime3(561)                       # ==> false --> :)
+
+# ╔═╡ 702cbddc-d362-4029-95eb-b0589ebec23e
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 6f3e5541-0d66-43ee-9341-d88d29bdca72
+myIsprime3(1105)                      # ==> false --> :)
+
+# ╔═╡ 76c13f36-ae76-4173-b8c9-36f261236059
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ 0c88ebf7-105b-4015-a3bb-92db767c3e38
+myIsprime3(1729)                      # ==> false --> :)
+
+# ╔═╡ 4fa732fa-b031-48ad-b846-53d14ee48877
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ cf3848fd-41fb-4c0d-b6b7-78907956a1e8
+myIsprime3(2465)                      # ==> false --> :)
+
+# ╔═╡ 69b961e8-1be0-4da6-9c1f-54970bcadff0
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ ad93c8b8-913f-40ae-b872-e5c533e7ac91
+myIsprime3(2821)                      # ==> false --> :)
+
+# ╔═╡ d311e7c8-1136-42e3-b2b2-ed92ebd10c7a
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ 1fb22733-3afa-4611-aabd-1d4ffef42d1b
+myIsprime3(6601)                      # ==> false --> :)
+
+# ╔═╡ 4be6019b-f5f8-4965-9a55-334a27b58306
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ cb97dd4b-e711-4787-a5ca-5ed2f7652b29
+myIsprime3(8911)                      # ==> false --> :)
+
+# ╔═╡ af046953-fb2d-4825-b9e5-1029c0da7ac5
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ 9db0c031-f53f-44cc-a1bc-6428fd86bec8
+myIsprime3(10585)                     # ==> false --> :)
+
+# ╔═╡ 6f211c92-c6e7-4b4b-88df-2ede20e06340
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ e80c19fb-6868-42d7-820d-d78703659de7
+myIsprime3(15841)                     # ==> false --> :)
+
+# ╔═╡ a5782ca5-e8b0-4fd9-a710-5f54dc244cbc
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ 92c1fd0b-0d46-4b42-a975-5f4a6933ec6b
+myIsprime3(29341)                     # ==> false --> :)
+
+# ╔═╡ 9af4ac3a-b262-4e4a-a9d7-9eb3f26f81db
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ 3f8afe4b-f381-4979-9e7d-b1c2883a2c85
+myIsprime3(41041)                     # ==> false --> :)
+
+# ╔═╡ f78510e7-aa45-4a15-8dcd-9e27052d68ea
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ a344b574-3520-414b-887a-a55ed91334a7
+myIsprime3(46657)                     # ==> false --> :)
+
+# ╔═╡ 4880be53-a679-4408-94de-d33a500bf216
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 678bf3f6-d974-4571-8cdb-ac766ded79f1
+myIsprime3(52633)                     # ==> false --> :)
+
+# ╔═╡ 59b4a0c5-2c86-41f7-8513-aa6f3a5f68c2
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 15e7f4ad-8a86-4f8d-9d4e-61fb6f747f09
+myIsprime3(62745)                     # ==> false --> :)
+
+# ╔═╡ 31d6b5b8-9bc7-4e49-8db1-c65c1b909b79
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ c629e780-04cf-4198-bc1e-09052d50d630
+myIsprime3(63973)                     # ==> false --> :)
+
+# ╔═╡ 5d64c3d0-0179-457f-8154-f4e8f203316f
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ 39b8633f-2fa4-4918-a98e-ccf6f5aa5bf1
+myIsprime3(75361)                     # ==> false --> :)
+
+# ╔═╡ ee5289aa-835d-4346-9294-b3c38f9dcd1c
+md"
+---
+###### 4.2 Iterative Function $isprime4$ 
+with localized definitions and function-wide scope of $n$
+
+"
+
+# ╔═╡ c665c4fe-4061-4da1-a324-a43c126db248
+√110
+
+# ╔═╡ 7ca56b5e-2662-44fd-9451-d13dd5b69164
+Int
+
+# ╔═╡ 99ce7b3d-0f79-4495-a786-b42fa173e992
+round(Int, √2)
+
+# ╔═╡ 45301594-f549-4897-bb87-8b78e7778746
+round(Int, √3)
+
+# ╔═╡ aa546fa7-be8b-4768-9198-0e16bde99e46
+round(Int, √4)
+
+# ╔═╡ 00b9a040-f24a-4c9a-b0ae-3896b994343d
+round(Int, √110)
+
+# ╔═╡ 4eb6cc09-f864-4a80-9d8d-a03a08e0f97e
+let count = 0
+	for i = 1:100
+		count = i
+		i > 5 && break # if ... then ...
+	end # for
+	count
+end # let
+
+# ╔═╡ 2beafb91-5227-45eb-bb09-138128713268
+# function-wide scope of 'n';  suppressed in local functions
+function myIsprime4(n::Signed)::Bool
+	#------------------------------------------------------
+	divides(a::Signed, b::Signed)::Bool = rem(b, a) == 0 
+	#------------------------------------------------------
+	function smallest_divisor()::Signed
+		test_divisor = 2
+		for i = 2:round(Int,√n)
+			test_divisor = i
+			divides(test_divisor, n) && break
+		end # for
+		divides(test_divisor, n) ? test_divisor : n
+	end # function smallest_divisor
+	#------------------------------------------------------
+	n == smallest_divisor() 
+end # function myIsprime4
+
+# ╔═╡ 661fdf22-22f5-4b7f-aec4-04422ec3c50d
+myIsprime4(1)                        # ==> true --> :)
+
+# ╔═╡ 00a795d7-fe31-4568-b53a-7511052e6e06
+myIsprime4(2)                        # ==> true --> :)
+
+# ╔═╡ 83a17a23-8486-476b-9b2d-fd6203c03ff9
+myIsprime4(3)                        # ==> true --> :)
+
+# ╔═╡ 2885dc3c-e984-4008-a153-e4a438e398d8
+myIsprime4(4)                        # ==> false --> :)
+
+# ╔═╡ af776524-b603-408b-966e-6d7b2d462f73
+myIsprime4(5)                        # ==> true --> :)
+
+# ╔═╡ 3048bc35-c1ed-44fd-b761-7a0f7b65ac67
+myIsprime4(6)                        # ==> false --> :)
+
+# ╔═╡ 9ae6d8e7-3c27-4b74-8f1c-57057dc525a1
+myIsprime4(97)                       # ==> true --> :)
+
+# ╔═╡ b7aa0853-2b58-4689-b0a2-bc601cff7174
+myIsprime4(99989)                    # ==> true --> :)
+
+# ╔═╡ ef11bdd6-ac98-4f26-afa7-142dae6a214a
+myIsprime4(99991)                    # ==> true --> :)
+
+# ╔═╡ 64f76aea-c240-45d2-b146-42007a18ae89
+myIsprime4(99993)                    # ==> false --> :)
+
+# ╔═╡ 03a54358-3228-48f2-a4d6-5598704b5df6
+myIsprime4(100003)                   # ==> true --> :)
+
+# ╔═╡ 0eb278bf-4ded-41f7-ad7e-fd4fd4de8342
+md"
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $myIsprime4$ is searching divisors *exhausively*, so its perfect but not effective.
+"
+
+# ╔═╡ 59d7d87b-850d-4934-84ed-985ebf068794
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ cea4063a-2f10-4cb7-944b-a2055d41c3d1
+myIsprime4(561)                       # ==> false --> :)
+
+# ╔═╡ 77b86d25-3640-4455-a66f-c9f6fff4f75b
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 50e1140a-f108-4236-8b43-989ab458ef95
+myIsprime4(1105)                      # ==> false --> :)
+
+# ╔═╡ 4c174e06-3812-42b4-bdb5-4cc771ad10f5
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ b6a6ffa9-31be-4196-9b6d-680c1406ef4a
+myIsprime4(1729)                      # ==> false --> :)
+
+# ╔═╡ 1cb7e0dd-d7e8-4f79-b3ae-5f7bbde93f35
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ 509ffec5-f06a-4fd9-9723-9c5116104df7
+myIsprime4(2465)                      # ==> false --> :)
+
+# ╔═╡ d3d45287-4949-4a89-ab93-43109e3e8bb6
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ aee21fdd-e1ca-49bd-b208-c1bcbaf258b6
+myIsprime4(2821)                      # ==> false --> :)
+
+# ╔═╡ 6b67cf55-514d-492a-aa89-50eda8a19c82
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ a0e3b5a1-611a-4b8f-80ee-15d5ab3725ef
+myIsprime4(6601)                      # ==> false --> :)
+
+# ╔═╡ 6802ad17-0a23-42c6-876a-6ed750743acd
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ 41215219-cd82-4b7d-85b6-4a985f34aa18
+myIsprime4(8911)                      # ==> false --> :)
+
+# ╔═╡ e3c37e74-1bff-4d8c-8bb2-a27d918254ea
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ 886d9958-8d7a-40ca-bde0-bccc20d54c4b
+myIsprime4(10585)                     # ==> false --> :)
+
+# ╔═╡ 66c9d14d-7870-4c1c-9a1f-94a3cf23bfe0
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ 2726b89a-325d-4675-b896-922392a5fef9
+myIsprime4(15841)                     # ==> false --> :)
+
+# ╔═╡ 992111fa-b073-421c-9799-a83b0d96fda1
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ 2cfc5a17-7e12-4571-ab1a-c37219fe50d9
+myIsprime4(29341)                     # ==> false --> :)
+
+# ╔═╡ 9c29a2e7-e877-44af-926c-7c2c0df6023d
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ 7b7b6ccf-5635-4c7a-93c3-12f1ab7519dd
+myIsprime4(41041)                     # ==> false --> :)
+
+# ╔═╡ f39e0478-8094-4049-9eb0-3bafe652ad78
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ 81c2762b-4253-4929-a603-cf5ce8af292f
+myIsprime4(46657)                     # ==> false --> :)
+
+# ╔═╡ 2ebd4469-4492-4cc6-97ef-9498069fd66a
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 339c5cf9-2bd6-478c-aa79-2ab9323376b4
+myIsprime4(52633)                     # ==> false --> :)
+
+# ╔═╡ 6641f813-6e0f-41c6-a4ff-2bd402369536
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 9218057c-7372-452b-914a-641330012c43
+myIsprime4(62745)                     # ==> false --> :)
+
+# ╔═╡ 596887c2-5e6d-481f-ac70-4141e1d70c35
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ 02ae9603-dc76-4c4f-a403-3d3355c3782d
+myIsprime4(63973)                     # ==> false --> :)
+
+# ╔═╡ e4b5b0a1-6f99-4af6-9c1d-43f39b211886
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ db54ef5a-4c41-42c5-b89a-71edd5a861af
+myIsprime4(75361)                     # ==> false --> :)
+
+# ╔═╡ b06561f2-546b-44a7-a4a3-43056d1019e4
+md"
+---
+###### 4.3 Iterative *Fermat Test*: $fast\_prime3$
+"
+
+# ╔═╡ b1601460-c2d3-492a-85cc-c3cd08a37546
+function fast_prime3(n::Integer, times::Integer)::Bool
+	#--------------------------------------------
+	# while !(times == 0 || !fermat_test2(n))  
+	#  ≡ while times !== 0 && fermat_test2(n)
+	#--------------------------------------------
+	while (times != 0) && fermat_test2(n)
+		times -= 1
+	end
+	times == 0 ? true : false
+end # function fast_prime3
+
+# ╔═╡ 136294ce-8c08-4607-ab0b-c1fd1fdb9e44
+fast_prime3(2, 100)           # ==> true --> :)
+
+# ╔═╡ 1f1a7137-3856-4392-a731-06e2a5dab683
+fast_prime3(3, 100)           # ==> true --> :)
+
+# ╔═╡ c3757944-71d2-4783-8dad-12093b0ddfc6
+fast_prime3(4, 100)           # ==> false --> :)
+
+# ╔═╡ dbda9f3f-1a59-4fd1-9672-1fefa020efb5
+fast_prime3(5, 100)           # ==> true --> :)
+
+# ╔═╡ e485954f-ec8d-46db-b0f6-e8ff7c545e60
+fast_prime3(6, 100)           # ==> false --> :)
+
+# ╔═╡ 049602a5-b86a-4975-a038-1429451e154e
+fast_prime3(7, 100)           # ==> true --> :)
+
+# ╔═╡ b3da196b-748c-4018-8aea-7f25cea226d4
+fast_prime3(9, 100)           # ==> false --> :)
+
+# ╔═╡ d6fe0d38-1d59-41b8-8895-df28eb1cf49a
+fast_prime3(11, 100)          # ==> true --> :)
+
+# ╔═╡ 67683aa1-bb33-4f39-b6ce-4f0c17ca94e4
+fast_prime3(97, 100)          # ==> true --> :)
+
+# ╔═╡ 25a17f89-0568-4f40-93ee-c66b49824ea7
+fast_prime3(99989, 100)       # ==> true --> :)
+
+# ╔═╡ dc86cd34-db60-4472-917d-164dfb017154
+fast_prime3(99991, 100)       # ==> true --> :)
+
+# ╔═╡ 2f4a0498-bc9f-48bf-adaa-36d096fa3bf1
+fast_prime3(99993, 100)       # ==> false --> :), because 3*33331 = 99993
+
+# ╔═╡ 488b4b80-7bab-4bf0-9d91-6bc7d638476a
+fast_prime3(100003, 100)      # ==> true --> :)
+
+# ╔═╡ ea8bafa9-ab4b-477e-b702-76cfa1770e5c
+md"
+###### Carmichael numbers *usually* fool Fermat's Test, but not $fast\_prime3$
+"
+
+# ╔═╡ aa470a5e-d5dd-4575-9380-a6fe948fdafd
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ 435fc3f4-022f-4d76-bfce-a059d422ea19
+fast_prime2(561, 100)        # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ e53609bd-0200-41cf-884d-c3b55790f6a2
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ e84189b9-0f30-44b0-a5bf-db9e4a95ca3d
+fast_prime2(1105, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 6c17f1e3-c604-4eb7-9c8e-c3e599aa658b
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ dc1fb0d7-099f-4f97-aded-39fa887bdfef
+fast_prime2(1729, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ ed89e6f0-6beb-4a56-b5d8-234ed99e1705
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ 16646d37-f82c-455a-9baf-78e262b863e2
+fast_prime2(2465, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ d2db7b42-7740-4cfc-a7ab-774e1cd9a295
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ 828970a9-1284-4b3f-9d83-9768d959fde9
+fast_prime2(2821, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 3f0b976a-2c05-4759-b35e-8eb23fd3b59c
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ b6d25de8-9f4d-41b6-96f7-684e2d583ade
+fast_prime2(6601, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 0a99ecf0-40ff-4859-94d5-daa23a8ff1ad
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ f3a80c96-41df-4fa0-8ded-3d247d16cf4c
+fast_prime2(8911, 100)       # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ a12b1bf2-8ce1-4533-b6ba-f9330225a92e
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ b88083e3-8a6b-46a7-b024-38f84756b987
+fast_prime2(10585, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ b21ea350-86fd-4225-a8b7-5ba27dd38e8f
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ 763a0b2a-934c-4cae-bddf-001d2f2cebee
+fast_prime2(15841, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ ee88876a-a04e-4bba-bf15-fab521747859
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ d9805d69-d9f6-465c-a795-593f6b6a1faa
+fast_prime2(29341, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 71c32ec8-9a8a-40f9-9bdb-39c5bc1a1f0e
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ 281f123a-8455-4f69-919e-2e61f0985546
+fast_prime2(41041, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 062175aa-0057-4518-9560-d2847b3a2627
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ e8ecccf2-224a-43d7-b8bd-98011d00def9
+fast_prime2(46657, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 670c7bb1-0ba7-4aa4-ac3f-b6f4dee02cd0
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ e8f244c1-09e0-4782-917f-d8435e6ed1fa
+fast_prime2(52633, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 7ee9d52a-4b8a-4baf-86be-4b9c4d6f98ae
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 89d56dbd-9275-4137-87dc-1731272ed88b
+fast_prime2(62745, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 0cf91598-9774-41b8-90aa-e53da69c464f
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ ca30da6b-5965-44c8-88c8-580e6baf92cb
+fast_prime2(63973, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ fd5a057b-5f8f-4d4b-8d8f-68794ad2d46f
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ 0f9ee0d8-2f73-43ee-bc67-279342f96168
+fast_prime2(75361, 100)      # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 27648379-3689-414c-a126-2e00921beb78
+md"
+---
+##### 5. Julia Package function $Primes.isprime$
+"
+
+# ╔═╡ afb70559-ed53-49b5-87ef-d0c9ec45ff60
+Primes.isprime(1)               # ==> false --> :)
+
+# ╔═╡ 1fffc29f-dcf1-4e25-9922-30c19e64d208
+Primes.isprime(2)               # ==> true --> :); 2 is prime
+
+# ╔═╡ a2efacd3-76a4-4afb-b33d-86231076fc5d
+Primes.isprime(3)               # ==> true --> :); 3 is prime
+
+# ╔═╡ f7b74f24-f84a-4a20-9e24-ac5121e8ea09
+Primes.isprime(4)               # ==> false --> :)
+
+# ╔═╡ 2b460f2f-2315-49e2-886c-eb2eaf3e3927
+Primes.isprime(5)               # ==> true --> :); 5 is prime
+
+# ╔═╡ 64a34c97-df81-4d75-8b66-ef611d7bfe13
+Primes.isprime(6)               # ==> false --> :)
+
+# ╔═╡ 38bf06b5-f147-4654-90c4-4c441be4aa72
+Primes.isprime(97)              # ==> true --> :); 97 is prime
+
+# ╔═╡ 58b5599f-b6a2-4d02-8b0f-2a7b11145986
+md"
+###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+"
+
+# ╔═╡ 253ccb6c-2b96-44c0-9691-8a943314c53d
+Primes.isprime(99989)           # ==> true --> :)
+
+# ╔═╡ d38ce7d0-0c93-4513-882f-1a74230f1063
+Primes.isprime(99991)           # ==> true --> :)
+
+# ╔═╡ eeead12a-70d8-4ebf-b41d-60694a031010
+Primes.isprime(99993)           # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 438e35e7-91d8-412a-8514-c6c5b4b269c6
+Primes.isprime(100003)          # ==> true --> :)
+
+# ╔═╡ 2339ae20-64d9-46a6-bbb6-71a5587cf558
+md"
+###### Carmichael numbers *usually* fool Fermat's Test, but not $Primes.isprime$
+"
+
+# ╔═╡ e0d4084c-436a-4def-8e65-a944dc522f8b
+md"
+###### 1st Carmichael number
+"
+
+# ╔═╡ 8fc835d4-bec7-4026-b17c-b23aac89aae3
+Primes.isprime(561)             # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 639e2cfc-2fb6-4e43-85bc-ef55ae167949
+md"
+###### 2nd Carmichael number
+"
+
+# ╔═╡ 40860255-4a68-4f0b-a8e2-7dabefb6c497
+Primes.isprime(1105)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 05ec46f4-128c-4628-90d7-bf5818173f58
+md"
+###### 3rd Carmichael number
+"
+
+# ╔═╡ 8cb9af71-dcea-4b83-a5ab-8713b6c78ca2
+Primes.isprime(1729)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 160fd108-a0a7-4d61-a11e-c0ceb2be16e6
+md"
+###### 4th Carmichael number
+"
+
+# ╔═╡ 20a1747b-0949-4d5e-91a8-34f9c24562a0
+Primes.isprime(2465)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ a184f35c-b5b2-44b7-bbbd-eeedebe14fa5
+md"
+###### 5th Carmichael number
+"
+
+# ╔═╡ 5ed16f5b-9550-4149-bf78-c1faa5e3e6e9
+Primes.isprime(2821)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 093d2b2e-5be7-476b-b16f-a5f0edf92b29
+md"
+###### 6th Carmichael number
+"
+
+# ╔═╡ 3952f23b-366c-46b4-889b-a903c913a236
+Primes.isprime(6601)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 2f64673d-798c-4ca1-b515-4bcb537b5316
+md"
+###### 7th Carmichael number
+"
+
+# ╔═╡ 000b6a03-6d41-40d2-9d4a-ef84d09ffe41
+Primes.isprime(8911)            # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 3272a62e-cd81-4be2-a4cc-ec0ca276344b
+md"
+###### 8th Carmichael number
+"
+
+# ╔═╡ f9cc80f9-df9f-4c05-88a1-1d80d5b039b9
+Primes.isprime(10585)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 7e11f80d-aa82-4525-a43e-bc09b663db68
+md"
+###### 9th Carmichael number
+"
+
+# ╔═╡ 3841b3de-11ef-4912-b886-3a24a401d429
+Primes.isprime(15841)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ a52fd122-e1a0-4b50-bb23-ae8ecc593118
+md"
+###### 10th Carmichael number
+"
+
+# ╔═╡ a8aea5f3-336e-41fd-b670-679e3f1d9a65
+Primes.isprime(29341)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ d388dec0-51e3-4d4c-a487-fde7684f7059
+md"
+###### 11th Carmichael number
+"
+
+# ╔═╡ a20afae0-d9ec-4e16-9118-c939b92665b1
+Primes.isprime(41041)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 9d2e01a5-2a6d-43bf-a2c7-2fd85512b103
+md"
+###### 12th Carmichael number
+"
+
+# ╔═╡ b8e45861-2935-4253-8178-e6a978ba8ed1
+Primes.isprime(46657)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 9479588a-f884-4a3f-9b4d-c33509eb67b8
+md"
+###### 13th Carmichael number
+"
+
+# ╔═╡ 04e589f3-8703-4f17-b4b5-764abe7be9ec
+Primes.isprime(52633)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ e22eb7f1-c7df-4a41-9a9b-92b114994137
+md"
+###### 14th Carmichael number
+"
+
+# ╔═╡ 17b4ff5a-c78d-4f66-9db7-03c792d0e094
+Primes.isprime(62745)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 80c66cb1-3f37-4561-8e70-a6a0129d0f29
+md"
+###### 15th Carmichael number
+"
+
+# ╔═╡ 9dceb743-767a-4fac-aeb1-83e601e989be
+Primes.isprime(63973)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 4de5d117-4720-4319-8283-ba4e5a808604
+md"
+###### 16th Carmichael number
+"
+
+# ╔═╡ eb91249c-2a72-4643-9d80-e87d80f0cf58
+Primes.isprime(75361)           # ==> false --> :) ; test could *not* be fooled
+
+# ╔═╡ 6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
+md"
+---
+##### 6. Summary
+We presented four methods for identifying primes. The first is the *exhaustive search for divisors*. The next two are based on *Fermat's Little Theorem*. The first is based on the *longer* form of the theorem and a transpilation of *SICP*'s Scheme function. The second is based on a *shorter* version of *Fermat's Little Theorem*. The last is a Julia package function $Primes.isprime$.
+
+The *first* algorithm is perfect but inefficient. The *second* can be fooled by all 16 Carmichel numbers we studied. The *third* and the *fourth* are perfect in this respect. All 16 Carmichel numbers could be unmasked as *composites*.
+
+"
+
+# ╔═╡ 5889eede-0150-476a-a0d1-7298b616172f
+md"
+---
+##### 7. References
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2025/01/21
+
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf); Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/21
+
+- **Cormen, Th.H., Leiserson, Ch.e., Rivest, R.L. & Stein, C.**; *Introduction to Algorithms*, Cambridge, Mass.: MIT Press, 2022, (4/e)
+
+- **t5k.org**; [*List of 100.008 Primes*](https://t5k.org/lists/small/100000.txt), last visit 2025/01/26
+
+- **Wikipedia**; [*Carmichael Number*](https://en.wikipedia.org/wiki/Carmichael_number); last visit 2025/01/26
+
+- **Wikipedia**; [*Euler's totient function*](https://en.wikipedia.org/wiki/Euler%27s_totient_function): last visit 2025/02/01
+
+- **Wikipedia**; [*Fermat's little theorem*](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem); last visit 2025/01/27
+
+- **Wikipedia**; [*Likelihood*](https://en.wikipedia.org/wiki/Likelihood_function); last visit 2025/01/28
+
+- **Wikipedia**; [*Prime Number*](https://en.wikipedia.org/wiki/Prime_number); last vist 2025/02/02
+
+- **Wikipedia**; [*Pseudoprimes*](https://en.wikipedia.org/wiki/Pseudoprime); last visit 2025/01/28
+
+- **Wikipedia**; [*The First 100,008 Primes*](https://en.wikipedia.org/wiki/List_of_prime_numbers); last visit 2025/01/21
+
+"
+
+# ╔═╡ 5ddec9aa-8c2c-447f-b97c-a91b39be792b
+md"
+----
+###### end of ch. 1.2.6
+==================================================================================
+
+This is a **draft** under the [Attribution-NonCommercial-ShareAlike 4.0 International **(CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en) license; Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+
+==================================================================================
+"
+
+# ╔═╡ 00000000-0000-0000-0000-000000000001
+PLUTO_PROJECT_TOML_CONTENTS = """
+[deps]
+GraphRecipes = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+
+[compat]
+GraphRecipes = "~0.5.13"
+LaTeXStrings = "~1.4.0"
+Plots = "~1.40.9"
+Pluto = "~0.20.4"
+Primes = "~0.5.5"
+"""
+
+# ╔═╡ 00000000-0000-0000-0000-000000000002
+PLUTO_MANIFEST_TOML_CONTENTS = """
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.11.3"
+manifest_format = "2.0"
+project_hash = "2ad46fc9cc030f9d667861856dd9359ab57b84b4"
+
+[[deps.AbstractTrees]]
+git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
+uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+version = "0.4.5"
+
+[[deps.Adapt]]
+deps = ["LinearAlgebra", "Requires"]
+git-tree-sha1 = "50c3c56a52972d78e8be9fd135bfb91c9574c140"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "4.1.1"
+weakdeps = ["StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptStaticArraysExt = "StaticArrays"
+
+[[deps.AliasTables]]
+deps = ["PtrArrays", "Random"]
+git-tree-sha1 = "9876e1e164b144ca45e9e3198d0b689cadfed9ff"
+uuid = "66dad0bd-aa9a-41b7-9441-69ab47430ed8"
+version = "1.1.3"
+
+[[deps.ArgTools]]
+uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.2"
+
+[[deps.ArnoldiMethod]]
+deps = ["LinearAlgebra", "Random", "StaticArrays"]
+git-tree-sha1 = "d57bd3762d308bded22c3b82d033bff85f6195c6"
+uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
+version = "0.4.0"
+
+[[deps.Artifacts]]
+uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
+
+[[deps.AxisAlgorithms]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
+git-tree-sha1 = "01b8ccb13d68535d73d2b0c23e39bd23155fb712"
+uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
+version = "1.1.0"
+
+[[deps.Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
+
+[[deps.BitFlags]]
+git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
+uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
+version = "0.1.9"
+
+[[deps.Bzip2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "8873e196c2eb87962a2048b3b8e08946535864a1"
+uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
+version = "1.0.8+4"
+
+[[deps.Cairo_jll]]
+deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "009060c9a6168704143100f36ab08f06c2af4642"
+uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
+version = "1.18.2+1"
+
+[[deps.ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra"]
+git-tree-sha1 = "1713c74e00545bfe14605d2a2be1712de8fbcb58"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "1.25.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.ChainRulesCore.extensions]
+    ChainRulesCoreSparseArraysExt = "SparseArrays"
+
+[[deps.CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "bce6804e5e6044c6daab27bb533d1295e4a2e759"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.6"
+
+[[deps.ColorSchemes]]
+deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
+git-tree-sha1 = "c785dfb1b3bfddd1da557e861b919819b82bbe5b"
+uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+version = "3.27.1"
+
+[[deps.ColorTypes]]
+deps = ["FixedPointNumbers", "Random"]
+git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
+uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+version = "0.11.5"
+
+[[deps.ColorVectorSpace]]
+deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
+git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
+uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
+version = "0.10.0"
+
+    [deps.ColorVectorSpace.extensions]
+    SpecialFunctionsExt = "SpecialFunctions"
+
+    [deps.ColorVectorSpace.weakdeps]
+    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[[deps.Colors]]
+deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
+git-tree-sha1 = "64e15186f0aa277e174aa81798f7eb8598e0157e"
+uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
+version = "0.13.0"
+
+[[deps.Compat]]
+deps = ["TOML", "UUIDs"]
+git-tree-sha1 = "8ae8d32e09f0dcf42a36b90d4e17f5dd2e4c4215"
+uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
+version = "4.16.0"
+weakdeps = ["Dates", "LinearAlgebra"]
+
+    [deps.Compat.extensions]
+    CompatLinearAlgebraExt = "LinearAlgebra"
+
+[[deps.CompilerSupportLibraries_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "1.1.1+0"
+
+[[deps.ConcurrentUtilities]]
+deps = ["Serialization", "Sockets"]
+git-tree-sha1 = "f36e5e8fdffcb5646ea5da81495a5a7566005127"
+uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
+version = "2.4.3"
+
+[[deps.Configurations]]
+deps = ["ExproniconLite", "OrderedCollections", "TOML"]
+git-tree-sha1 = "4358750bb58a3caefd5f37a4a0c5bfdbbf075252"
+uuid = "5218b696-f38b-4ac9-8b61-a12ec717816d"
+version = "0.17.6"
+
+[[deps.ConstructionBase]]
+git-tree-sha1 = "76219f1ed5771adbb096743bff43fb5fdd4c1157"
+uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+version = "1.5.8"
+
+    [deps.ConstructionBase.extensions]
+    ConstructionBaseIntervalSetsExt = "IntervalSets"
+    ConstructionBaseLinearAlgebraExt = "LinearAlgebra"
+    ConstructionBaseStaticArraysExt = "StaticArrays"
+
+    [deps.ConstructionBase.weakdeps]
+    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
+    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[[deps.Contour]]
+git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
+uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
+version = "0.6.3"
+
+[[deps.DataAPI]]
+git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
+uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
+version = "1.16.0"
+
+[[deps.DataStructures]]
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "1d0a14036acb104d9e89698bd408f63ab58cdc82"
+uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+version = "0.18.20"
+
+[[deps.DataValueInterfaces]]
+git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+version = "1.0.0"
+
+[[deps.Dates]]
+deps = ["Printf"]
+uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
+
+[[deps.Dbus_jll]]
+deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "fc173b380865f70627d7dd1190dc2fce6cc105af"
+uuid = "ee1fde0b-3d02-5ea6-8484-8dfef6360eab"
+version = "1.14.10+0"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+version = "1.9.1"
+
+[[deps.Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
+
+[[deps.DocStringExtensions]]
+deps = ["LibGit2"]
+git-tree-sha1 = "2fb1e02f2b635d0845df5d7c167fec4dd739b00d"
+uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+version = "0.9.3"
+
+[[deps.Downloads]]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
+uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
+
+[[deps.EarCut_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "e3290f2d49e661fbd94046d7e3726ffcb2d41053"
+uuid = "5ae413db-bbd1-5e63-b57d-d24a61df00f5"
+version = "2.2.4+0"
+
+[[deps.EpollShim_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a4be429317c42cfae6a7fc03c31bad1970c310d"
+uuid = "2702e6a9-849d-5ed8-8c21-79e8b8f9ee43"
+version = "0.0.20230411+1"
+
+[[deps.ExceptionUnwrapping]]
+deps = ["Test"]
+git-tree-sha1 = "d36f682e590a83d63d1c7dbd287573764682d12a"
+uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
+version = "0.1.11"
+
+[[deps.Expat_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "e51db81749b0777b2147fbe7b783ee79045b8e99"
+uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
+version = "2.6.4+3"
+
+[[deps.ExpressionExplorer]]
+git-tree-sha1 = "7005f1493c18afb2fa3bdf06e02b16a9fde5d16d"
+uuid = "21656369-7473-754a-2065-74616d696c43"
+version = "1.1.0"
+
+[[deps.ExproniconLite]]
+git-tree-sha1 = "4c9ed87a6b3cd90acf24c556f2119533435ded38"
+uuid = "55351af7-c7e9-48d6-89ff-24e801d99491"
+version = "0.10.13"
+
+[[deps.Extents]]
+git-tree-sha1 = "81023caa0021a41712685887db1fc03db26f41f5"
+uuid = "411431e0-e8b7-467b-b5e0-f676ba4f2910"
+version = "0.1.4"
+
+[[deps.FFMPEG]]
+deps = ["FFMPEG_jll"]
+git-tree-sha1 = "53ebe7511fa11d33bec688a9178fac4e49eeee00"
+uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
+version = "0.4.2"
+
+[[deps.FFMPEG_jll]]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "466d45dc38e15794ec7d5d63ec03d776a9aff36e"
+uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
+version = "4.4.4+1"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
+
+[[deps.FixedPointNumbers]]
+deps = ["Statistics"]
+git-tree-sha1 = "05882d6995ae5c12bb5f36dd2ed3f61c98cbb172"
+uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+version = "0.8.5"
+
+[[deps.Fontconfig_jll]]
+deps = ["Artifacts", "Bzip2_jll", "Expat_jll", "FreeType2_jll", "JLLWrappers", "Libdl", "Libuuid_jll", "Zlib_jll"]
+git-tree-sha1 = "21fac3c77d7b5a9fc03b0ec503aa1a6392c34d2b"
+uuid = "a3f928ae-7b40-5064-980b-68af3947d34b"
+version = "2.15.0+0"
+
+[[deps.Format]]
+git-tree-sha1 = "9c68794ef81b08086aeb32eeaf33531668d5f5fc"
+uuid = "1fa38f19-a742-5d3f-a2b9-30dd87b9d5f8"
+version = "1.3.7"
+
+[[deps.FreeType2_jll]]
+deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "786e968a8d2fb167f2e4880baba62e0e26bd8e4e"
+uuid = "d7e528f0-a631-5988-bf34-fe36492bcfd7"
+version = "2.13.3+1"
+
+[[deps.FriBidi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "846f7026a9decf3679419122b49f8a1fdb48d2d5"
+uuid = "559328eb-81f9-559d-9380-de523a88c83c"
+version = "1.0.16+0"
+
+[[deps.FuzzyCompletions]]
+deps = ["REPL"]
+git-tree-sha1 = "be713866335f48cfb1285bff2d0cbb8304c1701c"
+uuid = "fb4132e2-a121-4a70-b8a1-d5b831dcdcc2"
+version = "0.5.5"
+
+[[deps.GLFW_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
+git-tree-sha1 = "fcb0584ff34e25155876418979d4c8971243bb89"
+uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
+version = "3.4.0+2"
+
+[[deps.GR]]
+deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
+git-tree-sha1 = "424c8f76017e39fdfcdbb5935a8e6742244959e8"
+uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+version = "0.73.10"
+
+[[deps.GR_jll]]
+deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "FreeType2_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Qt6Base_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "b90934c8cb33920a8dc66736471dc3961b42ec9f"
+uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
+version = "0.73.10+0"
+
+[[deps.GeoFormatTypes]]
+git-tree-sha1 = "59107c179a586f0fe667024c5eb7033e81333271"
+uuid = "68eda718-8dee-11e9-39e7-89f7f65f511f"
+version = "0.4.2"
+
+[[deps.GeoInterface]]
+deps = ["DataAPI", "Extents", "GeoFormatTypes"]
+git-tree-sha1 = "f4ee66b6b1872a4ca53303fbb51d158af1bf88d4"
+uuid = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+version = "1.4.0"
+
+[[deps.GeometryBasics]]
+deps = ["EarCut_jll", "Extents", "GeoInterface", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
+git-tree-sha1 = "b62f2b2d76cee0d61a2ef2b3118cd2a3215d3134"
+uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+version = "0.4.11"
+
+[[deps.GeometryTypes]]
+deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "d796f7be0383b5416cd403420ce0af083b0f9b28"
+uuid = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
+version = "0.8.5"
+
+[[deps.Gettext_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "9b02998aba7bf074d14de89f9d37ca24a1a0b046"
+uuid = "78b55507-aeef-58d4-861c-77aaff3498b1"
+version = "0.21.0+0"
+
+[[deps.Glib_jll]]
+deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE2_jll", "Zlib_jll"]
+git-tree-sha1 = "b0036b392358c80d2d2124746c2bf3d48d457938"
+uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
+version = "2.82.4+0"
+
+[[deps.GraphRecipes]]
+deps = ["AbstractTrees", "GeometryTypes", "Graphs", "InteractiveUtils", "Interpolations", "LinearAlgebra", "NaNMath", "NetworkLayout", "PlotUtils", "RecipesBase", "SparseArrays", "Statistics"]
+git-tree-sha1 = "10920601dc51d2231bb3d2111122045efed8def0"
+uuid = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+version = "0.5.13"
+
+[[deps.Graphite2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "01979f9b37367603e2848ea225918a3b3861b606"
+uuid = "3b182d85-2403-5c21-9c21-1e1f0cc25472"
+version = "1.3.14+1"
+
+[[deps.Graphs]]
+deps = ["ArnoldiMethod", "Compat", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
+git-tree-sha1 = "1dc470db8b1131cfc7fb4c115de89fe391b9e780"
+uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
+version = "1.12.0"
+
+[[deps.Grisu]]
+git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
+uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
+version = "1.0.2"
+
+[[deps.HTTP]]
+deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
+git-tree-sha1 = "c67b33b085f6e2faf8bf79a61962e7339a81129c"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "1.10.15"
+
+[[deps.HarfBuzz_jll]]
+deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
+git-tree-sha1 = "55c53be97790242c29031e5cd45e8ac296dadda3"
+uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
+version = "8.5.0+0"
+
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.5"
+
+[[deps.Inflate]]
+git-tree-sha1 = "d1b1b796e47d94588b3757fe84fbf65a5ec4a80d"
+uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
+version = "0.1.5"
+
+[[deps.IntegerMathUtils]]
+git-tree-sha1 = "b8ffb903da9f7b8cf695a8bead8e01814aa24b30"
+uuid = "18e54dd8-cb9d-406c-a71d-865a43cbb235"
+version = "0.1.2"
+
+[[deps.InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
+
+[[deps.Interpolations]]
+deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "88a101217d7cb38a7b481ccd50d21876e1d1b0e0"
+uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+version = "0.15.1"
+weakdeps = ["Unitful"]
+
+    [deps.Interpolations.extensions]
+    InterpolationsUnitfulExt = "Unitful"
+
+[[deps.IrrationalConstants]]
+git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
+uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
+version = "0.2.2"
+
+[[deps.IterTools]]
+git-tree-sha1 = "42d5f897009e7ff2cf88db414a389e5ed1bdd023"
+uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
+version = "1.10.0"
+
+[[deps.IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
+
+[[deps.JLFzf]]
+deps = ["Pipe", "REPL", "Random", "fzf_jll"]
+git-tree-sha1 = "71b48d857e86bf7a1838c4736545699974ce79a2"
+uuid = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
+version = "0.1.9"
+
+[[deps.JLLWrappers]]
+deps = ["Artifacts", "Preferences"]
+git-tree-sha1 = "a007feb38b422fbdab534406aeca1b86823cb4d6"
+uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+version = "1.7.0"
+
+[[deps.JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.4"
+
+[[deps.JpegTurbo_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "eac1206917768cb54957c65a615460d87b455fc1"
+uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
+version = "3.1.1+0"
+
+[[deps.LAME_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "170b660facf5df5de098d866564877e119141cbd"
+uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
+version = "3.100.2+0"
+
+[[deps.LERC_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "78e0f4b5270c4ae09c7c5f78e77b904199038945"
+uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
+version = "4.0.0+2"
+
+[[deps.LLVMOpenMP_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "78211fb6cbc872f77cad3fc0b6cf647d923f4929"
+uuid = "1d63c593-3942-5779-bab2-d838dc0a180e"
+version = "18.1.7+0"
+
+[[deps.LZO_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "854a9c268c43b77b0a27f22d7fab8d33cdb3a731"
+uuid = "dd4b983a-f0e5-5f8d-a1b7-129d4a5fb1ac"
+version = "2.10.2+3"
+
+[[deps.LaTeXStrings]]
+git-tree-sha1 = "dda21b8cbd6a6c40d9d02a73230f9d70fed6918c"
+uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+version = "1.4.0"
+
+[[deps.Latexify]]
+deps = ["Format", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
+git-tree-sha1 = "ce5f5621cac23a86011836badfedf664a612cee4"
+uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+version = "0.16.5"
+
+    [deps.Latexify.extensions]
+    DataFramesExt = "DataFrames"
+    SparseArraysExt = "SparseArrays"
+    SymEngineExt = "SymEngine"
+
+    [deps.Latexify.weakdeps]
+    DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LazilyInitializedFields]]
+git-tree-sha1 = "0f2da712350b020bc3957f269c9caad516383ee0"
+uuid = "0e77f7df-68c5-4e49-93ce-4cd80f5598bf"
+version = "1.3.0"
+
+[[deps.LibCURL]]
+deps = ["LibCURL_jll", "MozillaCACerts_jll"]
+uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.4"
+
+[[deps.LibCURL_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
+uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "8.6.0+0"
+
+[[deps.LibGit2]]
+deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
+uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
+
+[[deps.LibGit2_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
+uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
+version = "1.7.2+0"
+
+[[deps.LibSSH2_jll]]
+deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
+uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.11.0+1"
+
+[[deps.Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
+
+[[deps.Libffi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "27ecae93dd25ee0909666e6835051dd684cc035e"
+uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
+version = "3.2.2+2"
+
+[[deps.Libgcrypt_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll"]
+git-tree-sha1 = "8be878062e0ffa2c3f67bb58a595375eda5de80b"
+uuid = "d4300ac3-e22c-5743-9152-c294e39db1e4"
+version = "1.11.0+0"
+
+[[deps.Libglvnd_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll", "Xorg_libXext_jll"]
+git-tree-sha1 = "ff3b4b9d35de638936a525ecd36e86a8bb919d11"
+uuid = "7e76a0d4-f3c7-5321-8279-8d96eeed0f29"
+version = "1.7.0+0"
+
+[[deps.Libgpg_error_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "df37206100d39f79b3376afb6b9cee4970041c61"
+uuid = "7add5ba3-2f88-524e-9cd5-f83b8a55f7b8"
+version = "1.51.1+0"
+
+[[deps.Libiconv_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "61dfdba58e585066d8bce214c5a51eaa0539f269"
+uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
+version = "1.17.0+1"
+
+[[deps.Libmount_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "84eef7acd508ee5b3e956a2ae51b05024181dee0"
+uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
+version = "2.40.2+2"
+
+[[deps.Libtiff_jll]]
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "XZ_jll", "Zlib_jll", "Zstd_jll"]
+git-tree-sha1 = "b404131d06f7886402758c9ce2214b636eb4d54a"
+uuid = "89763e89-9b03-5906-acba-b20f662cd828"
+version = "4.7.0+0"
+
+[[deps.Libuuid_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "edbf5309f9ddf1cab25afc344b1e8150b7c832f9"
+uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
+version = "2.40.2+2"
+
+[[deps.LinearAlgebra]]
+deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
+
+[[deps.LogExpFunctions]]
+deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
+git-tree-sha1 = "13ca9e2586b89836fd20cccf56e57e2b9ae7f38f"
+uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+version = "0.3.29"
+
+    [deps.LogExpFunctions.extensions]
+    LogExpFunctionsChainRulesCoreExt = "ChainRulesCore"
+    LogExpFunctionsChangesOfVariablesExt = "ChangesOfVariables"
+    LogExpFunctionsInverseFunctionsExt = "InverseFunctions"
+
+    [deps.LogExpFunctions.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    ChangesOfVariables = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+
+[[deps.Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
+
+[[deps.LoggingExtras]]
+deps = ["Dates", "Logging"]
+git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
+uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+version = "1.1.0"
+
+[[deps.MIMEs]]
+git-tree-sha1 = "1833212fd6f580c20d4291da9c1b4e8a655b128e"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "1.0.0"
+
+[[deps.MacroTools]]
+deps = ["Markdown", "Random"]
+git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.13"
+
+[[deps.Malt]]
+deps = ["Distributed", "Logging", "RelocatableFolders", "Serialization", "Sockets"]
+git-tree-sha1 = "02a728ada9d6caae583a0f87c1dd3844f99ec3fd"
+uuid = "36869731-bdee-424d-aa32-cab38c994e3b"
+version = "1.1.2"
+
+[[deps.Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
+
+[[deps.MbedTLS]]
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
+git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "1.1.9"
+
+[[deps.MbedTLS_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.6+0"
+
+[[deps.Measures]]
+git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
+uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
+version = "0.3.2"
+
+[[deps.Missings]]
+deps = ["DataAPI"]
+git-tree-sha1 = "ec4f7fbeab05d7747bdf98eb74d130a2a2ed298d"
+uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
+version = "1.2.0"
+
+[[deps.Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
+
+[[deps.MozillaCACerts_jll]]
+uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2023.12.12"
+
+[[deps.MsgPack]]
+deps = ["Serialization"]
+git-tree-sha1 = "f5db02ae992c260e4826fe78c942954b48e1d9c2"
+uuid = "99f44e22-a591-53d1-9472-aa23ef4bd671"
+version = "1.2.1"
+
+[[deps.NaNMath]]
+deps = ["OpenLibm_jll"]
+git-tree-sha1 = "0877504529a3e5c3343c6f8b4c0381e57e4387e4"
+uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+version = "1.0.2"
+
+[[deps.NetworkLayout]]
+deps = ["GeometryBasics", "LinearAlgebra", "Random", "Requires", "StaticArrays"]
+git-tree-sha1 = "0c51e19351dc1eecc61bc23caaf2262e7ba71973"
+uuid = "46757867-2c16-5918-afeb-47bfcb05e46a"
+version = "0.4.7"
+weakdeps = ["Graphs"]
+
+    [deps.NetworkLayout.extensions]
+    NetworkLayoutGraphsExt = "Graphs"
+
+[[deps.NetworkOptions]]
+uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
+
+[[deps.OffsetArrays]]
+git-tree-sha1 = "5e1897147d1ff8d98883cda2be2187dcf57d8f0c"
+uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+version = "1.15.0"
+weakdeps = ["Adapt"]
+
+    [deps.OffsetArrays.extensions]
+    OffsetArraysAdaptExt = "Adapt"
+
+[[deps.Ogg_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "887579a3eb005446d514ab7aeac5d1d027658b8f"
+uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
+version = "1.3.5+1"
+
+[[deps.OpenBLAS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.27+1"
+
+[[deps.OpenLibm_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
+version = "0.8.1+2"
+
+[[deps.OpenSSL]]
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "38cb508d080d21dc1128f7fb04f20387ed4c0af4"
+uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
+version = "1.4.3"
+
+[[deps.OpenSSL_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "7493f61f55a6cce7325f197443aa80d32554ba10"
+uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+version = "3.0.15+3"
+
+[[deps.Opus_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6703a85cb3781bd5909d48730a67205f3f31a575"
+uuid = "91d4177d-7536-5919-b921-800302f37372"
+version = "1.3.3+0"
+
+[[deps.OrderedCollections]]
+git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
+uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+version = "1.7.0"
+
+[[deps.PCRE2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+version = "10.42.0+1"
+
+[[deps.Pango_jll]]
+deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "ed6834e95bd326c52d5675b4181386dfbe885afb"
+uuid = "36c8627f-9965-5494-a995-c6b170f724f3"
+version = "1.55.5+0"
+
+[[deps.Parsers]]
+deps = ["Dates", "PrecompileTools", "UUIDs"]
+git-tree-sha1 = "8489905bcdbcfac64d1daa51ca07c0d8f0283821"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "2.8.1"
+
+[[deps.Pipe]]
+git-tree-sha1 = "6842804e7867b115ca9de748a0cf6b364523c16d"
+uuid = "b98c9c47-44ae-5843-9183-064241ee97a0"
+version = "1.3.0"
+
+[[deps.Pixman_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LLVMOpenMP_jll", "Libdl"]
+git-tree-sha1 = "35621f10a7531bc8fa58f74610b1bfb70a3cfc6b"
+uuid = "30392449-352a-5448-841d-b1acce4e97dc"
+version = "0.43.4+0"
+
+[[deps.Pkg]]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
+
+[[deps.PlotThemes]]
+deps = ["PlotUtils", "Statistics"]
+git-tree-sha1 = "41031ef3a1be6f5bbbf3e8073f210556daeae5ca"
+uuid = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
+version = "3.3.0"
+
+[[deps.PlotUtils]]
+deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random", "Reexport", "StableRNGs", "Statistics"]
+git-tree-sha1 = "3ca9a356cd2e113c420f2c13bea19f8d3fb1cb18"
+uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
+version = "1.4.3"
+
+[[deps.Plots]]
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
+git-tree-sha1 = "dae01f8c2e069a683d3a6e17bbae5070ab94786f"
+uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+version = "1.40.9"
+
+    [deps.Plots.extensions]
+    FileIOExt = "FileIO"
+    GeometryBasicsExt = "GeometryBasics"
+    IJuliaExt = "IJulia"
+    ImageInTerminalExt = "ImageInTerminal"
+    UnitfulExt = "Unitful"
+
+    [deps.Plots.weakdeps]
+    FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+    GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+    IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+    ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
+    Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[[deps.Pluto]]
+deps = ["Base64", "Configurations", "Dates", "Downloads", "ExpressionExplorer", "FileWatching", "FuzzyCompletions", "HTTP", "HypertextLiteral", "InteractiveUtils", "Logging", "LoggingExtras", "MIMEs", "Malt", "Markdown", "MsgPack", "Pkg", "PlutoDependencyExplorer", "PrecompileSignatures", "PrecompileTools", "REPL", "RegistryInstances", "RelocatableFolders", "Scratch", "Sockets", "TOML", "Tables", "URIs", "UUIDs"]
+git-tree-sha1 = "b5509a2e4d4c189da505b780e3f447d1e38a0350"
+uuid = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+version = "0.20.4"
+
+[[deps.PlutoDependencyExplorer]]
+deps = ["ExpressionExplorer", "InteractiveUtils", "Markdown"]
+git-tree-sha1 = "e0864c15334d2c4bac8137ce3359f1174565e719"
+uuid = "72656b73-756c-7461-726b-72656b6b696b"
+version = "1.2.0"
+
+[[deps.PrecompileSignatures]]
+git-tree-sha1 = "18ef344185f25ee9d51d80e179f8dad33dc48eb1"
+uuid = "91cefc8d-f054-46dc-8f8c-26e11d7c5411"
+version = "3.0.3"
+
+[[deps.PrecompileTools]]
+deps = ["Preferences"]
+git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
+uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+version = "1.2.1"
+
+[[deps.Preferences]]
+deps = ["TOML"]
+git-tree-sha1 = "9306f6085165d270f7e3db02af26a400d580f5c6"
+uuid = "21216c6a-2e73-6563-6e65-726566657250"
+version = "1.4.3"
+
+[[deps.Primes]]
+deps = ["IntegerMathUtils"]
+git-tree-sha1 = "1d05623b5952aed1307bf8b43bec8b8d1ef94b6e"
+uuid = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+version = "0.5.5"
+
+[[deps.Printf]]
+deps = ["Unicode"]
+uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
+
+[[deps.PtrArrays]]
+git-tree-sha1 = "77a42d78b6a92df47ab37e177b2deac405e1c88f"
+uuid = "43287f4e-b6f4-7ad1-bb20-aadabca52c3d"
+version = "1.2.1"
+
+[[deps.Qt6Base_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Vulkan_Loader_jll", "Xorg_libSM_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_cursor_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "libinput_jll", "xkbcommon_jll"]
+git-tree-sha1 = "492601870742dcd38f233b23c3ec629628c1d724"
+uuid = "c0090381-4147-56d7-9ebc-da0b1113ec56"
+version = "6.7.1+1"
+
+[[deps.Qt6Declarative_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll", "Qt6ShaderTools_jll"]
+git-tree-sha1 = "e5dd466bf2569fe08c91a2cc29c1003f4797ac3b"
+uuid = "629bc702-f1f5-5709-abd5-49b8460ea067"
+version = "6.7.1+2"
+
+[[deps.Qt6ShaderTools_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll"]
+git-tree-sha1 = "1a180aeced866700d4bebc3120ea1451201f16bc"
+uuid = "ce943373-25bb-56aa-8eca-768745ed7b5a"
+version = "6.7.1+1"
+
+[[deps.Qt6Wayland_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll", "Qt6Declarative_jll"]
+git-tree-sha1 = "729927532d48cf79f49070341e1d918a65aba6b0"
+uuid = "e99dba38-086e-5de3-a5b1-6e4c66e897c3"
+version = "6.7.1+1"
+
+[[deps.REPL]]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
+uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
+
+[[deps.Random]]
+deps = ["SHA"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
+
+[[deps.Ratios]]
+deps = ["Requires"]
+git-tree-sha1 = "1342a47bf3260ee108163042310d26f2be5ec90b"
+uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
+version = "0.4.5"
+weakdeps = ["FixedPointNumbers"]
+
+    [deps.Ratios.extensions]
+    RatiosFixedPointNumbersExt = "FixedPointNumbers"
+
+[[deps.RecipesBase]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "5c3d09cc4f31f5fc6af001c250bf1278733100ff"
+uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+version = "1.3.4"
+
+[[deps.RecipesPipeline]]
+deps = ["Dates", "NaNMath", "PlotUtils", "PrecompileTools", "RecipesBase"]
+git-tree-sha1 = "45cf9fd0ca5839d06ef333c8201714e888486342"
+uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
+version = "0.6.12"
+
+[[deps.Reexport]]
+git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
+uuid = "189a3867-3050-52da-a836-e630ba90ab69"
+version = "1.2.2"
+
+[[deps.RegistryInstances]]
+deps = ["LazilyInitializedFields", "Pkg", "TOML", "Tar"]
+git-tree-sha1 = "ffd19052caf598b8653b99404058fce14828be51"
+uuid = "2792f1a3-b283-48e8-9a74-f99dce5104f3"
+version = "0.1.0"
+
+[[deps.RelocatableFolders]]
+deps = ["SHA", "Scratch"]
+git-tree-sha1 = "ffdaf70d81cf6ff22c2b6e733c900c3321cab864"
+uuid = "05181044-ff0b-4ac5-8273-598c1e38db00"
+version = "1.0.1"
+
+[[deps.Requires]]
+deps = ["UUIDs"]
+git-tree-sha1 = "838a3a4188e2ded87a4f9f184b4b0d78a1e91cb7"
+uuid = "ae029012-a4dd-5104-9daa-d747884805df"
+version = "1.3.0"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
+
+[[deps.Scratch]]
+deps = ["Dates"]
+git-tree-sha1 = "3bac05bc7e74a75fd9cba4295cde4045d9fe2386"
+uuid = "6c6a2e73-6563-6170-7368-637461726353"
+version = "1.2.1"
+
+[[deps.Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
+
+[[deps.SharedArrays]]
+deps = ["Distributed", "Mmap", "Random", "Serialization"]
+uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+version = "1.11.0"
+
+[[deps.Showoff]]
+deps = ["Dates", "Grisu"]
+git-tree-sha1 = "91eddf657aca81df9ae6ceb20b959ae5653ad1de"
+uuid = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
+version = "1.0.3"
+
+[[deps.SimpleBufferStream]]
+git-tree-sha1 = "f305871d2f381d21527c770d4788c06c097c9bc1"
+uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
+version = "1.2.0"
+
+[[deps.SimpleTraits]]
+deps = ["InteractiveUtils", "MacroTools"]
+git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
+uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
+version = "0.9.4"
+
+[[deps.Sockets]]
+uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
+
+[[deps.SortingAlgorithms]]
+deps = ["DataStructures"]
+git-tree-sha1 = "66e0a8e672a0bdfca2c3f5937efb8538b9ddc085"
+uuid = "a2af1166-a08f-5f64-846c-94a0d3cef48c"
+version = "1.2.1"
+
+[[deps.SparseArrays]]
+deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
+uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+version = "1.11.0"
+
+[[deps.StableRNGs]]
+deps = ["Random"]
+git-tree-sha1 = "83e6cce8324d49dfaf9ef059227f91ed4441a8e5"
+uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
+version = "1.0.2"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "47091a0340a675c738b1304b58161f3b0839d454"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.10"
+weakdeps = ["ChainRulesCore", "Statistics"]
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
+
+[[deps.StaticArraysCore]]
+git-tree-sha1 = "192954ef1208c7019899fbf8049e717f92959682"
+uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+version = "1.4.3"
+
+[[deps.Statistics]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
+uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
+
+[[deps.StatsAPI]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "1ff449ad350c9c4cbc756624d6f8a8c3ef56d3ed"
+uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
+version = "1.7.0"
+
+[[deps.StatsBase]]
+deps = ["AliasTables", "DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
+git-tree-sha1 = "29321314c920c26684834965ec2ce0dacc9cf8e5"
+uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+version = "0.34.4"
+
+[[deps.StructArrays]]
+deps = ["ConstructionBase", "DataAPI", "Tables"]
+git-tree-sha1 = "9537ef82c42cdd8c5d443cbc359110cbb36bae10"
+uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
+version = "0.6.21"
+
+    [deps.StructArrays.extensions]
+    StructArraysAdaptExt = "Adapt"
+    StructArraysGPUArraysCoreExt = ["GPUArraysCore", "KernelAbstractions"]
+    StructArraysLinearAlgebraExt = "LinearAlgebra"
+    StructArraysSparseArraysExt = "SparseArrays"
+    StructArraysStaticArraysExt = "StaticArrays"
+
+    [deps.StructArrays.weakdeps]
+    Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+    GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
+    KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
+[[deps.SuiteSparse_jll]]
+deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
+uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
+version = "7.7.0+0"
+
+[[deps.TOML]]
+deps = ["Dates"]
+uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.3"
+
+[[deps.TableTraits]]
+deps = ["IteratorInterfaceExtensions"]
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "1.0.1"
+
+[[deps.Tables]]
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "OrderedCollections", "TableTraits"]
+git-tree-sha1 = "598cd7c1f68d1e205689b1c2fe65a9f85846f297"
+uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+version = "1.12.0"
+
+[[deps.Tar]]
+deps = ["ArgTools", "SHA"]
+uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
+
+[[deps.TensorCore]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
+uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
+version = "0.1.1"
+
+[[deps.Test]]
+deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
+
+[[deps.TranscodingStreams]]
+git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.11.3"
+
+[[deps.Tricks]]
+git-tree-sha1 = "7822b97e99a1672bfb1b49b668a6d46d58d8cbcb"
+uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
+version = "0.1.9"
+
+[[deps.URIs]]
+git-tree-sha1 = "67db6cc7b3821e19ebe75791a9dd19c9b1188f2b"
+uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+version = "1.5.1"
+
+[[deps.UUIDs]]
+deps = ["Random", "SHA"]
+uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
+
+[[deps.Unicode]]
+uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
+
+[[deps.UnicodeFun]]
+deps = ["REPL"]
+git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
+uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
+version = "0.4.1"
+
+[[deps.Unitful]]
+deps = ["Dates", "LinearAlgebra", "Random"]
+git-tree-sha1 = "01915bfcd62be15329c9a07235447a89d588327c"
+uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
+version = "1.21.1"
+
+    [deps.Unitful.extensions]
+    ConstructionBaseUnitfulExt = "ConstructionBase"
+    InverseFunctionsUnitfulExt = "InverseFunctions"
+
+    [deps.Unitful.weakdeps]
+    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+
+[[deps.UnitfulLatexify]]
+deps = ["LaTeXStrings", "Latexify", "Unitful"]
+git-tree-sha1 = "975c354fcd5f7e1ddcc1f1a23e6e091d99e99bc8"
+uuid = "45397f5d-5981-4c77-b2b3-fc36d6e9b728"
+version = "1.6.4"
+
+[[deps.Unzip]]
+git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
+uuid = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
+version = "0.2.0"
+
+[[deps.Vulkan_Loader_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Wayland_jll", "Xorg_libX11_jll", "Xorg_libXrandr_jll", "xkbcommon_jll"]
+git-tree-sha1 = "2f0486047a07670caad3a81a075d2e518acc5c59"
+uuid = "a44049a8-05dd-5a78-86c9-5fde0876e88c"
+version = "1.3.243+0"
+
+[[deps.Wayland_jll]]
+deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "85c7811eddec9e7f22615371c3cc81a504c508ee"
+uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
+version = "1.21.0+2"
+
+[[deps.Wayland_protocols_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "5db3e9d307d32baba7067b13fc7b5aa6edd4a19a"
+uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
+version = "1.36.0+0"
+
+[[deps.WoodburyMatrices]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "c1a7aa6219628fcd757dede0ca95e245c5cd9511"
+uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
+version = "1.0.0"
+
+[[deps.XML2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
+git-tree-sha1 = "a2fccc6559132927d4c5dc183e3e01048c6dcbd6"
+uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
+version = "2.13.5+0"
+
+[[deps.XSLT_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgcrypt_jll", "Libgpg_error_jll", "Libiconv_jll", "XML2_jll", "Zlib_jll"]
+git-tree-sha1 = "7d1671acbe47ac88e981868a078bd6b4e27c5191"
+uuid = "aed1982a-8fda-507f-9586-7b0439959a61"
+version = "1.1.42+0"
+
+[[deps.XZ_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "15e637a697345f6743674f1322beefbc5dcd5cfc"
+uuid = "ffd25f8a-64ca-5728-b0f7-c24cf3aae800"
+version = "5.6.3+2"
+
+[[deps.Xorg_libICE_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "326b4fea307b0b39892b3e85fa451692eda8d46c"
+uuid = "f67eecfb-183a-506d-b269-f58e52b52d7c"
+version = "1.1.1+0"
+
+[[deps.Xorg_libSM_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libICE_jll"]
+git-tree-sha1 = "3796722887072218eabafb494a13c963209754ce"
+uuid = "c834827a-8449-5923-a945-d239c165b7dd"
+version = "1.2.4+0"
+
+[[deps.Xorg_libX11_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxcb_jll", "Xorg_xtrans_jll"]
+git-tree-sha1 = "9dafcee1d24c4f024e7edc92603cedba72118283"
+uuid = "4f6342f7-b3d2-589e-9d20-edeb45f2b2bc"
+version = "1.8.6+3"
+
+[[deps.Xorg_libXau_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "2b0e27d52ec9d8d483e2ca0b72b3cb1a8df5c27a"
+uuid = "0c0b7dd1-d40b-584c-a123-a41640f87eec"
+version = "1.0.11+3"
+
+[[deps.Xorg_libXcursor_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXfixes_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "807c226eaf3651e7b2c468f687ac788291f9a89b"
+uuid = "935fb764-8cf2-53bf-bb30-45bb1f8bf724"
+version = "1.2.3+0"
+
+[[deps.Xorg_libXdmcp_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "02054ee01980c90297412e4c809c8694d7323af3"
+uuid = "a3789734-cfe1-5b06-b2d0-1dd0d9d62d05"
+version = "1.1.4+3"
+
+[[deps.Xorg_libXext_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "d7155fea91a4123ef59f42c4afb5ab3b4ca95058"
+uuid = "1082639a-0dae-5f34-9b06-72781eeb8cb3"
+version = "1.3.6+3"
+
+[[deps.Xorg_libXfixes_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "6fcc21d5aea1a0b7cce6cab3e62246abd1949b86"
+uuid = "d091e8ba-531a-589c-9de9-94069b037ed8"
+version = "6.0.0+0"
+
+[[deps.Xorg_libXi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXfixes_jll"]
+git-tree-sha1 = "984b313b049c89739075b8e2a94407076de17449"
+uuid = "a51aa0fd-4e3c-5386-b890-e753decda492"
+version = "1.8.2+0"
+
+[[deps.Xorg_libXinerama_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll"]
+git-tree-sha1 = "a1a7eaf6c3b5b05cb903e35e8372049b107ac729"
+uuid = "d1454406-59df-5ea1-beac-c340f2130bc3"
+version = "1.1.5+0"
+
+[[deps.Xorg_libXrandr_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "b6f664b7b2f6a39689d822a6300b14df4668f0f4"
+uuid = "ec84b674-ba8e-5d96-8ba1-2a689ba10484"
+version = "1.5.4+0"
+
+[[deps.Xorg_libXrender_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "a490c6212a0e90d2d55111ac956f7c4fa9c277a6"
+uuid = "ea2f1a96-1ddc-540d-b46f-429655e07cfa"
+version = "0.9.11+1"
+
+[[deps.Xorg_libpthread_stubs_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "fee57a273563e273f0f53275101cd41a8153517a"
+uuid = "14d82f49-176c-5ed1-bb49-ad3f5cbd8c74"
+version = "0.1.1+3"
+
+[[deps.Xorg_libxcb_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "XSLT_jll", "Xorg_libXau_jll", "Xorg_libXdmcp_jll", "Xorg_libpthread_stubs_jll"]
+git-tree-sha1 = "1a74296303b6524a0472a8cb12d3d87a78eb3612"
+uuid = "c7cfdc94-dc32-55de-ac96-5a1b8d977c5b"
+version = "1.17.0+3"
+
+[[deps.Xorg_libxkbfile_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "dbc53e4cf7701c6c7047c51e17d6e64df55dca94"
+uuid = "cc61e674-0454-545c-8b26-ed2c68acab7a"
+version = "1.1.2+1"
+
+[[deps.Xorg_xcb_util_cursor_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_jll", "Xorg_xcb_util_renderutil_jll"]
+git-tree-sha1 = "04341cb870f29dcd5e39055f895c39d016e18ccd"
+uuid = "e920d4aa-a673-5f3a-b3d7-f755a4d47c43"
+version = "0.1.4+0"
+
+[[deps.Xorg_xcb_util_image_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "0fab0a40349ba1cba2c1da699243396ff8e94b97"
+uuid = "12413925-8142-5f55-bb0e-6d7ca50bb09b"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libxcb_jll"]
+git-tree-sha1 = "e7fd7b2881fa2eaa72717420894d3938177862d1"
+uuid = "2def613f-5ad1-5310-b15b-b15d46f528f5"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_keysyms_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "d1151e2c45a544f32441a567d1690e701ec89b00"
+uuid = "975044d2-76e6-5fbe-bf08-97ce7c6574c7"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_renderutil_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "dfd7a8f38d4613b6a575253b3174dd991ca6183e"
+uuid = "0d47668e-0667-5a69-a72c-f761630bfb7e"
+version = "0.3.9+1"
+
+[[deps.Xorg_xcb_util_wm_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "e78d10aab01a4a154142c5006ed44fd9e8e31b67"
+uuid = "c22f9ab0-d5fe-5066-847c-f4bb1cd4e361"
+version = "0.4.1+1"
+
+[[deps.Xorg_xkbcomp_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxkbfile_jll"]
+git-tree-sha1 = "ab2221d309eda71020cdda67a973aa582aa85d69"
+uuid = "35661453-b289-5fab-8a00-3d9160c6a3a4"
+version = "1.4.6+1"
+
+[[deps.Xorg_xkeyboard_config_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_xkbcomp_jll"]
+git-tree-sha1 = "691634e5453ad362044e2ad653e79f3ee3bb98c3"
+uuid = "33bec58e-1273-512f-9401-5d533626f822"
+version = "2.39.0+0"
+
+[[deps.Xorg_xtrans_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "b9ead2d2bdb27330545eb14234a2e300da61232e"
+uuid = "c5fb5394-a638-5e4d-96e5-b29de1b5cf10"
+version = "1.5.0+3"
+
+[[deps.Zlib_jll]]
+deps = ["Libdl"]
+uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.13+1"
+
+[[deps.Zstd_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "622cf78670d067c738667aaa96c553430b65e269"
+uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
+version = "1.5.7+0"
+
+[[deps.eudev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "gperf_jll"]
+git-tree-sha1 = "431b678a28ebb559d224c0b6b6d01afce87c51ba"
+uuid = "35ca27e7-8b34-5b7f-bca9-bdc33f59eb06"
+version = "3.2.9+0"
+
+[[deps.fzf_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6e50f145003024df4f5cb96c7fce79466741d601"
+uuid = "214eeab7-80f7-51ab-84ad-2988db7cef09"
+version = "0.56.3+0"
+
+[[deps.gperf_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "0ba42241cb6809f1a278d0bcb976e0483c3f1f2d"
+uuid = "1a1c6b14-54f6-533d-8383-74cd7377aa70"
+version = "3.1.1+1"
+
+[[deps.libaom_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "522c1df09d05a71785765d19c9524661234738e9"
+uuid = "a4ae2306-e953-59d6-aa16-d00cac43593b"
+version = "3.11.0+0"
+
+[[deps.libass_jll]]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "e17c115d55c5fbb7e52ebedb427a0dca79d4484e"
+uuid = "0ac62f75-1d6f-5e53-bd7c-93b484bb37c0"
+version = "0.15.2+0"
+
+[[deps.libblastrampoline_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.11.0+0"
+
+[[deps.libdecor_jll]]
+deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
+git-tree-sha1 = "9bf7903af251d2050b467f76bdbe57ce541f7f4f"
+uuid = "1183f4f0-6f2a-5f1a-908b-139f9cdfea6f"
+version = "0.2.2+0"
+
+[[deps.libevdev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "141fe65dc3efabb0b1d5ba74e91f6ad26f84cc22"
+uuid = "2db6ffa8-e38f-5e21-84af-90c45d0032cc"
+version = "1.11.0+0"
+
+[[deps.libfdk_aac_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a22cf860a7d27e4f3498a0fe0811a7957badb38"
+uuid = "f638f0a6-7fb0-5443-88ba-1cc74229b280"
+version = "2.0.3+0"
+
+[[deps.libinput_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "eudev_jll", "libevdev_jll", "mtdev_jll"]
+git-tree-sha1 = "ad50e5b90f222cfe78aa3d5183a20a12de1322ce"
+uuid = "36db933b-70db-51c0-b978-0f229ee0e533"
+version = "1.18.0+0"
+
+[[deps.libpng_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "b7bfd3ab9d2c58c3829684142f5804e4c6499abc"
+uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
+version = "1.6.45+0"
+
+[[deps.libvorbis_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll", "Pkg"]
+git-tree-sha1 = "490376214c4721cdaca654041f635213c6165cb3"
+uuid = "f27f6e37-5d2b-51aa-960f-b287f2bc3b7a"
+version = "1.3.7+2"
+
+[[deps.mtdev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "814e154bdb7be91d78b6802843f76b6ece642f11"
+uuid = "009596ad-96f7-51b1-9f1b-5ce2d5e8a71e"
+version = "1.1.6+0"
+
+[[deps.nghttp2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.59.0+0"
+
+[[deps.p7zip_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+2"
+
+[[deps.x264_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "4fea590b89e6ec504593146bf8b988b2c00922b2"
+uuid = "1270edf5-f2f9-52d2-97e9-ab00b5d0237a"
+version = "2021.5.5+0"
+
+[[deps.x265_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "ee567a171cce03570d77ad3a43e90218e38937a9"
+uuid = "dfaa095f-4041-5dcd-9319-2fabd8486b76"
+version = "3.5.0+0"
+
+[[deps.xkbcommon_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll", "Wayland_protocols_jll", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]
+git-tree-sha1 = "63406453ed9b33a0df95d570816d5366c92b7809"
+uuid = "d8fb68d0-12a3-5cfd-a85a-d49703b185fd"
+version = "1.4.1+2"
+"""
+
+# ╔═╡ Cell order:
+# ╟─fcaf83d0-f611-11eb-1bc9-31384cf290cb
+# ╟─6d09aba9-b862-4e38-a4a9-fd718d4744c4
+# ╟─23534646-17d3-4cba-8505-10991158a47c
+# ╟─b64b7617-c882-44b3-9400-863138f3678e
+# ╠═b58f3d47-bc97-4b54-ad3e-19b775e6849c
+# ╟─35a00708-a1ff-4b0c-a4eb-50452e394e06
+# ╟─fc96aecc-a50e-4b17-aeda-1294bdf2ec0b
+# ╠═66a32388-59bf-4cda-946d-a299487c8760
+# ╠═da94c3aa-381d-4604-bdd8-298f74ccd998
+# ╠═6dce0f0d-290f-429b-8c4d-d9a3e9ea5357
+# ╠═22f5327d-b4ea-4eae-badb-cf8a139b4bd3
+# ╟─d123c9b7-7473-40b3-981c-03a4c88e2126
+# ╠═414fada3-20bd-4085-9dcc-ae279600ad30
+# ╠═038c0c86-ec82-4f7d-a271-a06490995528
+# ╠═3107665f-2e0e-493e-aec8-e536ccea0492
+# ╠═fc40132c-b9b4-4c04-a67a-88f382482189
+# ╠═c14293eb-0a71-4e59-8a85-d65354ca1db0
+# ╠═9b30ad81-9829-48f6-b125-9a61ee3bcc05
+# ╠═4c9de0d0-dd9d-4371-9a1b-9523d641ad32
+# ╟─d50c7a2f-a7cf-4b1a-8b07-c3cdf96024d0
+# ╠═452f1c9a-d2b5-46bf-adcc-af9f80b62d68
+# ╠═19cf97ec-4c9a-4069-9dce-fa265bb904e5
+# ╠═d56f43ca-11dc-491f-b6ad-f332a2e2731c
+# ╟─c37fb2db-62ef-4eeb-a7cf-27a3cde6bb64
+# ╠═afcd5e13-b61a-491a-bf4f-47ea59fe112d
+# ╠═e78e17f2-c9fa-4f5b-aefc-8c3e580f117f
+# ╠═c1fd79b5-abfa-44b6-bc10-783f4b1c9924
+# ╠═f1aa9700-1c4a-4a7d-8563-595984bd4a19
+# ╠═5504eb77-0e64-4321-8db9-6449deaa401f
+# ╠═b8e74e16-deed-4903-aaea-d68e3e9d6024
+# ╠═46cc1617-f160-4041-bd79-193d311afb61
+# ╟─db02e8a1-4131-4c0f-9975-6223dafd1631
+# ╠═768cc486-5e6e-4ce1-bf2c-a35151a4793f
+# ╠═dac9cfc1-6b2d-4458-82a6-cf9e2c79fcc1
+# ╠═b5b5a466-e78e-49c0-8ee9-765644596e27
+# ╠═56beed19-5ee7-458b-bd50-3afb9e38e342
+# ╠═a344aaaa-af28-4345-8e96-a6b735fb6023
+# ╠═eb89783e-e948-42d8-b7d5-857a719da9b4
+# ╠═2754573a-24ea-4a7b-85c3-303004aec2e2
+# ╠═2a3be054-6361-4b44-9ceb-465547ce3803
+# ╟─6bd55608-02f5-4b95-8ad9-597abdf106b6
+# ╠═4d06eb30-b117-4b02-b04c-6c459a73bcd8
+# ╠═33fb902c-bece-4876-a731-3eaf7ffe2ff4
+# ╠═9bc0eb42-79b0-4d7b-b472-07abae671439
+# ╠═57187f78-2aeb-4284-90da-b529a298eb91
+# ╟─8d69e081-99d6-404a-805a-5d12821c5f5a
+# ╟─6a7a2391-9cbc-44ef-83f8-5252c1454ac2
+# ╠═fa620300-3307-4bda-97de-1c49fbf58d61
+# ╟─b5278a66-dbca-44d0-96ad-bd8e24e90ee3
+# ╠═81147945-ae09-4fa3-a9ef-288a8c42744e
+# ╟─e555ade7-e8f8-4158-8b68-0af132d8861a
+# ╠═a37e9857-fc51-4fdc-b8a5-50f6607f52bf
+# ╟─d641ab56-f97a-4cab-820d-2d1ce7b3c546
+# ╠═04a9798b-fc72-455e-be71-62842167b292
+# ╟─1c6fbf70-c098-44cc-ac84-28acc220da7d
+# ╠═af7c8d34-5bf3-4e5a-851e-4b7d13b5f6b4
+# ╟─8cec6bc7-37fd-43b0-81de-863d6a93e153
+# ╠═28eca35a-ff7a-4f07-84dd-08d8329f8fd2
+# ╟─fbc3c07c-7db4-4c69-add6-5135d33c2ebd
+# ╠═eb73d8b4-c26f-49a7-9790-49c72fbf85e9
+# ╟─113f62c9-e1b7-44f9-a113-d90be226ef51
+# ╠═25dad7c6-453d-4849-aeb1-cc56ac1c6faa
+# ╟─d6bc8877-7093-4c3c-a256-ab1409183866
+# ╠═3e9d4b35-0e9d-4a23-874c-82ed4edee8fb
+# ╟─be8ba70d-fd85-40d9-bd91-79907b148439
+# ╠═26c58152-1e0a-45e4-bbf9-effefff6c695
+# ╟─7d4832ca-cd8c-49af-aa3e-df0104dc677c
+# ╠═ac8e5704-a619-4545-95c3-313f4e8d6585
+# ╟─714d49ef-ede2-439a-acac-d8065ca22771
+# ╠═6811e773-beb5-442a-88b6-61de219eb71d
+# ╟─534db6f2-c7ea-4e67-9a29-66a1063a3722
+# ╠═6e8b2888-2c41-4868-a451-0f68a0256056
+# ╟─376f22c8-6323-4f4f-ba68-d4066b0c08f5
+# ╠═b9994c20-d8b9-43e0-839f-0727c2280868
+# ╟─38ac1686-0f3a-4969-907d-16e9ab98ea65
+# ╠═dcc6e279-3775-404e-adec-23fe32388032
+# ╟─42f795ad-acd6-49a1-8328-61217325c991
+# ╠═148f7d98-dbd5-473c-ab4a-6fa0559f8413
+# ╟─e698ce81-6cd0-4a9a-931a-5994bf91dc39
+# ╠═9979c1e4-349b-4e0a-87a0-39de45ecdf4c
+# ╠═e6ac837a-adc0-4114-9b09-edb43ab4d5bb
+# ╠═c5ed48aa-74b8-4a68-958f-10aca604ea5b
+# ╠═dca62763-1e1d-48c8-97dc-bc47bca6f2d3
+# ╠═692e04a0-ea2c-4ce4-bee2-2d3d4736259b
+# ╠═df838016-92fc-4255-be0a-85fb0990bce7
+# ╠═cb61b117-245b-4845-808c-70deb40f7061
+# ╠═f2741526-1906-4ea4-8800-17d27a74ed18
+# ╠═218cc9d7-3c37-44a6-82b8-fecdf8e6fc02
+# ╠═d803272a-0090-495d-93a2-d56d2d9b6858
+# ╠═23cdee96-73a6-4bdc-ba7d-627f84821ea5
+# ╠═01ba9d22-919c-4887-919e-88dcfbc7a03c
+# ╟─4cb5f5b4-c0a5-4bac-93e8-1b5069e3863a
+# ╟─c9f0881e-95d4-44ab-8a1b-84b9b1636478
+# ╠═894d5371-66dd-4cfa-83ad-a1a5ef96fe81
+# ╟─9ccc6095-fb94-4bbe-8b79-adf38cacadcf
+# ╠═000041cd-e527-46ba-bdbb-c899ccc0567d
+# ╟─d90c320e-c578-45ea-bc98-f54b63a83a4b
+# ╠═b7f68f0f-6dc4-4131-947e-ec88ad3827b3
+# ╟─0ed8c711-5530-454f-8c7f-8f72fe90032b
+# ╠═bfaca850-d65f-4354-9149-1d97f23cad8b
+# ╟─b9fee51c-774b-474d-a508-962df966b5b0
+# ╠═7906ee7f-c102-42c6-beff-aa08d6f2ebdf
+# ╟─977e806a-b361-4d54-bf12-ea7e46e64bc6
+# ╠═5eed380c-d7f3-4a64-ab58-b2598e4925e1
+# ╟─f0189ee0-ee8f-450f-a909-73050adfb965
+# ╠═c7159488-3e73-4327-bd66-0f80cdc5937b
+# ╟─c6a5e5cb-c266-4315-88a6-e02990d7e21c
+# ╠═29d544ec-ca31-403e-bb47-ac2cb75bb211
+# ╟─2febaefa-c436-4b93-b312-30c2dfda4f9a
+# ╠═a2800255-5583-448f-9b89-8ec4b1bdfe47
+# ╟─1624efd8-abb1-47b4-b42d-b190c0a93099
+# ╠═7297f795-c99d-46f0-bf6b-30ba3954b4d4
+# ╟─8edd5779-2050-4255-aee0-1b28edff2540
+# ╠═b1cc4859-166c-4836-817f-6bfe480978ca
+# ╟─ec478f2e-1b78-44f6-a99f-7822fb1594b8
+# ╠═186e941a-d81b-4f64-a974-346268d74654
+# ╟─e5fa1992-0f35-467f-a113-66a0f6a45b48
+# ╠═f7288e68-eb85-4a4a-b744-d7fb82446d17
+# ╟─b9732f72-9344-45f4-9b44-09ff50c1c373
+# ╠═0e33cbc9-159f-4d26-b945-490e3922037a
+# ╟─f150a27b-728c-47ef-945d-62331de9f474
+# ╠═ecb30694-9742-4519-8b51-c1d520a7335e
+# ╟─6cece608-0153-4415-963f-e94bc54c32c2
+# ╠═134fb4b5-29d2-41be-8ccd-5dff7a7d6cf0
+# ╟─374eccff-3888-4760-9ce7-09b388beaed0
+# ╟─84499038-4ed6-46fc-a6d1-70a5964c3f3e
+# ╟─99f32ce2-e7c5-4a0a-b466-d7ecf5ef6af4
+# ╠═8bbdd3d4-9a2b-478d-8ba4-7ca3a10aa86e
+# ╠═0af40eda-a6fd-4fb3-9d77-129c02d66b79
+# ╟─bff175b8-7637-40ae-84a5-3047a5c71d30
+# ╠═5ee7549a-dff7-4809-b63c-ebf572ad10eb
+# ╟─65c473e2-c57a-4045-bd41-1f0ee046ef0f
+# ╠═770100ce-9cd8-4892-a3c0-d15c97192b5b
+# ╟─d83d7003-094c-4e99-8762-d642156581d0
+# ╠═247589bd-70b9-4677-bf8f-472aa4d57804
+# ╟─24479ece-4777-4c18-a846-682c2364486d
+# ╠═708d6883-e125-489e-bbe7-76ff0fa59aa6
+# ╠═80174e42-0389-4efe-b80a-97625860c4dd
+# ╠═18bcfbd7-be4e-45d3-8e80-0953a422368d
+# ╠═d3002fe5-3fc9-493e-93ca-e0e243845d68
+# ╟─cebc2513-0f94-41df-ab52-9bfe6815bb8d
+# ╠═e57b3eb9-a394-4253-8f23-76ff51bc1998
+# ╠═8d905cbe-ca91-413c-ae68-0c7613685b5b
+# ╠═7079c8a5-af5b-4083-b494-aaaf0ed1336a
+# ╠═cd1ed62c-086a-4d92-b625-dfce3362f1c6
+# ╠═f3dc6cb1-d360-4684-a860-09da9180456a
+# ╠═f22888d3-26a2-4dc5-af18-4f9e5e05ba91
+# ╠═e7b85f55-93e2-41d5-8a0c-2948e943c3f2
+# ╠═ac859543-dae4-49de-9afc-ea9c5d6600e8
+# ╠═49ad573f-078e-4ebb-a1e2-da27e6c46a1d
+# ╠═643e4865-a682-4ef5-9c04-1e058d60f01b
+# ╠═6d344ac0-c073-45ae-8d74-532ae7001a92
+# ╟─c9403479-b7e2-4391-a058-541501434de0
+# ╠═8a3e42bf-6c51-4201-b894-a96bc3b8c6b6
+# ╠═cbdc8f90-774b-49ad-8736-033e4d98fbd3
+# ╠═ce83ac3a-974f-4c2a-b407-16f89055c66c
+# ╠═b90b682f-e083-44b9-93e8-2d7f143c8386
+# ╠═ff66c235-6d17-42ad-bbfd-7b4cd5dd0bac
+# ╠═a8d176f8-af2e-4fbe-a4ae-2588443f80e1
+# ╠═2408748e-f577-48b4-8828-e8bc59914a7a
+# ╠═13d75f8a-edc4-4042-8473-7eb24764b404
+# ╠═5474b2e3-ca51-42ce-9a61-f8a22420a162
+# ╠═e2116f5a-636b-4194-9e5f-acffa2656a1c
+# ╠═b2432745-1d5e-4f47-8c8e-dfa360bf3923
+# ╠═4ca1868f-c694-47fe-be38-6f1899c8e902
+# ╠═41e11d01-7a92-4663-8b79-3d7302cbc985
+# ╠═2275dc7a-43d9-47aa-a5ab-e1b53a8c7df2
+# ╠═442e1767-4055-4a49-9f46-665240a0537d
+# ╟─cac5241d-8e7c-4c78-87ff-9df4d12632af
+# ╟─8cbdd3f2-e7d5-4e78-9d0b-34b43ac14b40
+# ╠═eb712016-f15a-43aa-96b0-e129bff835f8
+# ╟─f7513770-7b6c-4bc8-b9fb-ca306f0cb9d8
+# ╠═f05ef05e-f1be-4706-b950-77e273c7884e
+# ╟─c433c8bd-43e4-463a-8ff2-7b6bb70aaef3
+# ╠═681da4df-ecb6-40ec-a5b8-03d49b25822c
+# ╟─5bcdaf47-9be0-4824-bd99-da274e30a360
+# ╠═cb5d584d-5928-4223-9daf-139397b2e380
+# ╟─72c045cb-9655-4f2c-8340-4d9b19e11fce
+# ╠═6882300e-3e56-4eac-b7de-b6dd78a4d5cb
+# ╟─3351208c-94a4-4cc4-a3d0-851b0986010a
+# ╠═55293415-c1d3-4f8d-ab45-098e4a86d295
+# ╟─8408cbef-007b-4b64-a7d3-be4944113217
+# ╠═2a484f43-8e7b-4e6e-88c0-1d27a45cf4aa
+# ╟─076c461a-7a4b-42d7-a7fd-1006a8fa0f89
+# ╠═182fe756-65b6-43ee-8238-a8e6bd7950ee
+# ╟─caef03c1-fe96-4504-a100-3478312e79c0
+# ╠═bd896dca-d317-431a-89f3-a57dfef64f8f
+# ╟─742b6b98-d66b-41e5-96bf-8f3882047e6a
+# ╠═ca245186-4ad0-4fd1-8cbb-7310f455b3cb
+# ╟─9d643e66-9504-4a40-81d3-690c2df98c5f
+# ╠═7aab20ba-4685-47fe-8337-1037c686909f
+# ╟─7477cc56-adfd-44bb-959b-819dc63fba9c
+# ╠═8b82b7b8-ba1f-4f7f-897e-c13f78cdf847
+# ╟─7c3b5bfb-fb6e-4d63-80f6-7a8a7dd1c0a6
+# ╠═8fcf9b3f-e7d3-4e33-b671-da484cfa07cc
+# ╟─96f3e1b1-442e-47ef-9306-b1debafb1e5c
+# ╠═1e6174e0-ed2e-4167-8a5f-0361b6b2ff1b
+# ╟─060e3768-239c-4e18-a8d9-bfb585e6c17e
+# ╠═b0fe5cd7-e660-4dae-bd09-c826cfcd60f2
+# ╟─31b1939d-94bc-4c06-ace7-dbe70e2fb5cb
+# ╠═a3febf5c-1b67-499a-96c3-77d94d7eaae2
+# ╟─f3e9ad78-79f2-4aeb-8113-c8f50d05e68e
+# ╠═88f02453-317c-4162-bb18-764715015a0b
+# ╠═5b9a1a53-2081-4778-aab6-a60fcfbef3b6
+# ╠═d77a7757-c72d-4e8f-93c9-3009700ab975
+# ╠═595b9dda-541b-4732-a294-affce2b0c4e5
+# ╠═c8d3613a-6d2b-4901-9321-aad8a99179cb
+# ╠═fda84f34-1d43-446b-8c27-145b51812455
+# ╠═9a45cf8d-4d2b-48cc-9fc9-e0c4fd9468da
+# ╠═02659ecf-235a-4391-9998-167a69f6714e
+# ╠═7b7b0882-61be-4b76-96e8-18cb0d872ef6
+# ╠═2a6189a7-885d-42c1-bddb-c53891cfe972
+# ╠═0d3af18b-2cb0-4d25-b0b0-9df9f64caf9c
+# ╠═8e12127d-e814-4001-9100-77f679ed4c65
+# ╠═293c9a6d-74cc-4e48-9386-4a3b946d5f20
+# ╠═9a08b4be-03d3-4dee-aa7c-233a0427da15
+# ╠═fa52d319-05b9-4798-9b9b-91d6ff907569
+# ╟─f64f11be-05fa-44a5-a14f-28044bac53aa
+# ╟─864506fb-9979-4cf9-a17d-fdfb0d88f5bf
+# ╠═d021796a-f02e-42ab-911f-b018e13797b8
+# ╟─baf18a7f-7661-4fba-8cfa-5add5ea6d5e2
+# ╠═53840c6f-68c9-42c3-b64f-123bce53b094
+# ╟─42718dc3-6ccc-407f-a2c4-0163f4bcd422
+# ╠═755421d0-9011-4e69-95c3-84f00e21b8ea
+# ╟─9639eb4f-ae74-4310-8be5-cd8a546f9fea
+# ╠═7a05e505-cd9a-4719-9f04-ccbb48073847
+# ╟─1d1da0d5-81ce-47dd-ad37-aa4156c02268
+# ╠═49802eb0-597c-4b67-bf32-a98bd21e3039
+# ╟─32e1dc38-d2a6-4c6b-b817-fb958451b6a1
+# ╠═f0f344a2-3a74-4bdb-a6a1-813376791e7e
+# ╟─7c352835-0f7f-44ec-bbd4-2b8aee7d4fac
+# ╠═33f9961f-1236-465e-b182-13b4efdb5ab5
+# ╟─b4b175bf-7515-471f-a649-d10763f0914e
+# ╠═bfb82d1d-b568-417a-84fb-ce96978aaa3e
+# ╟─1e0703f3-cdbf-4add-a853-986ae459844b
+# ╠═b48b09c3-a076-419d-95e4-67446d6c9ac7
+# ╟─1e3a90f8-a5fc-4ae3-aaae-5464d8fc23f3
+# ╠═223b1199-7cc0-4757-bbbc-5c5b02458c34
+# ╟─3f71753e-39e3-4bf3-9c5b-0b3e142e8c8d
+# ╠═bf1e0bb2-3a5c-4c4b-8ce3-e0823a44df07
+# ╟─0eb07be2-3635-44f3-9a2a-4a51c0eb34cd
+# ╠═fd4330e0-095c-4408-8617-7484c8e31b69
+# ╟─0e429c35-a5d2-47a6-a42b-69c80926f867
+# ╠═2036003b-dfc1-421d-85c6-a3e3491e7b27
+# ╟─95f53a85-dd50-4c15-9857-d1052fa00550
+# ╠═2c6cce53-42f4-407e-a5ab-531eb8098888
+# ╟─070fee56-07a4-4f68-8020-e45834c9a98e
+# ╠═9d9d29fa-ce2e-4ab9-922d-94d513d274e1
+# ╟─62199cc9-a4a6-4cf1-96c3-2594d891f392
+# ╠═e53068ab-05d0-41d2-890d-47c4da7e3a79
+# ╟─295d258d-3633-4c3f-acf4-f277679e4d2a
+# ╟─682dab37-9f5f-4f92-9795-c7d1c1d2179f
+# ╠═36ccf5f4-2106-4055-a255-457fe6e88185
+# ╠═dcb6c753-3b16-4283-b445-86d1d8b97597
+# ╠═982407df-7197-4999-a674-fdfb17cacd4a
+# ╠═5a5c83a9-6916-4aeb-901a-42485cde0798
+# ╠═03af5d66-77d1-4a7c-bba6-6982ddef3595
+# ╠═74025279-68a4-4370-81f2-d68cf8002505
+# ╠═d226bb12-6728-471b-8281-4e6d22e2c75a
+# ╠═d9f2f821-8d37-40df-b810-92c4bba4d0bd
+# ╠═e4bfcf03-0fed-489e-b582-d63eb339651e
+# ╠═85683cc3-a96a-40e5-9136-7e954bca0be7
+# ╠═bbc0425b-076b-4a5a-8fce-853845c5a26e
+# ╠═e7e74706-cdf4-46d0-945d-807e0d13312c
+# ╟─661f9a76-4a93-4cd8-85d5-7cc670027be6
+# ╟─3e1f9d8e-8e07-42b6-b163-5721e219e0d7
+# ╠═5e1b7f4e-837c-4b87-9da8-0641b0f3a71b
+# ╟─702cbddc-d362-4029-95eb-b0589ebec23e
+# ╠═6f3e5541-0d66-43ee-9341-d88d29bdca72
+# ╟─76c13f36-ae76-4173-b8c9-36f261236059
+# ╠═0c88ebf7-105b-4015-a3bb-92db767c3e38
+# ╟─4fa732fa-b031-48ad-b846-53d14ee48877
+# ╠═cf3848fd-41fb-4c0d-b6b7-78907956a1e8
+# ╟─69b961e8-1be0-4da6-9c1f-54970bcadff0
+# ╠═ad93c8b8-913f-40ae-b872-e5c533e7ac91
+# ╟─d311e7c8-1136-42e3-b2b2-ed92ebd10c7a
+# ╠═1fb22733-3afa-4611-aabd-1d4ffef42d1b
+# ╟─4be6019b-f5f8-4965-9a55-334a27b58306
+# ╠═cb97dd4b-e711-4787-a5ca-5ed2f7652b29
+# ╟─af046953-fb2d-4825-b9e5-1029c0da7ac5
+# ╠═9db0c031-f53f-44cc-a1bc-6428fd86bec8
+# ╟─6f211c92-c6e7-4b4b-88df-2ede20e06340
+# ╠═e80c19fb-6868-42d7-820d-d78703659de7
+# ╟─a5782ca5-e8b0-4fd9-a710-5f54dc244cbc
+# ╠═92c1fd0b-0d46-4b42-a975-5f4a6933ec6b
+# ╟─9af4ac3a-b262-4e4a-a9d7-9eb3f26f81db
+# ╠═3f8afe4b-f381-4979-9e7d-b1c2883a2c85
+# ╟─f78510e7-aa45-4a15-8dcd-9e27052d68ea
+# ╠═a344b574-3520-414b-887a-a55ed91334a7
+# ╟─4880be53-a679-4408-94de-d33a500bf216
+# ╠═678bf3f6-d974-4571-8cdb-ac766ded79f1
+# ╟─59b4a0c5-2c86-41f7-8513-aa6f3a5f68c2
+# ╠═15e7f4ad-8a86-4f8d-9d4e-61fb6f747f09
+# ╟─31d6b5b8-9bc7-4e49-8db1-c65c1b909b79
+# ╠═c629e780-04cf-4198-bc1e-09052d50d630
+# ╟─5d64c3d0-0179-457f-8154-f4e8f203316f
+# ╠═39b8633f-2fa4-4918-a98e-ccf6f5aa5bf1
+# ╟─ee5289aa-835d-4346-9294-b3c38f9dcd1c
+# ╠═c665c4fe-4061-4da1-a324-a43c126db248
+# ╠═7ca56b5e-2662-44fd-9451-d13dd5b69164
+# ╠═99ce7b3d-0f79-4495-a786-b42fa173e992
+# ╠═45301594-f549-4897-bb87-8b78e7778746
+# ╠═aa546fa7-be8b-4768-9198-0e16bde99e46
+# ╠═00b9a040-f24a-4c9a-b0ae-3896b994343d
+# ╠═4eb6cc09-f864-4a80-9d8d-a03a08e0f97e
+# ╠═2beafb91-5227-45eb-bb09-138128713268
+# ╠═661fdf22-22f5-4b7f-aec4-04422ec3c50d
+# ╠═00a795d7-fe31-4568-b53a-7511052e6e06
+# ╠═83a17a23-8486-476b-9b2d-fd6203c03ff9
+# ╠═2885dc3c-e984-4008-a153-e4a438e398d8
+# ╠═af776524-b603-408b-966e-6d7b2d462f73
+# ╠═3048bc35-c1ed-44fd-b761-7a0f7b65ac67
+# ╠═9ae6d8e7-3c27-4b74-8f1c-57057dc525a1
+# ╠═b7aa0853-2b58-4689-b0a2-bc601cff7174
+# ╠═ef11bdd6-ac98-4f26-afa7-142dae6a214a
+# ╠═64f76aea-c240-45d2-b146-42007a18ae89
+# ╠═03a54358-3228-48f2-a4d6-5598704b5df6
+# ╟─0eb278bf-4ded-41f7-ad7e-fd4fd4de8342
+# ╟─59d7d87b-850d-4934-84ed-985ebf068794
+# ╠═cea4063a-2f10-4cb7-944b-a2055d41c3d1
+# ╟─77b86d25-3640-4455-a66f-c9f6fff4f75b
+# ╠═50e1140a-f108-4236-8b43-989ab458ef95
+# ╟─4c174e06-3812-42b4-bdb5-4cc771ad10f5
+# ╠═b6a6ffa9-31be-4196-9b6d-680c1406ef4a
+# ╟─1cb7e0dd-d7e8-4f79-b3ae-5f7bbde93f35
+# ╠═509ffec5-f06a-4fd9-9723-9c5116104df7
+# ╟─d3d45287-4949-4a89-ab93-43109e3e8bb6
+# ╠═aee21fdd-e1ca-49bd-b208-c1bcbaf258b6
+# ╟─6b67cf55-514d-492a-aa89-50eda8a19c82
+# ╠═a0e3b5a1-611a-4b8f-80ee-15d5ab3725ef
+# ╟─6802ad17-0a23-42c6-876a-6ed750743acd
+# ╠═41215219-cd82-4b7d-85b6-4a985f34aa18
+# ╟─e3c37e74-1bff-4d8c-8bb2-a27d918254ea
+# ╠═886d9958-8d7a-40ca-bde0-bccc20d54c4b
+# ╟─66c9d14d-7870-4c1c-9a1f-94a3cf23bfe0
+# ╠═2726b89a-325d-4675-b896-922392a5fef9
+# ╟─992111fa-b073-421c-9799-a83b0d96fda1
+# ╠═2cfc5a17-7e12-4571-ab1a-c37219fe50d9
+# ╟─9c29a2e7-e877-44af-926c-7c2c0df6023d
+# ╠═7b7b6ccf-5635-4c7a-93c3-12f1ab7519dd
+# ╟─f39e0478-8094-4049-9eb0-3bafe652ad78
+# ╠═81c2762b-4253-4929-a603-cf5ce8af292f
+# ╟─2ebd4469-4492-4cc6-97ef-9498069fd66a
+# ╠═339c5cf9-2bd6-478c-aa79-2ab9323376b4
+# ╟─6641f813-6e0f-41c6-a4ff-2bd402369536
+# ╠═9218057c-7372-452b-914a-641330012c43
+# ╟─596887c2-5e6d-481f-ac70-4141e1d70c35
+# ╠═02ae9603-dc76-4c4f-a403-3d3355c3782d
+# ╟─e4b5b0a1-6f99-4af6-9c1d-43f39b211886
+# ╠═db54ef5a-4c41-42c5-b89a-71edd5a861af
+# ╟─b06561f2-546b-44a7-a4a3-43056d1019e4
+# ╠═b1601460-c2d3-492a-85cc-c3cd08a37546
+# ╠═136294ce-8c08-4607-ab0b-c1fd1fdb9e44
+# ╠═1f1a7137-3856-4392-a731-06e2a5dab683
+# ╠═c3757944-71d2-4783-8dad-12093b0ddfc6
+# ╠═dbda9f3f-1a59-4fd1-9672-1fefa020efb5
+# ╠═e485954f-ec8d-46db-b0f6-e8ff7c545e60
+# ╠═049602a5-b86a-4975-a038-1429451e154e
+# ╠═b3da196b-748c-4018-8aea-7f25cea226d4
+# ╠═d6fe0d38-1d59-41b8-8895-df28eb1cf49a
+# ╠═67683aa1-bb33-4f39-b6ce-4f0c17ca94e4
+# ╠═25a17f89-0568-4f40-93ee-c66b49824ea7
+# ╠═dc86cd34-db60-4472-917d-164dfb017154
+# ╠═2f4a0498-bc9f-48bf-adaa-36d096fa3bf1
+# ╠═488b4b80-7bab-4bf0-9d91-6bc7d638476a
+# ╟─ea8bafa9-ab4b-477e-b702-76cfa1770e5c
+# ╟─aa470a5e-d5dd-4575-9380-a6fe948fdafd
+# ╠═435fc3f4-022f-4d76-bfce-a059d422ea19
+# ╟─e53609bd-0200-41cf-884d-c3b55790f6a2
+# ╠═e84189b9-0f30-44b0-a5bf-db9e4a95ca3d
+# ╟─6c17f1e3-c604-4eb7-9c8e-c3e599aa658b
+# ╠═dc1fb0d7-099f-4f97-aded-39fa887bdfef
+# ╟─ed89e6f0-6beb-4a56-b5d8-234ed99e1705
+# ╠═16646d37-f82c-455a-9baf-78e262b863e2
+# ╟─d2db7b42-7740-4cfc-a7ab-774e1cd9a295
+# ╠═828970a9-1284-4b3f-9d83-9768d959fde9
+# ╟─3f0b976a-2c05-4759-b35e-8eb23fd3b59c
+# ╠═b6d25de8-9f4d-41b6-96f7-684e2d583ade
+# ╟─0a99ecf0-40ff-4859-94d5-daa23a8ff1ad
+# ╠═f3a80c96-41df-4fa0-8ded-3d247d16cf4c
+# ╟─a12b1bf2-8ce1-4533-b6ba-f9330225a92e
+# ╠═b88083e3-8a6b-46a7-b024-38f84756b987
+# ╟─b21ea350-86fd-4225-a8b7-5ba27dd38e8f
+# ╠═763a0b2a-934c-4cae-bddf-001d2f2cebee
+# ╟─ee88876a-a04e-4bba-bf15-fab521747859
+# ╠═d9805d69-d9f6-465c-a795-593f6b6a1faa
+# ╟─71c32ec8-9a8a-40f9-9bdb-39c5bc1a1f0e
+# ╠═281f123a-8455-4f69-919e-2e61f0985546
+# ╟─062175aa-0057-4518-9560-d2847b3a2627
+# ╠═e8ecccf2-224a-43d7-b8bd-98011d00def9
+# ╟─670c7bb1-0ba7-4aa4-ac3f-b6f4dee02cd0
+# ╠═e8f244c1-09e0-4782-917f-d8435e6ed1fa
+# ╟─7ee9d52a-4b8a-4baf-86be-4b9c4d6f98ae
+# ╠═89d56dbd-9275-4137-87dc-1731272ed88b
+# ╟─0cf91598-9774-41b8-90aa-e53da69c464f
+# ╠═ca30da6b-5965-44c8-88c8-580e6baf92cb
+# ╟─fd5a057b-5f8f-4d4b-8d8f-68794ad2d46f
+# ╠═0f9ee0d8-2f73-43ee-bc67-279342f96168
+# ╟─27648379-3689-414c-a126-2e00921beb78
+# ╠═afb70559-ed53-49b5-87ef-d0c9ec45ff60
+# ╠═1fffc29f-dcf1-4e25-9922-30c19e64d208
+# ╠═a2efacd3-76a4-4afb-b33d-86231076fc5d
+# ╠═f7b74f24-f84a-4a20-9e24-ac5121e8ea09
+# ╠═2b460f2f-2315-49e2-886c-eb2eaf3e3927
+# ╠═64a34c97-df81-4d75-8b66-ef611d7bfe13
+# ╠═38bf06b5-f147-4654-90c4-4c441be4aa72
+# ╟─58b5599f-b6a2-4d02-8b0f-2a7b11145986
+# ╠═253ccb6c-2b96-44c0-9691-8a943314c53d
+# ╠═d38ce7d0-0c93-4513-882f-1a74230f1063
+# ╠═eeead12a-70d8-4ebf-b41d-60694a031010
+# ╠═438e35e7-91d8-412a-8514-c6c5b4b269c6
+# ╟─2339ae20-64d9-46a6-bbb6-71a5587cf558
+# ╟─e0d4084c-436a-4def-8e65-a944dc522f8b
+# ╠═8fc835d4-bec7-4026-b17c-b23aac89aae3
+# ╟─639e2cfc-2fb6-4e43-85bc-ef55ae167949
+# ╠═40860255-4a68-4f0b-a8e2-7dabefb6c497
+# ╟─05ec46f4-128c-4628-90d7-bf5818173f58
+# ╠═8cb9af71-dcea-4b83-a5ab-8713b6c78ca2
+# ╟─160fd108-a0a7-4d61-a11e-c0ceb2be16e6
+# ╠═20a1747b-0949-4d5e-91a8-34f9c24562a0
+# ╟─a184f35c-b5b2-44b7-bbbd-eeedebe14fa5
+# ╠═5ed16f5b-9550-4149-bf78-c1faa5e3e6e9
+# ╟─093d2b2e-5be7-476b-b16f-a5f0edf92b29
+# ╠═3952f23b-366c-46b4-889b-a903c913a236
+# ╟─2f64673d-798c-4ca1-b515-4bcb537b5316
+# ╠═000b6a03-6d41-40d2-9d4a-ef84d09ffe41
+# ╟─3272a62e-cd81-4be2-a4cc-ec0ca276344b
+# ╠═f9cc80f9-df9f-4c05-88a1-1d80d5b039b9
+# ╟─7e11f80d-aa82-4525-a43e-bc09b663db68
+# ╠═3841b3de-11ef-4912-b886-3a24a401d429
+# ╟─a52fd122-e1a0-4b50-bb23-ae8ecc593118
+# ╠═a8aea5f3-336e-41fd-b670-679e3f1d9a65
+# ╟─d388dec0-51e3-4d4c-a487-fde7684f7059
+# ╠═a20afae0-d9ec-4e16-9118-c939b92665b1
+# ╟─9d2e01a5-2a6d-43bf-a2c7-2fd85512b103
+# ╠═b8e45861-2935-4253-8178-e6a978ba8ed1
+# ╟─9479588a-f884-4a3f-9b4d-c33509eb67b8
+# ╠═04e589f3-8703-4f17-b4b5-764abe7be9ec
+# ╟─e22eb7f1-c7df-4a41-9a9b-92b114994137
+# ╠═17b4ff5a-c78d-4f66-9db7-03c792d0e094
+# ╟─80c66cb1-3f37-4561-8e70-a6a0129d0f29
+# ╠═9dceb743-767a-4fac-aeb1-83e601e989be
+# ╟─4de5d117-4720-4319-8283-ba4e5a808604
+# ╠═eb91249c-2a72-4643-9d80-e87d80f0cf58
+# ╟─6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
+# ╟─5889eede-0150-476a-a0d1-7298b616172f
+# ╟─5ddec9aa-8c2c-447f-b97c-a91b39be792b
+# ╟─00000000-0000-0000-0000-000000000001
+# ╟─00000000-0000-0000-0000-000000000002
