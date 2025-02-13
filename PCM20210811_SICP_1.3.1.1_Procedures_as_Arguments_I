@@ -27,7 +27,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/12 ***
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/13 ***
 =====================================================================================
 "
 
@@ -929,10 +929,6 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://sarabander.github.io/sicp/), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2022/08/25
 - **Hable, R.**; *Einführung in die Stochastik*, Heidelberg: Springer, 2015
 - **Maas, M.D.**; [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2023/09/01
-- **Nazarathy, Y. & Klok, H.**; *Statistics with Julia*; Cham, Switzland: Springer, 2021
-- **Schilling, M.F., Watkins, A.E. & Watkins, W.**; [*Is Human Height Bimodal ?*](http://dbsi.org/dist/00031300265.pdf);  The American Statistician, Vol.56, No.3, p.223-229
-- **Schilling, R.L.**; *Measures, Integrals, and Martingales*; Cambridge, UK: Cambridge University Press, 2005
-- **Schilling, R.L.**; *Maß und Integral*; Berlin: de Gruyter, 2015
 - **Stark, P.A.**; *Introduction to Numerical Methods*, NY: MacMillan, 1970
 - **Wikipedia**; [*Dirichlet function*](https://en.wikipedia.org/wiki/Dirichlet_function); last visit 2023/09/04
 - **Wikipedia**; [*Gaussian Integral*](https://en.wikipedia.org/wiki/Gaussian_integral); last visit 2025/02/11
@@ -2559,7 +2555,7 @@ version = "1.4.1+2"
 # ╠═27db6328-e997-4972-865f-4a3aeaaa18e5
 # ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
 # ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
-# ╠═bd63330c-e1f8-4f4e-836f-b1285539a0c1
+# ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
 # ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
 # ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
 # ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
