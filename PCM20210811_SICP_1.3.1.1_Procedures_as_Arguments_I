@@ -27,7 +27,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/13 ***
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/18 ***
 =====================================================================================
 "
 
@@ -806,55 +806,10 @@ let f(x) = halfParabola(x)
 	I,est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
-# ╔═╡ fa168189-8c6d-4a62-a1db-9e33015aa61c
-md"
----
-###### 4.2 *Riemann* Integration of Stick Densities
-
-The *measure* (= area) unter this *stick* density is for $0.0 < x \le 3.0$ approximately $2\cdot(f(x)\cdot 2\Delta x)$.
-
-"
-
-# ╔═╡ 28bc9f1b-a982-455e-a630-7f3af12b0248
-function stickDensity(x; Δx=1.0E-3) 
-	((1.0-Δx) <= x <= (1.0+Δx)) ? 0.5 : 
-	((2.0-Δx) <= x <= (2.0+Δx)) ? 0.5 : 0.0
-end # function myStickDensity
-
-# ╔═╡ 67512229-1207-4522-bfe7-87dca4feeb02
-md"
-###### *Riemann* fails: $QuadGK$ generates an *incorrect* integral value of $0.0$ instead of $0.002$
-"
-
-# ╔═╡ 3585b157-96d8-45de-b951-916dc0eb8159
-begin
-	xs = [x for x in 0:1E-3:3]
-	#-----------------------------------------------------------------------------
-	plot(xs, stickDensity, size=(600, 400), xlim=(0.0, 3.0), ylim=(0, 0.6), 
-	line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Stick Function", titlefontsize=12, xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
-	#-----------------------------------------------------------------------------
-	annotate!([(1.5, 0.53, L"$\int_0^3f(x)\cdot\lambda(dx)=0.5 \cdot 4\Delta x$")])
-end # begin
-
-# ╔═╡ fa6643ce-8d9a-4525-825d-8a8d915118c0
-let f(x) = stickDensity(x)
-	a= 0.0
-	b=+3.0
-	Integral, est = quadgk(f, a, b, rtol=1e-8)
-end # let
-
-# ╔═╡ 9b02b59d-8f2d-4791-8f77-5f6a30958bc9
-function trueAreaOfStick(f, x; Δx=1.0E-3)
-	f(x)*4*Δx
-end # function trueAreaOfStick
-
-# ╔═╡ 999b68a3-9bfc-462c-82c2-b4b71a562a5f
-trueArea = trueAreaOfStick(stickDensity, 1.0)
-
 # ╔═╡ 7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 md"
 ---
-###### 4.3 Standard Normal (= Gaussian) Distribution using $QuadGK$
+###### 4.2 Standard Normal (= Gaussian) Distribution using $QuadGK$
 $Prob(- \sigma \le X \le +\sigma) \text{ when } X \sim N(X|\mu = 0; \sigma=1)$
 
 "
@@ -869,7 +824,7 @@ end # let
 # ╔═╡ 1e409f7c-7e2d-4d1d-816a-de12b8987a62
 md"
 ---
-###### 4.4 Integration With Regard to the *Lebesgue* Measure $\lambda(dx)$ 
+###### 4.3 Integration With Regard to the *Lebesgue* Measure $\lambda(dx)$ 
 (Hable, 2015, p.73)
 
 $\int_{[0,3]}(x^2-1)\lambda(dx)=\left(\frac{1}{3}x^3-x\right)\Bigg\vert_0^3$
@@ -915,11 +870,88 @@ let f = mixedDensity
 	Integral, est = quadgk(f, a, b, rtol=1e-8)
 end # let
 
+# ╔═╡ 221209af-1895-4eaa-badf-c576517938af
+md"
+---
+###### 4.4 Stick Densities
+
+$f(x) =
+\begin{cases}
+\frac{\delta(A_1)}{4 \Delta x} & \text{ if } x \in A_1 = \{x\;|\;(1.0 - \Delta x) \le x \le (1.0 + \Delta x)\} \\
+\frac{\delta(A_2)}{4 \Delta x} & \text{ if } x \in A_2 = \{x\;|\;(2.0 - \Delta x) \le x \le (2.0 + \Delta x)\} \\
+0.0  & \text{ else } \\
+\end{cases}$
+
+The *Lebesgue measure* (= area) unter this *stick* density is for $0.0 < x \le 3.0$ approximately $2 \cdot \left(\frac{\delta(A)}{4\Delta x}\right) \cdot 2\Delta x = 2 \cdot f(x)\cdot 2\Delta x = 1.0.$
+
+"
+
+# ╔═╡ 28bc9f1b-a982-455e-a630-7f3af12b0248
+function stickDensity(x::Float64; Δx=1.0E-3) 
+	# δ(x) = x ∈ A 
+	δ(x) = 	((1.0 - Δx) ≤ x ≤ (1.0 + Δx)) ? 1.0 :        # δ(A_1)
+			((2.0 - Δx) ≤ x ≤ (2.0 + Δx)) ? 1.0 : 0.0    # δ(A_2)
+	f(x) = δ(x) / (4.0 * Δx)
+	f(x)
+end # function stickDensity
+
+# ╔═╡ 29dc076b-2a79-48ae-bceb-2bb88b3a2b61
+function plotStickDensity(;Δx=1E-4)
+	xs = [x for x in 0:Δx:3]
+	#-----------------------------------------------------------------------------
+	plot(xs, stickDensity, size=(600, 400), xlim=(0.0, 3.0), ylim=(0, 500), 
+	line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Stick Function for $Δx", titlefontsize=12, xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	#-----------------------------------------------------------------------------
+	annotate!([(1.5, 400.0, L"$\int_0^3f(x)\cdot\lambda(dx)=\left(\frac{1}{2}\frac{\delta(A_1)}{2\Delta x} + \frac{1}{2}\frac{\delta(A_2)}{\Delta x}\right)\Delta x=1$")])
+end # function plotStickDensity
+
+# ╔═╡ c0ba6831-cbed-4b0b-bb22-7ffb6e41b40c
+plotStickDensity()
+
+# ╔═╡ 1d40ee9f-e0d6-4bfc-bb78-0c267a099cef
+function trueAreaOfStick(f, x; Δx=1.0E-3)
+	# two * ((stickDensity at x) * lengthOfInterval) = 
+	# = 2 * (δ(A)/4Δx) * 2Δx =
+	# = 2 *    f(x)    * 2Δx = 1
+	2 * (f(x) * (2 * Δx)) 
+end # function trueAreaOfStick
+
+# ╔═╡ 999b68a3-9bfc-462c-82c2-b4b71a562a5f
+trueArea = trueAreaOfStick(stickDensity, 1.0)
+
+# ╔═╡ 67512229-1207-4522-bfe7-87dca4feeb02
+md"
+###### *Riemann* fails: $QuadGK$ generates an *incorrect* integral value of $0.0$ instead of $0.002$
+Failure (!) for all tolerance levels.
+"
+
+# ╔═╡ b7efe97e-379d-48df-877e-3d0ea0105ddd
+let f(x) = stickDensity(x)
+	a= 0.0
+	b=+3.0
+	Integral, est = quadgk(f, a, b, rtol=1e-4)
+end # let
+
+# ╔═╡ fa6643ce-8d9a-4525-825d-8a8d915118c0
+let f(x) = stickDensity(x)
+	a= 0.0
+	b=+3.0
+	Integral, est = quadgk(f, a, b, rtol=1e-8)
+end # let
+
+# ╔═╡ 9bcba573-da4a-4c1b-b666-893652e64868
+let f(x) = stickDensity(x)
+	a= 0.0
+	b=+3.0
+	Integral, est = quadgk(f, a, b, rtol=1e-12)
+end # let
+
 # ╔═╡ 8b629a00-83a5-4838-b3fa-ab018c525a41
 md"
 ---
 ##### 5. Summary
 We extracted from functions common *patterns*, compiled these to *higher-order* functions, and demonstrated their applications within several contexts including *Riemannian* integration.
+Then we used the Julian *package* $quadgk$. This package generated results as expected. But it *failed* (!) when applied to our *Dirac*-like density $stickDensity$.
 "
 
 # ╔═╡ 84667282-7410-4c19-b227-1a2bc8bf88ee
@@ -2572,13 +2604,6 @@ version = "1.4.1+2"
 # ╟─2b1e1603-963e-4d3e-b2b9-7469e54649aa
 # ╟─b94e055b-3bd7-440a-ad3b-fa77d76a407a
 # ╠═12a0d4d6-e259-4711-ba11-05649af921ee
-# ╟─fa168189-8c6d-4a62-a1db-9e33015aa61c
-# ╠═28bc9f1b-a982-455e-a630-7f3af12b0248
-# ╟─67512229-1207-4522-bfe7-87dca4feeb02
-# ╟─3585b157-96d8-45de-b951-916dc0eb8159
-# ╠═fa6643ce-8d9a-4525-825d-8a8d915118c0
-# ╠═9b02b59d-8f2d-4791-8f77-5f6a30958bc9
-# ╠═999b68a3-9bfc-462c-82c2-b4b71a562a5f
 # ╟─7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 # ╠═8f884ca3-790c-42fd-8bcb-8476012d4ee1
 # ╟─1e409f7c-7e2d-4d1d-816a-de12b8987a62
@@ -2589,6 +2614,16 @@ version = "1.4.1+2"
 # ╟─5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
 # ╠═a9ec7875-1522-42a5-a5e2-438fe312604c
 # ╠═8c1b16be-bf24-4897-8176-beff174b9f32
+# ╟─221209af-1895-4eaa-badf-c576517938af
+# ╠═28bc9f1b-a982-455e-a630-7f3af12b0248
+# ╟─29dc076b-2a79-48ae-bceb-2bb88b3a2b61
+# ╠═c0ba6831-cbed-4b0b-bb22-7ffb6e41b40c
+# ╠═1d40ee9f-e0d6-4bfc-bb78-0c267a099cef
+# ╠═999b68a3-9bfc-462c-82c2-b4b71a562a5f
+# ╟─67512229-1207-4522-bfe7-87dca4feeb02
+# ╠═b7efe97e-379d-48df-877e-3d0ea0105ddd
+# ╠═fa6643ce-8d9a-4525-825d-8a8d915118c0
+# ╠═9bcba573-da4a-4c1b-b666-893652e64868
 # ╟─8b629a00-83a5-4838-b3fa-ab018c525a41
 # ╟─84667282-7410-4c19-b227-1a2bc8bf88ee
 # ╟─9c61b414-134f-4924-87b8-8e761e5816ed
