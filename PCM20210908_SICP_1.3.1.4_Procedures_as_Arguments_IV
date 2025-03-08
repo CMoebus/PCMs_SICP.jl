@@ -28,7 +28,7 @@ md"
 ===================================================================================
 #### nonSICP: 1.3.1.4 Procedures as Arguments IV: Cognitive First Choice Voting Models 
 ##### file: PCM20210908\_SICP\_1.3.1.4\_Procedures\_as\_Arguments\_IV.jl
-##### code: Julia/Pluto (1.11.3/0.20.4) by PCM *** 2025/03/07 ***
+##### code: Julia/Pluto (1.11.3/0.20.4) by PCM *** 2025/03/08 ***
 
 ===================================================================================
 "
@@ -121,7 +121,7 @@ function plotUnitStepDensity()
 	plot!([-1.0, -1.0], [0.0, +0.5], lw=4, color=:lightblue, label="")
 	plot!([+1.0, +1.0], [0.0, +0.5], lw=4, color=:lightblue, label="")
 	plot!([-1.0, +1.0], [0.5, +0.5], lw=2, color=:berlin100, label="")
-	annotate!(0.0, 0.25, L"\int_{5-\infty}^{+\infty} f(x)\; dx = 1", 12)
+	annotate!(0.0, 0.25, L"\int_{-\infty}^{+\infty} f(x)\; dx = 1", 12)
 end # function plotUnitStepDensity
 
 # ╔═╡ 5efa17e5-c284-4b72-a21c-3b12f6d0c3ab
@@ -901,16 +901,24 @@ $\;$
 
 The area under these densities is equal to the *stimulus-specific* probability of *first choice* vote
 
-$p(I > J,K,...).$
+$p(I > J,K,...)= \int f_I(x) \cdot \mu_{J,K,L,...}(dx) = f_I(x)\cdot d\mu_{J,K,L,...}.$
 
+$\;$
+$\;$
 $\;$
 
 "
+
+# ╔═╡ 78987082-90cc-4d4a-9922-2b0fe1fc8e2e
+function integralOfStimulusSpecificPDFsWithQuadGK(f; a=-10.0, b=+10.0) 
+	I,est = quadgk(f, a, b, rtol=1e-8)
+end # function myIntegralWithQuadGK
 
 # ╔═╡ e3fe5e15-c17f-45d9-9631-cdc5785fed71
 md"
 ---
 ##### 5.1 for $kS=3$ Stimuli
+###### 5.1.1 Stimulus-specificPDFs
 "
 
 # ╔═╡ 39ea5482-74bf-4d22-ad2c-76930d7fcafe
@@ -943,10 +951,25 @@ $\;$
 # ╔═╡ c6c03cbf-2fbf-49da-9b70-d8856631859b
 thurstoneChoiceModelDistrib(kS=3)   # p(I > J, K), P(J > I, K), p(K > I, J)
 
+# ╔═╡ c0235c94-36cf-4e6b-bd2e-5114a67755bd
+md"
+###### 5.1.2 Integration of *Stimulus-specific* PDFs Generates *First Choice Probabilities*
+"
+
+# ╔═╡ 6f21d546-879e-47fe-ac98-99289d93d612
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_I(x) * gaussianDensityCDF_J(x) * gaussianDensityCDF_K(x))[1]       # p(I > J,K)
+
+# ╔═╡ a0e552e2-3df4-4289-b7b1-ab4e729145ab
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_J(x) * gaussianDensityCDF_I(x) * gaussianDensityCDF_K(x))[1]       # p(J > I,K)
+
+# ╔═╡ 580ccd5d-1aab-4a94-8884-349ffd10347b
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_K(x) * gaussianDensityCDF_I(x) * gaussianDensityCDF_J(x))[1]       # p(K > I,J)
+
 # ╔═╡ af856d5e-b6ed-4212-af3a-29fe63fc9a9f
 md"
 ---
 ##### 5.2 for $kS=4$ Stimuli
+###### 5.2.1 Stimulus-specificPDFs
 "
 
 # ╔═╡ 1b5a154e-f30d-4b25-a6f3-c0ca67a26d38
@@ -964,13 +987,30 @@ $\;$
 # ╔═╡ a8e28662-3a5e-466f-93e3-d0b9c789671c
 thurstoneChoiceModelDistrib(kS=4) # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
 
+# ╔═╡ 13b87350-c56d-45bf-aac5-9be091fea711
+md"
+###### 5.2.2 Integration of *Stimulus-specific* PDFs Generates *First Choice Probabilities*
+"
+
+# ╔═╡ 6ee44b9b-6e39-4f40-b5b7-016cdf2243b3
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_I(x) * gaussianDensityCDF_J(x) * gaussianDensityCDF_K(x) * unitStepDensityCDF_L(x))[1]       # p(I > J,K,L)
+
+# ╔═╡ 833ec486-9918-4f98-b358-110e59ace02e
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_J(x) * gaussianDensityCDF_I(x) * gaussianDensityCDF_K(x) * unitStepDensityCDF_L(x))[1]       # p(J > I,K,L)
+
+# ╔═╡ da79bd89-1bc3-4e11-bf53-234a3ac10139
+integralOfStimulusSpecificPDFsWithQuadGK(x -> gaussianDensityPDF_K(x) * gaussianDensityCDF_I(x) * gaussianDensityCDF_J(x) * unitStepDensityCDF_L(x))[1]       # p(K > I,J,L)
+
+# ╔═╡ 9e156df5-e3be-4a99-bd53-252a76f199c8
+integralOfStimulusSpecificPDFsWithQuadGK(x -> unitStepDensityPDF_L(x) * gaussianDensityCDF_I(x) * gaussianDensityCDF_J(x) * gaussianDensityCDF_K(x))[1]       # p(L > I,J,K)
+
 # ╔═╡ 576d4814-048b-4a76-bed3-404b1f029f1c
 md"
 ---
 ##### 6. Stimulus-specific PDFs in our *Voting Choice* Model (VCM)
 We assume that each voter has a *preference mass* of $1$ which can be distributed across the *stimulus-specific* discriminal dispersions. The *vertical red* line marks the various stimulus-specific *first-choice* voting *probabilities* at the end of the distribution process. The distribution process of the preference mass stops, when the *sum* of the first choice probabilities *sums up* to $1$.
 
-The *stimulus-specific* first choice probability is equal to the *ordinate* of the crossing between the *vertical* red line at $x_crit$ and the function denoting the *preference mass* at $x_crit.$
+The *stimulus-specific* first choice probability is equal to the *ordinate* of the crossing between the *vertical* red line at $x_{crit}$ and the *function* denoting the *preference mass* at $x_{crit}.$
 
 "
 
@@ -998,7 +1038,16 @@ function plotVCMPreferenceDensity(;kS=3)
 		cumsum3xcrit = cumsum3(xcrit)
 		println("==> $cumsum3xcrit")
 		println("xcrit ==> $xcrit")
-		plot!([(xcrit, 0), (xcrit, 1)], linecolor=:red, linestyle=:dash, lw=1.0, label=L"Pref\ mass\ exhausted")
+		plot!([(xcrit, 0), (xcrit, 1)], linecolor=:red, linestyle=:dash, lw=1.0, label=L"x_{crit}")
+		annotate!(xcrit, 0.0, L"x_{crit}=2.01", 10)
+		#--------------------------------------------------------------------------
+		# horizontal lines = first choice probabilities
+		xss = [x for x in -10.0:0.1:xcrit]
+		plot!(x -> 0.688464, xss, ls=:dash, linecolor=:green, label="")
+		annotate!(-7.8, 0.71, L"p(K>I,J) = 0.69", 9)
+		plot!(x -> 0.157288, xss, ls=:dash, linecolor=:cornflowerblue, label="")
+		annotate!(-6.4, 0.18, L"p(I>J,K), p(J>I,K) = 0.15", 9)
+		#--------------------------------------------------------------------------
 	elseif kS == 4
 		xcrit = 10.0
 		cumsum4(x) = 
@@ -1016,7 +1065,20 @@ function plotVCMPreferenceDensity(;kS=3)
 		cumsum4xcrit = cumsum4(xcrit)
 		println("==> $cumsum4xcrit")
 		println("xcrit ==> $xcrit")
-		plot!([(xcrit, 0), (xcrit, 1)], linecolor=:red, linestyle=:dash, lw=1.0, label=L"Pref\ mass\ exhausted")
+		plot!([(xcrit, 0), (xcrit, 1)], linecolor=:red, linestyle=:dash, lw=1.0, label=L"x_{crit}")
+		annotate!(xcrit, 0.0, L"x_{crit}=2.90", 9)
+		#--------------------------------------------------------------------------
+		# horizontal lines = first choice probabilities
+		xss = [x for x in -10.0:0.1:xcrit]
+		plot!(x -> 0.51974, xss, ls=:dash, linecolor=:green, label="")
+		annotate!(-7.6, 0.54, L"p(K>I,J,L) = 0.52", 9)
+		plot!(x -> 0.35495, xss, ls=:dash, linecolor=:magenta, label="")
+		annotate!(-7.6, 0.37, L"p(L>I,J,K) = 0.35", 9)
+		plot!(x -> 0.0967434, xss, ls=:dash, linecolor=:cornflowerblue, label="")
+		annotate!(-7.5, 0.13, L"p(I>J,K,L) = 0.096", 9)
+		plot!(x -> 0.028651, xss, ls=:dash, linecolor=:red, label="")
+		annotate!(-7.5, 0.05, L"p(J>I,K,L) = 0.028", 9)
+		#--------------------------------------------------------------------------
 	end # if 
 end # function plotVCMPreferenceDensity
 
@@ -2680,15 +2742,25 @@ version = "1.4.1+2"
 # ╟─681b6508-4fa0-4a3b-a80b-b2a527edda3d
 # ╠═e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
 # ╟─c367f470-168a-4cfb-b4ac-49dbe2f59db9
+# ╠═78987082-90cc-4d4a-9922-2b0fe1fc8e2e
 # ╟─e3fe5e15-c17f-45d9-9631-cdc5785fed71
 # ╟─39ea5482-74bf-4d22-ad2c-76930d7fcafe
 # ╟─c7d4d038-e54d-4b3b-a075-904f696e3bd5
 # ╟─0a099648-e4d3-4322-b6b4-2adb50ef0ca7
 # ╠═c6c03cbf-2fbf-49da-9b70-d8856631859b
+# ╟─c0235c94-36cf-4e6b-bd2e-5114a67755bd
+# ╠═6f21d546-879e-47fe-ac98-99289d93d612
+# ╠═a0e552e2-3df4-4289-b7b1-ab4e729145ab
+# ╠═580ccd5d-1aab-4a94-8884-349ffd10347b
 # ╟─af856d5e-b6ed-4212-af3a-29fe63fc9a9f
 # ╠═1b5a154e-f30d-4b25-a6f3-c0ca67a26d38
 # ╟─75bc5f45-4089-4d49-9d8f-4cb0e47e0cb4
 # ╠═a8e28662-3a5e-466f-93e3-d0b9c789671c
+# ╟─13b87350-c56d-45bf-aac5-9be091fea711
+# ╠═6ee44b9b-6e39-4f40-b5b7-016cdf2243b3
+# ╠═833ec486-9918-4f98-b358-110e59ace02e
+# ╠═da79bd89-1bc3-4e11-bf53-234a3ac10139
+# ╠═9e156df5-e3be-4a99-bd53-252a76f199c8
 # ╟─576d4814-048b-4a76-bed3-404b1f029f1c
 # ╟─9c428dcb-5f9b-4291-8ca2-237e08205c04
 # ╟─b5eb9a03-50a5-435d-a9c7-d955ce5db788
