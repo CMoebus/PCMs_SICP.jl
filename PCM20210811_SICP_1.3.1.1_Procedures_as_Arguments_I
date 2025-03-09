@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
@@ -27,16 +27,17 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/18 ***
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/03/09 ***
 =====================================================================================
 "
 
 # ╔═╡ a1da43d1-d45e-44d3-a995-892941efad1b
 md"
----
 ##### 0. Introduction
 We study different procedures computing several *series* of numbers or terms. These  range from simple *sum of integers*, *sum of cubes*, *Leibniz*' $\pi$-series to *Riemann*-type *integrals*. 
 Then we extract *common recursive* and *iterative* patterns underlying these series. These patterns are converted into *higher-order* functions. Each *term* in the *pattern* is replaced by a *parameter* in the function's *body*. Parameter can be bound to *arguments* which are *constants, expressions*, or themself *functions*. Because of the latter characteristic functions are qualified as *higher-order*.
+
+$\;$
 
 "
 
@@ -102,13 +103,22 @@ md"
 ---
 ###### 3.1.2 Simple *Low-order* and *Typed* Function $sumOfIntegers$
 ###### Specification
+
 *... computes the sum of the integers from $a$ through $b$* (SICP, 1996; 2016, p.76)
  
 $sumOfIntegers : \mathbb Z \times \mathbb Z \rightarrow \mathbb Z$
 
+$\;$
+
 $(a, b) \mapsto sumOfIntegers(a, b)$
 
+$\;$
+
 $sumOfIntegers(a, b) := \sum_{i=a}^{b}i$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -186,14 +196,23 @@ md"
 ---
 ###### 3.1.3 *Simple* Function $sumOfCubes$
 ###### Specification
+
 *... computes the sum of the cubes of the integers in the given
 range* (SICP, 1996; 2016, p.76)
 
 $sumOfCubes : \mathbb Z \rightarrow \mathbb Z$
 
+$\;$
+
 $(a, b) \mapsto sumOfCubes(a, b)$
 
+$\;$
+
 $sumOfCubes(a, b) := \sum_{i=a}^{b}i^3$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -278,9 +297,17 @@ to Leibniz
 
 $\pi_{Sum}: \mathbb N \times \mathbb N \rightarrow \mathbb R$
 
+$\;$
+
 $\pi_{Sum}: (a, b) \mapsto \pi_{Sum}(a, b)$
 
-$\pi_{Sum}(a=1, b) := \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+... \approx \frac{\pi}{8}$
+$\;$
+
+$\pi_{Sum}(a=1, b) := \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+... \approx \frac{\pi}{8}.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -290,15 +317,30 @@ The well known but slow converging [*Leibniz* formula](https://en.wikipedia.org/
 
 $\frac{\pi}{4} = \sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)} = 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \frac{1}{9} - \frac{1}{11} + ...$
 
+$\;$
+$\;$
+
 We partition the series into a sum of pairs:
 
 $\frac{\pi}{4} = \sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)} = \left(1 - \frac{1}{3} \right) + \left(\frac{1}{5} - \frac{1}{7}\right) + \left(\frac{1}{9} - \frac{1}{11}\right) + ...$
 
+$\;$
+$\;$
+$\;$
+
 $\frac{\pi}{4} = \sum_{k=0,2,4,...}^\infty \left(\frac{1}{(2k+1)}-\frac{1}{2(k+1+1)} \right) = \sum_{k=0,2,4,...}^\infty \frac{2}{(2k+1)(2k+3)}$
+
+$\;$
+$\;$
+$\;$
 
 Division by $2$ simplifies the numerator:
 
 $\frac{\pi}{8} = \sum_{k=0,2,4,...}^\infty \frac{1}{(2k+1)(2k+3)} = \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+...$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -378,14 +420,30 @@ into formal parameters*. (SICP, 1996, p.58; 2016, p.77f)
 Now we take the *pattern* above and modify it into a *Julia-function* $sum_{Rec}$ with parameters replacing some parts of the *pattern*:
 
 $name \mapsto sum_{Rec}$
+
+$\;$
+
 $term \mapsto f$
+
+$\;$
+
 $next \mapsto succ$
+
+$\;$
 
 $sum_{Rec} : (\mathbb Z \rightarrow \mathbb Z) \times \mathbb Z \times (\mathbb Z \rightarrow \mathbb Z) \times \mathbb Z \rightarrow \mathbb Z$
 
+$\;$
+
 $(f, a, succ, b) \mapsto sum_{Rec}(f, succ(a), succ, b)$
 
+$\;$
+
 $sum_{Rec}(f, a, succ, b) := \sum_{i=a}^b f(i) = f(a) + f(succ(a)) + f(succ(succ(a))) + ... + f(b)$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -531,6 +589,10 @@ Using the *recursive* pattern $sumRec$
 
 $\frac{\pi}{8} = \sum_{k=0,2,4,...}^\infty \frac{1}{(2k+1)(2k+3)} = \frac{1}{1\cdot3}+\frac{1}{5\cdot7}+\frac{1}{9\cdot11}+...$
 
+$\;$
+$\;$
+$\;$
+
 "
 
 # ╔═╡ 7dc42461-ba3a-4837-ba37-e91920c8dc66
@@ -583,7 +645,15 @@ md"
 
 $\int_a^b f(x)\; dx \approx \left[f\left(a+\frac{Δx}{2}\right)+f\left(a+Δx+\frac{Δx}{2}\right)+f\left(a+2Δx+\frac{Δx}{2}\right)...\right]\;Δx$
 
+$\;$
+$\;$
+$\;$
+
 $=\left[\sum_{i=0}^{b/Δx}f\left(a + i \cdot Δx + \frac{dx}{2}\right)\right]\;Δx.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -618,10 +688,17 @@ md"
 
 $\int_0^1 x^3 dx= \left.\frac{x^4}{4}\right|_0^1=\left(\frac{1^4}{4}-\frac{0^4}{4}\right)=\frac{1}{4}.$
 
+$\;$
+$\;$
+$\;$
+
 "
 
 # ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
-plot(cube, 0.0, 1.0, size=(525, 400), xlims=(0.0, 1.1), ylims=(0, 1.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^3$", framestyle=:semi, xlabel=L"x", ylabel=L"x^3", label="")
+begin 
+	plot(x -> x^3, 0, 1, size=(600, 500), xlim=(0.0, 1.1), ylim=(0.0, 1.2), line=:darkblue, fill=(0, :lightblue), aspect_ratio=1, framestyle=:semi, title=L"f: x \mapsto x^3", xlabel=L"x", ylabel=L"f: x \mapsto x^3", label=L"f: x \mapsto x^3")
+	annotate!(.8, 0.13, L"\int_0^1 x^3 dx = \frac{1}{4}", 12)
+end # begin
 
 # ╔═╡ bf281edd-d933-446b-8b54-903e52c4505b
 integralRecPat(cube, 0, 1)                            # SICP, 1996, p.60; 2016, p.79
@@ -650,10 +727,14 @@ integralIterPat(cube, 0, 1, Δx=1.0E-6),
 # ╔═╡ 7dffb4c0-1820-46c4-8676-f327de55048e
 md"
 ---
-###### 3.3.6 Halfparabola
+###### 3.3.6 Integral of Halfparabola
 (Stark, P.A., *Introduction to Numerical Methods*, 1970, ch. 6.2-6.3, p. 196, Example 6-1)
 
-$\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1=(6-1)=5$
+$\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1=(6-1)=5.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -661,7 +742,10 @@ $\int_0^1\left(6-6x^5\right)dx = \left.\left(6x-6\frac{x^6}{6}\right)\right|_0^1
 halfParabola(x) =  -6x^5 + 6    # Stark, P.A., Intro to Num. Methods, 1970, p.196f.
 
 # ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
-plot(halfParabola, 0.0, 1.0, size=(300, 450), xlim=(0.0, 1.1), ylim=(0, 6.5), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$x\mapsto -6x^5 + 6$", titlefontsize=12, xlabel=L"x", ylabel=L"-6x^5+6", label="")
+begin
+	plot(x->-(6, *(6, ^(x, 5))), 0, 1, size=(400, 400), xlim=(0.0, 1.2), ylim=(0.0, 6.2), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"f: x \mapsto (6-6x^5)", xlabel=L"x", ylabel=L"f: x \mapsto (6-6x^5)", label=L"f: x \mapsto (6-6x^5)")
+	annotate!(0.45, 1.5, L"\int_0^1 (6-6x^5) dx = 5", 12)
+end # begin
 
 # ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
 integralRecPat(halfParabola, 0.0, 1.0, Δx=1.0E-1), 
@@ -695,7 +779,14 @@ md"
 
 $\int_{-\infty}^{+\infty}e^{-x^2}dx=\sqrt \pi$
 
+$\;$
+$\;$
+$\;$
+
 *Abraham de Moivre originally discovered this type of integral in 1733, while Gauss published the precise integral in 1809,[1] attributing its discovery to Laplace. The integral has a wide range of applications.*([Wikipedia](https://en.wikipedia.org/wiki/Gaussian_integral))
+
+$\;$
+
 "
 
 # ╔═╡ 7d652d8e-72af-4d98-890a-ee730ca41876
@@ -730,7 +821,8 @@ let x1 = +1.0
 	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
 	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
 	plot!([x2, x2], [0, y2], color=:red, label=L"$x=-1.0=-\sigma$")
-	annotate!(0, 0.1, (L"p=0.68", 12))
+	annotate!(0.05, 0.1, L"\int_{-1}^{+1} N(\mu=0, \sigma=1)=", 10)
+	annotate!(0, 0.06, L"=p=0.68", 10)
 end # let
 
 # ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
@@ -829,7 +921,15 @@ md"
 
 $\int_{[0,3]}(x^2-1)\lambda(dx)=\left(\frac{1}{3}x^3-x\right)\Bigg\vert_0^3$
 
+$\;$
+$\;$
+$\;$
+
 $=\left(\frac{27}{3}-3\right)-0=\left(9 - 3 \right) = 6.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -882,7 +982,15 @@ $f(x) =
 0.0  & \text{ else } \\
 \end{cases}$
 
+$\;$
+$\;$
+$\;$
+$\;$
+$\;$
+
 The *Lebesgue measure* (= area) unter this *stick* density is for $0.0 < x \le 3.0$ approximately $2 \cdot \left(\frac{\delta(A)}{4\Delta x}\right) \cdot 2\Delta x = 2 \cdot f(x)\cdot 2\Delta x = 1.0.$
+
+$\;$
 
 "
 
@@ -2564,7 +2672,7 @@ version = "1.4.1+2"
 # ╟─a0bbb64a-28bc-466d-bb44-117ff9e21083
 # ╠═56e8072b-59ab-4e64-86fa-d5138c5405e1
 # ╟─cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
-# ╟─02bf20ff-0e44-40bc-bd6a-1e55e2086571
+# ╠═02bf20ff-0e44-40bc-bd6a-1e55e2086571
 # ╠═bf281edd-d933-446b-8b54-903e52c4505b
 # ╠═84465f7d-7dbf-4ddf-b46c-01deab41bdcd
 # ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
@@ -2582,7 +2690,7 @@ version = "1.4.1+2"
 # ╠═cb7368d8-91dd-4feb-9334-0d1ad32f6818
 # ╠═b738ef42-21c4-43ff-950e-1104038216ab
 # ╟─f350f924-09db-4543-a0a9-a7988d1c3aeb
-# ╠═7d652d8e-72af-4d98-890a-ee730ca41876
+# ╟─7d652d8e-72af-4d98-890a-ee730ca41876
 # ╠═a08111b9-ed7e-4f85-8a2c-ebd27dbdf43c
 # ╠═27db6328-e997-4972-865f-4a3aeaaa18e5
 # ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
