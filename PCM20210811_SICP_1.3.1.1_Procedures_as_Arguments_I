@@ -11,14 +11,14 @@ begin
 	using LaTeXStrings
 	using GraphRecipes
 	using QuadGK
-	using Statistics
+	# using Statistics
 	#----------------------------------------------------------------
 	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
 	println("pkgversion(Plots)         = ", pkgversion(Plots))
 	println("pkgversion(LaTeXStrings)  = ", pkgversion(LaTeXStrings))
 	println("pkgversion(GraphRecipes)  = ", pkgversion(GraphRecipes))
 	println("pkgversion(QuadGK)        = ", pkgversion(QuadGK))
-	println("pkgversion(Statistics)    = ", pkgversion(Statistics))
+	# println("pkgversion(Statistics)    = ", pkgversion(Statistics))
 end # begin
 
 # ╔═╡ 015f86b0-fa99-11eb-0a32-5bee9e7368fb
@@ -27,7 +27,7 @@ md"
 #### SICP: [1.3.1.1 Procedures as Arguments I](https://sarabander.github.io/sicp/html/1_002e3.xhtml#g_t1_002e3_002e1): Basics
 ##### file: PCM20210811\_SICP\_1.3.1.1\_Procedures\_as\_Arguments\_I.jl
 
-##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/03/09 ***
+##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/03/10 ***
 =====================================================================================
 "
 
@@ -46,12 +46,22 @@ md"
 ---
 ##### 1. Topics
 - *code patterns*
+- *tail-recursive* function
+- *iterative* function
+- *Leibniz*' π-sum
 - *functional* arguments
 - *higher-order* functions
 - *parallel* assignment
 - *keyword* parameter
 - *Riemann* integration
-
+- *trapezoidal* integration method
+- *integration* of cubic function
+- *integration* of half-parabola
+- *integration* of Gaussian
+- *integration* of Standard Gaussian
+- *integration* of mixed Gaussians
+- *integration* of stick density
+- *integration* with $QuadGK.jl$
 "
 
 # ╔═╡ 551d722d-cb86-4d4f-810d-66364fb6c50e
@@ -696,7 +706,7 @@ $\;$
 
 # ╔═╡ 02bf20ff-0e44-40bc-bd6a-1e55e2086571
 begin 
-	plot(x -> x^3, 0, 1, size=(600, 500), xlim=(0.0, 1.1), ylim=(0.0, 1.2), line=:darkblue, fill=(0, :lightblue), aspect_ratio=1, framestyle=:semi, title=L"f: x \mapsto x^3", xlabel=L"x", ylabel=L"f: x \mapsto x^3", label=L"f: x \mapsto x^3")
+	plot(x -> x^3, 0, 1, size=(800, 500), xlim=(0.0, 1.1), ylim=(0.0, 1.2), line=:darkblue, fill=(0, :lightblue), aspect_ratio=1, framestyle=:semi, title=L"f: x \mapsto x^3", xlabel=L"x", ylabel=L"f: x \mapsto x^3", label=L"f: x \mapsto x^3")
 	annotate!(.8, 0.13, L"\int_0^1 x^3 dx = \frac{1}{4}", 12)
 end # begin
 
@@ -743,8 +753,8 @@ halfParabola(x) =  -6x^5 + 6    # Stark, P.A., Intro to Num. Methods, 1970, p.19
 
 # ╔═╡ b2db2a4a-8a5e-43b1-bb99-d37828dbec0c
 begin
-	plot(x->-(6, *(6, ^(x, 5))), 0, 1, size=(400, 400), xlim=(0.0, 1.2), ylim=(0.0, 6.2), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"f: x \mapsto (6-6x^5)", xlabel=L"x", ylabel=L"f: x \mapsto (6-6x^5)", label=L"f: x \mapsto (6-6x^5)")
-	annotate!(0.45, 1.5, L"\int_0^1 (6-6x^5) dx = 5", 12)
+	plot(x->-(6, *(6, ^(x, 5))), 0, 1, size=(800, 400), xlim=(0.0, 1.2), ylim=(0.0, 6.2), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"f: x \mapsto (6-6x^5)", xlabel=L"x", ylabel=L"f: x \mapsto (6-6x^5)", label=L"f: x \mapsto (6-6x^5)")
+	annotate!(0.45, 1.5, L"\int_0^1 (6-6x^5) dx = 5", 14)
 end # begin
 
 # ╔═╡ 73a0deb5-6dc3-41d8-b810-5553c74455ed
@@ -790,40 +800,70 @@ $\;$
 "
 
 # ╔═╡ 7d652d8e-72af-4d98-890a-ee730ca41876
-let xs = [-5:0.1:+5]
+function plotGaussian()
+	xs = [-4:0.1:+4]
 	f(x) = exp(-x^2)
-	plot(xs, x -> f(x), size=(600,400), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"Gaussian\ Function", titlefontsize=12, xlabel=L"x", ylabel=L"e^{-x^2}", label=L"f(x) = e^{-x^2}")
-end # let
+	plot(xs, x -> f(x), size=(800,400), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"Gaussian\ Function", titlefontsize=12, xlabel=L"x", ylabel=L"e^{-x^2}", label=L"f(x) = e^{-x^2}")
+	annotate!(0, 0.10, L"\int_{-\infty}^{+\infty}e^{-x^2}dx = \sqrt{\pi}=1.77245...", 12)
+end # function plotGaussian
+
+# ╔═╡ 7e5eb609-e50f-4682-83a4-b7c0e8a7d3de
+plotGaussian()
+
+# ╔═╡ ac2eed3e-6302-46d8-8643-2a4ddce7c770
+integralRecPat(x -> exp(-x^2), -1, +1),                 # integralRecPat
+sqrt(π), 
+abs(integralRecPat(x -> exp(-x^2), -1, +1) - sqrt(π))
 
 # ╔═╡ a08111b9-ed7e-4f85-8a2c-ebd27dbdf43c
-integralRecPat(x -> exp(-x^2), -5, +5), sqrt(π), abs(integralRecPat(x -> exp(-x^2), -5, +5) - sqrt(π))
+integralRecPat(x -> exp(-x^2), -5, +5),                 # integralRecPat
+sqrt(π), 
+abs(integralRecPat(x -> exp(-x^2), -5, +5) - sqrt(π))
 
 # ╔═╡ 27db6328-e997-4972-865f-4a3aeaaa18e5
-integralIterPat(x -> exp(-x^2), -5, +5), sqrt(π), abs(integralIterPat(x -> exp(-x^2), -5, +5) - sqrt(π))
+integralIterPat(x -> exp(-x^2), -5, +5),                # integralIterPat
+sqrt(π), 
+abs(integralIterPat(x -> exp(-x^2), -5, +5) - sqrt(π))
+
+# ╔═╡ 4656a900-d689-480a-baf4-fef6ddf80bbb
+integralIterPat(x -> exp(-x^2), -15, +15),              # integralIterPat
+sqrt(π), 
+abs(integralIterPat(x -> exp(-x^2), -15, +15) - sqrt(π))
 
 # ╔═╡ 2cf94a78-f3ea-4e02-b417-aaa6510ff328
 md"
 ---
 ###### 3.3.8 [Standard Normal (= Gaussian) Distribution](https://en.wikipedia.org/wiki/Normal_distribution)
 (NonSICP)
+
+$f_{Gaussian}(x|\mu=0,\sigma=1) = \frac{1}{\sigma\sqrt{2\pi}}exp\left\{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right\}=N(x|\mu=0,\sigma=1)$ 
+
+$\;$
+$\;$
+$\;$
+
 "
 
 # ╔═╡ b2e9582d-bf46-486b-b7fb-1e3a68e77efe
 gaussianDensity(x; μ=0.0, σ=1.0) = 1/(σ*sqrt(2π))*exp(-(1/2)*((x-μ)/σ)^2)
 
 # ╔═╡ bd63330c-e1f8-4f4e-836f-b1285539a0c1
-let x1 = +1.0
+function plotNormalGaussian()
+	x1 = +1.0
 	x2 = -1.0
 	y1 = gaussianDensity(+1.0)
 	y2 = gaussianDensity(-1.0)
-	plot(gaussianDensity, -1.0, 1.0, size=(525, 400), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"$p(-1.0 < X < +1.0)$ for $X \sim N(X\;\;| μ=0.0, σ=1.0)$", titlefontsize=12, xlabel=L"$X$", ylabel=L"$f(X)$", label=L"f(X)")
-	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"$f(X)$")
-	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"$f(X)$")
-	plot!([x1, x1], [0, y1], color=:red, label=L"$x=+1.0=\sigma$")
-	plot!([x2, x2], [0, y2], color=:red, label=L"$x=-1.0=-\sigma$")
+	plot(gaussianDensity, -1.0, 1.0, size=(525, 400), xlim=(-3.0, 3.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title=L"p(-1 < X < +1)\ for\ X \sim N(X\;\;| μ=0, σ=1)", titlefontsize=10, xlabel=L"X=x", ylabel=L"N(x|\mu=0,\sigma=1)", label=L"N(x|\mu=0,\sigma=1)")
+	plot!(gaussianDensity, -3.0, -1.0,  line=:darkblue, label=L"N(x|\mu=0,\sigma=1)")
+	plot!(gaussianDensity, 1.0, 3.0,  line=:darkblue, label=L"N(x|\mu=0,\sigma=1)")
+	plot!([x1, x1], [0, y1], color=:red, label=L"x=\sigma=+1")
+	plot!([x2, x2], [0, y2], color=:red, label=L"x=-\sigma=-1")
 	annotate!(0.05, 0.1, L"\int_{-1}^{+1} N(\mu=0, \sigma=1)=", 10)
 	annotate!(0, 0.06, L"=p=0.68", 10)
-end # let
+end # function plotNormalGaussian
+
+# ╔═╡ 653d2cdd-b95e-4505-80c2-84d0f1677970
+plotNormalGaussian()
 
 # ╔═╡ 12e0fa05-135d-48b6-b6c2-c28ce006b2d9
 integralRecPat(gaussianDensity, -1.0, 1.0, Δx=0.1)          # ==> p = 0.682
@@ -842,6 +882,22 @@ md"
 ---
 ###### 3.3.9 Mixed Gaussians
 In empirical research *mixed* Gaussians are rather seldom used to describe real data [Schilling, et al. (2002)](http://dbsi.org/dist/00031300265.pdf). In contrast to their role in data analysis mixed Gaussians are rather often used to represent prior beliefs in *Bayesian* modeling (Wikipedia, [*Mixture Model*](https://en.wikipedia.org/wiki/Mixture_model)).
+
+$f_{MixedGaussians}(x|w_1=0.5, \mu_1=-3.0,\sigma_1=0.5; w_2=0.5, \mu_2=+3.0,\sigma_2=2.0) =$
+
+$\;$
+
+$=w_1\frac{1}{\sigma_1\sqrt{2\pi}}exp\left\{-\frac{1}{2}\left(\frac{x-\mu_1}{\sigma_1}\right)^2\right\} + w_2\frac{1}{\sigma_2\sqrt{2\pi}}exp\left\{-\frac{1}{2}\left(\frac{x-\mu_2}{\sigma_2}\right)^2\right\}=$
+
+$\;$
+$\;$
+$\;$
+
+$=w_1N(x|\mu_1,\sigma_1) + w_2N(x|\mu_2,\sigma_2).$ 
+
+$\;$
+$\;$
+
 "
 
 # ╔═╡ 6082fa14-a6f1-4075-bfeb-4d88575fbcaa
@@ -861,12 +917,13 @@ mixedDensity(x) = mixedGaussianDensity(x, μ1=-3.0, μ2=+3.0, σ1=0.5, σ2=2.0)
 # ╔═╡ 2de6f420-d6a1-4bd4-ab95-6774e2838b3b
 let x1 = -4.0
 	x2 = +6.5
-	plot(mixedDensity, -4.0, 6.5, size=(700, 500), xlim=(-6.0, 10.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Mixed Gaussians", titlefontsize=12, xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
+	plot(mixedDensity, -4.0, 6.5, size=(700, 500), xlim=(-6.0, 10.0), ylim=(0, 0.45), line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Mixed Gaussians", titlefontsize=12, xlabel=L"X=x", ylabel=L"f(X)", label=L"f(X)")
 	#-------------------------------------------------------------------------------
-	plot!(mixedDensity, -6.0, -4.0,  line=:darkblue, label=L"$f(X)$")
-	plot!(mixedDensity, 6.5, 10.0,  line=:darkblue, label=L"$f(X)$")
-	plot!([x1, x1], [0, mixedDensity(x1)], seriestype=:line, color=:red,  label=L"$x_1=-4.0$")
-	plot!([x2, x2], [0, mixedDensity(x2)], seriestype=:line, color=:red,  label=L"$x_2=+5.5$")
+	plot!(mixedDensity, -6.0, -4.0,  line=:darkblue, label=L"f(X)")
+	plot!(mixedDensity, 6.5, 10.0,  line=:darkblue, label=L"f(X)")
+	plot!([x1, x1], [0, mixedDensity(x1)], seriestype=:line, color=:red,  label=L"x_1=-4.0")
+	plot!([x2, x2], [0, mixedDensity(x2)], seriestype=:line, color=:red,  label=L"x_2=+5.5")
+	annotate!(0.6, 0.028, L"\int_{-4.0}^{+6.5}w_1N(x|\mu_1,\sigma_1) + w_2N(x|\mu_2,\sigma_2) dx = 0.9685", 10)
 end # let
 
 # ╔═╡ 3ef10af4-d6c0-4979-814b-c3674746e8ad
@@ -934,7 +991,10 @@ $\;$
 "
 
 # ╔═╡ 5aaeacc4-6d26-4cc5-be26-2161db3ce784
-plot(x->x^2-1, 0.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+begin
+	plot(x->x^2-1, 0.0, 3.0, size=(800, 400), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+	annotate!(1, 4, L"\int_0^3 (x^2-1) \lambda(dx) = 6", 14)
+end # begin
 
 # ╔═╡ d6f4ab59-0a81-404d-bebf-1e89ab674079
 let f(x) = x^2-1
@@ -944,7 +1004,10 @@ let f(x) = x^2-1
 end # let
 
 # ╔═╡ 5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
-plot(x->x^2-1, 1.0, 3.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+begin
+	plot(x->x^2-1, 1.0, 3.0, size=(800, 400), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", framestyle=:semi)
+	annotate!(2.4, 1.3, L"\int_1^3 (x^2-1) \lambda(dx) = 6.6666...", 12)
+end # begin
 
 # ╔═╡ 10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
 let f(x) = x^2-1
@@ -954,7 +1017,10 @@ let f(x) = x^2-1
 end # let
 
 # ╔═╡ 5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
-plot(x->x^2-1, 0.0, 1.0, size=(700, 300), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", titlefontsize=12, framestyle=:semi, xlabel=L"x", ylabel=L"x^2-1")
+begin 
+	plot(x->x^2-1, 0.0, 1.0, size=(800, 400), xlims=(0.0, 3.1), ylims=(-1.5, 9.2), line=:darkblue, fill=(0, :lightblue), title=L"$x \mapsto x^2-1$", titlefontsize=12, framestyle=:semi, xlabel=L"x", ylabel=L"x^2-1")
+	annotate!(0.55, -0.5, L"\int_1^3 (x^2-1) \lambda(dx) = -0.6666...", 12)
+end # begin
 
 # ╔═╡ a9ec7875-1522-42a5-a5e2-438fe312604c
 let f(x) = x^2-1
@@ -1010,7 +1076,7 @@ function plotStickDensity(;Δx=1E-4)
 	plot(xs, stickDensity, size=(600, 400), xlim=(0.0, 3.0), ylim=(0, 500), 
 	line=:darkblue, fill=(0, :lightblue), framestyle=:semi, title="Density of Stick Function for $Δx", titlefontsize=12, xlabel=L"$X$", ylabel=L"$f(X)$", label=L"$f(X)$")
 	#-----------------------------------------------------------------------------
-	annotate!([(1.5, 400.0, L"$\int_0^3f(x)\cdot\lambda(dx)=\left(\frac{1}{2}\frac{\delta(A_1)}{2\Delta x} + \frac{1}{2}\frac{\delta(A_2)}{\Delta x}\right)\Delta x=1$")])
+	annotate!([(1.5, 350.0, L"\int_0^3f(x)\cdot\lambda(dx)=\left(\frac{1}{2}\frac{\delta(A_1)}{2\Delta x} + \frac{1}{2}\frac{\delta(A_2)}{\Delta x}\right)\Delta x=1", 10)])
 end # function plotStickDensity
 
 # ╔═╡ c0ba6831-cbed-4b0b-bb22-7ffb6e41b40c
@@ -1099,7 +1165,6 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
-Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 GraphRecipes = "~0.5.13"
@@ -1107,7 +1172,6 @@ LaTeXStrings = "~1.4.0"
 Plots = "~1.40.9"
 Pluto = "~0.20.4"
 QuadGK = "~2.11.0"
-Statistics = "~1.11.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -1116,7 +1180,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "41aa010417326077b859d493c0309f0a629ff79d"
+project_hash = "bff6c21150dfc17fd9d378e6d4dbe9d494f8e820"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -2672,7 +2736,7 @@ version = "1.4.1+2"
 # ╟─a0bbb64a-28bc-466d-bb44-117ff9e21083
 # ╠═56e8072b-59ab-4e64-86fa-d5138c5405e1
 # ╟─cd4ad65b-6fa0-4eda-8dd5-0bb3d04eeeb2
-# ╠═02bf20ff-0e44-40bc-bd6a-1e55e2086571
+# ╟─02bf20ff-0e44-40bc-bd6a-1e55e2086571
 # ╠═bf281edd-d933-446b-8b54-903e52c4505b
 # ╠═84465f7d-7dbf-4ddf-b46c-01deab41bdcd
 # ╠═dc5ec344-9513-4cda-b97f-511a7449cb6d
@@ -2691,11 +2755,15 @@ version = "1.4.1+2"
 # ╠═b738ef42-21c4-43ff-950e-1104038216ab
 # ╟─f350f924-09db-4543-a0a9-a7988d1c3aeb
 # ╟─7d652d8e-72af-4d98-890a-ee730ca41876
+# ╠═7e5eb609-e50f-4682-83a4-b7c0e8a7d3de
+# ╠═ac2eed3e-6302-46d8-8643-2a4ddce7c770
 # ╠═a08111b9-ed7e-4f85-8a2c-ebd27dbdf43c
 # ╠═27db6328-e997-4972-865f-4a3aeaaa18e5
+# ╠═4656a900-d689-480a-baf4-fef6ddf80bbb
 # ╟─2cf94a78-f3ea-4e02-b417-aaa6510ff328
 # ╠═b2e9582d-bf46-486b-b7fb-1e3a68e77efe
 # ╟─bd63330c-e1f8-4f4e-836f-b1285539a0c1
+# ╠═653d2cdd-b95e-4505-80c2-84d0f1677970
 # ╠═12e0fa05-135d-48b6-b6c2-c28ce006b2d9
 # ╠═23824efd-d3d8-4e02-8ddd-5e20da7e99a4
 # ╠═40e24f4d-9966-4984-b255-34c6cd3e0d7e
@@ -2715,9 +2783,9 @@ version = "1.4.1+2"
 # ╟─7c734d5f-ac3d-4bbd-99b3-68c31aae6508
 # ╠═8f884ca3-790c-42fd-8bcb-8476012d4ee1
 # ╟─1e409f7c-7e2d-4d1d-816a-de12b8987a62
-# ╟─5aaeacc4-6d26-4cc5-be26-2161db3ce784
+# ╠═5aaeacc4-6d26-4cc5-be26-2161db3ce784
 # ╠═d6f4ab59-0a81-404d-bebf-1e89ab674079
-# ╟─5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
+# ╠═5b9cccf1-10bf-47f8-9343-a5d0404d4ad3
 # ╠═10f51d0a-a1d6-4e6c-9a9d-f7c0579c7371
 # ╟─5df40d45-72e8-4ab8-b97f-eb29f2ae7b1b
 # ╠═a9ec7875-1522-42a5-a5e2-438fe312604c
@@ -2725,7 +2793,7 @@ version = "1.4.1+2"
 # ╟─221209af-1895-4eaa-badf-c576517938af
 # ╠═28bc9f1b-a982-455e-a630-7f3af12b0248
 # ╟─29dc076b-2a79-48ae-bceb-2bb88b3a2b61
-# ╠═c0ba6831-cbed-4b0b-bb22-7ffb6e41b40c
+# ╟─c0ba6831-cbed-4b0b-bb22-7ffb6e41b40c
 # ╠═1d40ee9f-e0d6-4bfc-bb78-0c267a099cef
 # ╠═999b68a3-9bfc-462c-82c2-b4b71a562a5f
 # ╟─67512229-1207-4522-bfe7-87dca4feeb02
