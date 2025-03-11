@@ -41,7 +41,7 @@ We present two *cognitive stochastic* models for predicting *first* choices from
 
 The 2025 code version of both model is modified slightly compared to the 2024 version by abandoning all *arrays* in favor of *functions* so that the code fits better into the SICP chapter topic *Procedures as Arguments*.
 
-First in $3.$, *integrals* of the *discriminal dispersions* in form of *probability density functions (PDFs)* of *Gaussians* are computed numerically in a *Riemann* style. Then in $4.$ we *replace* *integratals* of Gaussian densities by calling *cumulative distribution functions (CDFs)* of *Gaussian*s. These are provided by the library *Distributions.jl*.
+First in $3.$, *integrals* of the *discriminal dispersions* in form of *probability density functions (PDFs)* of *Gaussians* are computed numerically in a *Riemann* style. Then in $4.$ we *replace* *integratals* of Gaussian densities by calling *cumulative distribution functions (CDFs)* of *Gaussian*s. These CDFs are provided as function by the library *Distributions.jl*.
  
 "
 
@@ -222,9 +222,9 @@ md"
 
 [*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) proposed a family of *discrimininal dispersions* in the form of *Gaussians* as a basic component in his *First Choice Model (TFCM)* for predictions of *first* choices. Each *probability density function (PDF)* of this family represents the *density* of subjective *latent affects* or *sentiments* of voters toward a stimulus or candidate. 
 
-The model predicts the percentage of *first* choice for each stimulus when presented in a set of alternatives. The parameters of *latent affect* or *sentiment* PDFs (= *discriminal dispersions*) are supposed to be measured by psychological scaling methods (e.g. rating scales). This way the model constructor is able to adapt the model to empirical data for affect values (e.g. sensations, attitudes, subjective utility, moral or aestetic sentiments).
+The model predicts the probabilty or proportion of *first* choice for each stimulus when presented in a set of alternatives. The parameters of the *latent affect* or *sentiment* PDFs (= *discriminal dispersions*) are supposed to be measured by psychological scaling methods (e.g. rating scales). This way the modeller is able to adapt the model to empirical data (e.g. for affect values like sensations, attitudes, subjective utility, moral or aestetic sentiments).
 
-The *discrete* version of *TFCM* was reused in [*Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf) and *both* versions *simplified* to the *DPVM* here. 
+The *discrete* version of *TFCM* was reused in [*Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf) to predict first choices when presented a set of German politicians. *Both* versions of the *TFCM* are *simplified* here to the *DPVM*. 
 "
 
 # ╔═╡ 0cf667f5-b597-41af-85cc-282e4484ffc3
@@ -291,19 +291,13 @@ md"
 
 According to the model the probability that stimulus $S_i$ is a *first choice* when presented together with a set of alternatives $j = 1, ..., k; j\neq i$ is:
 
-$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k p_j(x)\;dx =$
+$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k \int_{-\infty}^x f_j(x)\;dx=$
 
 $\;$
 $\;$
 $\;$
 
-$=\int_{-\infty}^{+\infty} PDF_I(x) \prod_{j=1; j\neq i}^k CDF_J(x)dx=$
-
-$\;$
-$\;$
-$\;$
-
-$= \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k \int_{-\infty}^x f_j(x)\;dx.$
+$=\int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k F_j(x)\;dx = \int_{-\infty}^{+\infty} PDF_I(x) \prod_{j=1; j\neq i}^k CDF_J(x)dx.$
 
 $\;$
 $\;$
@@ -313,13 +307,17 @@ $\;$
 
 # ╔═╡ 76b96893-03a8-435f-a351-daba84ae5df3
 md"
-The preference probability $P_i(i > j = 1, ..., k; j\neq i)$ is the *integral* of the *probability density function (PDF)* $f_I(x)$ *weighted* by the amount of *less favorable* attitude or sentiment $\mu_{x>J,K,L,...}(x)$ toward the alternatives $J,K, L,...$ measured at $x$. The latter is *measured* by the product of the *cumulative probability density functions (CDFs)* 
+The product
 
-$\mu_{x>x_j,x_k,x_l,...}(x) = \prod_{j=1; j\neq i}^k CDF_J(x).$
+$\mu_{X>X_j, X_k,X_l,...}(x) := \prod_{j=1; j\neq i}^k F_j(x)\;dx$
 
 $\;$
 $\;$
 $\;$
+
+is permitted only under the assumption of *mutual independence* of all stochastic variables $X_j \_\|\_ X_k; j \neq i,k; k \neq i,j.$ It *measures* the probability that *all* stimuli $j \neq i$ in the set of alternatives generate a $X_{j \neq i} < x.$
+
+The preference probability $P_i(i > j = 1, ..., k; j\neq i)$ is the *integral* of the *probability density function (PDF)* $f_I(x)$ *weighted* by the amount of *less favorable* attitude or sentiment $\mu_{x>x_j,x_k,x_l,...}(x)$ measured at $x$ toward the alternatives $j,k,l,...$. 
 
 So the mathematical model can be written as a *measure with density* (c.f. Schilling, 2017, p.83):
 
@@ -334,24 +332,29 @@ $\;$
 # ╔═╡ 14ccb9a2-ec6e-4a2b-a2cf-f3d78deba2fc
 md"
 ---
-###### 3.2.3 *Informal* Meaning of *Thurstone*'s Model
-The verbalized *informal* meaning is that
+###### 3.2.3 An *Alternative* Interpretation of *Thurstone*'s Model
+The simplified *formal* meaning is that the integral
 
-- the *strength of preference* for stimulus $S_i$ *at the point* of affect strength $x$ is the *product* of the density $f_i(x)$ (vertical *red* line in the graphic above) and *all* *cumulative* probabilities $p_{x>x_j,...,x_k; j \ne i}(x)$ (*blue* shaded areas left of the vertical *red* line in the above graphic). 
-
-- the product $\prod_{j=1,...,k; j \ne i}^k CDF_j(x)$ is the probability that *all* alternatives $S_{j;j \neq i}$ of $S_i$ stimulate a *lower* affective value than $x$. 
-
-- the *total* preference strength or probability $P_i(i > j; j\neq i)$  is the integral over the total range of sensations $-\infty < x < +\infty$.
-
-The verbalized *formal* meaning of $P_i(i > j = 1, ..., k; j\neq i)$ is that 
-
-- of a *conditional expectation*. It is the expectation for $S_i$ that the set of alternatives $S_{j; j\neq i}$ stimulates *lower* affects:
-
-$\mathbb E(p_{i>j}(x)|j\neq i) = P_i(i > j; j\neq i).$
+$I = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k F_j(x)\;dx$
 
 $\;$
+$\;$
+$\;$
 
-Because of its characteristic as a *conditional* expectation the model sometimes favors stimuli which are *controversal* (like $S_L$). These are stimuli with a *large* variance discriminal dispersion. This can lead to various interesting and surprising effects as are discussed by [*Thurstone* (1945)](https://link.springer.com/article/10.1007/BF02288891).
+is under the *mutual independence* assumption $\{X_j \_\|\_ X_k; j \neq i,k; k \neq i,j\}$
+
+$P((X_i > X_j) ... and ... P(X_i > X_k)) = P(X_i = max(X_i, X_j,...,X_k); i \neq j,k).$
+
+$\;$
+$\;$
+
+The sum of these preference probabilities is equal to 
+
+$\sum_{i=1}^k P(X_i = max(X_i, X_j,...,X_k); i \neq j,k) = 1.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -1114,33 +1117,10 @@ plotVCMPreferenceDensity(kS=4)
 # ╔═╡ 07b0afd8-f461-4acc-8fb0-066ef23f41f8
 ourVotingChoiceModelDistrib(kS=4)  # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
 
-# ╔═╡ c316df55-d432-4450-817c-3a108f1c75bd
-md"
----
-##### 7. Open Problem
-
-In *5.* we presented the *stimulus-specific* preference probability as a *weighted expectation*
-
-$p(I > J,K,...) = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>x_j,x_k,x_l,...}(dx) = \int_{-\infty}^{+\infty} f_I(x)\cdot d\mu_{x>x_j,x_k,x_l,...}.$
-
-$\;$
-$\;$
-$\;$
-
-The *open* question is why the sum of these *stimulus-specific* preference values is without any *aposteriori normalization* equal to 1:
-
-$\sum_{i=1}^k p(i > j,...; j \neq i) = \sum_{i=1}^k \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>x_j,x_k,x_l,...}(dx) = \sum_{i=1}^k \int_{-\infty}^{+\infty} f_I(x)\cdot d\mu_{x>x_j,x_k,x_l,...}=1.$
-
-$\;$
-$\;$
-$\;$
-
-"
-
 # ╔═╡ 026debbf-0696-46d9-8d12-ee9d400eaf91
 md"
 ---
-##### 8. Summary
+##### 7. Summary
 We presented two alternative *cognitive* models for the prediction of *first choices*. Both models assume that stimuli can be scaled on a *latent sentiment* or *attitude* scale (*discriminal dispersion, Thurstone*(1945)) and that *preference* for a stimulus is a *monotone* ascending function of this latent scale. The *first* model proposed by *Thurstone* (1945) computes for each stimulus the *first choice probability* as a *weighted expectation*. The *second* model proposed by us (2024) assumes that the *total preference mass* is distributed *across* the total set of stimulus-specific *discriminal dispersions*. The stimulus-specific *first choice probability* is equal to its share of *preference mass*.
 
 We compared both models with a small data set of 3 and 4 stimuli. Despite its conceptually and mathematically *simpler* nature *our* model could came up with *nearly the same* predictions as *Thurstones*.
@@ -1150,7 +1130,7 @@ We compared both models with a small data set of 3 and 4 stimuli. Despite its co
 # ╔═╡ bbd5f8c0-cfb6-4417-a8d2-5474bf0b4cb1
 md"
 ---
-##### 9. References
+##### 8. References
 - **Ahrens, H.J. & Möbus, C.**; [*Zur Verwendung von Einstellungsmessungen bei der Prognose von Wahlentscheidungen*](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf); Zeitschrift für Experimentelle und Angewandte Psychologie, 1968, Band XV. Heft 4. S.543-563; last visit: 2023/09/08
 - **Maas, M.D.;** [*MathecDev: Gauss-Kronrod Adaptive Quadrature with QuadGK.jl*](https://www.matecdev.com/posts/julia-numerical-integration.html#gauss-kronrod-adaptive-quadrature-with-quadgkjl); last visit 2025/03/03
 - **Nazarathy, Y. & Klok, H.**; *Statistics with Julia: Fundamentals for Data Science, Machine Learning and Artificial Intelligence*; Cham, Switzerland: Springer, 2021
@@ -2806,7 +2786,6 @@ version = "1.4.1+2"
 # ╟─a419ce31-2b73-48c8-9eb3-1428d1a38f89
 # ╠═f61e93ae-dd64-46c6-8309-c834089a87bb
 # ╠═07b0afd8-f461-4acc-8fb0-066ef23f41f8
-# ╟─c316df55-d432-4450-817c-3a108f1c75bd
 # ╟─026debbf-0696-46d9-8d12-ee9d400eaf91
 # ╟─bbd5f8c0-cfb6-4417-a8d2-5474bf0b4cb1
 # ╟─6f837e7f-3085-411b-b39f-c63f7fcf2939
