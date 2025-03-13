@@ -26,9 +26,9 @@ end # begin
 # ╔═╡ 951cce60-4e4f-11ee-379a-4385f4005380
 md"
 ===================================================================================
-#### nonSICP: 1.3.1.4 Procedures as Arguments IV: Cognitive First Choice Voting Models 
+#### nonSICP: 1.3.1.4 Procedures as Arguments IV: First Choice Voting Models 
 ##### file: PCM20210908\_SICP\_1.3.1.4\_Procedures\_as\_Arguments\_IV.jl
-##### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/11 ***
+##### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/13 ***
 
 ===================================================================================
 "
@@ -37,9 +37,11 @@ md"
 # ╔═╡ 036b8370-8b33-48a4-a2b2-889fafa50bcb
 md"
 ##### 0. Introduction
-We present two *cognitive stochastic* models for predicting *first* choices from a set of alternative *stimuli* or *candidates*. The *first* model (*Thurstone's First Choice Model* (*TFCM*)) was published by *Thurstone* (1945) and the *second* is called the *Distributed Probability Mass Voting Model (DPVM)* and was first presented here in *2024*. Our model makes *nearly identical* predictions but *fewer* assumptions about the nature of implied cognitive processes than *Thurstone's TFCM*. 
+We present two *stochastic* models for predicting *first choices* from a set of alternative *stimuli* or *candidates*. The *first* model (*Thurstone's First Choice Model* (*TFCM*)) was published by *Thurstone* (1945) and the *second* is called the *Distributed Preference Mass Voting Model (DPMVM)* and was first presented here in *2024*. Our model makes *nearly identical* predictions but *fewer* assumptions about the nature of implied *cognitive processes* than *Thurstone's TFCM*. 
 
-The 2025 code version of both model is modified slightly compared to the 2024 version by abandoning all *arrays* in favor of *functions* so that the code fits better into the SICP chapter topic *Procedures as Arguments*.
+In *TFCM* we need $n$ *passes* to determine the *probability of first choices* for stimulus $i=1,...,n$. In *DPMVM* it is only *one* pass to get the *same* first choice probabilities. In *TFCM* each pass for stimulus $i; i=1,...,n$ computes an integral of a *weighted measure* of *nonpreference* or *unattractiveness* for the set of remaining stimuli $j \neq i; j=1,...,n$. The greater complexity of the *TFCM* compared to the *DPMVM* raises doubts whether the *TFCM* is a *cognitive* model. We think that it is only a *stochastic* one only suitable for prediction purposes.
+
+The 2025 code version of both models is modified slightly compared to the 2024 version by abandoning all *arrays* in favor of *functions* so that the code fits better into the SICP chapter topic *Procedures as Arguments*.
 
 First in $3.$, *integrals* of the *discriminal dispersions* in form of *probability density functions (PDFs)* of *Gaussians* are computed numerically in a *Riemann* style. Then in $4.$ we *replace* *integratals* of Gaussian densities by calling *cumulative distribution functions (CDFs)* of *Gaussian*s. These CDFs are provided as function by the library *Distributions.jl*.
  
@@ -51,8 +53,8 @@ md"
 ##### 1. Topics
 - *Cognitive* model
 - *Stochastic* model
-- *Thurstone's First Choice* model
-- our *Voting Choice* model
+- *Thurstone's First Choice Model (TFCM)*
+- *Distributed Preference Mass Voting Model (DPMVM)*
 - *Riemann* integration
 - *Gaussian (= normal)* distribution
 - *PDFs* and *CDFs*
@@ -212,19 +214,20 @@ plotCumulativeGaussian(myCumulativeGaussian, title=L"Cumulative\ Gaussian\ Distr
 # ╔═╡ 2e694ae4-f952-402f-8fec-cfb4b346fb15
 md"
 ---
-##### 3.2 *Thurstone's First Choice Cognitive Voting* Model
+##### 3.2 A *n-Pass* Model: *Thurstone's First Choice Cognitive Voting* Model (TFCM)
 
 "
 
 # ╔═╡ a76a6491-b5e9-45a2-8b14-d54cc1586e9d
 md"
-###### 3.2.1 *Discriminal Dispersons* (=Family of *Gaussians*) of *First Choice Cognitive* Model
+###### 3.2.1 *Discriminal Dispersons* (=Family of *Gaussians*) as a Component of *First Choice Stochastic* Models
 
-[*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) proposed a family of *discrimininal dispersions* in the form of *Gaussians* as a basic component in his *First Choice Model (TFCM)* for predictions of *first* choices. Each *probability density function (PDF)* of this family represents the *density* of subjective *latent affects* or *sentiments* of voters toward a stimulus or candidate. 
+[*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) proposed a family of *discrimininal dispersions* in the form of *Gaussians* as a basic component in his *First Choice Model (TFCM)*. Each *probability density function (PDF)* of this family represents the *density* of subjective *latent affects* or *sentiments* of voters toward a stimulus or candidate. The probability that stimulus $i$ is of first choice is computed by analyzing certain aspects of these *discrimininal dispersions* when presented in a set of alternatives. 
 
-The model predicts the probabilty or proportion of *first* choice for each stimulus when presented in a set of alternatives. The parameters of the *latent affect* or *sentiment* PDFs (= *discriminal dispersions*) are supposed to be measured by psychological scaling methods (e.g. rating scales). This way the modeller is able to adapt the model to empirical data (e.g. for affect values like sensations, attitudes, subjective utility, moral or aestetic sentiments).
+The parameters of the *latent affect* or *sentiment* PDFs (= *discriminal dispersions*) are supposed to be measured by psychological scaling methods (e.g. rating scales). This way the modeller is able to adapt the model to empirical data (e.g. for affect values like sensations, attitudes, subjective utility, moral or aestetic sentiments).
 
-The *discrete* version of *TFCM* was reused in [*Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf) to predict first choices when presented a set of German politicians. *Both* versions of the *TFCM* are *simplified* here to the *DPVM*. 
+The *discrete* version of *TFCM* was reused in [*Ahrens, H.J. & Möbus, C.* (1968)](http://oops.uni-oldenburg.de/2729/1/PCM1968.pdf) to predict first choices when presented a set of German politicians. 
+
 "
 
 # ╔═╡ 0cf667f5-b597-41af-85cc-282e4484ffc3
@@ -287,17 +290,17 @@ Three stimuli $S_I, S_J, S_K$ are presented to voters. All stimuli generate diff
 # ╔═╡ 80b9a128-bd19-4851-b3f7-b699700fbd08
 md"
 ---
-###### 3.2.2 *Thurstone's First Choice* Model as a *Stochastic* Model
+###### 3.2.2 *Thurstone's First Choice* Model as a *n-Pass Stochastic* Model
 
-According to the model the probability that stimulus $S_i$ is a *first choice* when presented together with a set of alternatives $j = 1, ..., k; j\neq i$ is:
+According to the model the *probability* that stimulus $S_i$ is a *first choice* when presented together with a set of alternatives $j = 1, ..., n; j\neq i$ is:
 
-$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k \int_{-\infty}^x f_j(x)\;dx=$
+$P_i(i > j = 1, ..., n; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^n \int_{-\infty}^x f_j(x)\;dx=$
 
 $\;$
 $\;$
 $\;$
 
-$=\int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k F_j(x)\;dx = \int_{-\infty}^{+\infty} PDF_I(x) \prod_{j=1; j\neq i}^k CDF_J(x)dx.$
+$=\int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^n F_j(x)\;dx = \int_{-\infty}^{+\infty} PDF_I(x) \prod_{j=1; j\neq i}^n CDF_J(x)dx.$
 
 $\;$
 $\;$
@@ -309,22 +312,26 @@ $\;$
 md"
 The product
 
-$\mu_{X>X_j, X_k,X_l,...}(x) := \prod_{j=1; j\neq i}^k F_j(x)\;dx$
+$\mu_{X>X_j, X_k,X_l,...,X_n}(x) := \prod_{j=1; j\neq i}^n F_j(x)\;dx$
 
 $\;$
 $\;$
 $\;$
 
-is permitted only under the assumption of *mutual independence* of all stochastic variables $X_j \_\|\_ X_k; j \neq i,k; k \neq i,j.$ It *measures* the probability that *all* stimuli $j \neq i$ in the set of alternatives generate a $X_{j \neq i} < x.$
+is permitted only under the assumption of *mutual independence* of all stochastic variables $X_j \_\|\_ X_n; j \neq i,n; n \neq i,j.$ It *measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate a *more unattractive* response $X_{j \neq i} < x.$
 
-The preference probability $P_i(i > j = 1, ..., k; j\neq i)$ is the *integral* of the *probability density function (PDF)* $f_I(x)$ *weighted* by the amount of *less favorable* attitude or sentiment $\mu_{x>x_j,x_k,x_l,...}(x)$ measured at $x$ toward the alternatives $j,k,l,...$. 
+The preference probability $P_i(i > j = 1, ..., n; j\neq i)$ is the *integral* of the *probability density function (PDF)* $f_I(x)$ *weighted* by the amount of *less favorable* attitude or sentiment $\mu_{x>X_j,X_k,X_l,...,X_n}(x)$ measured at $x$ toward the alternatives $_j,X_k,X_l,...,X_n$. 
 
 So the mathematical model can be written as a *measure with density* (c.f. Schilling, 2017, p.83):
 
-$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>x_j,x_k,x_l,...}(dx)=\int_{-\infty}^{+\infty}f_I(x)\cdot d\mu_{x>x_j,x_k,x_l,...}.$
+$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>X_j,X_k,X_l,...,X_n}(dx) = \int_{-\infty}^{+\infty}f_I(x)\cdot d\mu_{x>X_j,X_k,X_l,...,X_n}.$
 
 $\;$
 $\;$
+$\;$
+
+This integral has to be computed for *each* of the $n$ stimuli. This is the reason that we call it a *n-pass* model. These can be computed simultaneously.
+
 $\;$
 
 "
@@ -332,7 +339,36 @@ $\;$
 # ╔═╡ 14ccb9a2-ec6e-4a2b-a2cf-f3d78deba2fc
 md"
 ---
-###### 3.2.3 An *Alternative* Interpretation of *Thurstone*'s Model
+###### 3.2.3 Interpretations of the *TFCM*
+###### 3.2.3.1 The *TFCM* as a Set of *Conditional* Expectations
+
+The integral
+
+$\int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>x_j,x_k,x_l,...}(dx)$
+
+$\;$
+$\;$
+$\;$
+
+can be identified as an *expectation*
+
+$\mathbb E_i[\mu_{x>x_j,x_k,x_l,...}] = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>x_j,x_k,x_l,...}(dx).$
+
+$\;$
+$\;$
+$\;$
+
+The *verbalized* meaning of this expectation for stimulus $i$ is the *stimulus-specific expectation of the unattractiveness of the set of alternatives*. This expectation has to be computed for *each* stimulus $i;i=1,...n$.
+
+This interpretation has the drawback that you cannot see that the expectations *sum up* to 1. So we need an alternative interpretation (s. 3.2.3.2).
+
+"
+
+# ╔═╡ 61e7d5c1-213e-434c-9483-2fe473767ce8
+md"
+---
+###### 3.2.3.2 The *TFCM* as a Set of *Conditional* Preference Probabilities
+
 The simplified *formal* meaning is that the integral
 
 $I = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^k F_j(x)\;dx$
@@ -341,16 +377,15 @@ $\;$
 $\;$
 $\;$
 
-is under the *mutual independence* assumption $\{X_j \_\|\_ X_k; j \neq i,k; k \neq i,j\}$
+is under the *mutual independence* assumption $\{X_j \_\|\_ X_k; j \neq i,k; k \neq i,j\}$ a *joint probability distribution (JPD)* of *extremes*:
 
-$P((X_i > X_j) ... and ... P(X_i > X_k)) = P(X_i = max(X_i, X_j,...,X_k); i \neq j,k).$
+$P\left\{(X_i > X_j)\land ... \land P(X_i > X_n); i \neq j,.., n\right\} = P\left\{X_i = max(X_i, X_j,...,X_n); i \neq j,..., n\right\}.$
 
 $\;$
-$\;$
 
-The sum of these preference probabilities is equal to 
+The sum of these preference probabilities is guarantied without further normalization to be equal to 1 :
 
-$\sum_{i=1}^k P(X_i = max(X_i, X_j,...,X_k); i \neq j,k) = 1.$
+$\sum_{i=1}^k P(X_i = max(X_i, X_j,...,X_k); i \neq j,n) = 1.$
 
 $\;$
 $\;$
@@ -514,9 +549,11 @@ $\;$
 md"
 ---
 ###### 3.2.7 Cognitive Assumptions of *Thurstone's First Choice* Model
-The assumptions of the model are *rather demanding*. It hypothesizes the existence of a cognitive mechanism which computes for *each* point $x$ of *latent* affect or sentiment the preference strength for $S_i$ in relation to *all* alternatives. Furthermore the mechanism *integrates* or *sums* these preference strengths not only over the *total* range of $X$ but also for *all* stimuli. Then these *stimulus-specific* preference strengths are compared and the *first choice* is selected accordingly.
+The assumptions of the model are *rather demanding*. It hypothesizes the existence of a cognitive mechanism which computes for *each* point $x$ of *latent* affect or sentiment the preference strength for $S_i$ in relation to *all* remaining alternatives. Furthermore the mechanism *integrates* or *sums* these preference strengths not only over the *total* range of $X$ but also for *all* stimuli. Then these *stimulus-specific* preference strengths are compared and the *first choice* is selected accordingly. 
 
-Below we present an alternative model with less demanding assumptions. We call this alternative *Distributed Probability Mass Voting Model (DPVM)*. According to the *DPVM* the probability of preference mass is *distributed across all* discriminal dispersions starting from the most positive affect $x$ down to least positive affect $x$ till the probability mass is exhausted. 
+This has to be repeated for *each* of the $i=1,...,n$ stimuli. So we call it a *n-pass* model.
+
+Below we present an alternative model with less demanding assumptions. We call this alternative a *1-pass* *Distributed Probability Mass Voting Model (DPMVM)*. According to the *DPMVM* the probability of preference mass is *distributed across all* discriminal dispersions starting from the most positive affect $x$ down to least positive affect $x$ till the probability mass is exhausted. 
 
 
 "
@@ -524,9 +561,9 @@ Below we present an alternative model with less demanding assumptions. We call t
 # ╔═╡ aeaf21e4-c7c2-4b95-a082-68c0e20c2ff8
 md"
 ---
-##### 3.3 Our *Voting Choice* Model
-###### 3.3.1 Our *Voting Choice* Model as a *Stochastic* Model
-The *Voting Choice Model* avoids the cognitive implausible *product* and *aggregation* of densities and probabilities. Instead it assumes that on an *individual* level each person possesses a certain amount of *preference voting mass* which will be distributed *across* the *latent affective* discriminal dispersions till this affective mass is exhausted (sum of *blue* shaded areas to the right of the vertical *red* line). This distribution process starts at $x = +\infty$. Then the $x$ moves down to lower values to the critical point $x_{crit}$ (*red* vertical line in the graphic below) where the *sum* of the individual $p_j(x_{crit})$ is $1.0$:
+##### 3.3 Our *1-pass Distributed Probability Mass Voting Model (DPMVM)*
+###### 3.3.1 The *DPMVM* as a *Stochastic* Model
+The *DPMVM* avoids the cognitive implausible *product* and *aggregation* of densities and probabilities. Instead it assumes that on an *individual* level each person possesses a certain amount of *preference voting mass* which will be distributed *across* the *latent affective* discriminal dispersions till this affective mass is exhausted (sum of *blue* shaded areas to the right of the vertical *red* line  in the graph below). This distribution process starts at $x = +\infty$. Then the $x$ moves down to lower values to the critical point $x_{crit}$ (*red* vertical line in the graph below) where the *sum* of the individual $p_j(x_{crit})$ is $1.0$:
 
 $\sum_{i=1}^k p_i(x_{crit}<x_i) = \sum_{i=1}^k \int_{x_{crit}}^{\infty} f_i(x)\;dx = 1.0$
 
@@ -535,7 +572,7 @@ $\;$
 $\;$
 $\;$
 
-The preference probability for $S_i$ is according *our voting choice model*:
+The preference probability for $S_i$ is according *our DPMVM*:
 
 $P_i(i > j = 1, ..., k; j\neq i) = \int_{x_{crit}}^{\infty} f_i(x)\;dx.$
 
@@ -544,7 +581,7 @@ $\;$
 $\;$
 $\;$
 
-This is much simpler compared with *Thurstone*'s model:
+This is much simpler compared to *Thurstone*'s model:
 
 $P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty}f_i(x)\prod_{j=1; j\neq i}^k \int_{-\infty}^x f_j(x)\;dx.$
 
@@ -591,7 +628,7 @@ plotDiscriminalDispersionsVotingChoice()
 # ╔═╡ 69fe57e5-75d2-48b7-a6bd-c8db35b13b88
 md"
 ---
-###### 3.3.3 *Code* of *Voting Choice* Model
+###### 3.3.3 *Code* of *DPMVM* Model
 "
 
 # ╔═╡ 3947ae42-c5e2-4893-8793-4314f1485b5a
@@ -634,7 +671,7 @@ $P(S_K > \{S_I, S_J\}) = 0.74062$
 
 $\;$
 
-###### Our Voting Choice Model
+###### Our *DPMVM* Model
 
 $P(S_I > \{S_J, S_K\}) = 0.157245$
 $P(S_J > \{S_I, S_K\}) = 0.154815$
@@ -652,7 +689,7 @@ function plotModelComparison(title, x, y) # x = Thurstone model; y = our voting 
 	let rxy = trunc(Statistics.cor(x, y), digits=4)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
-		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), size=(600, 500), title=title, titlefontsize=12, seriestype=:scatter, xlabel="Thurstone Model", ylabel="Voting Model", label="model predictions")
+		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), size=(600, 500), title=title, titlefontsize=12, seriestype=:scatter, xlabel="Thurstone Model", ylabel="DPMVM", label="model predictions")
 		plot!(xs, ys, label="line of perfect model agreement")
 		#---------------------------------------------------------------------------
 		annotate!([(0.7, 0.1, "r(model1, model2) = $rxy", 10)])
@@ -660,9 +697,9 @@ function plotModelComparison(title, x, y) # x = Thurstone model; y = our voting 
 end # function plotModelComparison
 
 # ╔═╡ 4e22fd91-107a-4421-8f4d-bf12871cf4ef
-plotModelComparison("Voting vs. Thurstone's Model (3 Stimuli)", 
+plotModelComparison("DPMVM vs. Thurstone's Model (3 Stimuli)", 
 	[0.109514, 0.14831,  0.74062],                  # Thurstone's model predictions
-	[0.157245, 0.154815, 0.688408])                 # Voting model predictions
+	[0.157245, 0.154815, 0.688408])                 # DPMVM predictions
 
 # ╔═╡ 0dea6ffc-b2cb-4401-b0b9-e7604f032f48
 md"
@@ -699,13 +736,13 @@ thurstoneChoiceModel(kS=4, Δx=0.001)
 ourVotingChoiceModel(kS=4)
 
 # ╔═╡ 0b6e1719-d88b-4d17-a7b8-57b6942a07d6
-plotModelComparison("Voting vs. Thurstone's Model (4 Stimuli)", 
+plotModelComparison("DPMVM vs. Thurstone's Model (4 Stimuli)", 
 	[0.0742588, 0.0870487, 0.507737, 0.329387],       # Thurstone's model predictions
-	[0.0966776, 0.0287166, 0.519706, 0.355])          # Voting model predictions
+	[0.0966776, 0.0287166, 0.519706, 0.355])          # DPMVM predictions
 
 # ╔═╡ 8a1c25a5-e091-49f7-8455-cc90b769a4d8
 md"
-*Both* models show *strong agreement* in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is near 1.00 (!). Empirical studies have to demonstrate their usefulness: the relatively assumption free *Voting Choice* or the more demanding *Thurstone* model.
+*Both* models show *strong agreement* in predicting first choices at least for this example. The *Pearson* product-moment correlation coefficient (Nazarathy & Klok, 2021, p.123) is near 1.00 (!). Empirical studies have to demonstrate their usefulness: the relatively assumption free *DPMVM* or the more demanding *Thurstone* model.
 "
 
 # ╔═╡ d05b08a1-79fc-4c92-99c3-e5807cbc5b74
@@ -844,7 +881,7 @@ thurstoneChoiceModelDistrib(kS=4)
 # ╔═╡ 17603e10-38e5-450f-a431-b40175ca9de7
 md"
 ---
-##### 4.3 *Code* and *Predictions* of *Voting Choice* Model
+##### 4.3 *Code* and *Predictions* of *DPMVM*
 "
 
 # ╔═╡ d78fb2c3-9793-45b7-acbd-a44fbf7eb019
@@ -889,9 +926,9 @@ md"
 "
 
 # ╔═╡ 284120d2-0bb2-4160-a96d-bbe7e6074e31
-plotModelComparison("Voting vs. Thurstone's Model (3 Stimuli) with Distrib.jl", 
+plotModelComparison("DPMVM vs. Thurstone's Model (3 Stimuli) with Distrib.jl", 
 	[0.109486, 0.148505, 0.741653],                 # Thurstone's model predictions
-	[0.157288, 0.154577, 0.688464])                 # Voting model predictions
+	[0.157288, 0.154577, 0.688464])                 # DPMVM predictions
 
 # ╔═╡ 681b6508-4fa0-4a3b-a80b-b2a527edda3d
 md"
@@ -900,9 +937,9 @@ md"
 "
 
 # ╔═╡ e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
-plotModelComparison("Voting vs. Thurstone's Model (4 Stimuli) with Distrib.jl", 
+plotModelComparison("DPMVM vs. Thurstone's Model (4 Stimuli) with Distrib.jl", 
 	[0.0742391, 0.0871594, 0.508426, 0.32982],      # Thurstone's model predictions
-	[0.0967434, 0.028651, 0.51974, 0.35495])        # Voting model predictions
+	[0.0967434, 0.028651, 0.51974, 0.35495])        # *DPMVM* predictions
 
 # ╔═╡ c367f470-168a-4cfb-b4ac-49dbe2f59db9
 md"
@@ -1024,7 +1061,7 @@ integralOfStimulusSpecificPDFsWithQuadGK(x -> unitStepDensityPDF_L(x) * gaussian
 # ╔═╡ 576d4814-048b-4a76-bed3-404b1f029f1c
 md"
 ---
-##### 6. Stimulus-specific PDFs in our *Voting Choice* Model (VCM)
+##### 6. Stimulus-specific PDFs in our *DPMVM*
 We assume that each voter has a *preference mass* of $1$ which can be distributed across the *stimulus-specific* discriminal dispersions. The *vertical red* line marks the various stimulus-specific *first-choice* voting *probabilities* at the end of the distribution process. The distribution process of the preference mass stops, when the *sum* of the first choice probabilities *sums up* to $1$.
 
 The *stimulus-specific* first choice probability is equal to the *ordinate* of the crossing between the *vertical* red line at $x_{crit}$ and the *function* denoting the *preference mass* at $x_{crit}.$
@@ -1046,7 +1083,7 @@ function plotVCMPreferenceDensity(;kS=3)
 			(invGaussianDensityCDF_I(x) + 
 			 invGaussianDensityCDF_J(x) + 
 			 invGaussianDensityCDF_K(x))
-		plot(x -> invGaussianDensityCDF_I(x), xs, label=L"P(I > J,K)", title="Our VCM: Distribution of Preference Masses for kS=3", titlefontsize=12)
+		plot(x -> invGaussianDensityCDF_I(x), xs, label=L"P(I > J,K)", title="Our DPMVM: Distribution of Preference Masses for kS=3", titlefontsize=12)
 		plot!(x -> invGaussianDensityCDF_J(x), xs, label=L"P(J > I,K)")
 		plot!(x -> invGaussianDensityCDF_K(x), xs, label=L"P(K > I,J)")
 		while !(1.0 < cumsum3(xcrit))
@@ -1072,7 +1109,7 @@ function plotVCMPreferenceDensity(;kS=3)
 			 invGaussianDensityCDF_J(x) + 
 			 invGaussianDensityCDF_K(x) +
 			 invUnitStepDensityCDF_L(x))
-		plot(x -> invGaussianDensityCDF_I(x), xs, label=L"P(I > J,K,L)", title="Our VCM: Distribution of Preference Masses for kS=4", titlefontsize=12)
+		plot(x -> invGaussianDensityCDF_I(x), xs, label=L"P(I > J,K,L)", title="Our DPMVM: Distribution of Preference Masses for kS=4", titlefontsize=12)
 		plot!(x -> invGaussianDensityCDF_J(x), xs, label=L"P(J > I,K,L)")
 		plot!(x -> invGaussianDensityCDF_K(x), xs, label=L"P(K > I,J,L)")
 		plot!(x -> invUnitStepDensityCDF_L(x), xs, label=L"P(L > I,J,K)")
@@ -1121,9 +1158,13 @@ ourVotingChoiceModelDistrib(kS=4)  # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J
 md"
 ---
 ##### 7. Summary
-We presented two alternative *cognitive* models for the prediction of *first choices*. Both models assume that stimuli can be scaled on a *latent sentiment* or *attitude* scale (*discriminal dispersion, Thurstone*(1945)) and that *preference* for a stimulus is a *monotone* ascending function of this latent scale. The *first* model proposed by *Thurstone* (1945) computes for each stimulus the *first choice probability* as a *weighted expectation*. The *second* model proposed by us (2024) assumes that the *total preference mass* is distributed *across* the total set of stimulus-specific *discriminal dispersions*. The stimulus-specific *first choice probability* is equal to its share of *preference mass*.
+We presented two alternative *cognitive* models for the prediction of *first choices*. Both models assume that stimuli can be scaled on a *latent sentiment* or *attitude* scale (*discriminal dispersion, Thurstone*(1945)) and that *preference* for a stimulus is a *monotone* ascending function of this latent scale. 
 
-We compared both models with a small data set of 3 and 4 stimuli. Despite its conceptually and mathematically *simpler* nature *our* model could came up with *nearly the same* predictions as *Thurstones*.
+The *first* model proposed by *Thurstone* (1945) computes for each stimulus the *first choice probability* as a *weighted expectation* or as the *probability of extremal sentiment or attitude*. 
+
+The *second* model proposed by us (2024) assumes that the *total preference mass* is distributed *across* the total set of stimulus-specific *discriminal dispersions*. The stimulus-specific *first choice probability* is equal to its share of *preference mass*.
+
+We compared both models with a small data set of 3 and 4 stimuli. Despite its conceptually and mathematically *simpler* nature *our* model could came up with *nearly the same* predictions as *Thurestones*.
 
 "
 
@@ -2714,6 +2755,7 @@ version = "1.4.1+2"
 # ╟─80b9a128-bd19-4851-b3f7-b699700fbd08
 # ╟─76b96893-03a8-435f-a351-daba84ae5df3
 # ╟─14ccb9a2-ec6e-4a2b-a2cf-f3d78deba2fc
+# ╟─61e7d5c1-213e-434c-9483-2fe473767ce8
 # ╟─a0353198-6417-486e-bcf5-30e8c221b453
 # ╠═ec9f191f-8fa9-48e9-97f2-385ee4b2e218
 # ╠═c1af9544-e300-454a-9155-d4c0559ccb97
@@ -2735,12 +2777,12 @@ version = "1.4.1+2"
 # ╟─d447005b-e05d-4c1a-adb0-8ceec19befb6
 # ╠═04efd6b7-7d4f-4c80-b30f-3ac1b55e9bc1
 # ╟─be0ac072-efd0-4e41-a805-dce10550cca1
-# ╠═4e22fd91-107a-4421-8f4d-bf12871cf4ef
+# ╟─4e22fd91-107a-4421-8f4d-bf12871cf4ef
 # ╟─0dea6ffc-b2cb-4401-b0b9-e7604f032f48
 # ╟─081c2c11-2466-475d-a773-a574d6266ac8
 # ╠═4842fa35-40d6-4b10-a28b-53672a492f49
 # ╠═f5aa1b6a-ef05-4edc-93de-70424d171ccd
-# ╠═0b6e1719-d88b-4d17-a7b8-57b6942a07d6
+# ╟─0b6e1719-d88b-4d17-a7b8-57b6942a07d6
 # ╟─8a1c25a5-e091-49f7-8455-cc90b769a4d8
 # ╟─d05b08a1-79fc-4c92-99c3-e5807cbc5b74
 # ╠═feea3a8e-b56b-471a-93fb-d75a7456b1f6
@@ -2755,7 +2797,7 @@ version = "1.4.1+2"
 # ╠═846662df-e0c2-4080-a6eb-25ee0e638bba
 # ╠═162e20f6-0eb7-4b25-8102-313bd0d170b9
 # ╟─e27371b7-5b48-494f-a006-1ba6a589645d
-# ╠═284120d2-0bb2-4160-a96d-bbe7e6074e31
+# ╟─284120d2-0bb2-4160-a96d-bbe7e6074e31
 # ╟─681b6508-4fa0-4a3b-a80b-b2a527edda3d
 # ╠═e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
 # ╟─c367f470-168a-4cfb-b4ac-49dbe2f59db9
@@ -2781,7 +2823,7 @@ version = "1.4.1+2"
 # ╟─576d4814-048b-4a76-bed3-404b1f029f1c
 # ╟─9c428dcb-5f9b-4291-8ca2-237e08205c04
 # ╟─b5eb9a03-50a5-435d-a9c7-d955ce5db788
-# ╠═9e0a8306-f550-47fd-a1e1-204bc13abdbe
+# ╟─9e0a8306-f550-47fd-a1e1-204bc13abdbe
 # ╠═e97a5ceb-6c56-4cbb-b710-7345e66ffc50
 # ╟─a419ce31-2b73-48c8-9eb3-1428d1a38f89
 # ╠═f61e93ae-dd64-46c6-8309-c834089a87bb
