@@ -294,7 +294,7 @@ md"
 
 According to the model the *probability* that stimulus $S_i$ is a *first choice* when presented together with a set of alternatives $j = 1, ..., n; j\neq i$ is:
 
-$P_i(i > j = 1, ..., n; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\prod_{j=1; j\neq i}^n \int_{-\infty}^x f_j(x)\;dx=$
+$P_i(i > j = 1, ..., n; j\neq i) = \int_{-\infty}^{+\infty} f_i(x)\;\left(\prod_{j=1; j\neq i}^n \int_{-\infty}^x f_j(x)\;dt\right)\;dx=$
 
 $\;$
 $\;$
@@ -312,7 +312,7 @@ $\;$
 md"
 The product
 
-$\mu_{x>X_j, X_k,X_l,...,X_n}(x) := \prod_{j=1; j\neq i}^n F_j(x)\;dx$
+$\mu_{x>X_j, X_k,X_l,...,X_n}(x) := \prod_{j=1; j\neq i}^n F_j(x)$
 
 $\;$
 $\;$
@@ -405,7 +405,7 @@ $\;$
 
 *measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate for the momentary value $x$ a *less attractive* response $x > X_{j \neq i}$. We augment this product by the factor $f_i(x)$. This way we have a *measure with density*
 
-$f_i(x) \cdot \mu_{x>X_j, X_k,X_l,...,X_n}(x) := f_i(x) \cdot \prod_{j=1; j\neq i}^n F_j(x)$
+$f_i(x) \cdot \mu_{x>X_j, X_k,X_l,...,X_n}(x) := f_i(x) \prod_{j=1; j\neq i}^n F_j(x)$
 
 $\;$
 $\;$
@@ -413,7 +413,7 @@ $\;$
 
 If we multiply this *weighted density* with the *infinitesimal* $dx$ we get the *infinitesimal* probability 
 
-$f_i(x) \cdot \mu_{x>X_j, X_k,X_l,...,X_n}(x) \cdot dx := f_i(x) \cdot \prod_{j=1; j\neq i}^n F_j(x) \cdot dx =$
+$f_i(x) \; \mu_{x>X_j, X_k,X_l,...,X_n}(x) \; dx := f_i(x) \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
 
 $\;$
 $\;$
@@ -425,9 +425,9 @@ $\;$
 $\;$
 $\;$
 
-Now we 'summarize' (= integrate) these *infinitesimal* probabilities 
+Now we '*summarize*' (= integrate) these *infinitesimal* probabilities 
 
-$\int_{-\infty}^{+\infty} f_i(x) \cdot \mu_{x>X_j, X_k,X_l,...,X_n}(x) \cdot dx := \int_{-\infty}^{+\infty} f_i(x) \cdot \prod_{j=1; j\neq i}^n F_j(x) \cdot dx =$
+$\int_{-\infty}^{+\infty} f_i(x) \; \mu_{x>X_j, X_k,X_l,...,X_n}(x) \; dx := \int_{-\infty}^{+\infty} f_i(x) \; \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
 
 $\;$
 $\;$
