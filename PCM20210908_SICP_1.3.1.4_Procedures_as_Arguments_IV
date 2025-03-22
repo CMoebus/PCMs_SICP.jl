@@ -28,7 +28,7 @@ md"
 ===================================================================================
 #### nonSICP: 1.3.1.4 Procedures as Arguments IV: Stochastic First Choice Voting Models 
 ##### file: PCM20210908\_SICP\_1.3.1.4\_Procedures\_as\_Arguments\_IV.jl
-##### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/15 ***
+##### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/22 ***
 
 ===================================================================================
 "
@@ -37,13 +37,13 @@ md"
 # ╔═╡ 036b8370-8b33-48a4-a2b2-889fafa50bcb
 md"
 ##### 0. Introduction
-We present two *stochastic* models for predicting *first choices* from a set of alternative *stimuli* or *candidates*. The *first* model (*Thurstone's First Choice Voting Model* (*TFCVM*)) was published by *Thurstone* (1945) and the *second* is called the *Distributed Preference Mass Voting Model (DPMVM)* and was first presented here in *2024*. Our model makes *nearly identical* predictions but *fewer* assumptions about the nature of implied *cognitive processes* than *Thurstone's TFCM*. 
+We present two *stochastic* models for predicting *first choices* from a set of alternative *stimuli* or *candidates*. The *first* model (*Thurstone's First Choice Voting Model* (*TFCVM*)) was published by *Thurstone* (1945) and the *second* is called the *Distributed Preference Mass Voting Model (DPMVM)* and was first presented here in *2024*. Our *DPMVM* makes *nearly identical* predictions with *fewer* assumptions about the nature of implied *cognitive processes* than *Thurstone's TFCM*. 
 
-In *TFCVM* we need $n$ *passes* to determine the *probability of first choices* for stimulus $i=1,...,n$. In *DPMVM* it is only *one* pass to get the *same* first choice probabilities. In *TFCVM* each pass for stimulus $i; i=1,...,n$ computes an integral of a *weighted measure* of *nonpreference* or *unattractiveness* for the set of remaining stimuli $j \neq i; j=1,...,n$. The greater complexity of the *TFCM* compared to the *DPMVM* raises doubts whether the *TFCVM* is a *cognitive* model. We think that it is only a *stochastic* one only suitable for *prediction* purposes.
+In *TFCVM* we need $n$ *passes* to determine the *probability of first choices* for each stimulus $i; i=1,...,n$. In *DPMVM* only *one* pass is needed to get the *same* first choice probabilities. In *TFCVM* each pass for *reference* stimulus $i$ computes an integral of a *weighted measure* of *nonpreference* or *unattractiveness* for the set of remaining stimuli $j \neq i; j=1,...,n$. This greater complexity of the *TFCM* in relation to the *DPMVM* raises doubts whether the *TFCVM* is a *cognitive* model. We think that it is only a *stochastic* one only suitable for *predictions*.
 
-The 2025 code version of both models is modified slightly compared to the 2024 version by abandoning all *arrays* in favor of *functions* so that the code fits better into the SICP chapter topic *Procedures as Arguments*.
+The 2025 code version of both models presented here ismodified slightly by abandoning all *arrays* in favor of *functions*. Now, the code fits better into the SICP chapter topic *Procedures as Arguments*.
 
-First in $3.$, *integrals* of the *discriminal dispersions* in form of *probability density functions (PDFs)* of *Gaussians* are computed numerically in a *Riemann* style. Then in $4.$ we *replace* *integratals* of Gaussian densities by calling *cumulative distribution functions (CDFs)* of *Gaussian*s. These CDFs are provided as function by the library *Distributions.jl*.
+First in $3.$, *Riemann integrals* of *probability density functions (PDFs)* of the *discriminal dispersions* are computed numerically. Then in $4.$ we *replace* *integrals* of Gaussian densities by calling *cumulative distribution functions (CDFs)* of *Gaussian*s. These CDFs are provided by the library *Distributions.jl* as library functions.
  
 "
 
@@ -222,7 +222,7 @@ md"
 md"
 ###### 3.2.1 *Discriminal Dispersons* (=Family of *Gaussians*) as a Component of *Stochastic First Choice Voting* Models
 
-[*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) proposed a family of *discrimininal dispersions* in the form of *Gaussians* as a *theoretical* component in his *First Choice Model (TFCVM)*. Each *probability density function (PDF)* of this family represents the *density* of subjective *latent affects* or *sentiments* of voters toward a stimulus or candidate. The probability that stimulus $i$ is of first choice is computed by analyzing certain aspects of these *discrimininal dispersions* when presented in a set of alternatives. 
+[*Thurstone, L.L.* (1945)](file:///C:/Users/claus/Downloads/BF02288891.pdf) proposed a family of *discrimininal dispersions* in the form of *Gaussians* as a *theoretical* component in his *First Choice Model (TFCVM)*. Each *probability density function (PDF)* of this family represents the *density* of subjective *latent affects* or *sentiments* of voters toward a stimulus or candidate. The probability that stimulus $i$ is first choice is computed by analyzing certain aspects of these *discrimininal dispersions* when presented in a set of alternatives. 
 
 The parameters of the *latent affect* or *sentiment* PDFs (= *discriminal dispersions*) are supposed to be measured by psychological scaling methods (e.g. rating scales). This way the modeller is able to adapt the model to empirical data (e.g. for affect values like sensations, attitudes, subjective utility, moral or aestetic sentiments).
 
@@ -318,19 +318,19 @@ $\;$
 $\;$
 $\;$
 
-is permitted only under the assumption of *mutual independence* of all stochastic variables $X_j \_\|\_ X_n; j \neq i,n; n \neq i,j.$ It *measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate a *less attractive* response $x > X_{j \neq i}.$
+is permitted only under the assumption of *mutual independence* of all stochastic variables $X_j \_\|\_ X_k; j, k \in \{1,...n\}; j,k \neq i; j \neq k.$ It *measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate a *less attractive* response $X_i = x > X_{j \neq i}.$
  
 The preference probability $P_i(i > j = 1, ..., n; j\neq i)$ is the *integral* of the *probability density function (PDF)* $f_I(x)$ *weighted* by the amount of *less favorable* attitude or sentiment $\mu_{x>X_j,X_k,X_l,...,X_n}(x)$ measured at $x$ toward the alternatives $X_j,X_k,X_l,...,X_n$. 
 
 So the mathematical model can be written as a *measure with density* (c.f. Schilling, 2017, p.83):
 
-$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>X_j,X_k,X_l,...,X_n}(dx) = \int_{-\infty}^{+\infty}f_I(x)\cdot d\mu_{x>X_j,X_k,X_l,...,X_n}.$
+$P_i(i > j = 1, ..., k; j\neq i) = \int_{-\infty}^{+\infty} f_I(x) \cdot \mu_{x>X_j,X_k,X_l,...,X_n}(x) = \int_{-\infty}^{+\infty}f_I(x)\cdot d\mu_{x>X_j,X_k,X_l,...,X_n}.$
 
 $\;$
 $\;$
 $\;$
 
-This integral has to be computed for *each* of the $n$ stimuli. This is the reason that we call it a *n-pass* model. These can be computed simultaneously.
+This integral has to be computed for *each* of the $n$ stimuli. This is the reason that we call it a *n-pass* model. Of course these maybe computed simultaneously.
 
 $\;$
 
@@ -367,7 +367,7 @@ This interpretation has the drawback that you cannot see that the expectations *
 # ╔═╡ 61e7d5c1-213e-434c-9483-2fe473767ce8
 md"
 ---
-###### 3.2.3.2 The *TFCVM* as a Set of *Conditional* Preference Probabilities
+###### 3.2.3.2 The *TFCVM* as a Set of *Preference* Probabilities
 
 The simplified *formal* meaning is that the integral
 
@@ -377,19 +377,21 @@ $\;$
 $\;$
 $\;$
 
-is under the *mutual independence* assumption $\{X_j \_\|\_ X_k; j \neq i,k; k \neq i,j\}$ a *joint probability distribution (JPD)* of *extremes*:
+is under the *mutual independence* assumption $X_j \_\|\_ X_k; j, k \in \{1,...n\}; j,k \neq i; j \neq k$ a *joint probability distribution (JPD)* of *extremes*:
 
 $P\left\{(X_i > X_j)\land ... \land (X_i > X_n); i \neq j,.., n\right\} = P\left\{X_i = max(X_i, X_j,...,X_n); i \neq j,..., n\right\}.$
 
 $\;$
 
-The sum of these preference probabilities is guarantied without further normalization to be equal to 1 :
+The sum of these preference probabilities is guaranteed without further normalization to be equal to 1 :
 
 $\sum_{i=1}^k P(X_i = max(X_i, X_j,...,X_k); i \neq j,n) = 1.$
 
 $\;$
 $\;$
 $\;$
+
+This is now explained in more detail.
 
 "
 
@@ -403,23 +405,25 @@ $\;$
 $\;$
 $\;$
 
-*measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate for the momentary value $x$ a *less attractive* response $x > X_{j \neq i}$. We augment this product by the factor $f_i(x)$. This way we have a *measure with density*
+*measures* the probability that *all* stimuli $j \neq i$ in the set of *remaining* alternatives stimulate a *less attractive* response $x > X_{j \neq i}$ for the momentary value $x$. 
 
-$f_i(x) \cdot \mu_{x>X_j, X_k,X_l,...,X_n}(x) := f_i(x) \prod_{j=1; j\neq i}^n F_j(x)$
+We augment this product by the factor $f_i(x)$. This way we have a *measure with density*
 
-$\;$
-$\;$
-$\;$
-
-If we multiply this *weighted density* with the *infinitesimal* $dx$ we get the *infinitesimal* probability 
-
-$f_i(x) \; \mu_{x>X_j, X_k,X_l,...,X_n}(x) \; dx := f_i(x) \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
+$f_i(x) \cdot \mu_{X_i=x>X_j, X_k,X_l,...,X_n}(x) := f_i(x) \prod_{j=1; j\neq i}^n F_j(x)$
 
 $\;$
 $\;$
 $\;$
 
-$= \mathbb P_i\left(x - \frac{dx}{2} < x \leq x + \frac{dx}{2}\right) \cdot \mathbb P\left\{(x > X_j)\land ... \land P(x > X_n); i \neq j,.., n\right\}.$
+If we multiply this *weighted density* with the *infinitesimal* $dx$ we get the infinitesimal *probability* 
+
+$f_i(x)\;dx \cdot \mu_{X_i=x>X_j, X_k,X_l,...,X_n}(x) = f_i(x) \; \mu_{X_i=x>X_j, X_k,X_l,...,X_n}(x) \; dx := f_i(x) \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
+
+$\;$
+$\;$
+$\;$
+
+$= \mathbb P\left(x - \frac{dx}{2} < X_i \leq x + \frac{dx}{2}\right) \cdot \mathbb P\left\{(X_i=x > X_j)\land ... \land P(X_i=x > X_n); i \neq j,.., n\right\}.$
 
 $\;$
 $\;$
@@ -427,7 +431,7 @@ $\;$
 
 Now we '*summarize*' (= integrate) these *infinitesimal* probabilities 
 
-$\int_{-\infty}^{+\infty} f_i(x) \; \mu_{x>X_j, X_k,X_l,...,X_n}(x) \; dx := \int_{-\infty}^{+\infty} f_i(x) \; \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
+$\int_{-\infty}^{+\infty} f_i(x) \; \mu_{X_i=x>X_j, X_k,X_l,...,X_n}(x) \; dx := \int_{-\infty}^{+\infty} f_i(x) \; \prod_{j=1; j\neq i}^n F_j(x) \; dx =$
 
 $\;$
 $\;$
@@ -438,6 +442,8 @@ $=\mathbb P\left\{(X_i > X_j)\land ... \land P(X_i > X_n); i \neq j,.., n\right\
 $\;$
 $\;$
 
+Now we got a *set* of *preference probabilities*.
+
 "
 
 # ╔═╡ a0353198-6417-486e-bcf5-30e8c221b453
@@ -447,9 +453,10 @@ md"
 "
 
 # ╔═╡ ec9f191f-8fa9-48e9-97f2-385ee4b2e218
-function thurstoneChoiceModel(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
+function tfcvm(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
 	pI = pJ = pK = pK = pL = x->x
 	prefProbI = prefProbJ = prefProbK = prefProbL = 0.0
+	loopCounter = 0
 	#-----------------------------------------------------------------------------
 	function preferenceDensity(m, pm::Function)
 		if m == 1 
@@ -467,22 +474,24 @@ function thurstoneChoiceModel(;kS=3, a=-10.0, b=+10.0, Δx=0.001)
 	#-----------------------------------------------------------------------------
 	for i in 1:kS
 		for j in 1:kS
-			if !(j == i)
+			if !(i == j)
 				for k in 1:kS
-					if !((k == i) || (k == j))
+					if (i ≠ k) && (j ≠ k) && (j < k)
 						#-----------------------------------------------
 						if kS == 3
 							pI, pJ, pK, pL = preferenceDensity(i, x -> 
 								myDensity(i)(x)  * integralIter(myDensity(j), 
 								-10.0, x, Δx=Δx) * integralIter(myDensity(k), 
 								-10.0, x, Δx=Δx))
+							loopCounter += 1
 						end # if kS == 3
 						#-----------------------------------------------
 						if kS == 4
 							for l in 1:kS
-								if !((l == i) || (l == j) || (l == k))
+								if (i ≠ l) && (j ≠ l) && (k ≠ l) && (j < k < l)
 									pI, pJ, pK, pL = preferenceDensity(i, x -> 
 									myDensity(i)(x)  * integralIter(myDensity(j), -10.0, x, Δx=Δx) * integralIter(myDensity(k), -10.0, x, Δx=Δx) * integralIter(myDensity(l), -10.0, x, Δx=Δx))	
+								loopCounter += 1
 								end # if 
 							end # for l
 						end # if kS == 4
@@ -505,18 +514,31 @@ function thurstoneChoiceModel(;kS=3, a=-10.0, b=+10.0, Δx=0.001)
 		end # if
 	end # for i
 	#-----------------------------------------------------------------------------
-	prefProbI, prefProbJ, prefProbK, prefProbL, 
-	prefProbI + prefProbJ + prefProbK + prefProbL
-end # function thurstoneChoiceModel
+	if kS == 3
+		checksum3 = prefProbI + prefProbJ + prefProbK
+		println("P(I > ...) = $prefProbI")
+		println("P(J > ...) = $prefProbJ") 
+		println("P(K > ...) = $prefProbK") 
+		println("checksum3  = $checksum3, loopCounter = $loopCounter")
+	elseif kS == 4
+		checksum4 = prefProbI + prefProbJ + prefProbK + prefProbL
+		println("P(I > ...) = $prefProbI")
+		println("P(J > ...) = $prefProbJ") 
+		println("P(K > ...) = $prefProbK")
+		println("P(L > ...) = $prefProbL")
+		println("checksum4  = $checksum4, loopCounter = $loopCounter")
+	end # if
+	#-----------------------------------------------------------------------------
+end # function tfcvm
 
 # ╔═╡ c1af9544-e300-454a-9155-d4c0559ccb97
-thurstoneChoiceModel(kS=3, Δx=0.001)
+tfcvm(kS=3, Δx=0.001)
 
 # ╔═╡ 16dee1f4-f9cc-4767-8c1d-15365fa5d0db
 md"
 The results are that stimulus $S_K$ gets *74.06%* of the *first choices*, followed by $S_J$ with *14.83%* and $S_I$ with *10.95%*:
 
-$P(S_I > S_J, S_K) = 0.109514$
+$P(S_I > S_J, S_K) = 0.10951$
 $P(S_J > S_I, S_K) = 0.14831$
 $P(S_K > S_I, S_J) = 0.74062$
 
@@ -561,7 +583,7 @@ function plotDiscriminalDispersionsI_to_L()
 	#---------------------------------------------------------------------
 	# density silhouettes for candidate L
 	plot!(unitStepDensityL, -10, +10, line=:magenta, label=L"$f_L(X)$")
-	annotate!([(+8.5, 0.06, text(L"Stimulus $S_L$", 12, :darkblue))])
+	annotate!([(+8.5, 0.065, text(L"Stimulus $S_L$", 12, :darkblue))])
 	#------------------------------------------------------------------------------
     # vertical red cut-off
 	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red, lw=1.5, label=L"$f_J(X=-0.3)$")
@@ -578,16 +600,16 @@ md"
 "
 
 # ╔═╡ 0aeebc71-81a5-43d8-a698-b2cfb84d53c0
-thurstoneChoiceModel(kS=4, Δx=0.001)
+tfcvm(kS=4, Δx=0.001)
 
 # ╔═╡ c9242575-0d24-4108-9bd5-3590ad4d3c45
 md"
 The introduction of a *controversial* candidate $S_L$ will distract preference from the *most* favorable but *less* controversial candidate $S_K$. This would happen even if *both* had the *same* mean. Here, stimulus $S_K$ is the main *loser* when the *controversal* stimulus $S_L$ is introduced into the set of alternatives.
 
-$P(S_I > S_J, S_K) = 0.109514 > P(S_I > S_J, S_K, S_L) = 0.0742588$
-$P(S_J > S_I, S_K) = 0.14831 > P(S_J > S_I, S_K, S_L) = 0.0870487$
-$\mathbf{P(S_K > S_I, S_J) = 0.74062 >> P(S_K > S_I, S_J, S_L) = 0.507737}$
-$\mathbf{P(S_L > S_I, S_J, S_K) = 0.329387}$
+$P(S_I > S_J, S_K) = 0.10951 > P(S_I > S_J, S_K, S_L) = 0.07426$
+$P(S_J > S_I, S_K) = 0.14831 > P(S_J > S_I, S_K, S_L) = 0.08705$
+$\mathbf{P(S_K > S_I, S_J) = 0.74062 >> P(S_K > S_I, S_J, S_L) = 0.50774}$
+$\mathbf{P(S_L > S_I, S_J, S_K) = 0.32939}$
 $\;$
 
 "
@@ -661,9 +683,9 @@ function plotDiscriminalDispersionsVotingChoice()
 	plot!(gaussianDensityI, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_i(X)$")
 	plot!(gaussianDensityK, x, 10.0, size=(700, 500), line=:darkblue, framestyle=:semi, label=L"$f_k(X)$")
 	#------------------------------------------------------------------------------
-	annotate!([(-4.8, 0.08, text(L"Stimulus $S_i$", 12, :darkblue))])
-	annotate!([(-0.7, 0.30, text(L"Stimulus $S_j$", 12, :darkblue))])
-	annotate!([(+5.8, 0.14, text(L"Stimulus $S_k$", 12, :darkblue))])
+	annotate!([(-4.8, 0.05, text(L"Stimulus $S_I$", 12, :darkblue))])
+	annotate!([(-0.7, 0.22, text(L"Stimulus $S_J$", 12, :darkblue))])
+	annotate!([(+5.8, 0.08, text(L"Stimulus $S_K$", 12, :darkblue))])
 	#--------------------------------------------------------------------------------
 	plot!([x, x], [0, gaussianDensityJ(x)], seriestype=:line, color=:red,  label=L"$f_j(x=-2.015)$")
 	#--------------------------------------------------------------------------------
@@ -679,7 +701,7 @@ md"
 "
 
 # ╔═╡ 3947ae42-c5e2-4893-8793-4314f1485b5a
-function ourVotingChoiceModel(;kS=3, b=+10.0, Δx=0.001)
+function dpmvm(;kS=3, b=+10.0, Δx=0.001)
 	# initalization to 0.0
 	votingProbI = votingProbJ = votingProbK = votingProbL = 0.0
 	x = b
@@ -699,9 +721,23 @@ function ourVotingChoiceModel(;kS=3, b=+10.0, Δx=0.001)
 		end # for i
 		x = x - Δx
 	end # while
-	votingProbI, votingProbJ, votingProbK, votingProbL, 
-	votingProbI + votingProbJ + votingProbK + votingProbL
-end # function ourVotingChoiceModel
+	#-----------------------------------------------------------------------------
+	if kS == 3
+		checksum3 = votingProbI + votingProbJ + votingProbK
+		println("P(I > ...) = $votingProbI")
+		println("P(J > ...) = $votingProbJ") 
+		println("P(K > ...) = $votingProbK") 
+		println("checksum3  = $checksum3")
+	elseif kS == 4
+		checksum4 = votingProbI + votingProbJ + votingProbK + votingProbL
+		println("P(I > ...) = $votingProbI")
+		println("P(J > ...) = $votingProbJ") 
+		println("P(K > ...) = $votingProbK") 
+		println("P(L > ...) = $votingProbL")
+		println("checksum4  = $checksum4")
+	end # if
+	#-----------------------------------------------------------------------------
+end # function dpmvm
 
 # ╔═╡ c1d37180-3ee1-49f6-9003-bac5ef96b50a
 md"
@@ -712,7 +748,7 @@ md"
 # ╔═╡ d447005b-e05d-4c1a-adb0-8ceec19befb6
 md"
 ###### *TFCVM*
-$P(S_I > \{S_J, S_K\}) = 0.109514$
+$P(S_I > \{S_J, S_K\}) = 0.10951$
 $P(S_J > \{S_I, S_K\}) = 0.14831$
 $P(S_K > \{S_I, S_J\}) = 0.74062$
 
@@ -720,33 +756,36 @@ $\;$
 
 ###### *DPMVM*
 
-$P(S_I > \{S_J, S_K\}) = 0.157245$
-$P(S_J > \{S_I, S_K\}) = 0.154815$
-$P(S_K > \{S_I, S_J\}) = 0.688408$
+$P(S_I > \{S_J, S_K\}) = 0.15725$
+$P(S_J > \{S_I, S_K\}) = 0.15482$
+$P(S_K > \{S_I, S_J\}) = 0.68841$
 
 $\;$
 
 "
 
+# ╔═╡ 1db4406f-07ad-4f13-a5d0-cc3041e46bb4
+tfcvm(kS=3, Δx=0.001)
+
 # ╔═╡ 04efd6b7-7d4f-4c80-b30f-3ac1b55e9bc1
-ourVotingChoiceModel()
+dpmvm()
 
 # ╔═╡ be0ac072-efd0-4e41-a805-dce10550cca1
-function plotModelComparison(title, x, y) # x = Thurstone model; y = our voting model
+function modelsComparison(title, x, y) # x = Thurstone model; y = our voting model
 	let rxy = trunc(Statistics.cor(x, y), digits=4)
 		xs = [0, 1]; ys = [0, 1]
 		#---------------------------------------------------------------------------
 		plot(x, y, xlims=(0.0, 1.0), ylims=(0.0, 1.0), size=(600, 500), title=title, titlefontsize=12, seriestype=:scatter, xlabel="TFCVM", ylabel="DPMVM", label="model predictions")
 		plot!(xs, ys, label="line of perfect model agreement")
 		#---------------------------------------------------------------------------
-		annotate!([(0.7, 0.1, "r(model1, model2) = $rxy", 10)])
+		annotate!([(0.7, 0.1, "r(TFCVM, DPMVM) = $rxy", 10)])
 	end # let
-end # function plotModelComparison
+end # function modelsComparison
 
 # ╔═╡ 4e22fd91-107a-4421-8f4d-bf12871cf4ef
-plotModelComparison("DPMVM vs. TFCVM (3 Stimuli)", 
-	[0.109514, 0.14831,  0.74062],                  # TFCVM predictions
-	[0.157245, 0.154815, 0.688408])                 # DPMVM predictions
+modelsComparison("TFCVM vs. DPMVM (3 Stimuli)", 
+	[0.109514, 0.14831, 0.74062],                  # TFCVM predictions
+	[0.157245, 0.15481, 0.68840])                  # DPMVM predictions
 
 # ╔═╡ 0dea6ffc-b2cb-4401-b0b9-e7604f032f48
 md"
@@ -758,8 +797,8 @@ md"
 md"
 ###### *TFCVM*
 
-$P(S_I > \{S_J, S_K, S_L\}) = 0.0742588$
-$P(S_J > \{S_I, S_K, S_L\}) = 0.0870487$
+$P(S_I > \{S_J, S_K, S_L\}) = 0.074259$
+$P(S_J > \{S_I, S_K, S_L\}) = 0.087049$
 $P(S_K > \{S_I, S_J, S_L\}) = 0.507737$
 $P(S_L > \{S_I, S_J, S_K\}) = 0.329387$
 
@@ -767,25 +806,25 @@ $\;$
 
 ###### *DPMVM*
 
-$P(S_I > \{S_J, S_K, S_L\}) = 0.0966776$
-$P(S_J > \{S_I, S_K, S_L\}) = 0.0287166$
+$P(S_I > \{S_J, S_K, S_L\}) = 0.096678$
+$P(S_J > \{S_I, S_K, S_L\}) = 0.028717$
 $P(S_K > \{S_I, S_J, S_L\}) = 0.519706$
-$P(S_L > \{S_I, S_J, S_K\}) = 0.355$
+$P(S_L > \{S_I, S_J, S_K\}) = 0.355000$
 
 $\;$
 
 "
 
 # ╔═╡ 4842fa35-40d6-4b10-a28b-53672a492f49
-thurstoneChoiceModel(kS=4, Δx=0.001)
+tfcvm(kS=4, Δx=0.001)
 
 # ╔═╡ f5aa1b6a-ef05-4edc-93de-70424d171ccd
-ourVotingChoiceModel(kS=4)
+dpmvm(kS=4)
 
 # ╔═╡ 0b6e1719-d88b-4d17-a7b8-57b6942a07d6
-plotModelComparison("DPMVM vs. TFCVM (4 Stimuli)", 
+modelsComparison("TFCVM vs. DPMVM (4 Stimuli)", 
 	[0.0742588, 0.0870487, 0.507737, 0.329387],       # TFCM predictions
-	[0.0966776, 0.0287166, 0.519706, 0.355])          # DPMVM predictions
+	[0.0966776, 0.0287166, 0.519706, 0.355000])       # DPMVM predictions
 
 # ╔═╡ 8a1c25a5-e091-49f7-8455-cc90b769a4d8
 md"
@@ -852,9 +891,10 @@ md"
 "
 
 # ╔═╡ ec8d7008-97aa-49c2-8143-19ea9d4eafe2
-function thurstoneChoiceModelDistrib(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
+function tfcvmDistrib(;kS=3, a=-10.0, b=+10.0, Δx=0.001) 
 	pI = pJ = pK = pK = pL = x->x
 	prefProbI = prefProbJ = prefProbK = prefProbL = 0.0
+	loopCounter = 0
 	#-----------------------------------------------------------------------------
 	function preferenceDensity(m, pm::Function)
 		if m == 1 
@@ -874,7 +914,7 @@ function thurstoneChoiceModelDistrib(;kS=3, a=-10.0, b=+10.0, Δx=0.001)
 		for j in 1:kS
 			if !(j == i)
 				for k in 1:kS
-					if !((k == i) || (k == j))
+					if (i ≠ k) && (j ≠ k) && (j < k)
 						#-----------------------------------------------
 						if kS == 3
 							pI, pJ, pK, pL = 
@@ -882,17 +922,19 @@ function thurstoneChoiceModelDistrib(;kS=3, a=-10.0, b=+10.0, Δx=0.001)
 									myDensityPDF(i)(x) * 
 									myDensityCDF(j)(x) * 
 									myDensityCDF(k)(x))
+							loopCounter += 1
 						end # if kS == 3
 						#-----------------------------------------------
 						if kS == 4
 							for l in 1:kS
-								if !((l == i) || (l == j) || (l == k))
+								if (i ≠ l) && (j ≠ l) && (k ≠ l) && (j < k < l)
 									pI, pJ, pK, pL = 
 										preferenceDensity(i, x -> 
 											myDensityPDF(i)(x) *
 											myDensityCDF(j)(x) * 
 											myDensityCDF(k)(x) *
 											myDensityCDF(l)(x))
+									loopCounter += 1
 								end # if 
 							end # for l
 						end # if kS == 4
@@ -915,15 +957,28 @@ function thurstoneChoiceModelDistrib(;kS=3, a=-10.0, b=+10.0, Δx=0.001)
 		end # if
 	end # for i
 	#-----------------------------------------------------------------------------
-	prefProbI, prefProbJ, prefProbK, prefProbL, 
-	prefProbI + prefProbJ + prefProbK + prefProbL
-end # function thurstoneChoiceModelQuadGK
+	if kS == 3
+		checksum3 = prefProbI + prefProbJ + prefProbK
+		println("P(I > ...) = $prefProbI")
+		println("P(J > ...) = $prefProbJ") 
+		println("P(K > ...) = $prefProbK") 
+		println("checksum3  = $checksum3, loopCounter = $loopCounter")
+	elseif kS == 4
+		checksum4 = prefProbI + prefProbJ + prefProbK + prefProbL
+		println("P(I > ...) = $prefProbI")
+		println("P(J > ...) = $prefProbJ") 
+		println("P(K > ...) = $prefProbK")
+		println("P(L > ...) = $prefProbL")
+		println("checksum4  = $checksum4, loopCounter = $loopCounter")
+	end # if
+	#-----------------------------------------------------------------------------
+end # function tfcvmDistrib
 
 # ╔═╡ 54fce4f0-7939-4f96-ac3a-eb86fca33171
-thurstoneChoiceModelDistrib(kS=3)
+tfcvmDistrib(kS=3)
 
 # ╔═╡ a15c8538-f3c8-4c14-a8d2-b00072596130
-thurstoneChoiceModelDistrib(kS=4)
+tfcvmDistrib(kS=4)
 
 # ╔═╡ 17603e10-38e5-450f-a431-b40175ca9de7
 md"
@@ -932,7 +987,7 @@ md"
 "
 
 # ╔═╡ d78fb2c3-9793-45b7-acbd-a44fbf7eb019
-function ourVotingChoiceModelDistrib(;kS=3, b=+10.0, Δx=0.001)
+function dpmvmDistrib(;kS=3, b=+10.0, Δx=0.001)
 	# initalization to 0.0
 	votingProbI = votingProbJ = votingProbK = votingProbL = 0.0
 	x = b
@@ -956,15 +1011,29 @@ function ourVotingChoiceModelDistrib(;kS=3, b=+10.0, Δx=0.001)
 		end # for i
 		x = x - Δx
 	end # while
-	votingProbI, votingProbJ, votingProbK, votingProbL, 
-	votingProbI + votingProbJ + votingProbK + votingProbL
-end # function ourVotingChoiceModelDistrib
+	#-----------------------------------------------------------------------------
+	if kS == 3
+		checksum3 = votingProbI + votingProbJ + votingProbK
+		println("P(I > ...) = $votingProbI")
+		println("P(J > ...) = $votingProbJ") 
+		println("P(K > ...) = $votingProbK") 
+		println("checksum3  = $checksum3")
+	elseif kS == 4
+		checksum4 = votingProbI + votingProbJ + votingProbK + votingProbL
+		println("P(I > ...) = $votingProbI")
+		println("P(J > ...) = $votingProbJ") 
+		println("P(K > ...) = $votingProbK") 
+		println("P(L > ...) = $votingProbL")
+		println("checksum4  = $checksum4")
+	end # if
+	#-----------------------------------------------------------------------------
+end # function dpmvmDistrib
 
 # ╔═╡ 846662df-e0c2-4080-a6eb-25ee0e638bba
-ourVotingChoiceModelDistrib()
+dpmvmDistrib()
 
 # ╔═╡ 162e20f6-0eb7-4b25-8102-313bd0d170b9
-ourVotingChoiceModelDistrib(kS=4)
+dpmvmDistrib(kS=4)
 
 # ╔═╡ e27371b7-5b48-494f-a006-1ba6a589645d
 md"
@@ -973,9 +1042,15 @@ md"
 "
 
 # ╔═╡ 284120d2-0bb2-4160-a96d-bbe7e6074e31
-plotModelComparison("DPMVM vs. TFCVM (3 Stimuli) with Distrib.jl", 
+modelsComparison("TFCVM vs. DPMVM (3 Stimuli) with Distrib.jl", 
 	[0.109486, 0.148505, 0.741653],                 # TFCVM predictions
 	[0.157288, 0.154577, 0.688464])                 # DPMVM predictions
+
+# ╔═╡ b1365c47-8d5b-4aad-8efd-e0d994904f69
+tfcvmDistrib(kS=3)
+
+# ╔═╡ 2a2082f2-1ceb-40ff-88cd-f4a1f933b0d4
+dpmvmDistrib(kS=3)
 
 # ╔═╡ 681b6508-4fa0-4a3b-a80b-b2a527edda3d
 md"
@@ -984,9 +1059,15 @@ md"
 "
 
 # ╔═╡ e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
-plotModelComparison("DPMVM vs. TFCM (4 Stimuli) with Distrib.jl", 
-	[0.0742391, 0.0871594, 0.508426, 0.32982],      # TFCM predictions
-	[0.0967434, 0.028651, 0.51974, 0.35495])        # *DPMVM* predictions
+modelsComparison("TFCVM vs. DPMVM (4 Stimuli) with Distrib.jl", 
+	[0.0742391, 0.087159, 0.50843, 0.32982],        # TFCVM predictions
+	[0.0967434, 0.028651, 0.51974, 0.35495])        # DPMVM predictions
+
+# ╔═╡ ace15509-14b9-4d5c-9b40-e0b6f76de85b
+tfcvmDistrib(kS=4)
+
+# ╔═╡ a2a7783d-dca2-4492-8294-11982e9ba5fa
+dpmvmDistrib(kS=4)
 
 # ╔═╡ c367f470-168a-4cfb-b4ac-49dbe2f59db9
 md"
@@ -1050,7 +1131,7 @@ $\;$
 "
 
 # ╔═╡ c6c03cbf-2fbf-49da-9b70-d8856631859b
-thurstoneChoiceModelDistrib(kS=3)   # p(I > J, K), P(J > I, K), p(K > I, J)
+tfcvmDistrib(kS=3)   # p(I > J, K), P(J > I, K), p(K > I, J)
 
 # ╔═╡ c0235c94-36cf-4e6b-bd2e-5114a67755bd
 md"
@@ -1086,7 +1167,7 @@ $\;$
 "
 
 # ╔═╡ a8e28662-3a5e-466f-93e3-d0b9c789671c
-thurstoneChoiceModelDistrib(kS=4) # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
+tfcvmDistrib(kS=4) # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
 
 # ╔═╡ 13b87350-c56d-45bf-aac5-9be091fea711
 md"
@@ -1145,9 +1226,9 @@ function plotVCMPreferenceDensity(;kS=3)
 		# horizontal lines = first choice probabilities
 		xss = [x for x in -10.0:0.1:xcrit]
 		plot!(x -> 0.688464, xss, ls=:dash, linecolor=:green, label="")
-		annotate!(-7.8, 0.71, L"p(K>I,J) = 0.69", 9)
+		annotate!(-7.7, 0.71, L"p(K>I,J) = 0.6885", 9)
 		plot!(x -> 0.157288, xss, ls=:dash, linecolor=:cornflowerblue, label="")
-		annotate!(-6.4, 0.18, L"p(I>J,K), p(J>I,K) = 0.15", 9)
+		annotate!(-6.3, 0.18, L"p(I>J,K), p(J>I,K) = 0.1573", 9)
 		#--------------------------------------------------------------------------
 	elseif kS == 4
 		xcrit = 10.0
@@ -1172,13 +1253,13 @@ function plotVCMPreferenceDensity(;kS=3)
 		# horizontal lines = first choice probabilities
 		xss = [x for x in -10.0:0.1:xcrit]
 		plot!(x -> 0.51974, xss, ls=:dash, linecolor=:green, label="")
-		annotate!(-7.6, 0.54, L"p(K>I,J,L) = 0.52", 9)
+		annotate!(-7.5, 0.54, L"p(K>I,J,L) = 0.5197", 9)
 		plot!(x -> 0.35495, xss, ls=:dash, linecolor=:magenta, label="")
-		annotate!(-7.6, 0.37, L"p(L>I,J,K) = 0.35", 9)
+		annotate!(-7.5, 0.37, L"p(L>I,J,K) = 0.3549", 9)
 		plot!(x -> 0.0967434, xss, ls=:dash, linecolor=:cornflowerblue, label="")
-		annotate!(-7.5, 0.13, L"p(I>J,K,L) = 0.096", 9)
+		annotate!(-7.4, 0.13, L"p(I>J,K,L) = 0.0967", 9)
 		plot!(x -> 0.028651, xss, ls=:dash, linecolor=:red, label="")
-		annotate!(-7.5, 0.05, L"p(J>I,K,L) = 0.028", 9)
+		annotate!(-7.4, 0.05, L"p(J>I,K,L) = 0.0286", 9)
 		#--------------------------------------------------------------------------
 	end # if 
 end # function plotVCMPreferenceDensity
@@ -1187,7 +1268,7 @@ end # function plotVCMPreferenceDensity
 plotVCMPreferenceDensity()
 
 # ╔═╡ e97a5ceb-6c56-4cbb-b710-7345e66ffc50
-ourVotingChoiceModelDistrib(kS=3)  # p(I > J, K), P(J > I, K), p(K > I, J)
+dpmvmDistrib(kS=3)  # p(I > J, K), P(J > I, K), p(K > I, J)
 
 # ╔═╡ a419ce31-2b73-48c8-9eb3-1428d1a38f89
 md"
@@ -1199,7 +1280,7 @@ md"
 plotVCMPreferenceDensity(kS=4)
 
 # ╔═╡ 07b0afd8-f461-4acc-8fb0-066ef23f41f8
-ourVotingChoiceModelDistrib(kS=4)  # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
+dpmvmDistrib(kS=4)  # p(I>J,K,L), P(J>I,K,L), p(K>I,J,L), p(L>I,J,K)
 
 # ╔═╡ 026debbf-0696-46d9-8d12-ee9d400eaf91
 md"
@@ -1209,7 +1290,7 @@ We presented two alternative *stochastic* models for the prediction of *first ch
 
 The *first* model proposed by *Thurstone* (1945) computes for each stimulus the *first choice probability* as a *weighted expectation* of less sympathy for competitors or as the *probability of preference* against the set of alternatives. 
 
-The *second* model proposed by us (2024) assumes that the *total preference mass* is distributed *across* the total set of stimulus-specific *discriminal dispersions*. The stimulus-specific *first choice probability* is equal to its share of *preference mass*.
+The *second* model proposed by us (2024, 2025) assumes that the *total preference mass* is distributed *across* the total set of stimulus-specific *discriminal dispersions*. The stimulus-specific *first choice probability* is equal to its share of *preference mass*.
 
 We compared both models with a small data set of 3 and 4 stimuli. Despite its conceptually and mathematically *simpler* nature *our* model could came up with *nearly the same* predictions as *Thurestones*.
 
@@ -2825,14 +2906,15 @@ version = "1.4.1+2"
 # ╠═3947ae42-c5e2-4893-8793-4314f1485b5a
 # ╟─c1d37180-3ee1-49f6-9003-bac5ef96b50a
 # ╟─d447005b-e05d-4c1a-adb0-8ceec19befb6
+# ╠═1db4406f-07ad-4f13-a5d0-cc3041e46bb4
 # ╠═04efd6b7-7d4f-4c80-b30f-3ac1b55e9bc1
 # ╟─be0ac072-efd0-4e41-a805-dce10550cca1
-# ╟─4e22fd91-107a-4421-8f4d-bf12871cf4ef
+# ╠═4e22fd91-107a-4421-8f4d-bf12871cf4ef
 # ╟─0dea6ffc-b2cb-4401-b0b9-e7604f032f48
 # ╟─081c2c11-2466-475d-a773-a574d6266ac8
 # ╠═4842fa35-40d6-4b10-a28b-53672a492f49
 # ╠═f5aa1b6a-ef05-4edc-93de-70424d171ccd
-# ╟─0b6e1719-d88b-4d17-a7b8-57b6942a07d6
+# ╠═0b6e1719-d88b-4d17-a7b8-57b6942a07d6
 # ╟─8a1c25a5-e091-49f7-8455-cc90b769a4d8
 # ╟─d05b08a1-79fc-4c92-99c3-e5807cbc5b74
 # ╠═feea3a8e-b56b-471a-93fb-d75a7456b1f6
@@ -2847,9 +2929,13 @@ version = "1.4.1+2"
 # ╠═846662df-e0c2-4080-a6eb-25ee0e638bba
 # ╠═162e20f6-0eb7-4b25-8102-313bd0d170b9
 # ╟─e27371b7-5b48-494f-a006-1ba6a589645d
-# ╟─284120d2-0bb2-4160-a96d-bbe7e6074e31
+# ╠═284120d2-0bb2-4160-a96d-bbe7e6074e31
+# ╠═b1365c47-8d5b-4aad-8efd-e0d994904f69
+# ╠═2a2082f2-1ceb-40ff-88cd-f4a1f933b0d4
 # ╟─681b6508-4fa0-4a3b-a80b-b2a527edda3d
-# ╟─e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
+# ╠═e9b9ea90-f95c-4293-bc25-ed0e9b6cfef9
+# ╠═ace15509-14b9-4d5c-9b40-e0b6f76de85b
+# ╠═a2a7783d-dca2-4492-8294-11982e9ba5fa
 # ╟─c367f470-168a-4cfb-b4ac-49dbe2f59db9
 # ╠═78987082-90cc-4d4a-9922-2b0fe1fc8e2e
 # ╟─e3fe5e15-c17f-45d9-9631-cdc5785fed71
@@ -2873,7 +2959,7 @@ version = "1.4.1+2"
 # ╟─576d4814-048b-4a76-bed3-404b1f029f1c
 # ╟─9c428dcb-5f9b-4291-8ca2-237e08205c04
 # ╟─b5eb9a03-50a5-435d-a9c7-d955ce5db788
-# ╟─9e0a8306-f550-47fd-a1e1-204bc13abdbe
+# ╠═9e0a8306-f550-47fd-a1e1-204bc13abdbe
 # ╠═e97a5ceb-6c56-4cbb-b710-7345e66ffc50
 # ╟─a419ce31-2b73-48c8-9eb3-1428d1a38f89
 # ╠═f61e93ae-dd64-46c6-8309-c834089a87bb
