@@ -28,7 +28,7 @@ md"
 ===================================================================================
 ##### nonSICP: 3.3.3.3 Nonparametric Stochastic First Choice Voting Models 
 ###### file: PCM20250225\_SICP\_3.3.3.3\_NonparametricStochasticFirstChoiceVotingModels
-###### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/23 ***
+###### code: Julia/Pluto (1.11.4/0.20.4) by PCM *** 2025/03/26 ***
 
 ===================================================================================
 "
@@ -123,6 +123,61 @@ function plotRatingDistributions(x::AbstractMatrix, title; maxY=0.4, mCrit=0)
 	myPlot
 	#--------------------------------------------------------------------------------
 end # function plotRatingDistributions
+
+# ╔═╡ 46e92833-e197-4782-ac69-a7ad812006e3
+function plotStepDensities(x::AbstractMatrix, title; maxY=0.4, mCrit=0)
+	(nRows, nCols) = size(x)
+	nCats    = nRows             # number of rating categories
+	nStims   = nCols             # number of stimuli
+	ms       = 1:nCats           # number of category m#
+	msMin05  = 0.5:1:nCats-0.5
+	msPlus05 = 1.5:1:nCats+0.5
+	println("nCats = $nCats, nStims = $nStims")
+	#--------------------------------------------------------------------------------
+	myPlot = 
+		plot(title=title, titlefontsize=12, xlimits=(0.5, nCats+.5), xticks=:1:nCats, ylimits=(-0.05, maxY), xlabel="positive affect rating category m", ylabel = L"P(m)")
+	#--------------------------------------------------------------------------------
+	plot!(ms, x[:, 1], seriestype=:scatter, colour=:blue, label="S1")   # 1st col
+	plot!(ms, x[:, 2], seriestype=:scatter, colour=:red, label="S2")    # 2nd col
+	plot!(ms, x[:, 3], seriestype=:scatter, colour=:green, label="S3")  # 3rd col
+	#--------------------------------------------------------------------------------
+	plot!(ms, x[:, 1], seriestype=:stepmid, colour=:blue, lw=2, label="")  # 1st col
+	plot!(ms.+0.02, x[:, 2],seriestype=:stepmid,colour=:red,lw=2,label="") # 2nd col
+	plot!(ms.+0.04, x[:, 3],seriestype=:stepmid,colour=:green,lw=2,label="") # 3rd
+	#--------------------------------------------------------------------------------
+	if nStims == 3
+		sum1, sum2, sum3 = sum(x[:, 1]), sum(x[:, 2]), sum(x[:, 3])
+		println("sums: col1 = $sum1, col2 = $sum2, col3 = $sum3")
+		#----------------------------------------------------------------------------
+	elseif nStims == 4 
+		#----------------------------------------------------------------------------
+		plot!(ms, x[:, 4], seriestype=:scatter, colour=:orange, label="S4") # 4th col
+		plot!(ms.+0.06, x[:, 4],seriestype=:stepmid,colour=:orange,lw=2,label="")
+		#----------------------------------------------------------------------------
+		sum1, sum2, sum3, sum4 = sum(x[:, 1]), sum(x[:, 2]), sum(x[:, 3]), sum(x[:, 4])
+		println("sums: col1 = $sum1, col2 = $sum2, col3 = $sum3, col4 = $sum4")
+	elseif nStims == 6 
+		#----------------------------------------------------------------------------
+		plot!(ms, x[:, 4], seriestype=:scatter, colour=:violet, label="S4")
+		plot!(ms, x[:, 5], seriestype=:scatter, colour=:orange, label="S5")
+		plot!(ms, x[:, 6], seriestype=:scatter, colour=:aquamarine, label="S6")
+		#----------------------------------------------------------------------------
+		plot!(ms.+0.06, x[:, 4],seriestype=:stepmid,colour=:violet,lw=2,label="")
+		plot!(ms.+0.08, x[:, 5],seriestype=:stepmid,colour=:orange,lw=2,label="")
+		plot!(ms.+0.10, x[:, 6],seriestype=:stepmid,colour=:aquamarine,lw=2,label="")
+		#----------------------------------------------------------------------------
+		sum1, sum2, sum3, sum4, sum5, sum6 = sum(x[:, 1]), sum(x[:, 2]), sum(x[:, 3]), sum(x[:, 4]), sum(x[:, 5]), sum(x[:, 6])
+		println("sums: col1 = $sum1, col2 = $sum2, col3 = $sum3, col4 = $sum4, col5 = $sum5, col6 = $sum6")
+		#----------------------------------------------------------------------------
+	end # if
+	#--------------------------------------------------------------------------------
+	if mCrit > 0
+		plot!([mCrit, mCrit], [-0.05, maxY], seriestype=:line, linestyle=:dash, color=:black, lw=1, label=L"mCrit")
+	end # i
+	#-------------------------------------------------------------------------------
+	myPlot
+	#--------------------------------------------------------------------------------
+end # function plotStepDensities
 
 # ╔═╡ cc1eb10e-9a46-4ad0-8eb5-aa8ad9d5d69e
 Base.rest([2, 1, 3], 2)
@@ -498,16 +553,22 @@ md"
 "
 
 # ╔═╡ 86262f01-212b-445d-8d0e-9497fb18f7ab
-plotRatingDistributions(x1, "Thurstone's 1st Data Example (table 1, S1 - S3)")
+plotStepDensities(x1, "Thurstone's 1st Data Example (table 1, S1 - S3)")
 
 # ╔═╡ e57fd44e-d8e9-43c2-a171-a47b645c160f
 nonparametricTFCVM(x1, "TFCVM: Thurstone's 1st data set, S1-S3")
 
+# ╔═╡ 060806be-e449-46ce-8ad8-5310139f959f
+nonparametricTFCVM(x1, "TFCVM: Thurstone's 1st data set, S1-S3")[2][1]
+
 # ╔═╡ 4d783cea-c556-4e1a-ae42-8211fbc06b66
 nonparametricTFCVM(normalizedCols(x1), "TFCVM: Thurstone's 1st data set, S1-S3")
 
+# ╔═╡ 6ff8defd-a9bd-4dd9-962c-0ca52ac67d8d
+nonparametricTFCVM(normalizedCols(x1), "TFCVM: Thurstone's 1st data set, S1-S3")[2][1]
+
 # ╔═╡ 7e8fc077-581d-442b-8815-e0502cce20eb
-plotRatingDistributions(x2, "Thurstone's 1st augmented Data Example, S1-S4")
+plotStepDensities(x2, "Thurstone's 1st augmented Data Example, S1-S4")
 
 # ╔═╡ 351b15f1-2df7-4a75-9bd6-4c8ec694930a
 nonparametricTFCVM(x2, "TFCVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")
@@ -524,7 +585,7 @@ md"
 "
 
 # ╔═╡ d786d237-d6e0-4209-bf33-7743c1820495
-plotRatingDistributions(x3, "Thurstone's 2nd Example (table 2, S1-S3)", maxY=0.2)
+plotStepDensities(x3, "Thurstone's 2nd Example (table 2, S1-S3)", maxY=0.2)
 
 # ╔═╡ 2dba9f22-e4ae-4b79-8169-9092bd0ff40f
 nonparametricTFCVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")
@@ -533,7 +594,7 @@ nonparametricTFCVM(x3, "Thurstone's 2nd Example (table 2;without controversial S
 nonparametricTFCVM(normalizedCols(x3), "Thurstone's 2nd Example (table 2;without controversial S4)")
 
 # ╔═╡ bf80ef07-d90f-429c-90d9-cc0c39c62d46
-plotRatingDistributions(x4, "Thurstone's 2nd Example(table 2; incl. controv.S4)", maxY=0.2)
+plotStepDensities(x4, "Thurstone's 2nd Example(table 2; incl. controv.S4)", maxY=0.2)
 
 # ╔═╡ 9398e74f-4f3e-48ff-97f3-11cd17e1321d
 nonparametricTFCVM(x4, "Thurstone's 2nd Example (table 2; incl. controversial S4)")
@@ -581,13 +642,13 @@ md"
 "
 
 # ╔═╡ 4a4d3c1d-cfe7-4413-902c-1c113f758cf0
-plotRatingDistributions(x1, "DPMVM: Thurstone's 1st Data Example (table 1, S1 - S3)", mCrit=5)
+plotStepDensities(x1, "DPMVM: Thurstone's 1st Data Example (table 1, S1 - S3)", mCrit=5)
 
 # ╔═╡ 053f2f2d-1008-4885-a1e4-b3633a63dd8e
 nonparametricDPMVM(x1, "DPMVM: Thurstone's 1st data set, S1-S3")
 
 # ╔═╡ f94ebbab-58d7-467f-a62f-e8b3486e697c
-plotRatingDistributions(x2, "DPMVM: Thurstone's 1st augmented data set, S1-S4", mCrit=6)
+plotStepDensities(x2, "DPMVM: Thurstone's 1st augmented data set, S1-S4", mCrit=6)
 
 # ╔═╡ 34f5ee1b-7216-461b-a516-ea37cd3a0240
 nonparametricDPMVM(x2, "DPMVM: Thurstone's 1st augmented data set, S1-S4") 
@@ -600,13 +661,13 @@ md"
 "
 
 # ╔═╡ d34b4fb5-6fd4-438a-9196-5ad82d2a031c
-plotRatingDistributions(x3, "DPMVM: Thurstone's 2nd Example (table 2, S1-S3)", maxY=0.2, mCrit=13)
+plotStepDensities(x3, "DPMVM: Thurstone's 2nd Example (table 2, S1-S3)", maxY=0.2, mCrit=13)
 
 # ╔═╡ b9c50064-157f-4bfd-9d47-e014388abf61
 nonparametricDPMVM(x3, "DPMVM: Thurstone's 2nd Example (table 2, p.246, S1-S3)")
 
 # ╔═╡ 086d2eb8-086c-45c5-93cd-771e19c5b8c0
-plotRatingDistributions(x4, "Thurstone's 2nd Example(table 2; incl. controv.S4)", maxY=0.2, mCrit=14)
+plotStepDensities(x4, "Thurstone's 2nd Example (table 2; incl. controv.S4)", maxY=0.2, mCrit=14)
 
 # ╔═╡ b1a31f45-1e75-4e9f-bd4e-85a67f9f4268
 nonparametricDPMVM(x4, "DPMVM: Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")
@@ -621,14 +682,14 @@ md"
 
 # ╔═╡ 84d2ea41-9000-4db6-ba6e-d36ef980438c
 modelsComparison("TFCVM vs. DPMVM", 
-	[0.47218, 0.299158, 0.228663],    # predictions of TFCVM (Thurstone, 1945, p.245)
-	[0.36129, 0.316129, 0.322581])    # predictions of DPMVM 
+	nonparametricTFCVM(x1, "TFCVM: Thurstone's 1st data set, S1-S3")[2][1], 
+	nonparametricDPMVM(x1, "DPMVM: Thurstone's 1st data set, S1-S3")[3])
 
-# ╔═╡ 20f6481e-d442-4f6a-a414-0be930591acd
-nonparametricTFCVM(x1, "TFCVM: Thurstone's 1st data set, S1-S3")
+# ╔═╡ 9fe3e7d0-0866-4067-83a2-7606e6d81f35
+nonparametricTFCVM(x1, "TFCVM: Thurstone's 1st data set, S1-S3")[2][1]
 
-# ╔═╡ a6a3c347-f03c-4eff-9644-c4204fa3f556
-nonparametricDPMVM(x1, "DPMVM: Thurstone's 1st data set, S1-S3")
+# ╔═╡ 3a501903-5fad-47f4-8c7c-bfd0028045bb
+nonparametricDPMVM(x1, "DPMVM: Thurstone's 1st data set, S1-S3")[3]
 
 # ╔═╡ 17a0af2d-d2cc-4a2f-8574-1fb7fcc99d95
 md"
@@ -660,14 +721,14 @@ $\;$
 
 # ╔═╡ 8e732689-8cce-494b-abbb-654879c57a5d
 modelsComparison("TFCVM vs DPMVM, Thurstone's 1st Data Set (table 1, S1-S4)",
-	[0.368371, 0.20603, 0.116645, 0.308954],     # TFCVM
-	[0.336973, 0.23869, 0.112324, 0.312012])     # DPMVM
+	nonparametricTFCVM(x2, "TFCVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")[2][1],
+	nonparametricDPMVM(x2, "DPMVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")[3])     
 
-# ╔═╡ 32061671-8d76-48aa-af3c-b153cf2f5198
-nonparametricTFCVM(x2, "TFCVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")
+# ╔═╡ fd9ee5de-3f8c-4720-8c8f-a3e98269182a
+nonparametricTFCVM(x2, "TFCVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")[2][1]
 
-# ╔═╡ b7decf98-c14c-4616-abc6-ac32c32feb1f
-nonparametricDPMVM(x2, "DPMVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")
+# ╔═╡ a7193c64-ad31-404c-977f-63673d61969b
+nonparametricDPMVM(x2, "DPMVM: Thurstone's 1st Data Set (table 1,incl. controversial S4)")[3]
 
 # ╔═╡ b2a3c2c7-6323-41a5-8c21-1c64aa67b20e
 md"
@@ -685,16 +746,16 @@ md"
 
 # ╔═╡ 82c2da16-3f3b-46f2-915e-c0f09a027761
 modelsComparison("TFCVM vs DPMVM (Thurstone's 2nd data set without S4)",
-	[0.477215, 0.457326, 0.0654586],      # TFCVM (Thurstone, 1945, p.247) 
-	[0.462963, 0.472222, 0.0648148],      # DPMVM
+	nonparametricTFCVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")[2][1],     
+	nonparametricDPMVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")[3],     
 	xlabel="TFCVM",
 	ylabel="DPMVM")  
 
-# ╔═╡ 2063c2db-6060-4981-a41b-0022327231fa
-nonparametricTFCVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")
+# ╔═╡ 91182e03-0b22-4f7d-916b-5b1803e17d65
+nonparametricTFCVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")[2][1]
 
-# ╔═╡ 76bf9df0-7ad9-44b7-9a2c-73ed1720df96
-nonparametricDPMVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")
+# ╔═╡ 086340ef-2c9b-4db3-9a63-931cc32ecd7c
+nonparametricDPMVM(x3, "Thurstone's 2nd Example (table 2;without controversial S4)")[3]
 
 # ╔═╡ 27e547b2-cae6-4711-9755-af74ad2ac315
 md"
@@ -711,16 +772,16 @@ md"
 
 # ╔═╡ 0b05b2b7-09f8-472d-aa2e-6fb4127aad47
 modelsComparison("TFCVM vs DPMVM (Thurst.'s 2nd data incl S4)",
-	[0.29953, 0.248575, 0.0323419, 0.419553],     # TFCVM (Thurstone, 1945, p.247) 
-	[0.33379, 0.267038, 0.0166898, 0.382476],     # DPMVM
+	nonparametricTFCVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")[2][1],     
+	nonparametricDPMVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")[3],     
 	xlabel="TFCVM",
 	ylabel="DPMVM")  
 
-# ╔═╡ 363ef966-c551-46b5-801e-d64d5f567245
-nonparametricTFCVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")
+# ╔═╡ b99c9e40-9ada-428b-a36a-a66c83c0ea70
+nonparametricTFCVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")[2][1]
 
-# ╔═╡ 16a93f99-a632-4de0-8aa1-3e4c3612ad27
-nonparametricDPMVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")
+# ╔═╡ 6315cb65-9f0c-4648-96ed-d301fb4a5070
+nonparametricDPMVM(x4, "Thurstone's 2nd Example (1945, Tab 2; incl. controversal S4)")[3]
 
 # ╔═╡ 814e78ae-02c4-4a27-9593-23372da6a1fe
 md"
@@ -865,16 +926,16 @@ md"
 "
 
 # ╔═╡ 0f8301ff-e42a-40bf-8962-379fcaf1fdbd
-plotRatingDistributions(normalizedRows(s1)', "Ratings: Civil Courage", maxY=0.6)
+plotStepDensities(normalizedRows(s1)', "Ratings: Civil Courage", maxY=0.6)
 
 # ╔═╡ 713bc237-146e-4b67-b2a5-fd392440c7e0
 dataModelComparison("1st Choice Data vs. TFCVM(Civil Courage)",
-	[0.114168, 0.317372, 0.171402, 0.245551, 0.0967584, 0.0547475], # TFCVM 
+	nonparametricTFCVM(normalizedRows(s1)', "Ratings: Civil Courage")[2][1],  
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	ylabel="Civil Courage")
 
-# ╔═╡ 77f70f13-e372-4e83-9dc4-61ee46b5c183
-nonparametricTFCVM(normalizedRows(s1)', "Ratings: Civil Courage")
+# ╔═╡ ce107dc0-6756-4904-a3ee-d54b87ca1330
+nonparametricTFCVM(normalizedRows(s1)', "Ratings: Civil Courage")[2][1]
 
 # ╔═╡ e65ef2f4-e91a-491a-8d27-871a708c24c1
 md"
@@ -884,16 +945,16 @@ md"
 "
 
 # ╔═╡ c2377f33-bd83-41ba-bb5e-d027062aff20
-plotRatingDistributions(s2', "Liberality Ratings", maxY=0.6)
+plotStepDensities(s2', "Liberality Ratings", maxY=0.6)
 
 # ╔═╡ ed9190c2-c601-4618-847d-36b14dcfc1b1
 dataModelComparison("1st Choice Data vs. TFCVM(Liberality)",
-	[0.250709, 0.191839, 0.0843001, 0.0245609, 0.229523, 0.219069], # TFCVM 
+	nonparametricTFCVM(s2', "Liberality Ratings")[2][1], 
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	ylabel="Liberality")
 
-# ╔═╡ ee0b9ab1-06b8-423b-97be-80f535af5cc6
-nonparametricTFCVM(s2', "Liberality Ratings")
+# ╔═╡ b9026be0-0545-4bde-8579-1945e0ecadec
+nonparametricTFCVM(s2', "Liberality Ratings")[2][1]
 
 # ╔═╡ b80b06a6-35ac-4e79-9265-7156fc72c216
 md"
@@ -903,16 +964,16 @@ md"
 "
 
 # ╔═╡ 5b4bf533-bd94-44a2-ba37-bb197b19941d
-plotRatingDistributions(s3', "Sincerity/Honesty Ratings", maxY=0.6)
+plotStepDensities(s3', "Sincerity/Honesty Ratings", maxY=0.6)
 
 # ╔═╡ 8d89ed01-5034-4537-b033-b65a808c3c79
 dataModelComparison("1st Choice Data - TFCVM(Sincerity/Honesty)",
-	[0.321178, 0.0989162, 0.0831428, 0.00321168, 0.204833, 0.288718], # TFCVM 
+	nonparametricTFCVM(s3', "Data Set s3: Sincerity/Honesty Ratings")[2][1],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	ylabel="Sincerity/Honesty") 
 
-# ╔═╡ addb3de8-88f6-423f-8158-2bcc992d5866
-nonparametricTFCVM(s3', "Data Set s3: Sincerity/Honesty Ratings")
+# ╔═╡ 157ed532-5fe9-4df4-aec7-b10614b1f912
+nonparametricTFCVM(s3', "Data Set s3: Sincerity/Honesty Ratings")[2][1]
 
 # ╔═╡ 88f06731-4088-4a75-8d91-c8638d9c55e2
 md"
@@ -921,16 +982,16 @@ md"
 "
 
 # ╔═╡ 6df585af-ae1c-4208-8e02-58014f3e1904
-plotRatingDistributions(s4', "Intelligence Ratings", maxY=0.6)
+plotStepDensities(s4', "Intelligence Ratings", maxY=0.6)
 
 # ╔═╡ 82142d83-d0fc-4742-bbea-0c8ef5ef31cd
 dataModelComparison("1st Choice Data vs. TFCVM(Intelligence)",
-	[0.26731, 0.222428, 0.0739308, 0.24268, 0.0435355, 0.150115], # TFCVM 
+	nonparametricTFCVM(s4', "Intelligence Ratings")[2][1],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	ylabel="Intelligence")
 
-# ╔═╡ 7866fb6e-76f9-4c8c-bf8c-d306640961cb
-nonparametricTFCVM(s4', "Intelligence Ratings")
+# ╔═╡ 85a9a231-2522-407f-bcff-cb33f1b20e15
+nonparametricTFCVM(s4', "Intelligence Ratings")[2][1]
 
 # ╔═╡ 867b58e5-b376-47d3-9f8f-3d35b7b8d1d5
 md"
@@ -939,16 +1000,16 @@ md"
 "
 
 # ╔═╡ 4bb2f16c-3f0c-4dfc-bac9-d22c82ae645a
-plotRatingDistributions(s5', "Objectivity Ratings")
+plotStepDensities(s5', "Objectivity Ratings")
 
 # ╔═╡ 46ca3bd9-122c-4849-a11d-1f230e6d1978
 dataModelComparison("1st Choice Data vs. TFCVM(Objectivity)",
-	[0.292603, 0.139025, 0.136568, 0.0583199, 0.158003, 0.215481], # TFCVM 
+	nonparametricTFCVM(s5', "Objectivity Ratings")[2][1],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus,1968, Tab. 4)
 	ylabel="Objectivity")
 
-# ╔═╡ be8288b8-70b8-4d31-8823-43d2aa0b9e92
-nonparametricTFCVM(s5', "Objectivity Ratings")
+# ╔═╡ 4bb9ddbb-9a6d-48c0-ba6d-9f571513de6c
+nonparametricTFCVM(s5', "Objectivity Ratings")[2][1]
 
 # ╔═╡ df9934b4-6031-40e4-b395-ad235967f88d
 md"
@@ -980,17 +1041,17 @@ md"
 "
 
 # ╔═╡ 82e3df8e-bbf7-44cb-8093-744264493255
-plotRatingDistributions(s1', "DPMVM:Civil Courage", maxY=0.6, mCrit=6)
+plotStepDensities(s1', "DPMVM:Civil Courage", maxY=0.6, mCrit=6)
 
 # ╔═╡ f7ee33fc-978b-43e0-8b74-97c05148f18c
 dataModelComparison("1st Choice Data vs. DPMVM(Civil Courage)",
 	# # DPMVM predictions on basis of civil courage ratings
-	[0.151899, 0.243671, 0.196203, 0.196203,0.120253, 0.0917722], # DPMVM 
+	nonparametricDPMVM(s1', "DPMVM: Civil Courage")[3],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	model="DPMVM", ylabel="Civil Courage") 
 
-# ╔═╡ a34f03f7-1bcb-41fb-9981-3b4217d1b190
-nonparametricDPMVM(s1', "DPMVM: Civil Courage")
+# ╔═╡ f403256c-1714-4cbd-a203-0a0a2bffd7be
+nonparametricDPMVM(s1', "DPMVM: Civil Courage")[3]
 
 # ╔═╡ cc673a72-163f-43eb-a5fb-616c280f5dfe
 md"
@@ -1000,17 +1061,17 @@ md"
 "
 
 # ╔═╡ e0fc0c7c-0f05-426b-ae35-8331a999626f
-plotRatingDistributions(s2', "DPMVM: Liberality Ratings", maxY=0.6, mCrit=6)
+plotStepDensities(s2', "DPMVM: Liberality Ratings", maxY=0.6, mCrit=6)
 
 # ╔═╡ b525f3d3-ad70-476d-b847-96062125c7bc
 dataModelComparison("1st Choice Data vs. DPMVM(Liberality)",
 	# DPMVM on basis of liberality ratings
-	[.248705, .176166, .0984456, .0259067, .222798, .227979], # DPMVM predictions  
+	nonparametricDPMVM(s2', "DPMVM: Liberality Ratings")[3], 
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, tab. 4)
 	model="DPMVM", ylabel="Liberality")
 
-# ╔═╡ 2288ebae-1cfd-49af-8f85-0861c66a1ecc
-nonparametricDPMVM(s2', "DPMVM: Liberality Ratings")
+# ╔═╡ 914de96c-e60a-43bd-8552-fd719204734c
+nonparametricDPMVM(s2', "DPMVM: Liberality Ratings")[3]
 
 # ╔═╡ 090b7b4f-3907-4d0f-b162-518b0686c4dc
 md"
@@ -1020,16 +1081,16 @@ md"
 "
 
 # ╔═╡ 1ed17ee6-5f9b-4abf-b826-b2ee16fe529f
-plotRatingDistributions(s3', "DPMVM: Sincerity/Honesty Ratings", maxY=0.6, mCrit=6)
+plotStepDensities(s3', "DPMVM: Sincerity/Honesty Ratings", maxY=0.6, mCrit=6)
 
 # ╔═╡ e58fafa1-53c1-4281-b981-cf8981211cd6
 dataModelComparison("1st Choice Data vs. DPMVM(Sincerity/Honesty)",
-	[.296296, .117284, .0617284, .0, .234568, .290123], # DPMVM predictions
+	nonparametricDPMVM(s3', "DPMVM: Sincerity/Honesty Ratings")[3],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	model="DPMVM", ylabel="Sincerity/Honesty") 
 
-# ╔═╡ e2167819-6c88-44f0-acc1-ec914228192e
-nonparametricDPMVM(s3', "DPMVM: Sincerity/Honesty Ratings")
+# ╔═╡ 68ecff1e-a330-4564-8e68-f93de28e7983
+nonparametricDPMVM(s3', "DPMVM: Sincerity/Honesty Ratings")[3]
 
 # ╔═╡ 63136607-7610-441d-970e-5abbcafeca90
 md"
@@ -1038,17 +1099,17 @@ md"
 "
 
 # ╔═╡ 86f7d8fe-119f-45ed-b765-9100010f4940
-plotRatingDistributions(s4', "DPMVM: Intelligence Ratings", maxY=0.6, mCrit=7)
+plotStepDensities(s4', "DPMVM: Intelligence Ratings", maxY=0.6, mCrit=7)
 
 # ╔═╡ d71d3e6c-7305-47ea-a39f-f72af0abf65c
 dataModelComparison("1st Choice Data vs. DPMVM(Intelligence)",
 	# DPMVM predictions on basis of intelligence ratings
-	[0.286957, 0.252174, 0.0434783, 0.252174, 0.0, 0.165217], # DPMVM predictions
+	nonparametricDPMVM(s4', "DPMVM: Intelligence Ratings")[3], 
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus, 1968, Tab. 4)
 	model="DPMVM", ylabel="Intelligence") 
 
-# ╔═╡ 89cedf1b-2207-4348-a8b3-24f5865d0bdb
-nonparametricDPMVM(s4', "DPMVM: Intelligence Ratings")
+# ╔═╡ cbd1f7b3-a50e-455a-9a01-9c4eab440155
+nonparametricDPMVM(s4', "DPMVM: Intelligence Ratings")[3]
 
 # ╔═╡ 5185895d-54bc-4d36-88f2-6a55999d5cc4
 md"
@@ -1057,16 +1118,16 @@ md"
 "
 
 # ╔═╡ 45cbaf80-bcea-44c8-a75a-1e1f5ba897b1
-plotRatingDistributions(s5', "DPMVM: Objectivity Ratings", maxY=0.6, mCrit=6)
+plotStepDensities(s5', "DPMVM: Objectivity Ratings", maxY=0.6, mCrit=6)
 
 # ╔═╡ 5cc3e5d9-cf3f-482a-944f-4759ef9d0b6b
 dataModelComparison("1st Choice Data vs. DPMVM(Objectivity)",
-	[0.239819, 0.171946, 0.108597, 0.0452489, 0.19457, 0.239819], # DPMVM predictions
+	nonparametricDPMVM(s5', "DPMVM: Objectivity Ratings")[3],
 	[.33, .28, .24, .10, .05, .00], # 1st choice data (Ahrens & Möbus 1968, Tab. 4)
 	model="DPMVM", ylabel="Objectivity") 
 
 # ╔═╡ 521ab2fd-d8ba-4f21-9ac4-c687227bc7bd
-nonparametricDPMVM(s5', "DPMVM: Objectivity Ratings")
+nonparametricDPMVM(s5', "DPMVM: Objectivity Ratings")[3]
 
 # ╔═╡ 721f5561-ee82-45bd-8317-07411310de06
 md" 
@@ -1085,60 +1146,60 @@ md"
 
 # ╔═╡ 18ebece4-7cfb-44b3-946b-445397a2f0ea
 modelsComparison("Thurstone vs Voting Model (Civil Courage Rating)",
-	[0.114168, 0.317372, 0.171402, 0.245551, 0.0967584, 0.0547475],  # TFCVM
-	[0.151899, 0.243671, 0.196203, 0.196203, 0.120253,0.0917722])    # DPMVM
+	nonparametricTFCVM(s1', "Civil Courage Ratings")[2][1], 
+	nonparametricDPMVM(s1', "Civil Courage Ratings")[3])
 
-# ╔═╡ e5469f77-a29a-4d0f-9486-64e93782bdc6
-nonparametricTFCVM(s1', "Civil Courage Ratings")
+# ╔═╡ a4e47b73-c521-4e39-8db0-54001989bc7f
+nonparametricTFCVM(s1', "Civil Courage Ratings")[2][1]
 
-# ╔═╡ a68de03f-c353-4645-81ac-b2e3c7f0133a
-nonparametricDPMVM(s1', "Civil Courage Ratings")
+# ╔═╡ 54b7b09c-1252-4a7f-a09b-3d570d6097c1
+nonparametricDPMVM(s1', "Civil Courage Ratings")[3]
 
 # ╔═╡ 6e4660de-209b-4c50-933a-d5f841b8018f
 modelsComparison("Thurstone vs Voting Model (Liberality Ratings)",
-	[0.250709, 0.191839, 0.0843001, 0.0245609, 0.229523, 0.219069],  # TFCVM 
-	[.248705, .176166, .0984456, .0259067, .222798, .227979])        # DPMVM
+	nonparametricTFCVM(s2', "Liberality Ratings")[2][1],
+	nonparametricDPMVM(s2', "Liberality Ratings")[3])        # DPMVM
 
 # ╔═╡ 47d2dc5e-ab56-4a82-83e5-a9dcaa0dd7f1
-nonparametricTFCVM(s2', "Liberality Ratings")
+nonparametricTFCVM(s2', "Liberality Ratings")[2][1]
 
 # ╔═╡ 835557a1-70e7-40ae-ba02-c2cd9be00733
-nonparametricDPMVM(s2', "Liberality Ratings")
+nonparametricDPMVM(s2', "Liberality Ratings")[3]
 
 # ╔═╡ 8b427eaf-db0d-4258-9d28-8d5d3d92be3a
 modelsComparison("Thurstone - Voting Model(Sincerety/Honesty Ratings)",
 	# Voting Model on basis of sincerety/honesty ratings
-	[0.321178, 0.0989162, 0.0831428, 0.00321168, 0.204833, 0.288718], # TFCVM
-	[0.296296, 0.117284, 0.0617284, 0.0, 0.234568, 0.290123])         # DPMVM
+	nonparametricTFCVM(s3', "Sincerity/Honesty Ratings")[2][1],
+	nonparametricDPMVM(s3', "Sincerity/Honesty Ratings")[3])         
 
 # ╔═╡ 6307bafa-04d6-4c73-985e-5af7a7e579d0
-nonparametricTFCVM(s3', "Sincerity/Honesty Ratings")
+nonparametricTFCVM(s3', "Sincerity/Honesty Ratings")[2][1]
 
 # ╔═╡ 7e239c60-fd38-426a-b6ab-1105fe155833
-nonparametricDPMVM(s3', "Sincerity/Honesty Ratings")
+nonparametricDPMVM(s3', "Sincerity/Honesty Ratings")[3]
 
 # ╔═╡ 2f394320-b75a-456a-8b2b-d9a115a02bba
 modelsComparison("Thurstone vs Voting Model (Intelligence Ratings)",
 	# Voting Model on basis of intelligence ratings
-	[0.26731, 0.222428, 0.0739308, 0.24268, 0.0435355, 0.150115],  # TFCVM
-	[0.286957, 0.252174, 0.0434783, 0.252174, 0.0, 0.165217])      # DPMVM
+	nonparametricTFCVM(s4', "Voting Model: Intelligence Ratings")[2][1],
+	nonparametricDPMVM(s4', "Voting Model: Intelligence Ratings")[3])      
 
 # ╔═╡ e8c5dfea-8e93-41e0-9872-1e40db91d86a
-nonparametricTFCVM(s4', "Voting Model: Intelligence Ratings")
+nonparametricTFCVM(s4', "Voting Model: Intelligence Ratings")[2][1]
 
 # ╔═╡ 53e6b409-797e-4c0c-b22b-14ef1703bca4
-nonparametricDPMVM(s4', "Voting Model: Intelligence Ratings")
+nonparametricDPMVM(s4', "Voting Model: Intelligence Ratings")[3]
 
 # ╔═╡ 30a9ff23-52c3-47b0-8201-8cb9ae7e2986
 modelsComparison("Thurstone vs Voting Model (Objectivity Ratings)",
-	[0.292603, 0.139025, 0.136568, 0.0583199, 0.158003, 0.215481],  # TFCVM
-	[0.239819, 0.171946, 0.108597, 0.0452489, 0.19457, 0.239819])   # DPMVM
+	nonparametricTFCVM(s5', "Objectivity Ratings")[2][1],
+	nonparametricDPMVM(s5', "Objectivity Ratings")[3])   
 
 # ╔═╡ a39b5c5c-9b61-41ce-b42f-270e3c84e3e9
-nonparametricTFCVM(s5', "Objectivity Ratings")
+nonparametricTFCVM(s5', "Objectivity Ratings")[2][1]
 
 # ╔═╡ 11edf748-68dc-4d14-9e74-dfc097bc763e
-nonparametricDPMVM(s5', "Objectivity Ratings")
+nonparametricDPMVM(s5', "Objectivity Ratings")[3]
 
 # ╔═╡ 288ad712-303e-4736-808e-b019b4449bd3
 md"
@@ -1146,7 +1207,7 @@ Both models seem to make *nearly identical* predictions when we look at correlat
 
 The computation complexity of *TFCVM* is far higher that that of *DPMVM*. Especially the computation of the indices of the set of alternatives of standard stimulus $i$ is complex and time-consuming.
 
-As a conclusion we can say that our *DPMVM* seems to have a higher *empirical validity* than *Thurstone's TFCVM*. 
+As a conclusion we can say that our *DPMVM* seems to have a higher *cognitive validity* than *Thurstone's TFCVM*. This is justified by its *same* prognostic goodness and its *lower* computational complexity.
 
 "
 
@@ -2611,6 +2672,7 @@ version = "1.4.1+2"
 # ╠═d0ba7291-b710-4b2e-afb5-6196adde5e2e
 # ╟─0dba7190-b4d1-4def-b648-49f8a265c0f1
 # ╟─e01cb359-dc73-49f2-8498-5f934dd12f21
+# ╟─46e92833-e197-4782-ac69-a7ad812006e3
 # ╠═cc1eb10e-9a46-4ad0-8eb5-aa8ad9d5d69e
 # ╠═182a6e45-eccc-43c6-a112-fd9843edbedc
 # ╠═e0586afb-954f-4a25-a284-1fdf3bb0caa9
@@ -2642,7 +2704,9 @@ version = "1.4.1+2"
 # ╟─5962f008-e468-4755-8e33-9a11f57a7480
 # ╠═86262f01-212b-445d-8d0e-9497fb18f7ab
 # ╠═e57fd44e-d8e9-43c2-a171-a47b645c160f
+# ╠═060806be-e449-46ce-8ad8-5310139f959f
 # ╠═4d783cea-c556-4e1a-ae42-8211fbc06b66
+# ╠═6ff8defd-a9bd-4dd9-962c-0ca52ac67d8d
 # ╠═7e8fc077-581d-442b-8815-e0502cce20eb
 # ╠═351b15f1-2df7-4a75-9bd6-4c8ec694930a
 # ╠═616b0f2c-59d3-4723-bad5-6d56bb73485a
@@ -2668,23 +2732,23 @@ version = "1.4.1+2"
 # ╠═b1a31f45-1e75-4e9f-bd4e-85a67f9f4268
 # ╟─1d32dbdb-800b-4649-a9c8-4cd336b709a4
 # ╠═84d2ea41-9000-4db6-ba6e-d36ef980438c
-# ╠═20f6481e-d442-4f6a-a414-0be930591acd
-# ╠═a6a3c347-f03c-4eff-9644-c4204fa3f556
+# ╠═9fe3e7d0-0866-4067-83a2-7606e6d81f35
+# ╠═3a501903-5fad-47f4-8c7c-bfd0028045bb
 # ╟─17a0af2d-d2cc-4a2f-8574-1fb7fcc99d95
 # ╟─13ef5d8f-e36b-46ed-959b-adc8c1f2f691
 # ╠═8e732689-8cce-494b-abbb-654879c57a5d
-# ╠═32061671-8d76-48aa-af3c-b153cf2f5198
-# ╠═b7decf98-c14c-4616-abc6-ac32c32feb1f
+# ╠═fd9ee5de-3f8c-4720-8c8f-a3e98269182a
+# ╠═a7193c64-ad31-404c-977f-63673d61969b
 # ╟─b2a3c2c7-6323-41a5-8c21-1c64aa67b20e
 # ╟─49005ab2-3134-4593-8cb4-21bc73c4b785
 # ╠═82c2da16-3f3b-46f2-915e-c0f09a027761
-# ╠═2063c2db-6060-4981-a41b-0022327231fa
-# ╠═76bf9df0-7ad9-44b7-9a2c-73ed1720df96
+# ╠═91182e03-0b22-4f7d-916b-5b1803e17d65
+# ╠═086340ef-2c9b-4db3-9a63-931cc32ecd7c
 # ╟─27e547b2-cae6-4711-9755-af74ad2ac315
 # ╟─e1693ac0-1778-46cd-9c9e-c633a7f50995
 # ╠═0b05b2b7-09f8-472d-aa2e-6fb4127aad47
-# ╠═363ef966-c551-46b5-801e-d64d5f567245
-# ╠═16a93f99-a632-4de0-8aa1-3e4c3612ad27
+# ╠═b99c9e40-9ada-428b-a36a-a66c83c0ea70
+# ╠═6315cb65-9f0c-4648-96ed-d301fb4a5070
 # ╟─814e78ae-02c4-4a27-9593-23372da6a1fe
 # ╟─f5839472-4d82-4324-ad6f-7a9559985a86
 # ╟─c1e826d8-c015-473a-88eb-b6947b27bbdc
@@ -2707,41 +2771,41 @@ version = "1.4.1+2"
 # ╟─13fb0a27-b37d-4f7f-b6ef-d0a73b6398a6
 # ╠═0f8301ff-e42a-40bf-8962-379fcaf1fdbd
 # ╠═713bc237-146e-4b67-b2a5-fd392440c7e0
-# ╠═77f70f13-e372-4e83-9dc4-61ee46b5c183
+# ╠═ce107dc0-6756-4904-a3ee-d54b87ca1330
 # ╟─e65ef2f4-e91a-491a-8d27-871a708c24c1
 # ╠═c2377f33-bd83-41ba-bb5e-d027062aff20
 # ╠═ed9190c2-c601-4618-847d-36b14dcfc1b1
-# ╠═ee0b9ab1-06b8-423b-97be-80f535af5cc6
+# ╠═b9026be0-0545-4bde-8579-1945e0ecadec
 # ╟─b80b06a6-35ac-4e79-9265-7156fc72c216
 # ╠═5b4bf533-bd94-44a2-ba37-bb197b19941d
 # ╠═8d89ed01-5034-4537-b033-b65a808c3c79
-# ╠═addb3de8-88f6-423f-8158-2bcc992d5866
+# ╠═157ed532-5fe9-4df4-aec7-b10614b1f912
 # ╟─88f06731-4088-4a75-8d91-c8638d9c55e2
 # ╠═6df585af-ae1c-4208-8e02-58014f3e1904
 # ╠═82142d83-d0fc-4742-bbea-0c8ef5ef31cd
-# ╠═7866fb6e-76f9-4c8c-bf8c-d306640961cb
+# ╠═85a9a231-2522-407f-bcff-cb33f1b20e15
 # ╟─867b58e5-b376-47d3-9f8f-3d35b7b8d1d5
 # ╠═4bb2f16c-3f0c-4dfc-bac9-d22c82ae645a
 # ╠═46ca3bd9-122c-4849-a11d-1f230e6d1978
-# ╠═be8288b8-70b8-4d31-8823-43d2aa0b9e92
+# ╠═4bb9ddbb-9a6d-48c0-ba6d-9f571513de6c
 # ╟─df9934b4-6031-40e4-b395-ad235967f88d
 # ╟─cbe5f25d-a042-493d-a493-b0371319dce7
 # ╟─d006f952-9e6e-45f0-9885-cef386949869
 # ╠═82e3df8e-bbf7-44cb-8093-744264493255
 # ╠═f7ee33fc-978b-43e0-8b74-97c05148f18c
-# ╠═a34f03f7-1bcb-41fb-9981-3b4217d1b190
+# ╠═f403256c-1714-4cbd-a203-0a0a2bffd7be
 # ╟─cc673a72-163f-43eb-a5fb-616c280f5dfe
 # ╠═e0fc0c7c-0f05-426b-ae35-8331a999626f
 # ╠═b525f3d3-ad70-476d-b847-96062125c7bc
-# ╠═2288ebae-1cfd-49af-8f85-0861c66a1ecc
+# ╠═914de96c-e60a-43bd-8552-fd719204734c
 # ╟─090b7b4f-3907-4d0f-b162-518b0686c4dc
 # ╠═1ed17ee6-5f9b-4abf-b826-b2ee16fe529f
 # ╠═e58fafa1-53c1-4281-b981-cf8981211cd6
-# ╠═e2167819-6c88-44f0-acc1-ec914228192e
+# ╠═68ecff1e-a330-4564-8e68-f93de28e7983
 # ╟─63136607-7610-441d-970e-5abbcafeca90
 # ╠═86f7d8fe-119f-45ed-b765-9100010f4940
 # ╠═d71d3e6c-7305-47ea-a39f-f72af0abf65c
-# ╠═89cedf1b-2207-4348-a8b3-24f5865d0bdb
+# ╠═cbd1f7b3-a50e-455a-9a01-9c4eab440155
 # ╟─5185895d-54bc-4d36-88f2-6a55999d5cc4
 # ╠═45cbaf80-bcea-44c8-a75a-1e1f5ba897b1
 # ╠═5cc3e5d9-cf3f-482a-944f-4759ef9d0b6b
@@ -2749,8 +2813,8 @@ version = "1.4.1+2"
 # ╟─721f5561-ee82-45bd-8317-07411310de06
 # ╟─d2d1bbe9-8417-4b24-824c-1a079c59c95e
 # ╠═18ebece4-7cfb-44b3-946b-445397a2f0ea
-# ╠═e5469f77-a29a-4d0f-9486-64e93782bdc6
-# ╠═a68de03f-c353-4645-81ac-b2e3c7f0133a
+# ╠═a4e47b73-c521-4e39-8db0-54001989bc7f
+# ╠═54b7b09c-1252-4a7f-a09b-3d570d6097c1
 # ╠═6e4660de-209b-4c50-933a-d5f841b8018f
 # ╠═47d2dc5e-ab56-4a82-83e5-a9dcaa0dd7f1
 # ╠═835557a1-70e7-40ae-ba02-c2cd9be00733
