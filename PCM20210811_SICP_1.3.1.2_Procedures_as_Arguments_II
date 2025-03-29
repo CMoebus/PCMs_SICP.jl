@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
@@ -23,7 +23,7 @@ md"
 #### nonSICP: 1.3.1.2 Procedures as Arguments II: [Cantor Set](https://en.wikipedia.org/wiki/Cantor_set)
 ##### file: PCM20210811\_SICP\_1.3.1.2\_Procedures\_as\_Arguments\_II.jl
 
-##### Julia/Pluto.jl-code (1.11.3/0.20.4) by PCM *** 2025/02/22 ***
+##### Julia/Pluto.jl-code (1.11.4/0.20.4) by PCM *** 2025/03/29 ***
 =====================================================================================
 "
 
@@ -137,19 +137,28 @@ We take the interval
 
 $C_0=[0,1]$ 
 
+$\;$
+
 with the *Lebesgue measure* (= length)
  
 $\lambda(C_0) = |C_0| = 1 - 0 = 1$
 
+$\;$
+
 and construct the *discontinuum* (Schilling, 2017, p.4; 2025, p.2f.) by removing in step $n$ all ternary *open* intervals 
 
 $I_{t_1t_2...t_n2}=(0.t_1t_2...t_n1, 0.t_1t_2...t_n2)_3$ 
+
+$\;$
 
 with $t_j \in \{0,2\} \text{ ; and } j=1,...,n.$
 
 The *Cantor set* is then
 
 $C := \bigcap_{n \in \mathbb N} C_n.$
+
+$\;$
+$\;$
 
 "
 
@@ -162,6 +171,8 @@ In the $n^{th}+1$ step we remove all intervals
 
 $I_{t_1t_2...t_{n-1}t_n2}=(0.t_1t_2...t_{n-1}t_n1,\; 0.t_1t_2...t_{n-1}t_n2)_3$
 
+$\;$
+
 with $t_1t_2...t_{n-1}t_n \in \{0,2\}.$
 
 Endpoints $0.t_1t_2...t_{n-1}t_n1$ and $0.t_1t_2...t_{n-1}t_n2$ are written as *triadic* numbers with numbers $t_1t_2...t_{n-1}t_n \in \{0,2\}.$ The sequence of triadic numbers $t_1...t_n$ encodes the position of the interval $I_{t_1t_2...t_{n-1}t_n2}$ in relation to the interval $I_{t_1t_2...t_{n-1}2}.$ The subscript $t_n=0$ means that the interval is *left* of $I_{t_1t_2...t_{n-1}2}$ and $t_n=2$ means that it is *right* of $I_{t_1t_2...t_{n-1}2}$. This results in a binary tree (graph below).
@@ -171,14 +182,31 @@ The *Lebesgue* measure (= length) of the interval $I_{t_1t_2...t_{n-1}t_n2}$ is:
 $\lambda(I_{t_1t_2...t_{n-1}t_n2})=0.t_1t_2...t_{n-1}t_n2-
 0.t_1t_2...t_{n-1}t_n1=0.00...001_3=3^{-(n+1)}.$
 
+$\;$
+
 $\text{e.g. }3^{-(0+1)}=\frac{1}{3},\; 3^{-(1+1)}=\frac{1}{9},\; 3^{-(2+1)}=\frac{1}{27},\;...$  
+
+$\;$
+$\;$
 
 So interval lengths can be derived from this *ternary* encoding:
 
 - 1st step: $2^0=1$ intervals $\lambda(I_2) = 0.2_3-0.1_3=0.1_3=3^{-(0+1)}=\frac{1}{3}$
+
+$\;$
+
 - 2nd step: $2^1=2$ intervals $\lambda(I_{02}), \lambda(I_{22}) =3^{-(1+1)}=\frac{1}{9}$
+
+$\;$
+
 - 3rd step: $2^2=4$ intervals $\lambda(I_{002}), \lambda(I_{022}), \lambda(I_{022}) , \lambda(I_{222})=3^{-(2+1)}=\frac{1}{27}$
+
+$\;$
+
 - (n+1)th step: $2^n$ intervals with length $3^{-(n+1)}.$
+
+$\;$
+$\;$
 
 " 
 
@@ -261,11 +289,23 @@ The *first* construction step is:
 
 $I_2=(0.1,0.2)_3=(0*3^0+1*3^{-1}, 0*3^0+2*3^{-1})_{10}=\left(\frac{1}{3},\frac{2}{3}\right)$
 
+$\;$
+
 $\lambda(I_2) = \frac{2}{3} - \frac{1}{3} = \frac{1}{3}$
+
+$\;$
+$\;$
 
 $C_1 = C_0\backslash\;I_2 = [0,1] \backslash \left(\frac{1}{3},\frac{2}{3}\right) = \left[0,\frac{1}{3}\right]\cup\left[\frac{2}{3},1\right]$
 
+$\;$
+$\;$
+
 $\lambda(C_1)=\lambda(C_0\backslash\;I_2) = 1 - \frac{1}{3} = \frac{1}{3}+\frac{1}{3}=\frac{2}{3}=\frac{\#remaingIntervals}{\#intervals}=0.\overline{6}.$
+
+$\;$
+$\;$
+$\;$
 
 "
 
@@ -276,17 +316,36 @@ md"
 
 $I_{02} := (0.01,0.02)_3=$
 
+$\;$
+
 $(0*3^0+0*3^{-1}+1*3^{-2},0*3^0+0*3^{-1}+2*3^{-2})=\left(\frac{1}{9}, \frac{2}{9}\right)$
+
+$\;$
+$\;$
 
 $I_{22} := (0.21,0.22)_3=$
 
+$\;$
+
 $(0*3^0+2*3^{-1}+1*3^{-2},0*3^0+2*3^{-1}+2*3^{-2})=\left(\frac{7}{9}, \frac{8}{9}\right)$
+
+$\;$
+$\;$
 
 $C_2 = C_1\;\backslash (I_{02}\cup I_{22}) = \left[0,\frac{1}{3}\right]\cup\left[\frac{2}{3},1\right] \backslash \left(\left(\frac{1}{9}, \frac{2}{9}\right)\cup \left(\frac{7}{9}, \frac{8}{9}\right)\right)$
 
+$\;$
+$\;$
+
 $=\left[0,\frac{1}{9}\right]\cup\left[\frac{2}{9},\frac{1}{3}\right]\cup\left[\frac{2}{3},\frac{7}{9}\right]\cup\left[\frac{8}{9},1\right]$
 
+$\;$
+$\;$
+
 $\lambda(C_2) = \lambda(C_1\;\backslash (I_{02}\cup I_{22})) = \frac{2}{3} - \frac{2}{9} = \frac{4}{9}=\frac{\#remainingIntervals}{\#intervals}=0.\overline{4}$
+
+$\;$
+$\;$
 
 "
 
@@ -295,54 +354,112 @@ md"
 ---
 - *3rd construction step* generating $C_3$: Remove from the $2^2$ remaining *closed* intervals of $C_2$ the middle *open* intervals $I_{t_1t_22}$ where $t_1,t_2 \in \{0,2\}$
 
+$\;$
+
 $I_{002} = (0.001, 0.002)_3 =$
+
+$\;$
 
 $=(0*3^0 + 0*3^{-1} + 0*3^{-2} + 1*3^{-3}, 
    0*3^0 + 0*3^{-1} + 0*3^{-2} + 2*3^{-3})=$
 
+$\;$
+
 $\left(0+0+0+\frac{1}{27}, 0+0+0+\frac{2}{27}\right) = \left(\frac{1}{27}, \frac{2}{27}\right) = (0.03704, 0.07407)$
+
+$\;$
+$\;$
  
 $I_{022}= (0.021, 0.022)_3=$
+
+$\;$
 
 $=(0*3^0 + 0*3^{-1} + 2*3^{-2} + 1*3^{-3}, 
    0*3^0 + 0*3^{-1} + 2*3^{-2} + 2*3^{-3})=$
 
+$\;$
+
 $=\left(0+0+\frac{2}{9}+\frac{1}{27}, 0+0+\frac{2}{9}+\frac{2}{27}\right) = \left(\frac{7}{27}, \frac{8}{27}\right) = (0.25926,0.29630)$
 
+$\;$
+$\;$
+
 $I_{202}= (0.201, 0.202)_3=$
+
+$\;$
 
 $=(0*3^0 + 2*3^{-1} + 0*3^{-2} + 1*3^{-3}, 
    0*3^0 + 2*3^{-1} + 0*3^{-2} + 2*3^{-3})=$
 
+$\;$
+
 $=\left(0+\frac{2}{3}+0+\frac{1}{27},0+\frac{2}{3}+0+\frac{2}{27}\right)=$
 
+$\;$
+$\;$
 
 $=\left(\frac{19}{27},\frac{20}{27}\right)=(0.70370, 0.74074)$
 
+$\;$
+$\;$
+
 $I_{222}=(0.221, 0.222)_3=$
 
+$\;$
 
 $=(0*3^0 + 2*3^{-1} + 2*3^{-2} + 1*3^{-3}, 
    0*3^0 + 2*3^{-1} + 2*3^{-2} + 2*3^{-3})=$
 
+$\;$
+
 $=\left(0+\frac{2}{3}+\frac{2}{9}+\frac{1}{27},0+\frac{2}{3}+\frac{2}{9}+\frac{2}{27}\right) = \left(\frac{25}{27},\frac{26}{27}\right) = (0.9293,0.96296)$
+
+$\;$
+$\;$
 
 $C_3 = C_2 \backslash\; (I_{002} \cup I_{022} \cup I_{202} \cup I_{222})=$
 
+$\;$
+
 $=\left(\left[0,\frac{1}{9}\right]\cup\left[\frac{2}{9},\frac{1}{3}\right]\cup\left[\frac{2}{3},\frac{7}{9}\right]\cup\left[\frac{8}{9},1\right]\right)\backslash$
+
+$\;$
+$\;$
+
 $\backslash\left(\left(\frac{1}{27}, \frac{2}{27}\right) \cup \left(\frac{7}{27}, \frac{8}{27}\right) \cup \left(\frac{19}{27},\frac{20}{27}\right) \cup \left(\frac{25}{27},\frac{26}{27}\right)\right)$
 
+$\;$
+$\;$
+
 $=\left[0,\frac{1}{27}\right]\cup\left[\frac{2}{27},\frac{1}{9}\right]\cup\left[\frac{2}{9},\frac{7}{27}\right]\cup\left[\frac{8}{27},\frac{1}{3}\right]\cup$
+
+$\;$
+$\;$
+
 $\cup\left[\frac{2}{3},\frac{19}{27}\right]\cup\left[\frac{20}{27},\frac{7}{9}\right]\cup\left[\frac{8}{9},\frac{25}{27}\right]\cup\left[\frac{26}{27},1\right].$
 
+$\;$
+$\;$
+
 $\lambda(C_3) = \lambda(C_2 \backslash\; (I_{002} \cup I_{022} \cup I_{202} \cup I_{222})) =$
+
+$\;$
+$\;$
+
 $=\frac{4}{9} -  \frac{4}{27} = \frac{8}{27} = \frac{\#remainingIntervals}{\#intervals}=0.\overline{2}\overline{9}\overline{6}.$
 
+$\;$
+
 $...$
+
+$\;$
 ---
 - *nth construction step* generating $C_n$
 
 $\lambda(C_n)= 1 - \sum_{j=0}^n \frac{2^j}{3^{j+1}} = \lambda(C_0) - \sum_{j=0}^n\frac{\#removedIntervals}{\#intervals}$
+
+$\;$
+$\;$
 
 " 
 
@@ -355,23 +472,50 @@ The *Lebesgue Measure* $\lambda(C)$ of *Cantor's Discontinuum* $C$ is (c.f. Schi
 
 $\lambda(C_0)=\lambda([0,1])=1$
 
+$\;$
+
 $\lambda(C_1)=\lambda(C_0)-\frac{1}{3}=\lambda([0,1])-\frac{1}{3}=1-\frac{1}{3}= \frac{2}{3}=0.\overline{6}$
+
+$\;$
+$\;$
 
 $\lambda(C_2)=\lambda(C_1)-2\cdot\frac{1}{9} = \frac{2}{3}-\frac{2}{9}=\frac{6}{9}-\frac{2}{9}=\frac{4}{9}=0.\overline{4}$
 
+$\;$
+$\;$
+
 $\lambda(C_3)=1-\frac{1}{3}\left[\frac{2^0}{3^0}+\frac{2^1}{3^1}+\frac{2^2}{3^2}\right]=1-\frac{1}{3}\left[1+\frac{2}{3}+\frac{4}{9}\right]=$
+
+$\;$
+$\;$
 
 $=1-\frac{1}{3}\cdot\frac{19}{9}=1-\frac{19}{27}=\frac{8}{27}=0.\overline{2}\overline{9}\overline{6}$
 
+$\;$
+$\;$
+
 $......$
+
+$\;$
+$\;$
 
 $\lambda(C_{n+1})=1-2^0\times\frac{1}{3^1}-2^1\times\frac{1}{3^2}-...-2^n\times\frac{1}{3^{n+1}}=1-\frac{1}{3}\sum_{j=0}^n\frac{2^j}{3^j}=1-\frac{1}{3}\sum_{j=0}^n\left(\frac{2}{3}\right)^j$
 
 $......$
 
+$\;$
+$\;$
+
 $\lambda(C)=1-\sum_{n=0}^\infty\frac{2^n}{3^{n+1}}=1-\frac{1}{3}\sum_{n=0}^\infty\frac{2^n}{3^n}=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=0.$
 
+$\;$
+$\;$
+$\;$
+
 This means that the *Cantor set* is a [*Null Set*](https://en.wikipedia.org/wiki/Null_set). It has length *zero* though it is not empty. It contains at least the endpoints of the intervals.
+
+$\;$
+$\;$
 
 "
 
@@ -381,11 +525,22 @@ Because $\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n$ is a convergent geometric 
 
 $\sum_{n=0}^\infty\left(r\right)^n=\frac{1}{1-r}$
 
+$\;$
+
 and
+
+$\;$
 
 $\lambda(C)=1-\frac{1}{3}\sum_{n=0}^\infty\left(\frac{2}{3}\right)^n=1-\frac{1}{3}\left(\frac{1}{1-\frac{2}{3}}\right)=1-\frac{1}{3}\left(\frac{1}{\frac{1}{3}}\right)=1-\frac{1}{3}\left(\frac{3}{1}\right)=0$
 
+$\;$
+$\;$
+$\;$
+
 *C* is not empty (e.g. Schilling, 2015, p.3). At least the end points of intervals are left over in $C$ after removings.
+
+$\;$
+$\;$
 
 "
 
@@ -577,7 +732,7 @@ Pluto = "~0.20.4"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.3"
+julia_version = "1.11.4"
 manifest_format = "2.0"
 project_hash = "2361d1a808db1daa1baaa2da4ba0784d61fe348d"
 
@@ -1286,7 +1441,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+2"
+version = "0.8.1+4"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
