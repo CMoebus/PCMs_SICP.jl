@@ -25,7 +25,7 @@ md"
 
 ###### file: PCM20210818\_SICP\_1.3.3\_ProceduresAsGeneralMethods.jl
 
-###### Julia/Pluto.jl-code (1.11.4/0.20.4) by PCM *** 2025/04/03 ***
+###### Julia/Pluto.jl-code (1.11.4/0.20.4) by PCM *** 2025/04/05 ***
 =====================================================================================
 "
 
@@ -42,7 +42,7 @@ md"
 ---
 ##### 1. Topics
 
-- *Root* of equaltion
+- *Root* of equation
 - *Half-interval* method
 - *error*(.)
 
@@ -116,14 +116,14 @@ end # function halfIntervalMethod
 
 # ╔═╡ 0be35aec-15b7-4ff3-bf26-4f08ab98debb
 let rootPi = round(halfIntervalMethod(sin, 2.0, 4.0), digits=4)
-	plot(sin::Function, 1.0, 5.0, size=(600, 400), xlim=(1, 5), aspect_ratio=1, line=:darkblue, framestyle=:zerolines, title=L"f(\pi)=0;\;f(x)=sin(x);\; 2.0 \leq x \leq 4;\;x_{rootPi}=3.1411...", titlefontsize=12, label=L"sin(x)")
+	plot(sin::Function, 1.0, 5.0, size=(600, 400), xlim=(1, 5), aspect_ratio=1, line=:darkblue, framestyle=:zerolines, title=L"f(x)=0;\;f(x)=sin(x);\; 2.0 \leq x \leq 4;\;x_{root}=3.1411...=\pi", titlefontsize=12, label=L"sin(x)")
 	plot!([rootPi, rootPi],[-1, +1], line=(2, :magenta), label=L"\pi := \{x|sin(x)=0;\; 2.0 \leq x \leq 4\})")
 	annotate!(2, -0.5, ("rootPi=$rootPi", 10))
 end
 
 # ╔═╡ fa9e22cb-667e-43fd-afa9-2820fe1c9e23
 let rootPi = round(halfIntervalMethod(sin, 2.0, 4.0), digits=4)
-	plot(sin::Function, 2, 4, size=(600, 400), xlim=(2.5, 3.7), ylim=(-0.5, +0.5),  line=:darkblue, framestyle=:zerolines, title=L"f(\pi)=0;\;f(x)=sin(x);\; 2.5 \leq x \leq 3.5;\;x_{rootPi}=3.1411...", titlefontsize=12, label=L"sin(x)", aspect_ratio=1)
+	plot(sin::Function, 2, 4, size=(600, 400), xlim=(2.5, 3.7), ylim=(-0.5, +0.5),  line=:darkblue, framestyle=:zerolines, title=L"f(x)=0;\;f(x)=sin(x);\; 2.5 \leq x \leq 3.5;\;x_{root}=3.1411...=\pi", titlefontsize=12, label=L"sin(x)", aspect_ratio=1)
 	plot!([rootPi, rootPi],[-1, +1], line=(2, :magenta), label=L"\pi := \{x|sin\ x=0;\; 2.5 \leq x \leq 3.5\}")
 	annotate!(2.75, -0.25, ("rootPi=$rootPi", 10))
 end
@@ -133,7 +133,7 @@ halfIntervalMethod(sin, 2.0, 4.0)
 
 # ╔═╡ 5ec5382e-3416-4986-a9c2-fa5ba66ba165
 let root = round(halfIntervalMethod(x->x^3-2x-3, 1, 2), digits=4)
-	plot(x -> x^3 - 2x - 3, 0.5, 2.5, size=(600, 400),line=:darkblue, xlim=(0.75, 2.5), aspect_ratio=.15, framestyle=:zerolines, title=L"f(x)=0;\; f(x)=x^3 - 2x - 3; \; 0.5 \leq x \leq 2.5;\;x_{rootPi}=1.8930...", titlefontsize=12, label=L"f(x) = x^3 - 2x - 3")
+	plot(x -> x^3 - 2x - 3, 0.5, 2.5, size=(600, 400),line=:darkblue, xlim=(0.75, 2.5), aspect_ratio=.15, framestyle=:zerolines, title=L"f(x)=0;\; f(x)=x^3 - 2x - 3; \; 0.5 \leq x \leq 2.5;\;x_{root}=1.8930...", titlefontsize=12, label=L"f(x) = x^3 - 2x - 3")
 	plot!([root, root],[-3.5, +3.5], line=(2, :magenta), label=L"{x|f(x) = x^3 - 2x - 3 = 0; \; 0.5 \leq x \leq 2.5}")
 	annotate!(2.25, -0.75, ("root=$root", 10))
 end
@@ -184,7 +184,7 @@ end # function fixedPoint
 
 # ╔═╡ 985fa2b9-1165-4fa2-aa76-b1ec82c22d20
 let fixPoint = round(fixedPoint(cos, 1.0), digits=4)
-	plot(cos, -1.0, 4.0, size=(600, 400), color=:darkblue, xlim=(-1.0, 3.0), ylim=[-1.0, +1.5], aspect_ratio=1.0, framestyle=:zerolines, title=L"f_{fixpoint} (x)=x;\; f(x)=cos(x);\; -1.0 \leq x \leq 4.0;\;x_{fixpoint}=0.7391...", titlefontsize=12, label=L"cos(x)")
+	plot(cos, -1.0, 4.0, size=(600, 400), color=:darkblue, xlim=(-1.0, 3.0), ylim=[-1.0, +1.5], aspect_ratio=1.0, framestyle=:zerolines, title=L"f(x) = x;\; f(x) = cos(x);\;x_{fixpoint} = 0.7391...;\; -1.0 \leq x \leq 4.0", titlefontsize=12, label=L"cos(x)")
 	plot!([fixPoint, fixPoint], [-1, +1], line=(2, :magenta), label=L"\{(x,.)|x=cos(x)\}")
 	plot!([-1, +1], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=cos(y)\}")
 	plot!([-1.0, +1.5], [-1.0, +1.5], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -199,7 +199,7 @@ cos(0.7390822985224023)
 
 # ╔═╡ 029d7a0c-7960-4abf-b5b7-b915cb1ef5a9
 let fixPoint = round(fixedPoint(y->sin(y)+cos(y), 1), digits=4)
-	plot(y->sin(y)+cos(y), -1.0, 3.5, size=(600, 400),line=:darkblue, xlim=(-1.0, 4.0), ylim=(-1.5, 2.5), aspect_ratio=1, framestyle=:zerolines, title=L"f_{fixpoint}(x)=x;\;f(x)=sin(x)+cos(x);\;x_{fixpoint}=1.2587...", titlefontsize=12, label=L"f(x)=sin(x)+cos(x)")
+	plot(y->sin(y)+cos(y), -1.0, 3.5, size=(600, 400),line=:darkblue, xlim=(-1.0, 4.0), ylim=(-1.5, 2.5), aspect_ratio=1, framestyle=:zerolines, title=L"f(x)=x;\;f(x)=sin(x)+cos(x);\;x_{fixpoint}=1.2587...", titlefontsize=12, label=L"f(x)=sin(x)+cos(x)")
 	plot!([fixPoint, fixPoint], [-1.0, +1.5], line=(2, :magenta), label=L"\{(x,.)|x=sin(x)+cos(x)\}")
 	plot!([-1, +1.5], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=sin(y)+cos(y)\}")
 	plot!([-1.0, +2.0], [-1.0, 2.0], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -286,11 +286,17 @@ function mySqrtIter(x)
 	#-------------------------------------
 end # function mySqrtIter
 
+# ╔═╡ 78abf623-12a3-4b00-8ca4-330a64c6806a
+md"
+---
+###### Square-root $\sqrt 2$
+"
+
 # ╔═╡ 26a3c79b-ae77-48c1-bdf9-2285a64705ae
 let (x, average) = (2.0, (x, y) -> (x + y)/2.0)
 	fixPoint = round(fixedPointIter(y -> average(y, x/y), 1.0), digits=4)
 	#--------------------------------------------------------------------------------
-	plot(y->x/y, [0.5:0.1:4.0], size=(600, 400), line=:darkblue, xlim=(-0.5, 4), aspect_ratio=1, framestyle=:zerolines, title=L"sqrt(x) := f_{fixpoint}(x)=\frac{x}{y}=y;\; x_{fixpoint}= 2.0", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
+	plot(y->x/y, [0.5:0.1:4.0], size=(600, 400), line=:darkblue, xlim=(-0.5, 4), aspect_ratio=1, framestyle=:zerolines, title=L"sqrt(2)=x_{fixpoint}=1.4142;\;sqrt(x) := f(x)=\frac{x}{y}=y", titlefontsize=12, label=L"f(x)=\frac{x}{y}") 
 	plot!([fixPoint, fixPoint], [-0.5, +2], line=(2, :magenta), label=L"\{(y,.)|y=x/y\}")
 	plot!([-0.5, +2], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=x/y\}")
 	plot!([-1.0, +2.0], [-1.0, 2.0], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -300,10 +306,16 @@ end
 # ╔═╡ 8d7294bf-842c-454f-8596-f55fade98382
 mySqrtIter(2.0)
 
+# ╔═╡ 3823d311-0876-4cdf-bbf7-f50301df57c6
+md"
+---
+###### Square-root $\sqrt 9$
+"
+
 # ╔═╡ db774e20-74c5-43ed-9ab4-30e9dcf753a7
 let (x, average) = (9.0, (x, y) -> (x + y)/2.0)
 	fixPoint = round(fixedPointIter(y->average(y, x/y), 1.0), digits=4)
-	plot(y->x/y, [0.5:0.1:9.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 9), ylim=(0, 10), aspect_ratio=.5, framestyle=:zerolines, title=L"sqrt(x) := f_{fixpoint}(x) = \frac{x}{y}=y;\;x_{fixpoint}=3", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
+	plot(y->x/y, [0.5:0.1:9.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 9), ylim=(0, 10), aspect_ratio=.5, framestyle=:zerolines, title=L"sqrt(9)=x_{fixpoint}=3.0;\; sqrt(x) := f(x) = \frac{x}{y}=y", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
 	plot!([fixPoint, fixPoint], [-0.5, +4], line=(2, :magenta), label=L"\{(y,.)|y=x/y\}")
 	plot!([-0.5, +4], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=x/y\}")
 	plot!([-1.0, 5.0], [-1.0, 5.0], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -346,7 +358,7 @@ end # function mySqrtIter2
 # ╔═╡ 9f84cab6-8f92-459f-96f9-854187875eea
 let (x, average) = (2.0, (x, y) -> (x + y)/2.0)
 	fixPoint = round(fixedPointIter2(y->average(y, x/y), 1.0), digits=4)
-	plot(y->x/y, [0.5:0.1:4.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 4), ylim=(-1, 4.0), aspect_ratio=0.75, framestyle=:zerolines, title=L"sqrt(x) := f_{fixpoint}(x) = \frac{x}{y}=y;\;x_{fixpoint}=3", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
+	plot(y->x/y, [0.5:0.1:4.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 4), ylim=(-1, 4.0), aspect_ratio=0.75, framestyle=:zerolines, title=L"sqrt(2)=x_{fixpoint}=1.4142;\;sqrt(x) := f(x) = \frac{x}{y}=y", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
 	plot!([fixPoint, fixPoint], [-0.5, +2], line=(2, :magenta), label=L"\{(y,.)|y=x/y\}")
 	plot!([-0.5, +2], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=x/y\}")
 	plot!([-1.0, 5.0], [-1.0, 5.0], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -359,7 +371,7 @@ mySqrtIter2(2.0)
 # ╔═╡ 04742e94-35a9-4744-83a4-396a85f9bf6a
 let (x, average) = (9.0, (x, y) -> (x + y)/2.0)
 	fixPoint = round(fixedPointIter2(y->average(y, x/y), 1.0), digits=4)
-	plot(y->x/y, [0.5:0.1:6.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 6), ylim=(-1, 6), aspect_ratio=0.75, framestyle=:zerolines, title=L"sqrt(x):= f_{fixpoint}(x) = \frac{x}{y}=y;\;x_{fixpoint}=3", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
+	plot(y->x/y, [0.5:0.1:6.0], size=(600, 400),line=:darkblue, xlim=(-0.5, 6), ylim=(-1, 6), aspect_ratio=0.75, framestyle=:zerolines, title=L"sqrt(9)=x_{fixpoint}=3.0;\; sqrt(x):= f(x) = \frac{x}{y}=y", titlefontsize=12, label=L"f(x)=\frac{x}{y}")
 	plot!([fixPoint, fixPoint], [-0.5, 3.5], line=(2, :magenta), label=L"\{(y,.)|y=x/y\}")
 	plot!([-0.5, 3.5], [fixPoint, fixPoint], line=(2, :magenta), label=L"\{(.,y)|y=x/y\}")
 	plot!([-1.0, 5.0], [-1.0, 5.0], line=(1, :cornflowerblue), label=L"x=f(x)")
@@ -399,10 +411,8 @@ We defined the $√$-function both as a *root*- and a *fixpoint*-searching metho
 md"
 ---
 ##### 6. References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2025/04/03
-
-- **Abelson, H., Sussman, G.J. & Sussman, J.**, Structure and Interpretation of Computer Programs, Cambridge, Mass.: MIT Press, (2/e), 1996, [https://sarabander.github.io/sicp/](https://sarabander.github.io/sicp/), last visit 2025/04/03
-
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2025/04/05
+- **Abelson, H., Sussman, G.J. & Sussman, J.**, [*Structure and Interpretation of Computer Programs*](https://sarabander.github.io/sicp/), Cambridge, Mass.: MIT Press, (2/e), 1996, Unofficial Texinfo Format 2.andresraba6.6 (September 16, 2015), based on 2.neilvandyke4 (January 10, 2007); last visit 2025/04/05
 
 "
 
@@ -1876,8 +1886,10 @@ version = "1.4.1+2"
 # ╠═50c5ed96-22ad-4a09-be21-9ea23946fb78
 # ╠═8ba154a1-f3f2-4427-a5dc-c357fb8ed079
 # ╠═2f0df9c1-462d-49fe-b79f-58da37db1d4b
+# ╟─78abf623-12a3-4b00-8ca4-330a64c6806a
 # ╟─26a3c79b-ae77-48c1-bdf9-2285a64705ae
 # ╠═8d7294bf-842c-454f-8596-f55fade98382
+# ╟─3823d311-0876-4cdf-bbf7-f50301df57c6
 # ╟─db774e20-74c5-43ed-9ab4-30e9dcf753a7
 # ╠═4830e8f0-7290-4ad2-9734-f6ee8a301c3b
 # ╠═10ea6db7-f046-43a2-8dc5-17fd3577eef1
