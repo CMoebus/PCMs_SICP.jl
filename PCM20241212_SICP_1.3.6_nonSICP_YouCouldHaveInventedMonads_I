@@ -1,0 +1,2840 @@
+### A Pluto.jl notebook ###
+# v0.20.0
+
+using Markdown
+using InteractiveUtils
+
+# ╔═╡ f7e8cdaf-e980-4ff5-bea7-3d573d5d84e3
+begin 
+	using Pluto
+	using Plots	
+	using LaTeXStrings, Latexify
+	using GraphRecipes
+	#----------------------------------------------------------------
+	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
+	println("pkgversion(Plots)         = ", pkgversion(Plots))
+	println("pkgversion(Latexify)      = ", pkgversion(Latexify))
+	println("pkgversion(GraphRecipes)  = ", pkgversion(GraphRecipes))
+end # begin
+
+# ╔═╡ 3c117110-b882-11ef-3be5-f5de5979efa9
+md"
+===================================================================================
+#### SICP: 1.3.6 nonSICP: [You Could Have Invented Monads I](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) !
+##### file: PCM20241212\_SICP\_1.3.6\_nonSICP\_YouCouldHaveInventedMonads\_I
+##### Julia/Pluto.jl-code (1.10.1/0.20.5) by PCM  **** 2025/04/17 ****
+
+==================================================================================
+"
+
+# ╔═╡ e5abf66b-1e47-42e2-8792-b71eb2d7634c
+md"
+##### 0. Introduction
+[Piponi (2006, 2024)](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) wrote a tutorial about *monads* in *Haskell*. The tutorial had the title '*You Could Have Invented Monads (And Maybe You Already Have)*'. [*Monads*](https://en.wikipedia.org/wiki/Monad_(functional_programming)) are a hard-to-understand concept in *functional* languages like e.g. *Haskell*. They deal with the *chaining of effects* in a *pure* functional context. 
+
+This chapter has two goals. First, we want to deal with *higher-order* functions by transpiling Haskell code into Julia. Second, we want to study, whether *monads* are really necessary in Julia with its *multiple-dispatch* competence.
+
+It is recommended to follow [Piponi's (2024) *original* tutorial](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) and our *transpilation* and *creation* parallel step-by-step. 
+"
+
+# ╔═╡ 564b5a6f-a20d-45e4-8414-659449f8cf3f
+md"
+---
+##### 1. Topics
+
+- *Union* of types (e.g. $Float = Union\{Float32, Float64\}$)
+- *Parametrized* types (e.g. $Tuple\{Float, String\}$)
+- *UML-activity* diagram
+- *Dataflow* diagram
+- *Sequence* of effects in a *pure* functional language
+- *Multiple dispatch* and *composition* $\circ$
+- *Multiple dispatch* and *pipelining* $\textit{ |> }$
+- *Lifting* of *input* and *output* types
+- *unit* of *composition*
+- *monad* 
+"
+
+# ╔═╡ ec45bd94-23b6-4993-bcec-64492cb499a3
+md"
+---
+##### 2. Libraries
+"
+
+# ╔═╡ f5d52640-17af-4860-b533-3b40fcca5580
+md"
+---
+##### 3. You Could Have Invented Monads within Julia
+
+##### 3.1 *Pure* Functions $f, g$
+
+For the following we assume *pure* functions.
+
+$f,g :: Float \rightarrow Float$
+
+$\;$
+
+$f: x \mapsto f(x)$
+
+$\;$
+
+$g: x \mapsto g(x)$
+
+$\;$
+
+In a *pure* functional language (e.g. Haskell) you might have two functions $f, g$ with *types* $Float \rightarrow Float$ (**Fig.1.3.6.1**). 
+
+$\;$
+
+"
+
+# ╔═╡ 8ac9dd19-ae83-469f-a98f-4a13a05a4262
+md"
+
+                                     +-----+    
+                        x::Float --> |  f  | --> f(x)::Float
+                                     +-----+
+
+                                     +-----+    
+                        x::Float --> |  g  | --> g(x)::Float
+                                     +-----+
+
+
+**Fig. 1.3.6.1** Input-Output-Dataflow-(≈ UML-Activity)-Diagram of Functions $f, g$
+
+$\;$
+
+"
+
+# ╔═╡ 12850bc8-98ea-4cc3-9a3f-442232d17e62
+md"
+---
+###### 3.1.1 *Functional* Julia Code of $f, g$
+
+These functions can be coded in Julia as *pure* functions, too.
+
+"
+
+# ╔═╡ daf3ce8b-3001-44de-8c42-7a211fa72fb3
+Float = Union{Float32, Float64}
+
+# ╔═╡ 41e3ce0e-abf8-4560-87bd-edf13c660681
+Float <: Real
+
+# ╔═╡ 67b7c688-4f24-4696-9eb8-ff415512da92
+f(x::Float)::Float = (2.0 * x)                       # example function f
+
+# ╔═╡ b871f9d1-658d-4e23-b312-e9d7ad1b9b53
+f(3.0)
+
+# ╔═╡ 8c703fd7-9f17-4c60-aa15-08db74284a0e
+g(x::Float)::Float = (x + 4.0)                       # example function g
+
+# ╔═╡ 39f27f02-e20a-4f6d-92e5-589b1a8256ab
+g(3.0)
+
+# ╔═╡ c6b31e7a-5121-4b62-9b3f-4b7979c15cdc
+md"
+---
+###### 3.1.2 Composition of $f$ and $g$
+Both functions $f, g$ are *composable*.
+"
+
+# ╔═╡ 2cf460e0-3e35-4611-bc1e-dae85af1c1ac
+g(f(4.0))
+
+# ╔═╡ d9e59902-0739-499d-a25c-dc38614ee4f8
+f(g(4.0))
+
+# ╔═╡ 174c5e5c-580d-4a53-9ada-d25ba3b717da
+ ∘(g, f)(4.0)                        # prefix ∘ 
+
+# ╔═╡ 49088e70-9c9e-4225-b170-0678a9ff1099
+∘(f, g)(4.0)                         # prefix ∘ 
+
+# ╔═╡ 26eff19d-9c03-45a9-8698-bae79a001a64
+(g ∘ f)(4.0)                         # infix ∘ 
+
+# ╔═╡ 28c45d84-eb7d-405b-a5c8-5634b1d1cbc7
+(f ∘ g)(4.0)                         # infix ∘ 
+
+# ╔═╡ d4bd5009-fd71-4614-8c2a-87f2ab3f53ba
+md"
+---
+###### 3.1.3 Piping of $f$ and $g$
+Both functions $f, g$ are *pipable*.
+"
+
+# ╔═╡ 250c5df1-5b00-45eb-b599-b42e810b931f
+4.0 |> f |> g
+
+# ╔═╡ f26f7ca3-d769-4de1-ac6e-1e837c21481a
+4.0 |> g |> f
+
+# ╔═╡ 6e2322aa-3223-4305-a1b9-80ca7e75f145
+md"
+---
+##### 3.2 *Pure* but *Lifted* (=Output-*Augmented*) Functions $f', g'$
+(Pisoni, 2024, p.3: '*debuggable*' functions)
+
+We want to *trace* the computation process in a *pure functional* context. So we have to *chain* trace information of each *function application* into a *sequence* of strings. The sequence of strings is concatenated into a *single* string which documents the *total* computational process.
+
+Pisoni propses '*debuggability*' of functions as his main goal for dealing with *monads*. We think that 'tracability' is a more modest goal.
+
+*How can we modify the types of $f$ and $g$ to admit side-effects ? Well there really isn't any choice at all. If we'd like $f'$ and $g'$ to produce strings as well as floating point numbers as output, then the only possible way is for these strings to be returned alongside the floating point numbers.*(Pisoni, 2024, p.3):
+
+- origininal *non*augmented output types
+
+$f :: Float \rightarrow Float$
+
+$\;$
+
+$g :: Float \rightarrow Float$
+
+$\;$
+
+- '*lifted*' (Pisoni, 2024, p.3: '*upgraded*', '*debuggable*', '*traceable*') output types
+
+$f' :: Float \rightarrow Tuple\{Float, String\}$
+
+$\;$
+
+$g' :: Float \rightarrow Tuple\{Float, String\}$
+
+$\;$
+
+Unfortunately the functions $f',g'$ have *lost* their *composability* and *pipability* because input and output types *don't* match any longer.
+
+"
+
+# ╔═╡ 9ab4e5f1-0afe-4bb6-8d42-3f5d36897162
+md"""
+---
+###### 3.2.1 *Functional* Julia Code for *Lifted* $f', g'$
+We graph the two '*lifted*' functions $f', g'$ as input-output-(IO)-dataflow-diagrams (a kind of simplified [*UML-activity*](https://www.uml-diagrams.org/activity-diagrams.html) diagrams) in **Fig. 1.3.6.2**.
+
+                                +-------------------+
+                                |                   |
+                                |  +-----+          |
+                    x::Float -->|->|  f  |->f(x)    | 
+                                |  +-----+   |      |                
+                                |            v      |
+                                |     f' -> (.,.) ->|-> (f(x)::Float, f'(s)::String)
+                                |              ^    |
+                                |              |    |
+                                |            "..."  |
+                                +-------------------+
+
+                                +-------------------+
+                                |                   |
+                                |  +-----+          |
+                    x::Float -->|->|  g  |->g(x)    |
+                                |  +-----+   |      |
+                                |            v      |
+                                |     g' -> (.,.) ->|-> (g(x)::Float, g'(s)::String)
+                                |              ^    |
+                                |              |    |
+                                |            "..."  |
+                                +-------------------+  
+                                                                           
+
+**Fig. 1.3.6.2** IO-(≈ UML-Activity)-Diagram of '*lifted*' functions $f', g'$
+
+$\;$
+
+"""
+
+# ╔═╡ d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
+# first method of fSimplePrime with (pseudo) side-effect augmented
+function fSimplePrime(x::Float)::Tuple{Float, String} 
+	fx = f(x)
+	(fx, " f'($x) = $fx ->;") 
+end # function fSimplePrime
+
+# ╔═╡ 05aff438-e201-450a-baf4-127edf8204eb
+fSimpleP = fSimplePrime
+
+# ╔═╡ 97edee73-6922-4dd1-bed4-d8f60c299c9f
+# first method gSimplePrime of g with (pseudo) side-effect augmented
+function gSimplePrime(x::Float)::Tuple{Float, String}
+	gx = g(x)
+	(gx, " g'($x) = $gx ->;")
+end # function gSimplePrime
+
+# ╔═╡ 0345cf4f-f708-4cc5-bc14-6f755bb50bda
+gSimpleP = gSimplePrime
+
+# ╔═╡ 9fe7f07c-7126-4adc-a782-b8bb08157b18
+gSimpleP(3.0)                  
+
+# ╔═╡ 8ff6ec09-f644-455d-9f66-30517a84c4f5
+fSimpleP(3.0)                              
+
+# ╔═╡ 890c07be-20ca-4c28-854f-932ba6d199a3
+typeof(gSimpleP(3.0))                      # output type Tuple --> :)
+
+# ╔═╡ 0b12912f-1556-4971-aa5c-90ef4c313cc9
+Tuple{Float64, String} <: Tuple{Float, String} # ==> true --> :)
+
+# ╔═╡ a117e9c2-04ec-4ed3-abde-181a8b2267c0
+md"
+---
+###### 3.2.2 *Non*-Composability of $f'$ and $g'$
+The functions $f',g'$ have *lost* their *composability* and *pipability* because input and output types *don't* match.
+"
+
+# ╔═╡ 3df545ea-8b47-4433-a342-3f355014c3a4
+try 
+	gSimpleP(fSimpleP(4.0))
+catch
+	@warn "composition of f' and g' is not possible"
+end
+
+# ╔═╡ cab30966-f397-4667-b141-cb9d4e4203f8
+md"
+---
+###### 3.2.3 *Non*-Pipability of $f$ and $g$
+The functions $f',g'$ *can't* be put into a *pipe* because input and output types *don't* match any longer.
+"
+
+# ╔═╡ ad67889e-c235-4787-b740-692a2440cb2d
+try 
+	4.0 |> fSimpleP |> gSimpleP
+catch
+	@warn "piping of f' and g' is not possible"
+end
+
+# ╔═╡ 0d30ad40-3929-43da-8c50-b994162e8958
+md"
+---
+##### 3.3 *Hand-coded* Composition of $f'$ and $g'$
+
+The functions $f',g'$ have lost their *composability* and *pipability*, though it is possible to achieve compositions by some kind of *hand-coded* $let$-*expression*.
+
+###### 3.3.1  Haskell Code Fragment of $let$
+(Piponi, 2024, 3):
+
+    let (y, s) = g' x 
+        (z, t) = f' y  
+        in (z, s ++ t)
+
+"
+
+# ╔═╡ 0ab63fb7-2514-415c-bbf1-62e8492ca2e7
+md"
+###### 3.3.2 *Functional* Julia Code Fragment of $let$
+
+In the Haskell code *variable* names are written in a short *mathematical* style. For documentary purposes we used longer self-explaining words in [*camelCase*](https://en.wikipedia.org/wiki/Camel_case) style.
+"
+
+# ╔═╡ 90c9a816-aad8-4d9a-a88f-1a75392d6484
+begin
+	x  = 3.0
+	let   (++) = *                          # mimicking Haskell's '++' by Julia's '*'
+		(y, s) = gSimpleP(x)
+		(z, t) = fSimpleP(y)
+		(z, s ++ t)
+	end # let
+end # begin
+
+# ╔═╡ bcc003fd-b3cf-4987-bd27-49b330ae7a10
+md"""
+We graph the $let$-*enabled composition* of the two functions $f', g'$ as input-output-(IO)-dataflow-diagrams (a kind of simplified [*UML-activity*](https://www.uml-diagrams.org/activity-diagrams.html) diagrams) in **Fig. 1.3.6.3**.
+
+                            +-------------------+
+                            |                   |
+                            |  +-----+          |
+        x::Float -->--->--->|->|  g  |->g(x)    | 
+                            |  +-----+   |      |                
+                            |            v      |
+                            |     g' -> (.,.) ->|-> (y::Float, s::String)
+                            |              ^    |      |          |
+                            |              |    |      v          v
+                            |            "..."  |      |          |
+                            +-------------------+      v          v  
+                                                       |          |
+                   +-----<-----<------<------<-----<---+          v
+                   |                                           +--+--+
+                   v        +-------------------+              |  *  |---> s*t      
+                   |        |                   |              +--+--+      |
+                   v        |  +-----+          |                 ^         v
+                y::Float -->|->|  f  |->f(y)    |                 |         |
+                            |  +-----+   |      |                 ^         v
+                            |            v      |                 |         |
+                            |     f' -> (.,.) ->|-> (z::Float, t::String)   v
+                            |              ^    |      |                    |
+                            |              |    |      v                    v
+                            |            "..."  |      |                    |
+                            +-------------------+      v                    v
+                                                       +----+          +----+
+                                                            |          |
+                                                            v          v
+                                                         (z::Float,s*t::String)
+
+                                                                        
+
+**Fig. 1.3.6.3** IO-(≈ UML-Activity)-Diagram of Hand-coded Function Composition $f', g'$
+
+"""
+
+# ╔═╡ 29e41f16-ace3-418c-b714-5bb53b1481cd
+md"
+---
+##### 3.4 Piponi's *Upgrading* Function $bind\ f'$ could be replaced by Julia's *Multiple Dispatch*
+
+Piponi (2024, p.4) admits that ordinary (Haskell) composition $f'.\ g'$ fails, because $g'$s *output* type $Tuple\{Float, String\}$ *doesn't* match $f'$s *input* type $Float$ and vice versa. 
+
+So he recommends a *lifting* (= '*upgrading*') function $bind$ which has to be applied to $f'$ or $g'$ so that the *lifted* (= '*upgraded*') input type of the *successor* function $g''$ *matches* the output type of the *predessor* $f''$ in the composition or pipe. After '*lifting*' input and output types of $f''$ and $g''$ are *identical*.
+
+We want to demonstrate that $bind$ is in fact *not* necessary because of Julia's *multiple dispatch* capability. We define for *each* function $f, g$ two additional *methods* $fPrime$ and $gPrime)$. These four methods have *internal* designations $f', f''$ and $g', g''$. 
+
+The first method pair $f', g'$ has the *simple* input type $Float$, whereas the second method pair $f'', g''$ accepts only the *lifted*(= '*upgraded*', compound) inputs with type $Tuple\{Float, String\}$.
+
+Because the *2nd* method pair $f'', g''$ has *identical* input and output types Julia's *ordinary* *composition* $\circ(.,.)$, $(.∘.)$ and *piping* $\textit{ |> }$ operators have *no* problems.
+
+"
+
+# ╔═╡ 410a8fa1-b0df-44a9-b38e-d8ab548db0b5
+md"
+---
+###### 3.4.1 Julia Code of Function's $f$ *Methods* $f', f''$ 
+Both methods $f', f''$ bear the same name $fPrime$. They can be distinguished by their different intput types. Both *methods* use the *original* function $f$.
+
+"
+
+# ╔═╡ d4cfe695-216e-494d-b3dd-7a5fce5ecf0e
+# 1st method f' of function f
+function fPrime(x::Float)::Tuple{Float, String}
+	fx = f(x)
+	(fx, " f'($x) = $fx ->;")                         # (f(x) and trace information)
+end # function fPrime
+
+# ╔═╡ 4f1a1d63-7249-478a-b970-a05b1949e4a0
+# 2nd method f'' of function f
+function fPrime(tuple::Tuple{Float, String})
+	(gx::Float, gPrime_s::String) = tuple             # destructuring of arg tuple
+	fgx = f(gx)
+	# (fx) and concatenated trace information)
+	(fgx, gPrime_s * " f''($gx) = $fgx ->; ") 
+end # function fPrime
+
+# ╔═╡ 6cc9631a-450c-42c1-9fb1-9d4ae34358b1
+fP = fPrime                                           # abbreviation fo function name
+
+# ╔═╡ 185f027c-a385-411c-9280-b9cf8094f6fd
+methods(fP)
+
+# ╔═╡ 2f262ce4-952c-4692-96c4-12fb87d20c7b
+md"
+---
+###### 3.4.2 *Functional* Julia Code of Methods $g', g''$
+Both methods $g', g''$ bear the same name $gPrime$. They can be distguished by their different intput types. Both *methods* use the *original* function $g$.
+
+"
+
+# ╔═╡ cad46c85-a203-4627-9812-090b04bf539d
+# 1st method g' of function g
+function gPrime(x::Float)::Tuple{Float, String}
+	gx = g(x)
+	(gx, " g'($x) = $gx ->;")                         # (g(x) and trace information)
+end # function fPrime
+
+# ╔═╡ 5e818c58-4cd0-42c6-9d2e-d12bdcee6b78
+# 2nd method g'' of function g
+function gPrime(tuple::Tuple{Float, String})
+	(x::Float, gPrime_s::String) = tuple              # destructuring of arg
+	gx = g(x)
+	# (gx) and concatenated trace information)
+	(gx, gPrime_s * " g''($x) = $gx ->; ")
+end # function fPrime
+
+# ╔═╡ f3fcc037-597e-4013-8723-c30a560fa1a0
+gP = gPrime                                           # abbreviation fo function name
+
+# ╔═╡ 5497de72-01af-44b1-bfb4-192f9d41f989
+methods(gP)
+
+# ╔═╡ a7554035-02fc-4a52-a306-bd0e1c06bcc4
+md"
+---
+###### 3.4.3 *Cross*-Methods Dispatch 
+*Cross*-method means that the *1st* method *lifts* the argument from type $Float$ to type $Tuple(Float, String)$ and the *2nd* method maps $Tuple(Float, String)$ to $Tuple(Float, String)$:
+
+- application of method $f'$ is followed by application of $g''$ or
+- application of method $g'$ is followed by application of $f''$
+"
+
+# ╔═╡ 78cd7e76-c69a-422c-bb92-91034c74f9f3
+md"
+###### 3.4.3.1 Applications
+"
+
+# ╔═╡ 4ebfa831-e7b5-48e1-8bad-e7e6bd0a5675
+gP(fP(3.0))
+
+# ╔═╡ 839fb2f1-1432-4b0d-8078-440ae8c21f4d
+gP(gP(3.0))
+
+# ╔═╡ c5757b28-e590-4497-a575-24c46717f322
+fP(fP(3.0))
+
+# ╔═╡ 426a48da-081a-4150-bf4c-de5381e41d78
+fP(gP(3.0))
+
+# ╔═╡ e85378e9-19fa-4081-ac86-eb8ab7bd7289
+md"
+###### 3.4.3.2 Compositions
+"
+
+# ╔═╡ 8fcaec6a-3cc6-40f9-bc48-b57867667151
+(gP ∘ fP)(3.0)                                    # infix ∘
+
+# ╔═╡ 2166f2d1-3cdb-4c69-bb4e-76ec47509408
+(gP ∘ gP)(3.0)
+
+# ╔═╡ 81026795-4e94-44c0-9409-afc9db75a4e3
+(fP ∘ fP)(3.0)
+
+# ╔═╡ 0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
+(fP ∘ gP)(3.0)                                     # infix ∘
+
+# ╔═╡ 6f2db889-1f9e-4592-a804-a31c1128a8af
+md"
+###### 3.4.3.3 Pipes
+"
+
+# ╔═╡ 9ae4e28d-3e66-46ca-aa9e-0bf272b3a26f
+3.0 |> fP |> gP
+
+# ╔═╡ 470beae4-8bde-40df-bb40-8120452b0e5c
+3.0 |> gP |> gP
+
+# ╔═╡ 9b9e3ce1-d8e2-4617-a2ef-4b80b0dafa1a
+3.0 |> fP |> fP
+
+# ╔═╡ 5a4ac136-9857-4b20-bccb-08485f3ff654
+3.0 |> gP |> fP
+
+# ╔═╡ 1f886457-5566-4939-b7b5-c99a52698b43
+md"
+---
+###### 3.4.4 '*Equal 2nd-Methods*' Dispatch 
+'*Equal 2nd-methods*' dispatch means that only *2nd* methods with *Tuple*-type arguments are used in *predecessor* and *successor* functions. 
+
+Because the composition expects as an argument a *Tuple* we have to code $((...))$. The outer pair $(...)$ is denoting *argument*s and inner pair $(...)$ denoting *tuple*s.
+"
+
+# ╔═╡ bb36bc88-dc62-411f-b91b-6bd430e42271
+gP(fP((3.0, "")))
+
+# ╔═╡ 11a0d14e-f880-4903-9553-4b877766795a
+fP(gP((3.0, "")))
+
+# ╔═╡ 92ac4efa-ad2d-4647-b6f4-97648484722f
+(gP ∘ fP)((3.0, ""))                               # infix ∘
+
+# ╔═╡ d828c0e0-c471-411c-80da-b253f1632229
+(fP ∘ gP)((3.0, ""))                               # infix ∘
+
+# ╔═╡ 8238b505-0913-4866-bcd4-3113abd667ea
+md"
+---
+###### 3.4.5 *Cross*-Method Piping
+*Cross*-method *piping* means that the *1st* method *lifts* the argument from type $Float$ to type $Tuple$ and the *2nd* method maps $Tuple$ to $Tuple$:
+"
+
+# ╔═╡ 2d4f3047-1fa9-41c4-abc6-24d964c94700
+3.0 |> gP |> fP       
+
+# ╔═╡ 9722edc0-7b8c-4279-ad45-2e25d255dd48
+3.0 |> fP |> gP      
+
+# ╔═╡ 1b85ab8e-dff5-446e-bb0a-ac987bc038d8
+md"
+###### 3.4.6 '*Equal 2nd-Methods*' Piping
+'*Equal 2nd-Methods*' piping means that only *2nd* methods with *Tuple*-type arguments are used in *predecessor* and *successor* functions. 
+"
+
+# ╔═╡ ee587d45-84e6-4f67-a6ae-226488b996e1
+(3.0, "") |> fP |> gP
+
+# ╔═╡ b019a9cf-308a-4ba9-8993-5b7785834abb
+(3.0, "") |> gP |> fP    
+
+# ╔═╡ 12c508d9-d583-4919-a41a-4cd0d8b3c29d
+md"
+---
+##### 3.5 *Higher-Order* Function $bind$
+Julia's *multiple dispatch* makes *lifting* (= '*upgrading*') of $f'$ and $g'$ (in principle) *obselete* when we provide methods $f',f''$ and $g',g''$ to each of the conceptual functions $f, g$. 
+
+The hand-coding of $f''$ and $g''$ can be replaced by the *higher-order* function $bind$.
+
+Piponi (2024, p.4) proposes as a solution for $bind$ which *lifts* (= '*upgrades*') $f', g'$ with input type $Float$ to $f'', g''$ with input type $Tuple\{Float, String\}$:
+
+$bind: \ f' \rightarrow f''$
+$bind: \ g' \rightarrow g''$
+
+$\;$
+
+"
+
+# ╔═╡ 6bb496ba-837a-4410-b378-8691075b1765
+md"
+
+This *implies* that $bind$ takes a function $f'$ or $g'$ and *lifts it* to a new function which (in our terminology) is $f''$ or $g''$:
+
+$bind: f' \mapsto f''$
+
+$bind: g' \mapsto g''$
+
+$\;$
+
+$bind :: (Float \rightarrow (Float, String)) \mapsto ((Float, String) \rightarrow (Float, String)).$
+
+$\;$
+
+"
+
+# ╔═╡ 5ef13808-55c4-4fc5-b31c-c90c222d6dae
+md"
+---
+##### 3.5.1 Exercise 1: 
+*Write the function* $bind$ (Piponi, 2024, p.4)
+
+###### 3.5.2 Haskell Code of $bind$
+Solution 1: 
+
+$bind\ f'\ (gx, gs) = let\ (fx, fs) = f'\ gx$
+$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; in\  (fx, gs\ \text{ ++ }\ fs)$
+
+$\;$
+"
+
+# ╔═╡ aa578002-06a1-4ad3-b981-50fa379f798e
+md"
+---
+###### 3.5.1 *Functional* Julia Code of $bind$
+
+The *transpilation* of Piponi's Haskell code follows here (s.a.: **Fig. 1.3.6.4**):
+"
+
+# ╔═╡ 4e868cb6-2aab-40b0-8e5e-02a9f2473cca
+md"            
+                                       f'         
+                                        |          
+                                        v          
+                            +------------------------+
+                            |       bind(f')         |
+                            +------------------------+
+                                        |
+                                        v
+               +--------------------------------------------------------+  
+               |                    f''(.,.)                            |  
+               |                                                        |
+               |                         +----------------+             |  
+               |                         |                |             |  
+               |                         |  +---+         |             |  
+               |                  +----->|->| f |->fgx    |             |  
+               |                  ^      |  +---+   |     |             |  
+               |                  |      |          v     |             |  
+       (.,.)-->|--------------->(gx,g's) |    f'-->(.,.)->|->(fgx, f't) |  
+               |                     |   |            ^   |    |    |   |
+               |                     v   |            |   |    v    v   |
+               |                     |   |            o   |    |    |   |    
+               |                     v   +----------------+    v    v   |  
+               |                     |                         |    |   |  
+               |                     v                         v    v   |  
+               |                     |                        (., .*.)->|->(fgx,g's*f't)                        
+               |                     v                            ^     |  
+               |                     |                            |     |  
+               |                     +------>------>------>------>+     |   
+               |                                                        |  
+               +--------------------------------------------------------+  
+
+
+**Fig. 1.3.6.4**: IO-(≈ UML-Activity)-Diagram of *Functor* (= *higher order* function) $bind$
+		   
+"
+
+# ╔═╡ 212d9d18-0349-47eb-95ec-c042efb9886b
+function bind(fP::Function)::Function 
+	# the lifted f'' is returned as an anonymous function 
+	#     with augmented input argument
+	(gTuple::Tuple{Float, String}) ->                  # signature of generated f''
+		let # destructuring of argument tuple in its components
+			(gx::Float, gP_s::String) = gTuple::Tuple{Float, String}
+			# application of f'(gx) which is in Haskell f' gx
+			(fgx, fP_t) = fP(gx::Float)::Tuple{Float, String} # application of f'
+			# construction of output tuple: (fx, gs ++ fs)
+			(fgx, gP_s * fP_t)::Tuple{Float, String}
+		end::Tuple{Float, String}   # end let
+end # function bind(fP) 
+
+# ╔═╡ c5d2f151-06dd-4d4c-a736-417a58d25eac
+md"
+---
+###### 3.5.2 *Lifting* of $f'$ and $\ g' by:\ bind(f') = f''$ and $bind(g') = g''$
+Piponi (2024, p.5) proposes a *new* (short hand) composition operator $'*'$:
+
+$f'\ *\ g' = bind\ f'\ .\ g'$
+
+$\;$
+
+This is in our (Julia inspired) terminology
+
+$f''∘\ g' = bind(f')\ \circ\ g'.$
+
+$\;$ 
+ 
+"
+
+# ╔═╡ 8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
+bind(fP)::Function                           # bind(f') ==> f''
+
+# ╔═╡ dc0d1133-d8d2-4679-b80a-cebab73f91ea
+bind(fP)((3.0, ""))                          # f''((3.0, ""))
+
+# ╔═╡ af0bc2ac-bb42-4c79-90f6-8c08e1a2c58b
+bind(gP)                                     # bind(g') ==> g''
+
+# ╔═╡ 2a6a31d8-a78a-42f4-af67-e841ca4fe9b6
+bind(gP)((3.0, ""))                          # g''((3.0, ""))
+
+# ╔═╡ dd94e758-5608-44bd-add7-adb7d4563838
+md"
+*Given a pair of debuggable* ('traceable') *functions $f'$ and $g'$, we can now compose them together to make a new debuggable* ('traceable') *function* $bind\ f'\ .\ \ g'.$ (Piponi, 2024, p.5)
+"
+
+# ╔═╡ af0892c1-b751-473a-8268-618f81d16f4c
+md"
+###### 3.5.2.1 Applications
+"
+
+# ╔═╡ ea2c7ffb-27e1-45f7-9212-2b722f4c3080
+bind(fP), bind(gP)                           # f'', g''
+
+# ╔═╡ 66c16d3c-7d2e-4742-90ea-570e730fcf75
+fPP::Function =                              # f'' = bind(f')
+	bind(fP)::Function 
+
+# ╔═╡ 879d969e-bf9d-42b9-b454-a4d646736e6c
+bind(fP)(gP(3.0))                            # f''(g'(3.0))
+
+# ╔═╡ e93574ad-93f1-4e87-870f-234737f6f499
+fPP(gP(3.0))                                 # f''(g'(3.0))
+
+# ╔═╡ 0efd51c1-5c30-41af-86b7-10f8e5f37b97
+md"
+###### 3.5.2.2 Compositions
+Piponi's $f' *\ g' = bind\ f'.\ g'$ (Piponi, 2024, p.5) is equal to our $f''(g'(.))$, $(f''∘\ g')(.)$ or $. \text{ |> } g' \text{ |> } f''$
+"
+
+# ╔═╡ ce6d7a20-5d29-47c9-8f08-2b0527c49832
+bind(fP) ∘ gP                                # f'' ∘ g'
+
+# ╔═╡ 48b854ee-b4d2-4243-93a2-bb40e10591dd
+bind(fP ∘ gP)((5.0, ""))                     # (f'' \circ g')((5.0, ""))
+
+# ╔═╡ caf866c6-8ff3-442b-bce6-12ef251a04b0
+(bind(fP) ∘ gP)(3.0)                         # (f'' \circ g')(3.0)
+
+# ╔═╡ cce4b0f2-e46b-4021-883e-6668926a48be
+(bind(fP) ∘ bind(gP))((5.0, ""))             # (f'' ∘ g'')((5.0, ""))
+
+# ╔═╡ f1838720-e721-4cfc-89ce-2323492965b4
+(fPP ∘ gP)(3.0)                              # (f'' \circ g')(3.0)
+
+# ╔═╡ 6a650856-fa36-4bc7-b1a7-25edbd5dae1c
+md"
+###### 3.5.2.3 Pipes
+"
+
+# ╔═╡ 80522206-84a9-4722-9c25-765c60276fee
+3.0 |> gP |> bind(fP)                        # 3.0 |> g' |> f''
+
+# ╔═╡ e6c02312-8fa8-4629-ab00-c4d6c91afa1e
+3.0 |> gP |> fPP                             # 3.0 |> g' |> f''
+
+# ╔═╡ 759bb009-c878-48bb-8378-6d5dc3fb3001
+md"
+---
+##### 3.6 Insert: *Higher-Order* Function $myCompose$
+
+We implemented the Haskell $bind$ in Julia. Now, we define a *higher-order* function $myCompose$ which composes the *unlifted* functions $f', g'$. We demonstrate that $myComposes$ succeeds in composing $f', g'$ despite the fact that the *output* type of $g'$ is *augmented* and the *input* type of $f'$ is *not*. By coding $myCompose$ we ignore the fact that it is in principle superfluous as we demonstrated above with Julia's *multiple dispatch* and $bind(f')$. The result of $myCompose(f', g') \mapsto fg'$ is displayed in **Fig. 1.3.6.5**.
+
+$\;$
+
+"
+
+# ╔═╡ 6392590c-642d-4c81-9b29-9b9ff689a392
+md"            
+                                   f'         g'
+                                   |          |
+                                   v          v
+                            +------------------------+
+                            |   myCompose(f', g')    |
+                            +------------------------+
+                                        |
+                                        v
+         +--------------------------------------------------------------+  
+         |                           fg'(x)                             |  
+         |                                                              |
+         |  +----------------+           +----------------+             |  
+         |  |                |           |                |             |  
+         |  |  +---+         |           |  +---+         |             |  
+    x -->|->|->| g |-->gx    |    +----->|->| f |->fgx    |             |  
+         |  |  +---+   |     |    ^      |  +---+   |     |             |  
+         |  |          v     |    |      |          v     |             |  
+         |  |    g'-->(.,.)->|->(gx,g's) |    f'-->(.,.)->|->(fgx, f't) |  
+         |  |            ^   |       |   |            ^   |    |    |   |
+         |  |            |   |       v   |            |   |    v    v   |
+         |  |            o   |       |   |            o   |    |    |   |    
+         |  +----------------+       v   +----------------+    v    v   |  
+         |                           |                         |    |   |  
+         |                           v                         v    v   |  
+         |                           |                        (., .*.)->|->(fgx,g's*f't)                        
+         |                           v                            ^     |  
+         |                           |                            |     |  
+         |                           +------>------>------>------>+     |   
+         |                                                              |  
+         +--------------------------------------------------------------+  
+
+
+**Fig. 1.3.6.5**: IO-(≈ UML-Activity)-Diagram of *Functor* (= *higher order* function) $myCompose$
+		   
+"
+
+# ╔═╡ 1994f1c4-8ff7-4e1d-b380-a60c3327b66f
+md"
+---
+###### 3.6.1 Functional Julia Code
+"
+
+# ╔═╡ f38f894c-7c9c-4ebb-a16f-a29b1be2ba7b
+function myCompose(fP::Function, gP::Function)
+	#-------------------------------------------------------------------------------
+	x::Float ->                                    # return of anonymous compositum
+		let (gx,  gP_s) = gP(x::Float)::Tuple{Float, String}
+			(fgx, fP_t) = fP(gx::Float)::Tuple{Float, String}
+			(fgx, gP_s * fP_t)::Tuple{Float, String}
+		end::Tuple{Float, String}                  # let of anonymous compositum
+	#-------------------------------------------------------------------------------
+end # function myCompose
+
+# ╔═╡ 038ea1d9-59d2-4239-88f3-5f4f1cc17db3
+md"
+---
+###### 3.6.2 Application $myCompose(.,.)$
+"
+
+# ╔═╡ 062181b9-3d55-4041-aeb1-aecb70ea1ae0
+myCompose(fP, gP)(3.0)::Tuple{Float, String}
+
+# ╔═╡ f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
+fgP = myCompose(fP, gP)
+
+# ╔═╡ 46b35394-6685-413f-bc9e-7ac52dd620d6
+typeof(fgP(3.0))
+
+# ╔═╡ a9577f41-3ea3-48c5-9cba-5dce82f1208d
+typeof(fgP) <: Function
+
+# ╔═╡ 770767ec-d109-4f53-aed9-a16e5380b338
+fgP(3.0)
+
+# ╔═╡ 8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
+md"
+---
+##### 4. Definition of *Augmented* Identity with $unit$
+
+According Piponi (2024, p.5) the ordinary Haskell *identity* has these properties:
+
+$id.f = f.id  = f$ 
+
+$\;$
+
+where $' . '$ is the ordinary (Haskell) function *composition* operator.
+
+*So we(Piponi)'re look for a debuggable function, call it unit, such that*
+
+$unit * f = f * unit = f$ 
+
+$\;$
+
+where '$*$' is Piponi's function composition operator: 
+
+$unit * f = bind\ \ unit . f$
+$f * unit = bind\ \ f . unit$
+
+$\;$
+
+So the *specification* is
+
+$bind\ \ unit\ .\ f = bind\ \ f .\ unit = f$
+
+$\;$
+ 
+*Obviously we(Piponi)'d expect it to produce the empty debugging string and otherwise act a bit like the identity* (Piponi, 2024, p.5)
+
+$\;$
+
+"
+
+# ╔═╡ cb3b5d37-dbc3-4a68-a1f6-942ad6e80699
+md"""
+---
+##### 4.1 Exercise 2: Definition of Function $unit$
+(Piponi, 2024, p.5)
+
+###### 4.1.1 Haskell Code
+
+Piponi proposes as a solution to the task '*define* $unit$' the Haskell code:
+
+$unit\ x\ \ =\ (x,\ "")$
+
+$unit\ .\ f\ x = lift\ f\ x$
+
+$\;$
+
+
+###### 4.1.2 *Functional* Julia Code
+
+We deviate from his proposal by defining not *one* but *two* functions $unit$ and $unit'=unitP$. The latter has two *methods* $u', u''$ for input types $::Float$ and $::Tuple\{Float, String\}$.
+
+In our terminology Piponi's $unit$ is nearly the first *method* $u'$ of *function* $unitP$. This method $u'$ is constrained to $x::Float$. So for $x::Function$ we have to define a third method $u'''$ for this type.
+
+"""
+
+# ╔═╡ 2c6d1d50-3538-48c0-b181-4d5a2f433081
+md"
+###### 4.1.2.1 Function $unit$
+"
+
+# ╔═╡ e5ccd297-2329-4aa9-a1fe-6cc1c45727f1
+unit(x::Float) = x          # *not* Pisoni's unit, because it returns not '(x, "")'
+
+# ╔═╡ acdfe921-c8c8-4484-97c6-682887cc0839
+unit(6.0)
+
+# ╔═╡ 47a974ae-d92c-4701-bcd5-bcce80a89b69
+md"
+###### 4.1.2.2 Methods $u', u'', u'''$ of Function $unitP$
+"
+
+# ╔═╡ 2148b2ca-7320-4304-8938-58731006c30b
+# 1st method u' of function unit' = unitP
+# for lifting Float --> Tuple{Float, String}
+#----------------------------------------------------------------------------------
+function unitP(x::Float)::Tuple{Float, String}
+	ux = unit(x)
+	(ux, "")   # this is Piponi's function 'unit x = (x, "") constrained to x::Float
+end # function unitP
+
+# ╔═╡ 590ad684-193a-4a8e-98b9-f31727217368
+# 2nd method unit'' of function unitP
+# for passing Tuple{Float, String} --> Tuple{Float, String}
+#----------------------------------------------------------------------
+function unitP(tuple::Tuple{Float, String})::Tuple{Float, String}
+	(x::Float, predecessor_s::String) = tuple
+	ux = unit(x)
+	(ux, predecessor_s * "" )::Tuple{Float, String}
+end # function unitP
+
+# ╔═╡ 0c31f9cb-804c-4f95-ba67-fc9580f264dd
+md"
+---
+###### 4.1.2.3 Method $unit'''$ of Function $unitPrime$
+This *third* method becomes necessary, because Piponi (2024, p.5) specifies 
+
+$unit\ .\ f = lift\ f\ x$
+
+$\;$
+
+and our methods $unit', unit''$ (above) have *no* input type $::Function$.
+
+"
+
+# ╔═╡ b50bfe80-658d-48f5-95c0-b1282b56529c
+# 3rd method unit''' of function unit
+# for lifting Function(::Float) --> Function(::Tuple{Float, String})
+#----------------------------------------------------------------------
+function unitP(foo::Function)::Function
+	# the lifted f' is returned as an anonymous function
+	#     with same input type like f 
+	#     but with augmented output argument
+	(x::Float) ->                                       # argment of f'
+		let foox = foo(x)
+			# (foox, " foo'($x) = $foox ->;")::Tuple{Float, String}
+			(foox, "")::Tuple{Float, String}
+		end # let
+end # function unitP
+
+# ╔═╡ 41ee68f0-c0d9-4234-b92a-0038e5765241
+md"
+###### 4.1.2.4 Application of Methods $u', u''$ of Function $unitP$
+"
+
+# ╔═╡ 728915dd-7307-4033-9b05-7ccb082e2fc1
+unitP(6.0)                      # passing of x::Float: u'(6.0) ==> (6.0, "") == 6.0
+
+# ╔═╡ f2917e2a-331d-491f-baf9-0e30c080fbb9
+try
+	unitP(5.0, " ->")
+catch
+	@warn "no method for this argument type"
+end # try
+
+# ╔═╡ 9d25683d-8337-42e5-a62a-25126603db7b
+unitP((5.0, ""))                    # passing of tuple: u''((5.0, "")) ==> (5.0, "")
+
+# ╔═╡ 99c6906b-7b41-47a1-8914-f5e74562c836
+fP(unitP(5.0))                      # lifting with u' and application of f''
+
+# ╔═╡ c09ab707-31b0-4ca0-9417-b4c0e3a5a65f
+bind(unitP)((6.0, ""))       # lifting of u' ==> u'' ==> u''((6.0, "")) ==> (6.0, "")
+
+# ╔═╡ 624b5fb1-1a15-4139-8ac0-5ed4a88ff2f8
+bind(fP)(unitP(5.0))             # f' ==> f'' ==> f''(unit'(5.0)) ==> f''((5.0, ""))
+
+# ╔═╡ 69989f7a-51a6-47bc-acda-58186b8782aa
+bind(unitP(f))(unitP(5.0))
+
+# ╔═╡ 0166c17c-00f3-4277-aa1f-f72678dd72e6
+gPP = bind(unitP(g))                  # double lifting g --> g' --> g''
+
+# ╔═╡ af0e96e6-a49c-4216-bff2-8fc5db5effa4
+gPP(unitP(5.0))                       # 5.0 --> (5.0, "...") --> g''((.,.))
+
+# ╔═╡ 34d492d1-642d-4874-b8a3-c493054d7e5c
+md"
+###### *Composition*
+"
+
+# ╔═╡ 8379a2a8-7215-4a8a-a8db-7f7327805409
+(unitP ∘ unitP)(5.0)                   # lifting with u' and the passing with u''
+
+# ╔═╡ 60b4dde4-b394-47fa-8c61-cb9ecb2d4398
+∘(unitP, unitP)(5.0)                   # lifting with u' and the passing with u''
+
+# ╔═╡ e4f18028-2973-4460-bb12-dcd12639c326
+md"
+###### *Piping*
+"
+
+# ╔═╡ 3f73c81a-f371-4313-b880-1552ce3e614b
+5.0 |> unitP|> unitP
+
+# ╔═╡ 8771f937-bc21-4012-8614-463ce72778fb
+5.0 |> unitP |> fP
+
+# ╔═╡ 5d5ea0e6-826a-4029-b08b-995193ed0bc5
+md"""
+###### 4.1.2.5 *Lifting* of any Function
+*The unit allows us to 'lift' any function into a debuggable one. In fact define*
+
+$lift\ f\ x = (f\ x, "")$ 
+
+$\;$
+
+*or more simply* 
+
+$lift\ f = unit\ .\ f$. 
+
+*The lifted version does much the same as the original function and, quite reasonably, it produces the empty string as a side effect.* (Piponi, 2024, p.5)
+
+$\;$
+
+"""
+
+# ╔═╡ 53056b0d-eecd-4552-89a2-f93597801a85
+unitP(f)                                   # lifting of function f: f --> f'
+
+# ╔═╡ 2cd90f75-91a7-4e65-a5dd-51d182b9a177
+unitP(f)(3.0)                              # f ==> f'(3.0) ==> (6.0, "")
+
+# ╔═╡ c19f7c66-d6cb-455e-b2ef-02c354d5260c
+(unitP ∘ f)(3.0)                           # (unit . f)(3.0)  ==> (6.0, "")
+
+# ╔═╡ c4a90a0f-66c7-4542-9f08-c64b934fb74b
+md"
+##### 4.2 *Lifting*: $lift = unit'$ with *Three* Methods
+"
+
+# ╔═╡ 7ae4f1b2-5d31-4e02-9148-d29238809448
+function myEqualityTest(tuple1, tuple2)
+	tuple1[1] == tuple2[1]
+end # function myEqualityTest
+
+# ╔═╡ 06a137ad-2811-4ff6-9f65-f6c615ef5447
+lift = unitP                                 # 3 methods
+
+# ╔═╡ 1c71dca2-6d3c-4f7a-bb5a-784df999add5
+fP(5.0)                                      # f' ==> f''
+
+# ╔═╡ 1d4ec72e-7a93-4e14-bb28-61d2a9183100
+lift(f)                                      # f --> f'
+
+# ╔═╡ 018dd5c4-42e3-456f-9619-68dd7b8046bf
+lift(f)(5.0)                                 # f --> f' --> f'(5.0) --> (10.0, "")
+
+# ╔═╡ b2a0c0c0-4e03-4532-8758-83d24d3d894d
+unitP(f)(5.0)
+
+# ╔═╡ 95067b0c-4de8-4b7d-94b9-cd7df4234522
+lift(f)(5.0) == unitP(f)(5.0)                # lift f x = (unit . f) x
+
+# ╔═╡ f7312ff3-0a42-42ce-8bdd-7bc0d156deed
+myEqualityTest(lift(f)(5.0), unitP(f(5.0)))  # f'(5.0) == f'(5.0)
+
+# ╔═╡ 30bd8f15-359d-4dc1-a313-ab5fd58444e3
+(lift ∘ f)(5.0)                              # f(5.0) ==> 10.0 ==> (10.0, "")
+
+# ╔═╡ 0183e1e5-cb49-4a76-9eab-9751dce1226f
+(unitP ∘ f)(5.0)
+
+# ╔═╡ 1d059182-9f91-40df-8fd3-b0dfb4b9837b
+(lift ∘ f)(5.0) == (unitP ∘ f)(5.0)
+
+# ╔═╡ 95494541-5313-42c9-92a0-788c833dd13d
+myEqualityTest((lift ∘ f)(5.0), (unitP ∘ f)(5.0))  
+
+# ╔═╡ 10c06c9c-f145-471c-b14a-d8fbc45f9aca
+unitP(lift(f)(5.0))                      # lifting with f' and the passing with u''
+
+# ╔═╡ 22addbcf-6dae-4dc9-9c84-9ad72de68222
+md"
+#####################################
+"
+
+# ╔═╡ d7ebba7c-b4a8-46e6-8b5e-ecd7bcd46b5b
+md"
+---
+##### 4.3 Exercise 3
+(Piponi, 2024,  p.5): *Show that* 
+
+$\;$
+
+$lift\ f\ *\ lift\ g = lift\ (f\ .\ g).$ 
+
+$\;$
+
+where '$*$' is Piponis *new* compose operator (Piponi, 2024, p.5)
+
+$f' *\ g' = bind\ f' .\ \ g'$
+
+$\;$
+
+So
+
+$bind \ lift\ f\ .\ lift\ g = lift\ (f\ .\ g).$ 
+
+$\;$
+
+"
+
+# ╔═╡ 29aca5c1-a2f3-4af5-9275-c3a6765fbf16
+lift(f), lift(g)
+
+# ╔═╡ b487a86c-8ed8-44cc-8546-fd1f13259f33
+lift(f)(3.0)
+
+# ╔═╡ 8c1857d7-181e-4907-8073-4d76150a62b7
+lift(g)(3.0)
+
+# ╔═╡ 0b45d2f3-33bf-4836-b4fc-47df8aea88cc
+(bind(lift(f)) ∘ lift(g))(5.0)
+
+# ╔═╡ f80a46ff-9931-431e-bcea-9192cd45da91
+(bind ∘ lift)(f)
+
+# ╔═╡ c48506bb-663e-479c-8cee-3863b006d5a5
+((bind ∘ lift)(f) ∘ lift(g))(5.0)
+
+# ╔═╡ ae83e0dd-80e7-497c-9e36-a26a11fe1947
+lift(f ∘ g)(5.0)
+
+# ╔═╡ ece5fbb7-ab2a-4933-ab0e-14ad7577f33c
+md"
+*Show that* (Piponi, 2024, p.5)
+
+$lift\ f * lift\ g = lift\ (f\ .\ g)$ 
+
+$\;$
+
+which is
+
+$bind \ lift\ f\ .\ lift\ g = lift\ (f\ .\ g).$ 
+
+$\;$
+
+"
+
+# ╔═╡ bd7ee629-f42e-45dc-817c-5f47af090cda
+((bind ∘ lift)(f) ∘ lift(g))(5.0) == lift(f ∘ g)(5.0)
+
+# ╔═╡ 1c1cfcb1-d34c-4596-b00b-d29f1978bd1c
+rand(1:1000)
+
+# ╔═╡ 5cd0c867-c285-4fe1-8200-8a7c5d9b90de
+((bind ∘ lift)(f) ∘ lift(g))(920.0) == lift(f ∘ g)(920.0)
+
+# ╔═╡ d7cd908a-13d8-454f-9443-4a1b7b25b6e4
+convert(Float64, rand(1:1000))
+
+# ╔═╡ 7157a8d4-af10-4697-a07a-e1a03fe63437
+let myRandom = convert(Float64, rand(1:1000))
+	((bind ∘ lift)(f) ∘ lift(g))(myRandom) == lift(f ∘ g)(myRandom)
+	# iRandom
+end # let
+
+# ╔═╡ 955bc0a9-9fd8-40ad-94d6-29e1a3d812bc
+((bind ∘ lift)(f) ∘ lift(g))(5.0)[1] == lift(f ∘ g)(5.0)[1]
+
+# ╔═╡ 1602152b-adf7-4eb8-978f-1c4f5891003b
+myEqualityTest(((bind ∘ lift)(f) ∘ lift(g))(5.0), lift(f ∘ g)(5.0))
+
+# ╔═╡ 412c459c-6f98-4e7b-9140-d80c6a8ad6af
+md"
+Now, we have a *probabilistical proof* that *exercise 3* could be met by our Julian code.
+"
+
+# ╔═╡ 0f062f15-86a1-4540-80e9-bb61d4c3b109
+md"
+---
+##### 5. Summary
+Pisoni writes: *Believe it or not ... you have defined your first monad. At this point it is not perfectly clear which of the structures ... is the monad itself,...* (Piponi, 2024, p.5). 
+
+Later on he provides a *definition*:
+
+###### Definition of *Monad*
+It is the *triple*
+
+$(m, uni, bind)$
+
+where
+
+- *lifted functions* (in our case $f', g'$) of (Haskell) *signature* $a \rightarrow m\ b$ 
+- *a, b* are variables (in our case *variables* of type $Float$)
+- *m* is a *variable* of *type* (in our case) $Tuple(b, String)$
+- *bind* a *function* of *signature* $(a \rightarrow m\ b) \mapsto (m\ a \rightarrow m\ b)$
+- a kind of *identity function* $unit$ with *signature* $a \rightarrow m\ a$
+
+and the *laws* or *axioms*
+
+- *identity 1*: $f * unit = unt * f = f$
+- *identity 2*: $lift\ f * lift\ g = lift (f\ .\ g)$
+
+where $*$ and $lift$ where defined in terms of $unit$ and $bind$.
+
+We implemented all these functions in Julia and solved all exercises. So we implemented an example of a *monad* in Julia.
+
+"
+
+# ╔═╡ cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
+md"
+---
+##### 6. References
+
+- **Piponi, D.**; [*You Could Have Invented Monads*](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf) ! (*And Maybe You Already have*.); [Github 2006, 2024](https://github.com/dpiponi/StableBlog/blob/main/YouCouldHaveInvented/YouCouldHaveInvented.pdf); last visit 2024/12/14
+
+- **uml-diagrams.org**; [*Activity Diagrams*](https://www.uml-diagrams.org/activity-diagrams.html); last visit 2024/12/18
+
+- **Wikipedia**; [*camelCase*](https://en.wikipedia.org/wiki/Camel_case); last visit 2024/12/21
+
+- **Wikipedia**; [*Monad (Functional Programming)*](https://en.wikipedia.org/wiki/Monad_(functional_programming)); last visit 2024/12/14
+"
+
+# ╔═╡ 28d1564f-2e8f-4aff-b0a6-f6fd381078ee
+md"
+====================================================================================
+
+This is a **draft** under the Attribution-NonCommercial-ShareAlike 4.0 International **(CC BY-NC-SA 4.0)** license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
+
+===================================================================================
+"
+
+# ╔═╡ 00000000-0000-0000-0000-000000000001
+PLUTO_PROJECT_TOML_CONTENTS = """
+[deps]
+GraphRecipes = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+
+[compat]
+GraphRecipes = "~0.5.13"
+LaTeXStrings = "~1.4.0"
+Latexify = "~0.16.5"
+Plots = "~1.40.8"
+Pluto = "~0.20.3"
+"""
+
+# ╔═╡ 00000000-0000-0000-0000-000000000002
+PLUTO_MANIFEST_TOML_CONTENTS = """
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.11.4"
+manifest_format = "2.0"
+project_hash = "994182bf8ba5eee835bb7a7df6dd2b9b17b50860"
+
+[[deps.AbstractTrees]]
+git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
+uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+version = "0.4.5"
+
+[[deps.Adapt]]
+deps = ["LinearAlgebra", "Requires"]
+git-tree-sha1 = "f7817e2e585aa6d924fd714df1e2a84be7896c60"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "4.3.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptSparseArraysExt = "SparseArrays"
+    AdaptStaticArraysExt = "StaticArrays"
+
+[[deps.AliasTables]]
+deps = ["PtrArrays", "Random"]
+git-tree-sha1 = "9876e1e164b144ca45e9e3198d0b689cadfed9ff"
+uuid = "66dad0bd-aa9a-41b7-9441-69ab47430ed8"
+version = "1.1.3"
+
+[[deps.ArgTools]]
+uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.2"
+
+[[deps.ArnoldiMethod]]
+deps = ["LinearAlgebra", "Random", "StaticArrays"]
+git-tree-sha1 = "d57bd3762d308bded22c3b82d033bff85f6195c6"
+uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
+version = "0.4.0"
+
+[[deps.Artifacts]]
+uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
+
+[[deps.AxisAlgorithms]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
+git-tree-sha1 = "01b8ccb13d68535d73d2b0c23e39bd23155fb712"
+uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
+version = "1.1.0"
+
+[[deps.Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
+
+[[deps.BitFlags]]
+git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
+uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
+version = "0.1.9"
+
+[[deps.Bzip2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
+uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
+version = "1.0.9+0"
+
+[[deps.Cairo_jll]]
+deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "2ac646d71d0d24b44f3f8c84da8c9f4d70fb67df"
+uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
+version = "1.18.4+0"
+
+[[deps.ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra"]
+git-tree-sha1 = "1713c74e00545bfe14605d2a2be1712de8fbcb58"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "1.25.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.ChainRulesCore.extensions]
+    ChainRulesCoreSparseArraysExt = "SparseArrays"
+
+[[deps.CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "962834c22b66e32aa10f7611c08c8ca4e20749a9"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.8"
+
+[[deps.ColorSchemes]]
+deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
+git-tree-sha1 = "403f2d8e209681fcbd9468a8514efff3ea08452e"
+uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+version = "3.29.0"
+
+[[deps.ColorTypes]]
+deps = ["FixedPointNumbers", "Random"]
+git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
+uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+version = "0.11.5"
+
+[[deps.ColorVectorSpace]]
+deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
+git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
+uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
+version = "0.10.0"
+
+    [deps.ColorVectorSpace.extensions]
+    SpecialFunctionsExt = "SpecialFunctions"
+
+    [deps.ColorVectorSpace.weakdeps]
+    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[[deps.Colors]]
+deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
+git-tree-sha1 = "64e15186f0aa277e174aa81798f7eb8598e0157e"
+uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
+version = "0.13.0"
+
+[[deps.Compat]]
+deps = ["TOML", "UUIDs"]
+git-tree-sha1 = "8ae8d32e09f0dcf42a36b90d4e17f5dd2e4c4215"
+uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
+version = "4.16.0"
+weakdeps = ["Dates", "LinearAlgebra"]
+
+    [deps.Compat.extensions]
+    CompatLinearAlgebraExt = "LinearAlgebra"
+
+[[deps.CompilerSupportLibraries_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "1.1.1+0"
+
+[[deps.ConcurrentUtilities]]
+deps = ["Serialization", "Sockets"]
+git-tree-sha1 = "d9d26935a0bcffc87d2613ce14c527c99fc543fd"
+uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
+version = "2.5.0"
+
+[[deps.Configurations]]
+deps = ["ExproniconLite", "OrderedCollections", "TOML"]
+git-tree-sha1 = "4358750bb58a3caefd5f37a4a0c5bfdbbf075252"
+uuid = "5218b696-f38b-4ac9-8b61-a12ec717816d"
+version = "0.17.6"
+
+[[deps.Contour]]
+git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
+uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
+version = "0.6.3"
+
+[[deps.DataAPI]]
+git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
+uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
+version = "1.16.0"
+
+[[deps.DataStructures]]
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
+uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+version = "0.18.22"
+
+[[deps.DataValueInterfaces]]
+git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+version = "1.0.0"
+
+[[deps.Dates]]
+deps = ["Printf"]
+uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
+
+[[deps.Dbus_jll]]
+deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "473e9afc9cf30814eb67ffa5f2db7df82c3ad9fd"
+uuid = "ee1fde0b-3d02-5ea6-8484-8dfef6360eab"
+version = "1.16.2+0"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+version = "1.9.1"
+
+[[deps.Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
+
+[[deps.DocStringExtensions]]
+git-tree-sha1 = "e7b7e6f178525d17c720ab9c081e4ef04429f860"
+uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+version = "0.9.4"
+
+[[deps.Downloads]]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
+uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
+
+[[deps.EarCut_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "e3290f2d49e661fbd94046d7e3726ffcb2d41053"
+uuid = "5ae413db-bbd1-5e63-b57d-d24a61df00f5"
+version = "2.2.4+0"
+
+[[deps.EpollShim_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a4be429317c42cfae6a7fc03c31bad1970c310d"
+uuid = "2702e6a9-849d-5ed8-8c21-79e8b8f9ee43"
+version = "0.0.20230411+1"
+
+[[deps.ExceptionUnwrapping]]
+deps = ["Test"]
+git-tree-sha1 = "d36f682e590a83d63d1c7dbd287573764682d12a"
+uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
+version = "0.1.11"
+
+[[deps.Expat_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "d55dffd9ae73ff72f1c0482454dcf2ec6c6c4a63"
+uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
+version = "2.6.5+0"
+
+[[deps.ExpressionExplorer]]
+git-tree-sha1 = "bf2e6a47b70dfb5d103f300ef83d950239f9fa50"
+uuid = "21656369-7473-754a-2065-74616d696c43"
+version = "1.1.2"
+
+[[deps.ExproniconLite]]
+git-tree-sha1 = "c13f0b150373771b0fdc1713c97860f8df12e6c2"
+uuid = "55351af7-c7e9-48d6-89ff-24e801d99491"
+version = "0.10.14"
+
+[[deps.Extents]]
+git-tree-sha1 = "063512a13dbe9c40d999c439268539aa552d1ae6"
+uuid = "411431e0-e8b7-467b-b5e0-f676ba4f2910"
+version = "0.1.5"
+
+[[deps.FFMPEG]]
+deps = ["FFMPEG_jll"]
+git-tree-sha1 = "53ebe7511fa11d33bec688a9178fac4e49eeee00"
+uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
+version = "0.4.2"
+
+[[deps.FFMPEG_jll]]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "466d45dc38e15794ec7d5d63ec03d776a9aff36e"
+uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
+version = "4.4.4+1"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
+
+[[deps.FixedPointNumbers]]
+deps = ["Statistics"]
+git-tree-sha1 = "05882d6995ae5c12bb5f36dd2ed3f61c98cbb172"
+uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+version = "0.8.5"
+
+[[deps.Fontconfig_jll]]
+deps = ["Artifacts", "Bzip2_jll", "Expat_jll", "FreeType2_jll", "JLLWrappers", "Libdl", "Libuuid_jll", "Zlib_jll"]
+git-tree-sha1 = "301b5d5d731a0654825f1f2e906990f7141a106b"
+uuid = "a3f928ae-7b40-5064-980b-68af3947d34b"
+version = "2.16.0+0"
+
+[[deps.Format]]
+git-tree-sha1 = "9c68794ef81b08086aeb32eeaf33531668d5f5fc"
+uuid = "1fa38f19-a742-5d3f-a2b9-30dd87b9d5f8"
+version = "1.3.7"
+
+[[deps.FreeType2_jll]]
+deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "2c5512e11c791d1baed2049c5652441b28fc6a31"
+uuid = "d7e528f0-a631-5988-bf34-fe36492bcfd7"
+version = "2.13.4+0"
+
+[[deps.FriBidi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "7a214fdac5ed5f59a22c2d9a885a16da1c74bbc7"
+uuid = "559328eb-81f9-559d-9380-de523a88c83c"
+version = "1.0.17+0"
+
+[[deps.FuzzyCompletions]]
+deps = ["REPL"]
+git-tree-sha1 = "be713866335f48cfb1285bff2d0cbb8304c1701c"
+uuid = "fb4132e2-a121-4a70-b8a1-d5b831dcdcc2"
+version = "0.5.5"
+
+[[deps.GLFW_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
+git-tree-sha1 = "fcb0584ff34e25155876418979d4c8971243bb89"
+uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
+version = "3.4.0+2"
+
+[[deps.GR]]
+deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
+git-tree-sha1 = "0ff136326605f8e06e9bcf085a356ab312eef18a"
+uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+version = "0.73.13"
+
+[[deps.GR_jll]]
+deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "FreeType2_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Qt6Base_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "9cb62849057df859575fc1dda1e91b82f8609709"
+uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
+version = "0.73.13+0"
+
+[[deps.GeoFormatTypes]]
+git-tree-sha1 = "8e233d5167e63d708d41f87597433f59a0f213fe"
+uuid = "68eda718-8dee-11e9-39e7-89f7f65f511f"
+version = "0.4.4"
+
+[[deps.GeoInterface]]
+deps = ["DataAPI", "Extents", "GeoFormatTypes"]
+git-tree-sha1 = "294e99f19869d0b0cb71aef92f19d03649d028d5"
+uuid = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+version = "1.4.1"
+
+[[deps.GeometryBasics]]
+deps = ["EarCut_jll", "Extents", "GeoInterface", "IterTools", "LinearAlgebra", "PrecompileTools", "Random", "StaticArrays"]
+git-tree-sha1 = "65e3f5c519c3ec6a4c59f4c3ba21b6ff3add95b0"
+uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+version = "0.5.7"
+
+[[deps.GeometryTypes]]
+deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "d796f7be0383b5416cd403420ce0af083b0f9b28"
+uuid = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
+version = "0.8.5"
+
+[[deps.Gettext_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "9b02998aba7bf074d14de89f9d37ca24a1a0b046"
+uuid = "78b55507-aeef-58d4-861c-77aaff3498b1"
+version = "0.21.0+0"
+
+[[deps.Glib_jll]]
+deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE2_jll", "Zlib_jll"]
+git-tree-sha1 = "b0036b392358c80d2d2124746c2bf3d48d457938"
+uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
+version = "2.82.4+0"
+
+[[deps.GraphRecipes]]
+deps = ["AbstractTrees", "GeometryTypes", "Graphs", "InteractiveUtils", "Interpolations", "LinearAlgebra", "NaNMath", "NetworkLayout", "PlotUtils", "RecipesBase", "SparseArrays", "Statistics"]
+git-tree-sha1 = "10920601dc51d2231bb3d2111122045efed8def0"
+uuid = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+version = "0.5.13"
+
+[[deps.Graphite2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a6dbda1fd736d60cc477d99f2e7a042acfa46e8"
+uuid = "3b182d85-2403-5c21-9c21-1e1f0cc25472"
+version = "1.3.15+0"
+
+[[deps.Graphs]]
+deps = ["ArnoldiMethod", "Compat", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
+git-tree-sha1 = "3169fd3440a02f35e549728b0890904cfd4ae58a"
+uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
+version = "1.12.1"
+
+[[deps.Grisu]]
+git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
+uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
+version = "1.0.2"
+
+[[deps.HTTP]]
+deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
+git-tree-sha1 = "f93655dc73d7a0b4a368e3c0bce296ae035ad76e"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "1.10.16"
+
+[[deps.HarfBuzz_jll]]
+deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
+git-tree-sha1 = "55c53be97790242c29031e5cd45e8ac296dadda3"
+uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
+version = "8.5.0+0"
+
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.5"
+
+[[deps.Inflate]]
+git-tree-sha1 = "d1b1b796e47d94588b3757fe84fbf65a5ec4a80d"
+uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
+version = "0.1.5"
+
+[[deps.InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
+
+[[deps.Interpolations]]
+deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "88a101217d7cb38a7b481ccd50d21876e1d1b0e0"
+uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+version = "0.15.1"
+weakdeps = ["Unitful"]
+
+    [deps.Interpolations.extensions]
+    InterpolationsUnitfulExt = "Unitful"
+
+[[deps.IrrationalConstants]]
+git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
+uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
+version = "0.2.4"
+
+[[deps.IterTools]]
+git-tree-sha1 = "42d5f897009e7ff2cf88db414a389e5ed1bdd023"
+uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
+version = "1.10.0"
+
+[[deps.IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
+
+[[deps.JLFzf]]
+deps = ["REPL", "Random", "fzf_jll"]
+git-tree-sha1 = "1d4015b1eb6dc3be7e6c400fbd8042fe825a6bac"
+uuid = "1019f520-868f-41f5-a6de-eb00f4b6a39c"
+version = "0.1.10"
+
+[[deps.JLLWrappers]]
+deps = ["Artifacts", "Preferences"]
+git-tree-sha1 = "a007feb38b422fbdab534406aeca1b86823cb4d6"
+uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+version = "1.7.0"
+
+[[deps.JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.4"
+
+[[deps.JpegTurbo_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "eac1206917768cb54957c65a615460d87b455fc1"
+uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
+version = "3.1.1+0"
+
+[[deps.LAME_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "170b660facf5df5de098d866564877e119141cbd"
+uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
+version = "3.100.2+0"
+
+[[deps.LERC_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "aaafe88dccbd957a8d82f7d05be9b69172e0cee3"
+uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
+version = "4.0.1+0"
+
+[[deps.LLVMOpenMP_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "78211fb6cbc872f77cad3fc0b6cf647d923f4929"
+uuid = "1d63c593-3942-5779-bab2-d838dc0a180e"
+version = "18.1.7+0"
+
+[[deps.LRUCache]]
+git-tree-sha1 = "5519b95a490ff5fe629c4a7aa3b3dfc9160498b3"
+uuid = "8ac3fa9e-de4c-5943-b1dc-09c6b5f20637"
+version = "1.6.2"
+weakdeps = ["Serialization"]
+
+    [deps.LRUCache.extensions]
+    SerializationExt = ["Serialization"]
+
+[[deps.LZO_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "1c602b1127f4751facb671441ca72715cc95938a"
+uuid = "dd4b983a-f0e5-5f8d-a1b7-129d4a5fb1ac"
+version = "2.10.3+0"
+
+[[deps.LaTeXStrings]]
+git-tree-sha1 = "dda21b8cbd6a6c40d9d02a73230f9d70fed6918c"
+uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+version = "1.4.0"
+
+[[deps.Latexify]]
+deps = ["Format", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
+git-tree-sha1 = "cd10d2cc78d34c0e2a3a36420ab607b611debfbb"
+uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+version = "0.16.7"
+
+    [deps.Latexify.extensions]
+    DataFramesExt = "DataFrames"
+    SparseArraysExt = "SparseArrays"
+    SymEngineExt = "SymEngine"
+
+    [deps.Latexify.weakdeps]
+    DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LazilyInitializedFields]]
+git-tree-sha1 = "0f2da712350b020bc3957f269c9caad516383ee0"
+uuid = "0e77f7df-68c5-4e49-93ce-4cd80f5598bf"
+version = "1.3.0"
+
+[[deps.LibCURL]]
+deps = ["LibCURL_jll", "MozillaCACerts_jll"]
+uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.4"
+
+[[deps.LibCURL_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
+uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "8.6.0+0"
+
+[[deps.LibGit2]]
+deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
+uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
+
+[[deps.LibGit2_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
+uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
+version = "1.7.2+0"
+
+[[deps.LibSSH2_jll]]
+deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
+uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.11.0+1"
+
+[[deps.Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
+
+[[deps.Libffi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "27ecae93dd25ee0909666e6835051dd684cc035e"
+uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
+version = "3.2.2+2"
+
+[[deps.Libglvnd_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll", "Xorg_libXext_jll"]
+git-tree-sha1 = "ff3b4b9d35de638936a525ecd36e86a8bb919d11"
+uuid = "7e76a0d4-f3c7-5321-8279-8d96eeed0f29"
+version = "1.7.0+0"
+
+[[deps.Libiconv_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "be484f5c92fad0bd8acfef35fe017900b0b73809"
+uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
+version = "1.18.0+0"
+
+[[deps.Libmount_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a31572773ac1b745e0343fe5e2c8ddda7a37e997"
+uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
+version = "2.41.0+0"
+
+[[deps.Libtiff_jll]]
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "XZ_jll", "Zlib_jll", "Zstd_jll"]
+git-tree-sha1 = "4ab7581296671007fc33f07a721631b8855f4b1d"
+uuid = "89763e89-9b03-5906-acba-b20f662cd828"
+version = "4.7.1+0"
+
+[[deps.Libuuid_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "321ccef73a96ba828cd51f2ab5b9f917fa73945a"
+uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
+version = "2.41.0+0"
+
+[[deps.LinearAlgebra]]
+deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
+
+[[deps.LogExpFunctions]]
+deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
+git-tree-sha1 = "13ca9e2586b89836fd20cccf56e57e2b9ae7f38f"
+uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+version = "0.3.29"
+
+    [deps.LogExpFunctions.extensions]
+    LogExpFunctionsChainRulesCoreExt = "ChainRulesCore"
+    LogExpFunctionsChangesOfVariablesExt = "ChangesOfVariables"
+    LogExpFunctionsInverseFunctionsExt = "InverseFunctions"
+
+    [deps.LogExpFunctions.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    ChangesOfVariables = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+
+[[deps.Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
+
+[[deps.LoggingExtras]]
+deps = ["Dates", "Logging"]
+git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
+uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+version = "1.1.0"
+
+[[deps.MIMEs]]
+git-tree-sha1 = "c64d943587f7187e751162b3b84445bbbd79f691"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "1.1.0"
+
+[[deps.MacroTools]]
+git-tree-sha1 = "72aebe0b5051e5143a079a4685a46da330a40472"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.15"
+
+[[deps.Malt]]
+deps = ["Distributed", "Logging", "RelocatableFolders", "Serialization", "Sockets"]
+git-tree-sha1 = "02a728ada9d6caae583a0f87c1dd3844f99ec3fd"
+uuid = "36869731-bdee-424d-aa32-cab38c994e3b"
+version = "1.1.2"
+
+[[deps.Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
+
+[[deps.MbedTLS]]
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
+git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "1.1.9"
+
+[[deps.MbedTLS_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.6+0"
+
+[[deps.Measures]]
+git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
+uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
+version = "0.3.2"
+
+[[deps.Missings]]
+deps = ["DataAPI"]
+git-tree-sha1 = "ec4f7fbeab05d7747bdf98eb74d130a2a2ed298d"
+uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
+version = "1.2.0"
+
+[[deps.Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
+
+[[deps.MozillaCACerts_jll]]
+uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2023.12.12"
+
+[[deps.MsgPack]]
+deps = ["Serialization"]
+git-tree-sha1 = "f5db02ae992c260e4826fe78c942954b48e1d9c2"
+uuid = "99f44e22-a591-53d1-9472-aa23ef4bd671"
+version = "1.2.1"
+
+[[deps.NaNMath]]
+deps = ["OpenLibm_jll"]
+git-tree-sha1 = "9b8215b1ee9e78a293f99797cd31375471b2bcae"
+uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+version = "1.1.3"
+
+[[deps.NetworkLayout]]
+deps = ["GeometryBasics", "LinearAlgebra", "Random", "Requires", "StaticArrays"]
+git-tree-sha1 = "f7466c23a7c5029dc99e8358e7ce5d81a117c364"
+uuid = "46757867-2c16-5918-afeb-47bfcb05e46a"
+version = "0.4.10"
+weakdeps = ["Graphs"]
+
+    [deps.NetworkLayout.extensions]
+    NetworkLayoutGraphsExt = "Graphs"
+
+[[deps.NetworkOptions]]
+uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
+
+[[deps.OffsetArrays]]
+git-tree-sha1 = "117432e406b5c023f665fa73dc26e79ec3630151"
+uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+version = "1.17.0"
+weakdeps = ["Adapt"]
+
+    [deps.OffsetArrays.extensions]
+    OffsetArraysAdaptExt = "Adapt"
+
+[[deps.Ogg_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "887579a3eb005446d514ab7aeac5d1d027658b8f"
+uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
+version = "1.3.5+1"
+
+[[deps.OpenBLAS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.27+1"
+
+[[deps.OpenLibm_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
+version = "0.8.1+4"
+
+[[deps.OpenSSL]]
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "38cb508d080d21dc1128f7fb04f20387ed4c0af4"
+uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
+version = "1.4.3"
+
+[[deps.OpenSSL_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a9697f1d06cc3eb3fb3ad49cc67f2cfabaac31ea"
+uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+version = "3.0.16+0"
+
+[[deps.Opus_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6703a85cb3781bd5909d48730a67205f3f31a575"
+uuid = "91d4177d-7536-5919-b921-800302f37372"
+version = "1.3.3+0"
+
+[[deps.OrderedCollections]]
+git-tree-sha1 = "cc4054e898b852042d7b503313f7ad03de99c3dd"
+uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+version = "1.8.0"
+
+[[deps.PCRE2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+version = "10.42.0+1"
+
+[[deps.Pango_jll]]
+deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "3b31172c032a1def20c98dae3f2cdc9d10e3b561"
+uuid = "36c8627f-9965-5494-a995-c6b170f724f3"
+version = "1.56.1+0"
+
+[[deps.Parsers]]
+deps = ["Dates", "PrecompileTools", "UUIDs"]
+git-tree-sha1 = "44f6c1f38f77cafef9450ff93946c53bd9ca16ff"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "2.8.2"
+
+[[deps.Pixman_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LLVMOpenMP_jll", "Libdl"]
+git-tree-sha1 = "db76b1ecd5e9715f3d043cec13b2ec93ce015d53"
+uuid = "30392449-352a-5448-841d-b1acce4e97dc"
+version = "0.44.2+0"
+
+[[deps.Pkg]]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
+
+[[deps.PlotThemes]]
+deps = ["PlotUtils", "Statistics"]
+git-tree-sha1 = "41031ef3a1be6f5bbbf3e8073f210556daeae5ca"
+uuid = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
+version = "3.3.0"
+
+[[deps.PlotUtils]]
+deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random", "Reexport", "StableRNGs", "Statistics"]
+git-tree-sha1 = "3ca9a356cd2e113c420f2c13bea19f8d3fb1cb18"
+uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
+version = "1.4.3"
+
+[[deps.Plots]]
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
+git-tree-sha1 = "41c9a70abc1ff7296873adc5d768bff33a481652"
+uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+version = "1.40.12"
+
+    [deps.Plots.extensions]
+    FileIOExt = "FileIO"
+    GeometryBasicsExt = "GeometryBasics"
+    IJuliaExt = "IJulia"
+    ImageInTerminalExt = "ImageInTerminal"
+    UnitfulExt = "Unitful"
+
+    [deps.Plots.weakdeps]
+    FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+    GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+    IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+    ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
+    Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[[deps.Pluto]]
+deps = ["Base64", "Configurations", "Dates", "Downloads", "ExpressionExplorer", "FileWatching", "FuzzyCompletions", "HTTP", "HypertextLiteral", "InteractiveUtils", "LRUCache", "Logging", "LoggingExtras", "MIMEs", "Malt", "Markdown", "MsgPack", "Pkg", "PlutoDependencyExplorer", "PrecompileSignatures", "PrecompileTools", "REPL", "RegistryInstances", "RelocatableFolders", "Scratch", "Sockets", "TOML", "Tables", "URIs", "UUIDs"]
+git-tree-sha1 = "6f31e71063d158b69c1b84c7c3a1a7d4db153143"
+uuid = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+version = "0.20.6"
+
+[[deps.PlutoDependencyExplorer]]
+deps = ["ExpressionExplorer", "InteractiveUtils", "Markdown"]
+git-tree-sha1 = "9071bfe6d1c3c51f62918513e8dfa0705fbdef7e"
+uuid = "72656b73-756c-7461-726b-72656b6b696b"
+version = "1.2.1"
+
+[[deps.PrecompileSignatures]]
+git-tree-sha1 = "18ef344185f25ee9d51d80e179f8dad33dc48eb1"
+uuid = "91cefc8d-f054-46dc-8f8c-26e11d7c5411"
+version = "3.0.3"
+
+[[deps.PrecompileTools]]
+deps = ["Preferences"]
+git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
+uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+version = "1.2.1"
+
+[[deps.Preferences]]
+deps = ["TOML"]
+git-tree-sha1 = "9306f6085165d270f7e3db02af26a400d580f5c6"
+uuid = "21216c6a-2e73-6563-6e65-726566657250"
+version = "1.4.3"
+
+[[deps.Printf]]
+deps = ["Unicode"]
+uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
+
+[[deps.PtrArrays]]
+git-tree-sha1 = "1d36ef11a9aaf1e8b74dacc6a731dd1de8fd493d"
+uuid = "43287f4e-b6f4-7ad1-bb20-aadabca52c3d"
+version = "1.3.0"
+
+[[deps.Qt6Base_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Vulkan_Loader_jll", "Xorg_libSM_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_cursor_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "libinput_jll", "xkbcommon_jll"]
+git-tree-sha1 = "492601870742dcd38f233b23c3ec629628c1d724"
+uuid = "c0090381-4147-56d7-9ebc-da0b1113ec56"
+version = "6.7.1+1"
+
+[[deps.Qt6Declarative_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll", "Qt6ShaderTools_jll"]
+git-tree-sha1 = "e5dd466bf2569fe08c91a2cc29c1003f4797ac3b"
+uuid = "629bc702-f1f5-5709-abd5-49b8460ea067"
+version = "6.7.1+2"
+
+[[deps.Qt6ShaderTools_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll"]
+git-tree-sha1 = "1a180aeced866700d4bebc3120ea1451201f16bc"
+uuid = "ce943373-25bb-56aa-8eca-768745ed7b5a"
+version = "6.7.1+1"
+
+[[deps.Qt6Wayland_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll", "Qt6Declarative_jll"]
+git-tree-sha1 = "729927532d48cf79f49070341e1d918a65aba6b0"
+uuid = "e99dba38-086e-5de3-a5b1-6e4c66e897c3"
+version = "6.7.1+1"
+
+[[deps.REPL]]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
+uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
+
+[[deps.Random]]
+deps = ["SHA"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
+
+[[deps.Ratios]]
+deps = ["Requires"]
+git-tree-sha1 = "1342a47bf3260ee108163042310d26f2be5ec90b"
+uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
+version = "0.4.5"
+weakdeps = ["FixedPointNumbers"]
+
+    [deps.Ratios.extensions]
+    RatiosFixedPointNumbersExt = "FixedPointNumbers"
+
+[[deps.RecipesBase]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "5c3d09cc4f31f5fc6af001c250bf1278733100ff"
+uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+version = "1.3.4"
+
+[[deps.RecipesPipeline]]
+deps = ["Dates", "NaNMath", "PlotUtils", "PrecompileTools", "RecipesBase"]
+git-tree-sha1 = "45cf9fd0ca5839d06ef333c8201714e888486342"
+uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
+version = "0.6.12"
+
+[[deps.Reexport]]
+git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
+uuid = "189a3867-3050-52da-a836-e630ba90ab69"
+version = "1.2.2"
+
+[[deps.RegistryInstances]]
+deps = ["LazilyInitializedFields", "Pkg", "TOML", "Tar"]
+git-tree-sha1 = "ffd19052caf598b8653b99404058fce14828be51"
+uuid = "2792f1a3-b283-48e8-9a74-f99dce5104f3"
+version = "0.1.0"
+
+[[deps.RelocatableFolders]]
+deps = ["SHA", "Scratch"]
+git-tree-sha1 = "ffdaf70d81cf6ff22c2b6e733c900c3321cab864"
+uuid = "05181044-ff0b-4ac5-8273-598c1e38db00"
+version = "1.0.1"
+
+[[deps.Requires]]
+deps = ["UUIDs"]
+git-tree-sha1 = "62389eeff14780bfe55195b7204c0d8738436d64"
+uuid = "ae029012-a4dd-5104-9daa-d747884805df"
+version = "1.3.1"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
+
+[[deps.Scratch]]
+deps = ["Dates"]
+git-tree-sha1 = "3bac05bc7e74a75fd9cba4295cde4045d9fe2386"
+uuid = "6c6a2e73-6563-6170-7368-637461726353"
+version = "1.2.1"
+
+[[deps.Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
+
+[[deps.SharedArrays]]
+deps = ["Distributed", "Mmap", "Random", "Serialization"]
+uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+version = "1.11.0"
+
+[[deps.Showoff]]
+deps = ["Dates", "Grisu"]
+git-tree-sha1 = "91eddf657aca81df9ae6ceb20b959ae5653ad1de"
+uuid = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
+version = "1.0.3"
+
+[[deps.SimpleBufferStream]]
+git-tree-sha1 = "f305871d2f381d21527c770d4788c06c097c9bc1"
+uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
+version = "1.2.0"
+
+[[deps.SimpleTraits]]
+deps = ["InteractiveUtils", "MacroTools"]
+git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
+uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
+version = "0.9.4"
+
+[[deps.Sockets]]
+uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
+
+[[deps.SortingAlgorithms]]
+deps = ["DataStructures"]
+git-tree-sha1 = "66e0a8e672a0bdfca2c3f5937efb8538b9ddc085"
+uuid = "a2af1166-a08f-5f64-846c-94a0d3cef48c"
+version = "1.2.1"
+
+[[deps.SparseArrays]]
+deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
+uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+version = "1.11.0"
+
+[[deps.StableRNGs]]
+deps = ["Random"]
+git-tree-sha1 = "83e6cce8324d49dfaf9ef059227f91ed4441a8e5"
+uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
+version = "1.0.2"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "0feb6b9031bd5c51f9072393eb5ab3efd31bf9e4"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.13"
+weakdeps = ["ChainRulesCore", "Statistics"]
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
+
+[[deps.StaticArraysCore]]
+git-tree-sha1 = "192954ef1208c7019899fbf8049e717f92959682"
+uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+version = "1.4.3"
+
+[[deps.Statistics]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
+uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
+
+[[deps.StatsAPI]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "1ff449ad350c9c4cbc756624d6f8a8c3ef56d3ed"
+uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
+version = "1.7.0"
+
+[[deps.StatsBase]]
+deps = ["AliasTables", "DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
+git-tree-sha1 = "29321314c920c26684834965ec2ce0dacc9cf8e5"
+uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+version = "0.34.4"
+
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
+[[deps.SuiteSparse_jll]]
+deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
+uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
+version = "7.7.0+0"
+
+[[deps.TOML]]
+deps = ["Dates"]
+uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.3"
+
+[[deps.TableTraits]]
+deps = ["IteratorInterfaceExtensions"]
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "1.0.1"
+
+[[deps.Tables]]
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "OrderedCollections", "TableTraits"]
+git-tree-sha1 = "598cd7c1f68d1e205689b1c2fe65a9f85846f297"
+uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+version = "1.12.0"
+
+[[deps.Tar]]
+deps = ["ArgTools", "SHA"]
+uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
+
+[[deps.TensorCore]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
+uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
+version = "0.1.1"
+
+[[deps.Test]]
+deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
+
+[[deps.TranscodingStreams]]
+git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.11.3"
+
+[[deps.Tricks]]
+git-tree-sha1 = "6cae795a5a9313bbb4f60683f7263318fc7d1505"
+uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
+version = "0.1.10"
+
+[[deps.URIs]]
+git-tree-sha1 = "cbbebadbcc76c5ca1cc4b4f3b0614b3e603b5000"
+uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+version = "1.5.2"
+
+[[deps.UUIDs]]
+deps = ["Random", "SHA"]
+uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
+
+[[deps.Unicode]]
+uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
+
+[[deps.UnicodeFun]]
+deps = ["REPL"]
+git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
+uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
+version = "0.4.1"
+
+[[deps.Unitful]]
+deps = ["Dates", "LinearAlgebra", "Random"]
+git-tree-sha1 = "c0667a8e676c53d390a09dc6870b3d8d6650e2bf"
+uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
+version = "1.22.0"
+
+    [deps.Unitful.extensions]
+    ConstructionBaseUnitfulExt = "ConstructionBase"
+    InverseFunctionsUnitfulExt = "InverseFunctions"
+
+    [deps.Unitful.weakdeps]
+    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+
+[[deps.UnitfulLatexify]]
+deps = ["LaTeXStrings", "Latexify", "Unitful"]
+git-tree-sha1 = "975c354fcd5f7e1ddcc1f1a23e6e091d99e99bc8"
+uuid = "45397f5d-5981-4c77-b2b3-fc36d6e9b728"
+version = "1.6.4"
+
+[[deps.Unzip]]
+git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
+uuid = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
+version = "0.2.0"
+
+[[deps.Vulkan_Loader_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Wayland_jll", "Xorg_libX11_jll", "Xorg_libXrandr_jll", "xkbcommon_jll"]
+git-tree-sha1 = "2f0486047a07670caad3a81a075d2e518acc5c59"
+uuid = "a44049a8-05dd-5a78-86c9-5fde0876e88c"
+version = "1.3.243+0"
+
+[[deps.Wayland_jll]]
+deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
+git-tree-sha1 = "85c7811eddec9e7f22615371c3cc81a504c508ee"
+uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
+version = "1.21.0+2"
+
+[[deps.Wayland_protocols_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "5db3e9d307d32baba7067b13fc7b5aa6edd4a19a"
+uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
+version = "1.36.0+0"
+
+[[deps.WoodburyMatrices]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "c1a7aa6219628fcd757dede0ca95e245c5cd9511"
+uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
+version = "1.0.0"
+
+[[deps.XML2_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
+git-tree-sha1 = "b8b243e47228b4a3877f1dd6aee0c5d56db7fcf4"
+uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
+version = "2.13.6+1"
+
+[[deps.XZ_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "fee71455b0aaa3440dfdd54a9a36ccef829be7d4"
+uuid = "ffd25f8a-64ca-5728-b0f7-c24cf3aae800"
+version = "5.8.1+0"
+
+[[deps.Xorg_libICE_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a3ea76ee3f4facd7a64684f9af25310825ee3668"
+uuid = "f67eecfb-183a-506d-b269-f58e52b52d7c"
+version = "1.1.2+0"
+
+[[deps.Xorg_libSM_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libICE_jll"]
+git-tree-sha1 = "9c7ad99c629a44f81e7799eb05ec2746abb5d588"
+uuid = "c834827a-8449-5923-a945-d239c165b7dd"
+version = "1.2.6+0"
+
+[[deps.Xorg_libX11_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxcb_jll", "Xorg_xtrans_jll"]
+git-tree-sha1 = "b5899b25d17bf1889d25906fb9deed5da0c15b3b"
+uuid = "4f6342f7-b3d2-589e-9d20-edeb45f2b2bc"
+version = "1.8.12+0"
+
+[[deps.Xorg_libXau_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "aa1261ebbac3ccc8d16558ae6799524c450ed16b"
+uuid = "0c0b7dd1-d40b-584c-a123-a41640f87eec"
+version = "1.0.13+0"
+
+[[deps.Xorg_libXcursor_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXfixes_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "807c226eaf3651e7b2c468f687ac788291f9a89b"
+uuid = "935fb764-8cf2-53bf-bb30-45bb1f8bf724"
+version = "1.2.3+0"
+
+[[deps.Xorg_libXdmcp_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "52858d64353db33a56e13c341d7bf44cd0d7b309"
+uuid = "a3789734-cfe1-5b06-b2d0-1dd0d9d62d05"
+version = "1.1.6+0"
+
+[[deps.Xorg_libXext_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "a4c0ee07ad36bf8bbce1c3bb52d21fb1e0b987fb"
+uuid = "1082639a-0dae-5f34-9b06-72781eeb8cb3"
+version = "1.3.7+0"
+
+[[deps.Xorg_libXfixes_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "6fcc21d5aea1a0b7cce6cab3e62246abd1949b86"
+uuid = "d091e8ba-531a-589c-9de9-94069b037ed8"
+version = "6.0.0+0"
+
+[[deps.Xorg_libXi_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXfixes_jll"]
+git-tree-sha1 = "984b313b049c89739075b8e2a94407076de17449"
+uuid = "a51aa0fd-4e3c-5386-b890-e753decda492"
+version = "1.8.2+0"
+
+[[deps.Xorg_libXinerama_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll"]
+git-tree-sha1 = "a1a7eaf6c3b5b05cb903e35e8372049b107ac729"
+uuid = "d1454406-59df-5ea1-beac-c340f2130bc3"
+version = "1.1.5+0"
+
+[[deps.Xorg_libXrandr_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXrender_jll"]
+git-tree-sha1 = "b6f664b7b2f6a39689d822a6300b14df4668f0f4"
+uuid = "ec84b674-ba8e-5d96-8ba1-2a689ba10484"
+version = "1.5.4+0"
+
+[[deps.Xorg_libXrender_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "7ed9347888fac59a618302ee38216dd0379c480d"
+uuid = "ea2f1a96-1ddc-540d-b46f-429655e07cfa"
+version = "0.9.12+0"
+
+[[deps.Xorg_libxcb_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXau_jll", "Xorg_libXdmcp_jll"]
+git-tree-sha1 = "bfcaf7ec088eaba362093393fe11aa141fa15422"
+uuid = "c7cfdc94-dc32-55de-ac96-5a1b8d977c5b"
+version = "1.17.1+0"
+
+[[deps.Xorg_libxkbfile_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
+git-tree-sha1 = "dbc53e4cf7701c6c7047c51e17d6e64df55dca94"
+uuid = "cc61e674-0454-545c-8b26-ed2c68acab7a"
+version = "1.1.2+1"
+
+[[deps.Xorg_xcb_util_cursor_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_jll", "Xorg_xcb_util_renderutil_jll"]
+git-tree-sha1 = "04341cb870f29dcd5e39055f895c39d016e18ccd"
+uuid = "e920d4aa-a673-5f3a-b3d7-f755a4d47c43"
+version = "0.1.4+0"
+
+[[deps.Xorg_xcb_util_image_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "0fab0a40349ba1cba2c1da699243396ff8e94b97"
+uuid = "12413925-8142-5f55-bb0e-6d7ca50bb09b"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_libxcb_jll"]
+git-tree-sha1 = "e7fd7b2881fa2eaa72717420894d3938177862d1"
+uuid = "2def613f-5ad1-5310-b15b-b15d46f528f5"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_keysyms_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "d1151e2c45a544f32441a567d1690e701ec89b00"
+uuid = "975044d2-76e6-5fbe-bf08-97ce7c6574c7"
+version = "0.4.0+1"
+
+[[deps.Xorg_xcb_util_renderutil_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "dfd7a8f38d4613b6a575253b3174dd991ca6183e"
+uuid = "0d47668e-0667-5a69-a72c-f761630bfb7e"
+version = "0.3.9+1"
+
+[[deps.Xorg_xcb_util_wm_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Xorg_xcb_util_jll"]
+git-tree-sha1 = "e78d10aab01a4a154142c5006ed44fd9e8e31b67"
+uuid = "c22f9ab0-d5fe-5066-847c-f4bb1cd4e361"
+version = "0.4.1+1"
+
+[[deps.Xorg_xkbcomp_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxkbfile_jll"]
+git-tree-sha1 = "ab2221d309eda71020cdda67a973aa582aa85d69"
+uuid = "35661453-b289-5fab-8a00-3d9160c6a3a4"
+version = "1.4.6+1"
+
+[[deps.Xorg_xkeyboard_config_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_xkbcomp_jll"]
+git-tree-sha1 = "691634e5453ad362044e2ad653e79f3ee3bb98c3"
+uuid = "33bec58e-1273-512f-9401-5d533626f822"
+version = "2.39.0+0"
+
+[[deps.Xorg_xtrans_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a63799ff68005991f9d9491b6e95bd3478d783cb"
+uuid = "c5fb5394-a638-5e4d-96e5-b29de1b5cf10"
+version = "1.6.0+0"
+
+[[deps.Zlib_jll]]
+deps = ["Libdl"]
+uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.13+1"
+
+[[deps.Zstd_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "446b23e73536f84e8037f5dce465e92275f6a308"
+uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
+version = "1.5.7+1"
+
+[[deps.eudev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "gperf_jll"]
+git-tree-sha1 = "431b678a28ebb559d224c0b6b6d01afce87c51ba"
+uuid = "35ca27e7-8b34-5b7f-bca9-bdc33f59eb06"
+version = "3.2.9+0"
+
+[[deps.fzf_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6e50f145003024df4f5cb96c7fce79466741d601"
+uuid = "214eeab7-80f7-51ab-84ad-2988db7cef09"
+version = "0.56.3+0"
+
+[[deps.gperf_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "0ba42241cb6809f1a278d0bcb976e0483c3f1f2d"
+uuid = "1a1c6b14-54f6-533d-8383-74cd7377aa70"
+version = "3.1.1+1"
+
+[[deps.libaom_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "522c1df09d05a71785765d19c9524661234738e9"
+uuid = "a4ae2306-e953-59d6-aa16-d00cac43593b"
+version = "3.11.0+0"
+
+[[deps.libass_jll]]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "e17c115d55c5fbb7e52ebedb427a0dca79d4484e"
+uuid = "0ac62f75-1d6f-5e53-bd7c-93b484bb37c0"
+version = "0.15.2+0"
+
+[[deps.libblastrampoline_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.11.0+0"
+
+[[deps.libdecor_jll]]
+deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
+git-tree-sha1 = "9bf7903af251d2050b467f76bdbe57ce541f7f4f"
+uuid = "1183f4f0-6f2a-5f1a-908b-139f9cdfea6f"
+version = "0.2.2+0"
+
+[[deps.libevdev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "141fe65dc3efabb0b1d5ba74e91f6ad26f84cc22"
+uuid = "2db6ffa8-e38f-5e21-84af-90c45d0032cc"
+version = "1.11.0+0"
+
+[[deps.libfdk_aac_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a22cf860a7d27e4f3498a0fe0811a7957badb38"
+uuid = "f638f0a6-7fb0-5443-88ba-1cc74229b280"
+version = "2.0.3+0"
+
+[[deps.libinput_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "eudev_jll", "libevdev_jll", "mtdev_jll"]
+git-tree-sha1 = "ad50e5b90f222cfe78aa3d5183a20a12de1322ce"
+uuid = "36db933b-70db-51c0-b978-0f229ee0e533"
+version = "1.18.0+0"
+
+[[deps.libpng_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "068dfe202b0a05b8332f1e8e6b4080684b9c7700"
+uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
+version = "1.6.47+0"
+
+[[deps.libvorbis_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll", "Pkg"]
+git-tree-sha1 = "490376214c4721cdaca654041f635213c6165cb3"
+uuid = "f27f6e37-5d2b-51aa-960f-b287f2bc3b7a"
+version = "1.3.7+2"
+
+[[deps.mtdev_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "814e154bdb7be91d78b6802843f76b6ece642f11"
+uuid = "009596ad-96f7-51b1-9f1b-5ce2d5e8a71e"
+version = "1.1.6+0"
+
+[[deps.nghttp2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.59.0+0"
+
+[[deps.p7zip_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+2"
+
+[[deps.x264_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "4fea590b89e6ec504593146bf8b988b2c00922b2"
+uuid = "1270edf5-f2f9-52d2-97e9-ab00b5d0237a"
+version = "2021.5.5+0"
+
+[[deps.x265_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "ee567a171cce03570d77ad3a43e90218e38937a9"
+uuid = "dfaa095f-4041-5dcd-9319-2fabd8486b76"
+version = "3.5.0+0"
+
+[[deps.xkbcommon_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll", "Wayland_protocols_jll", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]
+git-tree-sha1 = "63406453ed9b33a0df95d570816d5366c92b7809"
+uuid = "d8fb68d0-12a3-5cfd-a85a-d49703b185fd"
+version = "1.4.1+2"
+"""
+
+# ╔═╡ Cell order:
+# ╟─3c117110-b882-11ef-3be5-f5de5979efa9
+# ╟─e5abf66b-1e47-42e2-8792-b71eb2d7634c
+# ╟─564b5a6f-a20d-45e4-8414-659449f8cf3f
+# ╟─ec45bd94-23b6-4993-bcec-64492cb499a3
+# ╠═f7e8cdaf-e980-4ff5-bea7-3d573d5d84e3
+# ╟─f5d52640-17af-4860-b533-3b40fcca5580
+# ╟─8ac9dd19-ae83-469f-a98f-4a13a05a4262
+# ╟─12850bc8-98ea-4cc3-9a3f-442232d17e62
+# ╠═daf3ce8b-3001-44de-8c42-7a211fa72fb3
+# ╠═41e3ce0e-abf8-4560-87bd-edf13c660681
+# ╠═67b7c688-4f24-4696-9eb8-ff415512da92
+# ╠═b871f9d1-658d-4e23-b312-e9d7ad1b9b53
+# ╠═8c703fd7-9f17-4c60-aa15-08db74284a0e
+# ╠═39f27f02-e20a-4f6d-92e5-589b1a8256ab
+# ╟─c6b31e7a-5121-4b62-9b3f-4b7979c15cdc
+# ╠═2cf460e0-3e35-4611-bc1e-dae85af1c1ac
+# ╠═d9e59902-0739-499d-a25c-dc38614ee4f8
+# ╠═174c5e5c-580d-4a53-9ada-d25ba3b717da
+# ╠═49088e70-9c9e-4225-b170-0678a9ff1099
+# ╠═26eff19d-9c03-45a9-8698-bae79a001a64
+# ╠═28c45d84-eb7d-405b-a5c8-5634b1d1cbc7
+# ╟─d4bd5009-fd71-4614-8c2a-87f2ab3f53ba
+# ╠═250c5df1-5b00-45eb-b599-b42e810b931f
+# ╠═f26f7ca3-d769-4de1-ac6e-1e837c21481a
+# ╟─6e2322aa-3223-4305-a1b9-80ca7e75f145
+# ╟─9ab4e5f1-0afe-4bb6-8d42-3f5d36897162
+# ╠═d82906d4-3a2f-4a03-85d4-f0f8d8ddda15
+# ╠═05aff438-e201-450a-baf4-127edf8204eb
+# ╠═97edee73-6922-4dd1-bed4-d8f60c299c9f
+# ╠═0345cf4f-f708-4cc5-bc14-6f755bb50bda
+# ╠═9fe7f07c-7126-4adc-a782-b8bb08157b18
+# ╠═8ff6ec09-f644-455d-9f66-30517a84c4f5
+# ╠═890c07be-20ca-4c28-854f-932ba6d199a3
+# ╠═0b12912f-1556-4971-aa5c-90ef4c313cc9
+# ╟─a117e9c2-04ec-4ed3-abde-181a8b2267c0
+# ╠═3df545ea-8b47-4433-a342-3f355014c3a4
+# ╟─cab30966-f397-4667-b141-cb9d4e4203f8
+# ╠═ad67889e-c235-4787-b740-692a2440cb2d
+# ╟─0d30ad40-3929-43da-8c50-b994162e8958
+# ╟─0ab63fb7-2514-415c-bbf1-62e8492ca2e7
+# ╠═90c9a816-aad8-4d9a-a88f-1a75392d6484
+# ╟─bcc003fd-b3cf-4987-bd27-49b330ae7a10
+# ╟─29e41f16-ace3-418c-b714-5bb53b1481cd
+# ╟─410a8fa1-b0df-44a9-b38e-d8ab548db0b5
+# ╠═d4cfe695-216e-494d-b3dd-7a5fce5ecf0e
+# ╠═4f1a1d63-7249-478a-b970-a05b1949e4a0
+# ╠═6cc9631a-450c-42c1-9fb1-9d4ae34358b1
+# ╠═185f027c-a385-411c-9280-b9cf8094f6fd
+# ╟─2f262ce4-952c-4692-96c4-12fb87d20c7b
+# ╠═cad46c85-a203-4627-9812-090b04bf539d
+# ╠═5e818c58-4cd0-42c6-9d2e-d12bdcee6b78
+# ╠═f3fcc037-597e-4013-8723-c30a560fa1a0
+# ╠═5497de72-01af-44b1-bfb4-192f9d41f989
+# ╟─a7554035-02fc-4a52-a306-bd0e1c06bcc4
+# ╟─78cd7e76-c69a-422c-bb92-91034c74f9f3
+# ╠═4ebfa831-e7b5-48e1-8bad-e7e6bd0a5675
+# ╠═839fb2f1-1432-4b0d-8078-440ae8c21f4d
+# ╠═c5757b28-e590-4497-a575-24c46717f322
+# ╠═426a48da-081a-4150-bf4c-de5381e41d78
+# ╟─e85378e9-19fa-4081-ac86-eb8ab7bd7289
+# ╠═8fcaec6a-3cc6-40f9-bc48-b57867667151
+# ╠═2166f2d1-3cdb-4c69-bb4e-76ec47509408
+# ╠═81026795-4e94-44c0-9409-afc9db75a4e3
+# ╠═0cb8a78c-b4e0-4082-8a18-004eaaf2b32f
+# ╟─6f2db889-1f9e-4592-a804-a31c1128a8af
+# ╠═9ae4e28d-3e66-46ca-aa9e-0bf272b3a26f
+# ╠═470beae4-8bde-40df-bb40-8120452b0e5c
+# ╠═9b9e3ce1-d8e2-4617-a2ef-4b80b0dafa1a
+# ╠═5a4ac136-9857-4b20-bccb-08485f3ff654
+# ╟─1f886457-5566-4939-b7b5-c99a52698b43
+# ╠═bb36bc88-dc62-411f-b91b-6bd430e42271
+# ╠═11a0d14e-f880-4903-9553-4b877766795a
+# ╠═92ac4efa-ad2d-4647-b6f4-97648484722f
+# ╠═d828c0e0-c471-411c-80da-b253f1632229
+# ╟─8238b505-0913-4866-bcd4-3113abd667ea
+# ╠═2d4f3047-1fa9-41c4-abc6-24d964c94700
+# ╠═9722edc0-7b8c-4279-ad45-2e25d255dd48
+# ╟─1b85ab8e-dff5-446e-bb0a-ac987bc038d8
+# ╠═ee587d45-84e6-4f67-a6ae-226488b996e1
+# ╠═b019a9cf-308a-4ba9-8993-5b7785834abb
+# ╟─12c508d9-d583-4919-a41a-4cd0d8b3c29d
+# ╟─6bb496ba-837a-4410-b378-8691075b1765
+# ╟─5ef13808-55c4-4fc5-b31c-c90c222d6dae
+# ╟─aa578002-06a1-4ad3-b981-50fa379f798e
+# ╟─4e868cb6-2aab-40b0-8e5e-02a9f2473cca
+# ╠═212d9d18-0349-47eb-95ec-c042efb9886b
+# ╟─c5d2f151-06dd-4d4c-a736-417a58d25eac
+# ╠═8b4c4bd3-bd4a-47ff-ac7b-47fb6fa07ef5
+# ╠═dc0d1133-d8d2-4679-b80a-cebab73f91ea
+# ╠═af0bc2ac-bb42-4c79-90f6-8c08e1a2c58b
+# ╠═2a6a31d8-a78a-42f4-af67-e841ca4fe9b6
+# ╟─dd94e758-5608-44bd-add7-adb7d4563838
+# ╟─af0892c1-b751-473a-8268-618f81d16f4c
+# ╠═ea2c7ffb-27e1-45f7-9212-2b722f4c3080
+# ╠═66c16d3c-7d2e-4742-90ea-570e730fcf75
+# ╠═879d969e-bf9d-42b9-b454-a4d646736e6c
+# ╠═e93574ad-93f1-4e87-870f-234737f6f499
+# ╟─0efd51c1-5c30-41af-86b7-10f8e5f37b97
+# ╠═ce6d7a20-5d29-47c9-8f08-2b0527c49832
+# ╠═48b854ee-b4d2-4243-93a2-bb40e10591dd
+# ╠═caf866c6-8ff3-442b-bce6-12ef251a04b0
+# ╠═cce4b0f2-e46b-4021-883e-6668926a48be
+# ╠═f1838720-e721-4cfc-89ce-2323492965b4
+# ╟─6a650856-fa36-4bc7-b1a7-25edbd5dae1c
+# ╠═80522206-84a9-4722-9c25-765c60276fee
+# ╠═e6c02312-8fa8-4629-ab00-c4d6c91afa1e
+# ╟─759bb009-c878-48bb-8378-6d5dc3fb3001
+# ╟─6392590c-642d-4c81-9b29-9b9ff689a392
+# ╟─1994f1c4-8ff7-4e1d-b380-a60c3327b66f
+# ╠═f38f894c-7c9c-4ebb-a16f-a29b1be2ba7b
+# ╟─038ea1d9-59d2-4239-88f3-5f4f1cc17db3
+# ╠═062181b9-3d55-4041-aeb1-aecb70ea1ae0
+# ╠═f5ef78fd-ba8e-4bf2-ad84-ba1c8ccea38f
+# ╠═46b35394-6685-413f-bc9e-7ac52dd620d6
+# ╠═a9577f41-3ea3-48c5-9cba-5dce82f1208d
+# ╠═770767ec-d109-4f53-aed9-a16e5380b338
+# ╟─8e818c7b-669e-4bc2-ad30-64fa0e3f4e23
+# ╟─cb3b5d37-dbc3-4a68-a1f6-942ad6e80699
+# ╟─2c6d1d50-3538-48c0-b181-4d5a2f433081
+# ╠═e5ccd297-2329-4aa9-a1fe-6cc1c45727f1
+# ╠═acdfe921-c8c8-4484-97c6-682887cc0839
+# ╟─47a974ae-d92c-4701-bcd5-bcce80a89b69
+# ╠═2148b2ca-7320-4304-8938-58731006c30b
+# ╠═590ad684-193a-4a8e-98b9-f31727217368
+# ╟─0c31f9cb-804c-4f95-ba67-fc9580f264dd
+# ╠═b50bfe80-658d-48f5-95c0-b1282b56529c
+# ╟─41ee68f0-c0d9-4234-b92a-0038e5765241
+# ╠═728915dd-7307-4033-9b05-7ccb082e2fc1
+# ╠═f2917e2a-331d-491f-baf9-0e30c080fbb9
+# ╠═9d25683d-8337-42e5-a62a-25126603db7b
+# ╠═99c6906b-7b41-47a1-8914-f5e74562c836
+# ╠═c09ab707-31b0-4ca0-9417-b4c0e3a5a65f
+# ╠═624b5fb1-1a15-4139-8ac0-5ed4a88ff2f8
+# ╠═69989f7a-51a6-47bc-acda-58186b8782aa
+# ╠═0166c17c-00f3-4277-aa1f-f72678dd72e6
+# ╠═af0e96e6-a49c-4216-bff2-8fc5db5effa4
+# ╟─34d492d1-642d-4874-b8a3-c493054d7e5c
+# ╠═8379a2a8-7215-4a8a-a8db-7f7327805409
+# ╠═60b4dde4-b394-47fa-8c61-cb9ecb2d4398
+# ╟─e4f18028-2973-4460-bb12-dcd12639c326
+# ╠═3f73c81a-f371-4313-b880-1552ce3e614b
+# ╠═8771f937-bc21-4012-8614-463ce72778fb
+# ╟─5d5ea0e6-826a-4029-b08b-995193ed0bc5
+# ╠═53056b0d-eecd-4552-89a2-f93597801a85
+# ╠═2cd90f75-91a7-4e65-a5dd-51d182b9a177
+# ╠═c19f7c66-d6cb-455e-b2ef-02c354d5260c
+# ╟─c4a90a0f-66c7-4542-9f08-c64b934fb74b
+# ╠═7ae4f1b2-5d31-4e02-9148-d29238809448
+# ╠═06a137ad-2811-4ff6-9f65-f6c615ef5447
+# ╠═1c71dca2-6d3c-4f7a-bb5a-784df999add5
+# ╠═1d4ec72e-7a93-4e14-bb28-61d2a9183100
+# ╠═018dd5c4-42e3-456f-9619-68dd7b8046bf
+# ╠═b2a0c0c0-4e03-4532-8758-83d24d3d894d
+# ╠═95067b0c-4de8-4b7d-94b9-cd7df4234522
+# ╠═f7312ff3-0a42-42ce-8bdd-7bc0d156deed
+# ╠═30bd8f15-359d-4dc1-a313-ab5fd58444e3
+# ╠═0183e1e5-cb49-4a76-9eab-9751dce1226f
+# ╠═1d059182-9f91-40df-8fd3-b0dfb4b9837b
+# ╠═95494541-5313-42c9-92a0-788c833dd13d
+# ╠═10c06c9c-f145-471c-b14a-d8fbc45f9aca
+# ╟─22addbcf-6dae-4dc9-9c84-9ad72de68222
+# ╟─d7ebba7c-b4a8-46e6-8b5e-ecd7bcd46b5b
+# ╠═29aca5c1-a2f3-4af5-9275-c3a6765fbf16
+# ╠═b487a86c-8ed8-44cc-8546-fd1f13259f33
+# ╠═8c1857d7-181e-4907-8073-4d76150a62b7
+# ╠═0b45d2f3-33bf-4836-b4fc-47df8aea88cc
+# ╠═f80a46ff-9931-431e-bcea-9192cd45da91
+# ╠═c48506bb-663e-479c-8cee-3863b006d5a5
+# ╠═ae83e0dd-80e7-497c-9e36-a26a11fe1947
+# ╟─ece5fbb7-ab2a-4933-ab0e-14ad7577f33c
+# ╠═bd7ee629-f42e-45dc-817c-5f47af090cda
+# ╠═1c1cfcb1-d34c-4596-b00b-d29f1978bd1c
+# ╠═5cd0c867-c285-4fe1-8200-8a7c5d9b90de
+# ╠═d7cd908a-13d8-454f-9443-4a1b7b25b6e4
+# ╠═7157a8d4-af10-4697-a07a-e1a03fe63437
+# ╠═955bc0a9-9fd8-40ad-94d6-29e1a3d812bc
+# ╠═1602152b-adf7-4eb8-978f-1c4f5891003b
+# ╟─412c459c-6f98-4e7b-9140-d80c6a8ad6af
+# ╟─0f062f15-86a1-4540-80e9-bb61d4c3b109
+# ╟─cd90b07b-f29e-4ca1-9f0f-07d5da5c24a2
+# ╟─28d1564f-2e8f-4aff-b0a6-f6fd381078ee
+# ╟─00000000-0000-0000-0000-000000000001
+# ╟─00000000-0000-0000-0000-000000000002
