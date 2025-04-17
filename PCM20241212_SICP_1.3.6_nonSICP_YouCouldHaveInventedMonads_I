@@ -1100,11 +1100,6 @@ myEqualityTest((lift ∘ f)(5.0), (unitP ∘ f)(5.0))
 # ╔═╡ 10c06c9c-f145-471c-b14a-d8fbc45f9aca
 unitP(lift(f)(5.0))                      # lifting with f' and the passing with u''
 
-# ╔═╡ 22addbcf-6dae-4dc9-9c84-9ad72de68222
-md"
-#####################################
-"
-
 # ╔═╡ d7ebba7c-b4a8-46e6-8b5e-ecd7bcd46b5b
 md"
 ---
@@ -2815,7 +2810,6 @@ version = "1.4.1+2"
 # ╠═1d059182-9f91-40df-8fd3-b0dfb4b9837b
 # ╠═95494541-5313-42c9-92a0-788c833dd13d
 # ╠═10c06c9c-f145-471c-b14a-d8fbc45f9aca
-# ╟─22addbcf-6dae-4dc9-9c84-9ad72de68222
 # ╟─d7ebba7c-b4a8-46e6-8b5e-ecd7bcd46b5b
 # ╠═29aca5c1-a2f3-4af5-9275-c3a6765fbf16
 # ╠═b487a86c-8ed8-44cc-8546-fd1f13259f33
