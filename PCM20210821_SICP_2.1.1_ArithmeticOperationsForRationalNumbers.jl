@@ -24,7 +24,7 @@ md"
 
 ###### file: PCM20210821\_SICP\_2.1.1\_ArithmeticOperationsForRationalNumbers.jl
 
-###### Julia/Pluto.jl-code (1.11.4/0.20.6) by PCM *** 2025/02/26 ***
+###### Julia/Pluto.jl-code (1.11.4/0.20.6) by PCM *** 2025/02/27 ***
 =====================================================================================
 "
 
@@ -33,7 +33,7 @@ md"
 ---
 ##### 0. Introduction
 
-Here we deal with the *representation* of *rational* numbers with a simple *algebraic data type* (*ADT*) $Tuple$ or $Pair$. An *ADT* [*is a kind of composite data type ... formed by combining other types*](https://en.wikipedia.org/wiki/Algebraic_data_type).
+Here we deal with the *representation* of *rational* numbers with simple *algebraic data type* (*ADT*) $Tuple$. $Pair$ or $Rational$. An *ADT* [*is a kind of composite data type ... formed by combining other types*](https://en.wikipedia.org/wiki/Algebraic_data_type).
 
 Mathematically, [*Rationals*](https://en.wikipedia.org/wiki/Rational_number) $\mathbb Q$ are a superset of *integers* $\mathbb Z$ and a subset of *reals* $\mathbb R$:
 
@@ -41,15 +41,15 @@ $\mathbb N \subset \mathbb Z \subset \mathbb Q \subset \mathbb R \subset \mathbb
 
 $\;$
 
-We represent rational numbers as *pairs* of numerator and denominators in four alternative ways:
-- the *first* is the *default* way, very *Scheme-like* by an *un*typed *named tuple* with two fields $car$ and $cdr$; the construction is delegated to the body of a constructor function $cons1$. 
+We represent rational numbers as *pairs* of numerator and denominators in *four* alternative ways:
+- the *first* mimics the presentation in SICP. It is very *Scheme-like* with *un*named *tuples*. A *Tuple* object has two *un*typed fields $car$ and $cdr$. The construction of a $Tuple$ is delegated to the body of a constructor function $cons1$. 
 - the *second* is the first *specialized* way by using Julia's *built-in* type $Pair$. The construction of pairs is delegated to the body of a constructor function $cons2$. The two *fields* can accessed by selectors $first$ and $second$. They are hidden in the *Scheme*-like selector functions $car2$ and $cdr2$.
 - the *third* is the second *specialized* way by using Julia's *built-in* type $Rational$. The construction of pairs is delegated to the body of a *Scheme*-like constructor function $cons3$. The two fields can accessed by the functions $numerator$ and $denominator$. They are hidden in the *Scheme*-like selector functions $car3$ and $cdr3$.
 - the *fourth* is the most easy and third *specialized* way by using Julia's *built-in* type $Rational$ and its *built-in* operators $+, -, *, /$, and $==$. The construction of rationals is done by using Julia's *built-in* constructon operator *//*. The two fields can accessed by $numerator$ and $denominator$. 
 
-In this chapter we avoid Julia's *multiple dispatch*. *Multiple dispatch* is valuable for subordinating *type-different* alternative functions as *methods* under the umbrella of a reduced set of function objects. 
+In this chapter we try to avoid Julia's *multiple dispatch*. *Multiple dispatch* is valuable for subordinating *type-different* alternative functions as *methods* under the umbrella of a reduced set of function objects. *multiple dispatch* is allowed only as *methods* in some functions.
 
-We do not exploit *multiple dispatch* here. The *input* to the most *abstract* constructor in the *ADT* always consists of *Integers* for *numerator* and *denominator* of the ratio. Only the *basic* constructs *differ* in type (*Tuple*, *Pair*, *Struct*, *Rational*). So functions in each *abstraction tower* (= *abstraction hierachy*) have names with *postfixes* depending on the number of the *tower*. 
+Wheras *inputs* to the most *abstract* constructors $makeRat1-3$ are always the *same* their *outputs* differ. Inputs are *Integers* for *numerator* and *denominator* of the ratio. Outputs of constructors *differ* in type (*Tuple*, *Pair*, *Struct*, *Rational*). These output types are the relevant characteristic of each *abstraction tower* (= *abstraction hierachy*).
 
 "
 
@@ -330,13 +330,13 @@ md"
 # ╔═╡ 680c5ec0-6cf2-4b0c-a005-751ef8a7e568
 md"
 ---
-###### *Un*typed (*without* gcd) Function $makeRat1$
+###### *1st* (*Un*typed, *without* gcd) Method of Function $makeRat1$
 "
 
 # ╔═╡ 810b1eca-eac7-49cb-a34f-8328ea432824
 md"
 ---
-###### *2nd* method (*specialized*, *typed*, *with* gcd) of function $makeRat1$
+###### *2nd* method (*specialized*, *typed*, *with* gcd) of Function $makeRat1$
 ###### ... with type $$Signed$$ and imperative *looping* construct $while$
 "
 
@@ -715,6 +715,19 @@ md"
 # ╔═╡ b4c9a74b-5a49-452e-bbf0-44826cd92e46
 md"
 ###### Abstract *Typed* Constructor $makeRat2$
+"
+
+# ╔═╡ f46b3ac9-4ae4-42ba-9ef9-6516c96b013c
+md"
+---
+###### *1st* (*Un*typed, *without* gcd) Method of Function $makeRat2$
+"
+
+# ╔═╡ 48d6a6b2-aca3-44dc-af73-ede92f0dbc87
+md"
+---
+###### *2nd* method (*specialized*, *typed*, *with* gcd) of Function $makeRat2$
+###### ... with type $Signed$ and imperative *looping* construct $while$
 "
 
 # ╔═╡ 4e179b9f-021e-4891-8e27-7fa36b827fcf
@@ -2840,6 +2853,8 @@ version = "1.4.1+2"
 # ╠═afe55885-aba6-4cbc-af2c-23d15bbbf6f5
 # ╟─d84101ea-7172-4e1f-9929-1a23acd7a7c7
 # ╟─b4c9a74b-5a49-452e-bbf0-44826cd92e46
+# ╟─f46b3ac9-4ae4-42ba-9ef9-6516c96b013c
+# ╟─48d6a6b2-aca3-44dc-af73-ede92f0dbc87
 # ╠═3498e844-931f-4d46-a9aa-b9a2d3b892e7
 # ╟─4e179b9f-021e-4891-8e27-7fa36b827fcf
 # ╠═7f5b9164-07c2-4ae1-888d-f601fa9d286c
