@@ -216,25 +216,10 @@ car(z)
 # ╔═╡ 6c7b6bea-ba2a-419e-8304-d78cdf837386
 cdr(z)
 
-# ╔═╡ a99b80d7-5033-4f1d-8432-2bdc237aabe1
-md"
----
-##### 4.3 OOP-orientated Message Passing
-(c.f. Smalltalk or [Pharo](https://files.pharo.org/media/pharoCheatSheet.pdf))
-"
-
-# ╔═╡ 71a71be8-8b62-478b-abf8-8cae7b324420
-objectAB = cons(:a, :b)
-
-# ╔═╡ a06a1086-b24b-4127-9096-412314c63a09
-objectAB(:car) == :a  # ==> true --> :)      unary message ala Pharo or Smalltalk
-
-# ╔═╡ 8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
-objectAB(:cdr) == :b  # ==> true --> :)      unary message ala Pharo or Smalltalk
-
 # ╔═╡ 6a50a311-6479-4334-80f5-820dc6600fcd
 md"
-###### Test of Axioms
+---
+##### 4.3 Test of Axioms
 "
 
 # ╔═╡ 9e4a7729-3f1c-4be5-8a71-31f67685d3e6
@@ -248,6 +233,32 @@ cons(:a, :b) == cons(:a, :b)
 
 # ╔═╡ 74b28f91-39c5-4e68-806c-9aeecf96b6ed
 cons(:a, :b) == cons(:a, :c)
+
+# ╔═╡ a99b80d7-5033-4f1d-8432-2bdc237aabe1
+md"
+---
+##### 4.4 OOP-orientated Message Passing
+(c.f. Smalltalk or [Pharo](https://files.pharo.org/media/pharoCheatSheet.pdf))
+"
+
+# ╔═╡ 71a71be8-8b62-478b-abf8-8cae7b324420
+instanceObjectAB = cons(:a, :b)
+
+# ╔═╡ a06a1086-b24b-4127-9096-412314c63a09
+instanceObjectAB(:car) == :a  # ==> true --> :)  unary message ala Pharo or Smalltalk
+
+# ╔═╡ 8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
+instanceObjectAB(:cdr) == :b  # ==> true --> :)  unary message ala Pharo or Smalltalk
+
+# ╔═╡ a9416073-ee85-4496-9f8d-a8e8fc3a5c2a
+md"
+---
+##### 4.5 *Privatenes* of Instance Content
+You *can't* see the inner working or content of the *instance* $instanceObjectAB$
+"
+
+# ╔═╡ f82e0d8f-7e53-4a5e-87ea-3c1db034fd42
+instanceObjectAB
 
 # ╔═╡ 15862a5d-bfe3-44be-aca1-6a9a1732e51b
 md"
@@ -1712,15 +1723,17 @@ version = "1.4.1+2"
 # ╠═881e3a90-8b68-47ed-9d79-d8ed5ab1faa6
 # ╠═301d3021-02d3-41cf-8ffa-026370af7e5f
 # ╠═6c7b6bea-ba2a-419e-8304-d78cdf837386
-# ╟─a99b80d7-5033-4f1d-8432-2bdc237aabe1
-# ╠═71a71be8-8b62-478b-abf8-8cae7b324420
-# ╠═a06a1086-b24b-4127-9096-412314c63a09
-# ╠═8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
 # ╟─6a50a311-6479-4334-80f5-820dc6600fcd
 # ╠═9e4a7729-3f1c-4be5-8a71-31f67685d3e6
 # ╠═150b7adc-aff4-4b87-8ac3-316657b1fd0e
 # ╠═bda70e41-89cd-46af-bdae-ee69c7fb38fa
 # ╠═74b28f91-39c5-4e68-806c-9aeecf96b6ed
+# ╠═a99b80d7-5033-4f1d-8432-2bdc237aabe1
+# ╠═71a71be8-8b62-478b-abf8-8cae7b324420
+# ╠═a06a1086-b24b-4127-9096-412314c63a09
+# ╠═8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
+# ╟─a9416073-ee85-4496-9f8d-a8e8fc3a5c2a
+# ╠═f82e0d8f-7e53-4a5e-87ea-3c1db034fd42
 # ╟─15862a5d-bfe3-44be-aca1-6a9a1732e51b
 # ╟─168aa8a3-cfd8-4758-8161-6dd955468a7a
 # ╟─911260a4-e5ca-42ac-9ed9-fb3cd068be01
