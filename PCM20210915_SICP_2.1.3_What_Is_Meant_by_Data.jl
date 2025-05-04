@@ -24,7 +24,7 @@ md"
 
 ###### file: PCM20210915\_SICP\_2.1.3\_What\_Is\_Meant\_by\_Data.jl
 
-###### code: Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/05/03 ***
+###### code: Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/05/04 ***
 =====================================================================================
 "
 
@@ -65,12 +65,16 @@ The *implementation* has to obey a *specification* set by following *axioms*:
 *We need to guarantee that, if we construct a rational number x from a pair of integers n and d, then extracting the numer and the denom of x and dividing them should yield the same result as dividing n by d. In other words, make-rat, numer, and denom must satisfy the condition that, for any integer n and any non-zero integer d, if x is (make-rat n d), then* (SICP, 1996, 2016):
 
 ###### Axiom 1: 
-$numer(makeRat(n, d)) == n \;;\;\text{ where: }n,d \in Int$
+$\forall n, d::Int: numer(makeRat(n, d)) == n$
 
 $\;$
 
 ###### Axiom 2: 
-$denom(makeRat(n, d)) == d$
+$\forall n,d::Int: denom(makeRat(n, d)) == d$
+
+where:
+
+[*Int is the default type of most integer literals and is an alias for either Int32 or Int64, depending on Sys.WORD_SIZE*](https://docs.julialang.org/en/v1/base/numbers/#Core.Int)
 
 $\;$
 $\;$
@@ -84,19 +88,25 @@ md"
 
 ###### Axiom 1: 
 
-$car(cons(x, y)) == x$
+$\forall x,y::Any:\ car(cons(x, y)) == x$
 
 $\;$
 
 ###### Axiom 2: 
 
-$cdr(cons(x, y)) == y$
+$\forall x,y::Any:\ cdr(cons(x, y)) == y$
 
 $\;$
 
 ###### Axiom 3
 
-$cons(x1, y1) == cons(x2, y2) <=> (x1 == x2) \land (y1 == y2)$
+$\forall x,y::Any:\ cons(x1, y1) == cons(x2, y2) <=> (x1 == x2) \land (y1 == y2)$
+
+$\;$
+
+where:
+
+[*Any is the union of all types. It has the defining property isa(x, Any) == true for any x. Any therefore describes the entire universe of possible values.*](https://docs.julialang.org/en/v1/base/base/#Core.Any)
 
 $\;$
 
@@ -1728,7 +1738,7 @@ version = "1.4.1+2"
 # ╠═150b7adc-aff4-4b87-8ac3-316657b1fd0e
 # ╠═bda70e41-89cd-46af-bdae-ee69c7fb38fa
 # ╠═74b28f91-39c5-4e68-806c-9aeecf96b6ed
-# ╠═a99b80d7-5033-4f1d-8432-2bdc237aabe1
+# ╟─a99b80d7-5033-4f1d-8432-2bdc237aabe1
 # ╠═71a71be8-8b62-478b-abf8-8cae7b324420
 # ╠═a06a1086-b24b-4127-9096-412314c63a09
 # ╠═8a98bcac-3e71-4ac3-af59-ecd96ddbbd79
