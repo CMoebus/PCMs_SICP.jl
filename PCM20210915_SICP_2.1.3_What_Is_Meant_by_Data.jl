@@ -24,7 +24,7 @@ md"
 
 ###### file: PCM20210915\_SICP\_2.1.3\_What\_Is\_Meant\_by\_Data.jl
 
-###### code: Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/05/04 ***
+###### code: Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/05/09 ***
 =====================================================================================
 "
 
@@ -77,7 +77,6 @@ where:
 [*Int is the default type of most integer literals and is an alias for either Int32 or Int64, depending on Sys.WORD_SIZE*](https://docs.julialang.org/en/v1/base/numbers/#Core.Int)
 
 $\;$
-$\;$
 
 "
 
@@ -118,7 +117,7 @@ md"
 ##### 4. SICP-Scheme-like *functional* Julia 
 ---
 ##### 4.1 *Procedural* Representation of *Data* 
-The *procedural* representation of *aata* enables [*object orientated programming*](https://en.wikipedia.org/wiki/Object-oriented_programming) (*OOP*)). *Object-oriented programming (OOP) is a programming paradigm based on the concept of objects. Objects can contain data (called fields, attributes or properties) and have actions they can perform (called procedures or methods and implemented in code). In OOP, computer programs are designed by making them out of objects that interact with one another.* ([Wikipedia](https://en.wikipedia.org/wiki/Object-oriented_programming))
+The *procedural* representation of *data* enables [*object orientated programming*](https://en.wikipedia.org/wiki/Object-oriented_programming) (*OOP*)). *Object-oriented programming (OOP) is a programming paradigm based on the concept of objects. Objects can contain data (called fields, attributes or properties) and have actions they can perform (called procedures or methods and implemented in code). In OOP, computer programs are designed by making them out of objects that interact with one another.* ([Wikipedia](https://en.wikipedia.org/wiki/Object-oriented_programming))
 
 "
 
@@ -140,15 +139,17 @@ md"
          |                                                              |    
          |         +------------------------------------------+         |
          |         | dispatch                                 |         |
-         |         |                      +---+               |         |
-         |         |                      |   |               |         |
-         |         |         +--->:car--->| x |---------> x ->+-------->+----> 
-         |         |        / \           |   |               |         | 
-    ---->+-------->+------>+ ? +          +---+               |         |
-         | message |        \ /           |   |               |         |
-         |         |         +--->:cdr--->| y |---------> y ->+-------->+----> 
-         |         |                      |   |               |         |
-         |         |                      +---+               |         |
+         |         |                       +---+              |         |
+         |         |                       |   |              |         |
+         |         |          +--->:car--->+ x |--->x--->+    |         |
+         |         |         /\            |   |         |    |         |
+         |         |        /  \           +---+         v    |         | 
+    ---->+-------->+------>+ == +                        +--->+-------->+----->      
+         | message |        \  /           +---+         ^    |         |
+         |         |         \/            |   |         |    |         |
+         |         |          +--->:cdr--->| y |--->y--->+    |         |
+         |         |                       |   |              |         |
+         |         |                       +---+              |         |
          |         |                                          |         |
          |         +------------------------------------------+         |
          |                                                              |
@@ -274,7 +275,7 @@ instanceObjectAB
 md"
 ---
 ##### 5. Summary
-We demonstrated how OOP is possible in a functional contect. To that end the *constructor* has to be a *higher* function returning a function $dispatch$ with the only *parameter* $message$. $dispatch$ is bound to an *object name*. $message$ *values* are the *messages* sent to the *object*. According to the *value* of $message$ some computations get triggered.
+We demonstrated how OOP is possible in a functional contect. To that end the *constructor* has to be a *higher* function returning a function $dispatch$ with the only *parameter* $message$. Function $dispatch$ is bound to an *object name*. $message$ *values* are the *messages* sent to the *object*. According to the *value* of $message$ some computations get triggered.
 
 "
 
