@@ -28,7 +28,7 @@ md"
 =====================================================================================
 #### SICP: 2.2.4 [Example: A Picture Language II](https://sarabander.github.io/sicp/html/2_002e2.xhtml#g_t2_002e2_002e4)
 ###### file: PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_II.jl
-###### Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/06/03 ***
+###### Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/06/04 ***
 =====================================================================================
 "
 
@@ -37,11 +37,11 @@ md"
 md"
 ---
 ##### 0. Introduction
-The code in file *PCM20250531_SICP_2.2.4_Example_A_Picture_Language_I.jl* was a first try to implement as much as possible of SICP's chapter 2.2.4. We stopped that enterprise because we realized that we could *not* succeed in SICP's goal:
+The code in file *PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_I.jl* was a first try to implement as much as possible of SICP's chapter 2.2.4. We stopped that enterprise because we realized that we could *not* succeed in SICP's goal:
 
 *This section presents a simple language for drawing pictures that illustrates the power of data abstraction and closure, and also exploits higher-order procedures in an essential way. The language is designed to make it easy to experiment with patterns such as the ones in figure 2.9, which are composed of repeated elements that are shifted and scaled. In this language, the data objects being combined are represented as procedures rather than as list structure. Just as cons, which satisfies the closure property, allowed us to easily build arbitrarily complicated list structure, the operations in this language, which also satisfy the closure property, allow us to easily build arbitrarily complicated patterns.* (SICP, 1996, p.126; 2016, p.172f)
 
-Here in *PCM20250531_SICP_2.2.4_Example_A_Picture_Language_II.jl* we try to be as close as possible to SICP-Scheme. But beware ! There are as many '$()$' as in Scheme ! We only have to place them in slightly different places:
+Here in *PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_II.jl* we try to be as close as possible to SICP-Scheme. But beware ! There are as many '$()$' as in Scheme ! We only have to place them in slightly different places:
 "
 
 # ╔═╡ e50dfb4b-c5d4-4da9-89e7-ae80ef5fa69c
@@ -610,7 +610,7 @@ function plot4WaveMans(;title=L"Unit\ WaveMan")
 				scatter(drawLine(waveManBodySegments), label=false, colour=:cornflowerblue, title=title)
 				plot!(drawLine(waveManBodySegments), label=false, axis=false, lw=2, linecolour=:cornflowerblue, title=title)
 			end # let
-	plot4 = plot(Shape(waveManBodyXs, waveManBodyYs), colour=:cornflowerblue, opacity=0.4, title=title)
+	plot4 = plot(Shape(waveManBodyXs, waveManBodyYs), colour=:cornflowerblue, opacity=0.4, label=false, title=title)
     plot(plot1, plot2, plot3, plot4)
 end # function plot4WaveMans
 
