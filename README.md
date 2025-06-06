@@ -1,6 +1,6 @@
 # PCMs_SICP.jl
 ##  Problem-Solving with Julia - the SICP Way -
-- A self-study guide with Pluto
+- A 'SICP' (= Structure And Interpretation of Computer Programs) Self-study Diary 
 
 This is a personal learning diary when exploring Julia through working with the Scheme scripts in SICP.  Perhaps inspired by the fancy characters on the cover, the SICP book is called the wizard book. This should inspire the reader to become a wizard himself.
 
