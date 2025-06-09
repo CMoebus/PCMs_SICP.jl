@@ -28,7 +28,7 @@ md"
 =====================================================================================
 #### SICP: 2.2.4 [Example: A Picture Language II](https://sarabander.github.io/sicp/html/2_002e2.xhtml#g_t2_002e2_002e4)
 ###### file: PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_II.jl
-###### Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/06/04 ***
+###### Julia/Pluto.jl-code (1.11.5/0.20.6) by PCM *** 2025/06/09 ***
 =====================================================================================
 "
 
@@ -39,9 +39,19 @@ md"
 ##### 0. Introduction
 The code in file *PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_I.jl* was a first try to implement as much as possible of SICP's chapter 2.2.4. We stopped that enterprise because we realized that we could *not* succeed in SICP's goal:
 
-*This section presents a simple language for drawing pictures that illustrates the power of data abstraction and closure, and also exploits higher-order procedures in an essential way. The language is designed to make it easy to experiment with patterns such as the ones in figure 2.9, which are composed of repeated elements that are shifted and scaled. In this language, the data objects being combined are represented as procedures rather than as list structure. Just as cons, which satisfies the closure property, allowed us to easily build arbitrarily complicated list structure, the operations in this language, which also satisfy the closure property, allow us to easily build arbitrarily complicated patterns.* (SICP, 1996, p.126; 2016, p.172f)
+*This section presents a simple language for drawing pictures that illustrates the power of data abstraction and closure, and also exploits higher-order procedures in an essential way. The language is designed to make it easy to experiment with patterns such as the ones in (SICP, 1996, p.127, Figure 2.9) which are composed of repeated elements that are shifted and scaled. In this language, the data objects being combined are represented as procedures rather than as list structure. Just as cons, which satisfies the closure property, allowed us to easily build arbitrarily complicated list structure, the operations in this language, which also satisfy the closure property, allow us to easily build arbitrarily complicated patterns.* (SICP, 1996, p.126; 2016, p.172f)
 
-Here in *PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_II.jl* we try to be as close as possible to SICP-Scheme. But beware ! There are as many '$()$' as in Scheme ! We only have to place them in slightly different places:
+Here in *PCM20250531\_SICP\_2.2.4\_Example\_A\_Picture\_Language\_II.jl* we try a second time to be as close as possible to SICP-Scheme and succeed. 
+
+We think that we have to follow this sequence of design steps:
+
+- *construct* a *painter* that paints a *figure of interest (FIGOI)* in the *unit frame* by a *recursive functional* script in the *picture language* 
+
+- embed this *(FIGOI)* in a *frame of interest (FROI)*
+
+- plot the *FROI* with $Plot.jl$ or another *plot library*
+
+The *last* step has to be delayed as much as possible. But beware ! There are as many '$()$' as in Scheme ! We only have to place them in slightly different places:
 "
 
 # ╔═╡ e50dfb4b-c5d4-4da9-89e7-ae80ef5fa69c
@@ -134,9 +144,9 @@ md"
 makeVect(x::Real, y::Real) = Vect(x, y)::Vect
 
 # ╔═╡ b1fb0a44-e12c-4670-b666-b8bf9f9ec4e7
-function makeVects(xs::Vector, ys::Vector)::Vector
-	map((x, y) -> makeVect(x, y), xs, ys)
-end # function makeVects
+function makeVect(xs::Vector, ys::Vector)::Vector
+	map((x, y) -> [x, y], xs, ys)
+end # function makeVect
 
 # ╔═╡ cc1e91ae-4390-4a4f-89b5-0ddd800ef35b
 md"
@@ -144,10 +154,27 @@ md"
 "
 
 # ╔═╡ f969dbd4-dbf6-4a09-bc2b-3a2d90c9d981
-xCorVect(v::Vect)::Real = v.x::Real
+xCoordVect(v::Vect)::Real = 
+	v.x::Real
+
+# ╔═╡ 5b226945-1442-4d34-8a0d-05d51e1465d8
+xCoordVect(v::Vector)::Real = 
+	v[1]::Real
+
+# ╔═╡ 2f9e94d2-4c63-4cc6-b8cd-105685e74a0a
+xsCoordVect(vs::Vector{Vector})::Vector = 
+	map(v -> v[1], vs)
 
 # ╔═╡ 5492a690-ce5f-43a3-9aee-5f4b92c0909d
-yCorVect(v::Vect)::Real = v.y::Real
+yCoordVect(v::Vect)::Real = v.y::Real
+
+# ╔═╡ a78c070d-7745-4488-895a-dbc70aa3c9c9
+yCoordVect(v::Vector)::Real = 
+	v[2]::Real
+
+# ╔═╡ f26ccbfb-c657-400c-9426-d7f3b1f7448f
+ysCoordVect(vs::Vector{Vector})::Vector = 
+	map(v -> v[2], vs)
 
 # ╔═╡ 4d6ce9f8-c266-4b06-9637-54dc8f2b985b
 md"
@@ -159,13 +186,28 @@ md"
 addVect(v1::Vect, v2::Vect)::Vect = 
 	makeVect(v1.x + v2.x, v1.y + v2.y)::Vect
 
+# ╔═╡ a43a659f-2338-4a6a-a055-988a4a22cbac
+addVect(v1s::Vector, v2s::Vector)::Vector = 
+	v1s + v2s
+
 # ╔═╡ 259e8a18-5c1f-4dbd-be01-a10194bf18c1
 subVect(v1::Vect, v2::Vect)::Vect = 
 	makeVect(v1.x - v2.x, v1.y - v2.y)::Vect
 
+# ╔═╡ 1f9ba27e-0ced-4f71-8f35-c3c2aa4b5aaf
+subVect(v1s::Vector, v2s::Vector)::Vector = 
+	v1s - v2s
+
 # ╔═╡ 1d427fe1-21a3-4151-be29-54ef7d531c1e
 scaleVect(s::Real, v::Vect)::Vect = 
 	makeVect(s * v.x, s * v.y)::Vect
+
+# ╔═╡ 582a778b-47f4-4963-9125-3e9dd419312a
+scaleVect(s::Real, v::Vector)::Vector = 
+	s .* v
+
+# ╔═╡ 1f117119-228b-43de-a743-4818add6cd3f
+
 
 # ╔═╡ 3b4a452e-4896-4a2f-9d94-1d12dea0e8d4
 md"
@@ -177,10 +219,25 @@ md"
 z = makeVect(1, 2)
 
 # ╔═╡ 529727b7-e6ea-4d8f-82be-a995bed3a72f
-xCorVect(z)
+xCoordVect(z)
 
 # ╔═╡ ca86f7c6-dbd4-4d20-8543-062fa07b6b63
-yCorVect(z)
+yCoordVect(z)
+
+# ╔═╡ aa59c336-00fe-4d42-a851-2131d5fe9e94
+xs = [1, 2, 3]
+
+# ╔═╡ 34db0743-60b0-4aa5-ae96-c19e557513a1
+ys = [4, 5, 6]
+
+# ╔═╡ f881e434-0961-484d-a90e-cc10c4b3c710
+zs = makeVect(xs, ys)
+
+# ╔═╡ 5acd24ae-ded2-421f-b7b3-bfcdafca42fa
+addVect(xs, ys)
+
+# ╔═╡ 351d3ef3-82ff-4aba-9fc2-9917c2b6572a
+scaleVect(2.5, xs)
 
 # ╔═╡ 390ba005-e578-436c-8675-493953883368
 md"
@@ -226,13 +283,16 @@ md"
 "
 
 # ╔═╡ 66ec9e8c-6596-47f0-845d-e27c576d3c68
-originFrame(frame::Frame)::Vect = frame.origin
+originFrame(frame::Frame)::Vect = 
+	frame.origin
 
 # ╔═╡ 9468816b-5cac-468b-b1db-c73cd995cf80
-edge1Frame(frame::Frame)::Vect = frame.edge1
+edge1Frame(frame::Frame)::Vect = 
+	frame.edge1
 
 # ╔═╡ 71372e78-5364-4cd5-ac13-ba9f50fdf482
-edge2Frame(frame::Frame)::Vect = frame.edge2
+edge2Frame(frame::Frame)::Vect = 
+	frame.edge2
 
 # ╔═╡ 593200c8-8a4a-4e66-a4aa-6e54df2b0eb1
 function plotFrame(frame::Frame; title="", lw=1.5, xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), size=(900, 600), annotations=:false)
@@ -318,8 +378,8 @@ function frameCoordMap(frame)::Function
 	function (vect::Vect) # vect is vector to be mapped into the frame basis
 		addVect(
 			originFrame(frame),
-			addVect(scaleVect(xCorVect(vect), edge1Frame(frame)),
-					scaleVect(yCorVect(vect), edge2Frame(frame))))
+			addVect(scaleVect(xCoordVect(vect), edge1Frame(frame)),
+					scaleVect(yCoordVect(vect), edge2Frame(frame))))
 	end # function (vect)
 end # function frameCoordMap
 
@@ -330,7 +390,8 @@ frameCoordMap(frame1)(makeVect(0, 0))     # map (0, 0) into frame1's origin (2, 
 frameCoordMap(frame1)(makeVect(1, 1))     # map (1, 1) into frame1's top-left (6, 7)
 
 # ╔═╡ 696cda7c-6aca-4c90-9b3a-da0717ab1b8c
-frameCoordMap(frame1)(makeVect(1/2, 1/2)) # map (1/2, 1/2) into frame1's center (4, 4)
+# map (1/2, 1/2) into frame1's center (4, 4)
+frameCoordMap(frame1)(makeVect(1/2, 1/2)) 
 
 # ╔═╡ 9e337b84-7e62-40c4-ac8d-40013a599cf2
 frameCoordMap(frame1)(makeVect(0, 0)) == originFrame(frame1)    # SICP, 1996, p.136
@@ -352,15 +413,18 @@ md"
 "
 
 # ╔═╡ 4bc78c6d-2e39-41c9-af6e-4c9f238eea6e
-function makeSegment(startPoint::Vect, endPoint::Vect; 
-					 originPoint::Vect = makeVect(0, 0))
+function makeSegment(
+			startPoint::Vect, endPoint::Vect; 
+			originPoint::Vect = makeVect(0, 0))
 	Segment(originPoint, startPoint, endPoint)
 end # function makeSegment
 
 # ╔═╡ d3880771-94b9-43b8-b55e-e7e8f98937bc
-function makeSegments(Xs::Vector, Ys::Vector)
+function makeSegments(xs::Vector, ys::Vector)
 	[makeSegment(
-		makeVect(Xs[i], Ys[i]), makeVect(Xs[i+1], Ys[i+1])) for i in 1:length(Xs)-1]
+		makeVect(xs[i], ys[i]), 
+		makeVect(xs[i+1], ys[i+1])) 
+	 for i in 1:length(xs)-1]
 end # function makeSegments
 
 # ╔═╡ b6a7ff2f-2de8-4e30-96b0-b93cdaad64c1
@@ -397,12 +461,12 @@ makeSegmentList(segments...) =
 # ╔═╡ 0c6b418d-b888-4b40-925f-00829e0fed72
 md"
 ---
-###### 3.4.3 Methods of Function $drawLine$
+###### 3.4.3 Methods of Function $shapeSegment (= drawLine)$
 (SICP, 1996, p.136)
 "
 
 # ╔═╡ aa2abc32-91ea-46d1-b75d-46fccd52444b
-function drawLine(segment::Segment)::Shape
+function shapeSegment(segment::Segment)::Shape
 	let startP = getStartPoint(segment)
 		endP   = getEndPoint(segment)
 		#----------------------------------
@@ -411,29 +475,54 @@ function drawLine(segment::Segment)::Shape
 		#----------------------------------
 		Shape(xs, ys)
 	end # let
-end # function drawLine
+end # function shapeSegment
+
+# ╔═╡ e6730566-d799-4e6c-ab0d-4d9a91a960f7
+drawLine(segment::Segment)::Shape = 
+	shapeSegment(segment::Segment)::Shape
 
 # ╔═╡ 5f2fa967-3798-4afd-8c4a-f96919c3b4d8
-function drawLine(segmentList::Vector)::Vector{Shape}
-	map(segment -> drawLine(segment), segmentList)
-end # function drawLine
+function shapeSegments(segmentList::Vector)::Vector{Shape}
+	map(segment -> shapeSegment(segment), segmentList)
+end # function shapeSegments
+
+# ╔═╡ 655a5024-53f8-4b89-a2cb-4b2321931243
+drawLine(segmentList::Vector)::Vector{Shape} =
+	shapeSegments(segmentList::Vector)::Vector{Shape}
 
 # ╔═╡ 39fca6a6-4081-427d-9ae5-4f9084c3fd73
 md"
 ---
 ###### 3.4.4 Function $fromSegmentsToPainter$
+
+*For instance, suppose we have a procedure draw-line that draws a line on the screen between two specified points. Then we can create painters for line drawings, such as the wave painter in figure 2.10 (SICP, 1996, p.129), from lists of line segments as follows* (SICP, 1996, p.136f):
 "
 
 # ╔═╡ cf8835df-8f66-401f-97f8-d519a3112693
-function fromSegmentsToPainter(segmentList)
+function fromSegmentsToPainter(segmentList::Vector)::Function
 	frame -> 
 		map(segment -> 
-			drawLine(
+			shapeSegment(
 				makeSegment(
 					frameCoordMap(frame)(getStartPoint(segment)), 
 					frameCoordMap(frame)(getEndPoint(segment)))),
 			segmentList)
 end # function fromSegmentsToPainter
+
+# ╔═╡ 17ae3fd2-a96b-43d5-970e-8cddfd9c90e5
+function fromCoordinatesToPainter(segmentList::Vector)::Function
+	frame -> 
+		map(segment -> 
+			shapeSegment(
+					frameCoordMap(frame)(getStartPoint(segment)), 
+					frameCoordMap(frame)(getEndPoint(segment))),
+			segmentList)
+end # function fromCoordinatesToPainter
+
+# ╔═╡ 50351a14-de0b-4be7-97ee-736ddb401d45
+md"
+*The segments are given using coordinates with respect to the unit square. For each segment in the list, the painter transforms the segment endpoints with the frame coordinate map and draws a line between the transformed points.* (SICP, 1996, p.137)
+"
 
 # ╔═╡ 85cb061e-4074-4ec4-bc81-6f8ceffe6c6f
 md"
@@ -444,34 +533,41 @@ md"
 # ╔═╡ e3af35a2-0d4e-441e-9d28-9609b8537485
 md" 
 ---
-###### 3.4.5.1 Draw $segment1$
+###### 3.4.5.1 Draw $shapeSegment(segment1)(=drawLine(segment1))$
 "
 
 # ╔═╡ 49dd66f1-d30c-4946-85f6-4986231841a6
 segment1 = makeSegment(makeVect(2, 1), makeVect(5, 3))
 
 # ╔═╡ 906b2fd4-0eca-4b24-9212-6f30e4a19e85
-typeof(drawLine(segment1))
+drawLine(segment1), shapeSegment(segment1)
 
 # ╔═╡ 91127892-395f-4f66-ad94-99ad6a89a997
 getStartPoint(segment1), getEndPoint(segment1)
 
 # ╔═╡ 19fdaecd-8614-4761-bbd7-164b808d3fdb
-plot(drawLine(segment1); xlims=(0.0, 7.0), ylims=(0.0, 7.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(500, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"segment1")
+plot(drawLine(segment1); xlims=(0.0, 7.0), ylims=(0.0, 7.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"segment1")
 
 # ╔═╡ 11f4b71f-716d-41b4-b384-81cd206b170b
 md" 
 ---
-###### 3.4.5.2 Draw $segmentList1$
+###### 3.4.5.2 Draw $fromSegmentsToPainter(makeSegmentList(segment1))(frame1)$
 "
+
+# ╔═╡ 8c42f876-9623-4974-9fec-8ae728bc5f78
+makeSegmentList(segment1)
+
+# ╔═╡ d327d008-cf25-456a-9893-eea733bc83c0
+plot(fromSegmentsToPainter(makeSegmentList(segment1))(frame1); 
+	xlims=(0.0, 7.0), ylims=(0.0, 7.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"fromSegmentsToPainter(makeSegmentList(segment1))(frame1)", titlefontsize=10)
 
 # ╔═╡ d62d8161-de05-42cd-ab5f-ef03842166cd
 segmentList1 =
 	let
-		segment1 = makeSegment(makeVect(2, 1), makeVect(5, 3))
-		segment2 = makeSegment(makeVect(5, 3), makeVect(5, 6))
-		segment3 = makeSegment(makeVect(5, 6), makeVect(2, 4))
-		segment4 = makeSegment(makeVect(2, 4), makeVect(2, 1))
+		segment1    = makeSegment(makeVect(2, 1), makeVect(5, 3))
+		segment2    = makeSegment(makeVect(5, 3), makeVect(5, 6))
+		segment3    = makeSegment(makeVect(5, 6), makeVect(2, 4))
+		segment4    = makeSegment(makeVect(2, 4), makeVect(2, 1))
 		segmentList = makeSegmentList(segment1, segment2, segment3, segment4)
 	end # let
 
@@ -510,7 +606,8 @@ fromSegmentsToPainter(segmentList2)(frame1)
 plot(fromSegmentsToPainter(segmentList2)(frame1); xlims=(0.0, 1.0), ylims=(0.0, 1.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(500, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"segmentList2\ in\ frame1")
 
 # ╔═╡ 1134f274-92d4-4dd4-9740-a22c88b75752
-plot(fromSegmentsToPainter(segmentList2)(frame2); xlims=(0.0, 7.0), ylims=(0.0, 7.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(500, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"segmentList2\ in\ frame2")
+plot(fromSegmentsToPainter(segmentList2)(frame2);
+	 xlims=(0.0, 6.0), ylims=(0.0, 6.0), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(500, 300), linecolour=:cornflowerblue, lw=4, opacity=0.5, title=L"segmentList2\ in\ frame2")
 
 # ╔═╡ 248cf3e6-9b96-4c0a-9fd4-b5985044c329
 md"
@@ -537,16 +634,16 @@ function makeWaveMan(x0, y0; normalize=false)
 		[(x - minX) / lengthX for x in xs]
 	end
 	#--------------------------------------------------------------------------------
-	xsBody = x0 .+ [4, 7, 8.5, 10.5, 13.5, 10.5, 18, 18, 13.5, 10.5, 11.5, 10.5, 7, 5.5, 6.5, 4.5, 2, -1, -1, 2, 4.5, 5.5, 4]         # x-coordinates of body
-	ysBody = y0 .+ [.5, .5, 6, .5, .5, 9, 3.5, 7.5, 13, 13, 17, 20, 20, 17, 13, 13, 12, 17, 13, 8, 12, 10, .5]                        # y-coordinates of body
-	xsMouth    = x0 .+ [ 7.5,  8.0,  9.0,  9.5,  7.5] # x-coordinates of mouth
+	xsBody = x0 .+ [4, 7, 8.5, 10.5, 13.5, 10.5, 18, 18, 13.5, 10.5, 11.5, 10.5, 7, 5.5, 6.5, 4.5, 2, -1, -1, 2, 4.5, 5.5, 4]          # x-coordinates of body
+	ysBody = y0 .+ [.5, .5, 6, .5, .5, 9, 3.5, 7.5, 13, 13, 17, 20, 20, 17, 13, 13, 12, 17, 13, 8, 12, 10, .5]                         # y-coordinates of body
+	xsMouth    = x0 .+ [ 7.5,  8.0,  9.0,  9.5,  7.5]  # x-coordinates of mouth
 	ysMouth    = (y0 - 0.5) .+ [16.0, 15.5, 15.5, 16.0, 16.0] # y-coordinates of mouth
-	xsNose     = x0 .+ [ 8.0,  9.0,  8.5]             # x-coordinates of nose
-	ysNose     = (y0 -  0.8) .+ [17.0, 17.0, 18.0]    # y-coordinates of nose
-	xsLeftEye  = (x0 +  7.0) .+ shapeOfEye()[1]       # x-coordinates of left eye
-	ysLeftEye  = (y0 + 17.2) .+ shapeOfEye()[2]       # y-coordinates of left eye
-	xsRightEye = (x0 + 10.0) .+ shapeOfEye()[1]       # x-coordinates of right eye
-	ysRightEye = (y0 + 17.2) .+ shapeOfEye()[2]       # y-coordinates of right eye
+	xsNose     = x0 .+ [ 8.0,  9.0,  8.5, 8.0]         # x-coordinates of nose
+	ysNose     = (y0 -  0.8) .+ [17., 17., 18., 17.]   # y-coordinates of nose
+	xsLeftEye  = (x0 +  7.0) .+ shapeOfEye()[1]        # x-coordinates of left eye
+	ysLeftEye  = (y0 + 17.2) .+ shapeOfEye()[2]        # y-coordinates of left eye
+	xsRightEye = (x0 + 10.0) .+ shapeOfEye()[1]        # x-coordinates of right eye
+	ysRightEye = (y0 + 17.2) .+ shapeOfEye()[2]        # y-coordinates of right eye
 	#--------------------------------------------------------------------------------
 	if normalize !== false
 		# normalize data points so that all points of figure lay inside a unit square
@@ -581,41 +678,130 @@ function makeWaveMan(x0, y0; normalize=false)
 	(body=Shape(normalizedXsBody, normalizedYsBody), mouth=Shape(normalizedXsMouth, normalizedYsMouth), nose=Shape(normalizedXsNose, normalizedYsNose), leftEye=Shape(normalizedXsLeftEye, normalizedYsLeftEye), rightEye=Shape(normalizedXsRightEye, normalizedYsRightEye),layout=1)  
 end
 
-# ╔═╡ 2040afd0-3af6-4837-ac28-184fc25645a3
-waveManBodyXs = makeWaveMan(0, 0, normalize=true).body.x
+# ╔═╡ 6d7788cf-c3e4-4832-8e22-a52ccbb010ba
+function waveManCoords(waveMan)
+	waveManBodyXs     = waveMan.body.x      # xs = vector of x-coordinates of body
+	waveManBodyYs     = waveMan.body.y      # ys = vector of y-coordinates of body 
+	waveManMouthXs    = waveMan.mouth.x
+	waveManMouthYs    = waveMan.mouth.y
+	waveManNoseXs     = waveMan.nose.x
+	waveManNoseYs     = waveMan.nose.y
+	waveManLeftEyeXs  = waveMan.leftEye.x
+	waveManLeftEyeYs  = waveMan.leftEye.y
+	waveManRightEyeXs = waveMan.rightEye.x
+	waveManRightEyeYs = waveMan.rightEye.y
+	(waveManBodyXs=waveManBodyXs, waveManBodyYs=waveManBodyYs, waveManMouthXs=waveManMouthXs, waveManMouthYs=waveManMouthYs, waveManNoseXs=waveManNoseXs, waveManNoseYs=waveManNoseYs, waveManLeftEyeXs=waveManLeftEyeXs, waveManLeftEyeYs=waveManLeftEyeYs, waveManRightEyeXs=waveManRightEyeXs, waveManRightEyeYs=waveManRightEyeYs)
+end # function waveManCoords
 
-# ╔═╡ cf758e0a-714b-4b9a-8cab-cd26dba55d9f
-waveManBodyYs = makeWaveMan(0, 0, normalize=true).body.y
+# ╔═╡ 3b40e793-93d1-4ca8-ab78-788449f613e2
+waveManCoordinates = 
+	waveManCoords(makeWaveMan(0, 0, normalize=true))
+
+# ╔═╡ d3c8cc22-f34f-46af-8d4f-10a07b9f499c
+waveManCoordinates.waveManBodyXs
+
+# ╔═╡ 774e52f3-fc50-4350-8b75-8f92ae3f2dd0
+waveManCoordinates.waveManBodyYs
 
 # ╔═╡ 4c6f262f-909e-48a1-a566-4319c240d492
-waveManVects = makeVects(waveManBodyXs, waveManBodyYs)
+waveManVects = 
+	makeVect(waveManCoordinates.waveManBodyXs, waveManCoordinates.waveManBodyYs)
 
 # ╔═╡ 20a7d01b-afaf-4500-966e-446819d5b6f1
 typeof(waveManVects)
 
+# ╔═╡ 53184b92-eefd-4c14-8b59-671f7fee0074
+waveManVects[2]
+
 # ╔═╡ 374eaa45-1e6b-4d19-9ce9-3b3e4510c56c
-xCorVect(waveManVects[2]), yCorVect(waveManVects[2])
+xCoordVect(waveManVects[2]), yCoordVect(waveManVects[2])
 
 # ╔═╡ 77e84104-debb-435e-9184-7b79e6f730f4
-waveManBodySegments = makeSegments(waveManBodyXs, waveManBodyYs)
+function makeWaveManSegments(waveManCoordinates)
+	waveManBodySegments = 
+		makeSegments(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)
+	waveManMouthSegments = 
+		makeSegments(
+			waveManCoordinates.waveManMouthXs, 
+			waveManCoordinates.waveManMouthYs)
+	waveManNoseSegments = 
+		makeSegments(
+			waveManCoordinates.waveManNoseXs, 
+			waveManCoordinates.waveManNoseYs)
+	waveManLeftEyeSegments = 
+		makeSegments(
+			waveManCoordinates.waveManLeftEyeXs, 
+			waveManCoordinates.waveManLeftEyeYs)
+	waveManRightEyeSegments = 
+		makeSegments(
+			waveManCoordinates.waveManRightEyeXs, waveManCoordinates.waveManRightEyeYs)
+	waveManSegments = 
+		makeSegmentList(
+			waveManBodySegments..., waveManMouthSegments..., waveManNoseSegments..., waveManLeftEyeSegments..., waveManRightEyeSegments...)
+	(waveManBodySegments=waveManBodySegments, waveManMouthSegments=waveManMouthSegments, waveManNoseSegments=waveManNoseSegments, waveManLeftEyeSegments=waveManLeftEyeSegments, waveManRightEyeSegments=waveManRightEyeSegments,
+	waveManSegments=waveManSegments)
+end # function makeWaveManSegments
+
+# ╔═╡ 1c50caf6-14b2-49e1-8eca-79986462092e
+makeWaveManSegments(waveManCoordinates).waveManSegments
 
 # ╔═╡ fa48c228-10ce-4681-927d-2a4cb3af199b
-drawLine(waveManBodySegments)
+function plotWaveManSilhouette(segmentList::Vector)
+	plot(shapeSegments(segmentList::Vector), label=false)
+end # function plotWaveManSilhouette
+
+# ╔═╡ 4b1c5204-cf96-44fe-8d01-0559de944028
+typeof(makeWaveManSegments(waveManCoordinates).waveManSegments) <: Vector
+
+# ╔═╡ 416144cd-1d87-452e-aa38-3d64516b80bf
+plotWaveManSilhouette(makeWaveManSegments(waveManCoordinates).waveManSegments)
+
+# ╔═╡ bc903351-bc95-41e3-8763-965d62cfd6b4
+# ╠═╡ skip_as_script = true
+#=╠═╡
+function waveManShape() 
+	vcat(
+		Shape(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs),
+		Shape(
+			waveManCoordinates.waveManMouthXs, 
+			waveManCoordinates.waveManMouthYs),
+		Shape(
+			waveManCoordinates.waveManNoseXs, 
+			waveManCoordinates.waveManNoseYs),
+		Shape(
+			waveManCoordinates.waveManLeftEyeXs, waveManCoordinates.waveManLeftEyeYs),
+		Shape(
+			waveManCoordinates.waveManRightEyeXs, 			waveManCoordinates.waveManRightEyeYs))
+end # function plotWaveManShape
+  ╠═╡ =#
+
+# ╔═╡ 25136ed2-540b-43d5-9087-adfb10bd5401
+#=╠═╡
+plot(waveManShape(), label=false)
+  ╠═╡ =#
 
 # ╔═╡ 19af462d-9c54-4ed1-b999-3eebc6e8e3e3
+#=╠═╡
 function plot4WaveMans(;title=L"Unit\ WaveMan")
-	plot1 = scatter(drawLine(waveManBodySegments), label=false, colour=:cornflowerblue, title=title)
-	plot2 = plot(drawLine(waveManBodySegments), label=false, axis=false, lw=2, linecolour=:cornflowerblue, title=title)
-	plot3 = let 
-				scatter(drawLine(waveManBodySegments), label=false, colour=:cornflowerblue, title=title)
-				plot!(drawLine(waveManBodySegments), label=false, axis=false, lw=2, linecolour=:cornflowerblue, title=title)
-			end # let
-	plot4 = plot(Shape(waveManBodyXs, waveManBodyYs), colour=:cornflowerblue, opacity=0.4, label=false, title=title)
+	plot1 = scatter(
+		drawLine(makeWaveManSegments(waveManCoordinates).waveManBodySegments), label=false, colour=:cornflowerblue, title=title)
+	plot2 = plot(
+		drawLine(makeWaveManSegments(waveManCoordinates).waveManBodySegments), label=false, axis=false, lw=2, linecolour=:cornflowerblue, title=title)
+    plot3 = plot(
+		drawLine(makeWaveManSegments(waveManCoordinates).waveManSegments), label=false, axis=false, )
+	plot4 = plot(waveManShape(), label=false, axis=false) 
     plot(plot1, plot2, plot3, plot4)
 end # function plot4WaveMans
+  ╠═╡ =#
 
 # ╔═╡ da30b5f0-6144-4503-866c-b42ed704b249
+#=╠═╡
 plot4WaveMans()
+  ╠═╡ =#
 
 # ╔═╡ 0458f5e5-0e00-4f17-8aac-fa7de3b7b958
 segmentList3 =
@@ -631,22 +817,40 @@ segmentList3 =
 plot(fromSegmentsToPainter(segmentList3)(frame1); xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1, opacity=0.5, title=L"segmentList3\ in\ frame1")
 
 # ╔═╡ e12b2116-d310-4475-8898-cf8eadbb7b62
-plot(fromSegmentsToPainter(waveManBodySegments)(frame1), size=(600, 500), label=false, xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
+plot(
+	fromSegmentsToPainter(
+		makeWaveManSegments(waveManCoordinates).waveManSegments)(frame1), 
+	size=(600, 500), label=false, xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
 
-# ╔═╡ 40192caf-352c-4b26-9cee-5298f9b5644e
-let
-	plot(fromSegmentsToPainter(segmentList3)(frame1); xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1, opacity=0.5, title=L"segmentList3\ in\ frame1")
-	plot!(fromSegmentsToPainter(waveManBodySegments)(frame1), size=(600, 500), label=false, ratio=:equal, aspect_ratio=1, xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
-end # let
+# ╔═╡ b083310b-4de3-4b3d-967c-0af4ea0b06d5
+plot(
+	vcat(
+		fromSegmentsToPainter(
+			segmentList3)(frame1),
+		fromSegmentsToPainter(
+			makeWaveManSegments(
+				waveManCoordinates).waveManSegments)(frame1)), 
+			size=(600, 500), label=false, ratio=:equal, aspect_ratio=1, 
+			xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), linecolour=:cornflowerblue, lw=1.5, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
 
 # ╔═╡ 7d54ba1f-e86f-4cb8-b415-36bbc674fdbb
-plot(fromSegmentsToPainter(waveManBodySegments)(frame2), size=(600, 500), xlims=(1.8, 6.2), ylims=(0.8, 7.2), label=false, linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Oblique\ and\ Scaled\ Frame2", titlefontsize=10)
+plot(
+	fromSegmentsToPainter(
+			makeWaveManSegments(
+				waveManCoordinates).waveManSegments)(frame2), 
+			size=(600, 500), label=false, ratio=:equal, aspect_ratio=1, 
+			xlims=(1.0, 7.1), ylims=(0.0, 8.1), linecolour=:cornflowerblue, lw=1.5, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
 
 # ╔═╡ 921c1f16-a5e7-459c-aa85-1af2c7447f31
-let
-	plot(fromSegmentsToPainter(segmentList3)(frame2); xlims=(0.9, 7.1), ylims=(-0.1, 7.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1, opacity=0.5, title=L"segmentList3\ in\ frame1")
-	plot!(fromSegmentsToPainter(waveManBodySegments)(frame2), size=(600, 500), label=false, ratio=:equal, aspect_ratio=1, xlims=(0.9, 7.1), ylims=(-0.1, 7.1), linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
-end # let
+plot(
+	vcat(
+		fromSegmentsToPainter(
+			segmentList3)(frame2),
+		fromSegmentsToPainter(
+			makeWaveManSegments(
+				waveManCoordinates).waveManSegments)(frame2)), 
+			size=(600, 500), label=false, ratio=:equal, aspect_ratio=1, 
+			xlims=(1.0, 7.1), ylims=(0.0, 8.1), linecolour=:cornflowerblue, lw=1.5, title=L"Body\ of\ WaveMan\ in\ Unit\ Frame1", titlefontsize=10)
 
 # ╔═╡ 985b867e-ea4f-4212-99c3-fb59293bc330
 md"
@@ -672,43 +876,220 @@ function framePainter(frame)
 end # function framePainter
 
 # ╔═╡ 40bb49a1-91f6-4408-af1e-b247267d2fd4
-shapeOfFrame1 = framePainter(frame1)
+framePainter(frame1)
 
 # ╔═╡ c0d6d720-04eb-4776-9fd3-046baa729c9e
-typeof(shapeOfFrame1)
+typeof(framePainter(frame1))
 
 # ╔═╡ 18f2a8b4-209c-4de4-b681-71482e7c4eff
-	plot(shapeOfFrame1; xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1.5, opacity=0.5, title=L"frame1", titlefontsize=12)
+	plot(
+		framePainter(frame1); 
+		xlims=(-0.1, 1.1), ylims=(-0.1, 1.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1.5, opacity=0.5, title=L"frame1", titlefontsize=12)
 
 # ╔═╡ ef7db86c-49e0-4acc-87e1-6e49f4b80663
-shapeOfFrame2 = framePainter(frame2)
+framePainter(frame2)
 
 # ╔═╡ f2158a99-7b82-4023-879b-a829d03cbd4a
-	plot(shapeOfFrame2; xlims=(-0.1, 7.1), ylims=(-0.1, 7.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1.5, opacity=0.5, title=L"frame2", titlefontsize=12)
+	plot(
+		framePainter(frame2); 
+		xlims=(-0.1, 7.1), ylims=(-0.1, 7.1), legend=false, ratio=:equal, aspect_ratio=1, showaxis=true, size=(600, 500), linecolour=:cornflowerblue, lw=1.5, opacity=0.5, title=L"frame2", titlefontsize=12)
 
 # ╔═╡ 3bea9896-fbf9-4933-abb4-babdf8988b01
 md"
 ---
-###### The $waveMan$ Painter
+###### Painter $waveManSilhouettePainter$ 
 (SICP, 1996, p.137, Exercise 2.49)
+
+This is the SICP painter $wave$ mentioned in (SICP, 1996, p.137, Exercise 2.49).
+We *add* a second painter $waveManShapePainter$ *not* mentioned in SICP.
 "
 
 # ╔═╡ 9de2a15b-81f4-4211-95bf-884b0612f8a6
-function waveManPainter(frame)
-	fromSegmentsToPainter(waveManBodySegments)(frame)
-end # function waveManPainter
+function waveManSilhouettePainter()
+	#--------------------------------------------------------------------
+	function (frame)
+		let
+			waveManBody     =
+				fromSegmentsToPainter(
+					makeWaveManSegments(
+						waveManCoordinates).waveManBodySegments)(frame)
+			waveManMouth    =
+				fromSegmentsToPainter(
+					makeWaveManSegments(
+						waveManCoordinates).waveManMouthSegments)(frame)
+			waveManNose     =
+				fromSegmentsToPainter(
+					makeWaveManSegments(
+						waveManCoordinates).waveManNoseSegments)(frame)
+			waveManLeftEye  =
+				fromSegmentsToPainter(
+					makeWaveManSegments(
+						waveManCoordinates).waveManLeftEyeSegments)(frame)
+			waveManRightEye =
+				fromSegmentsToPainter(
+					makeWaveManSegments(
+						waveManCoordinates).waveManRightEyeSegments)(frame)
+			waveMan = 
+				vcat(waveManBody, waveManMouth, waveManNose, waveManLeftEye, waveManRightEye)
+			#----------------------------------------------------------------
+			(waveManBody=waveManBody, waveManMouth=waveManMouth, waveManNose=waveManNose, waveManLeftEye=waveManLeftEye, waveManRightEye=waveManRightEye, waveMan=waveMan)
+		end # let
+	end # function
+	#--------------------------------------------------------------------------------
+end # function waveManSilhouettePainter
 
-# ╔═╡ 35bd376a-f0a1-4fce-93c7-8b641fbd36d5
-shapeOfWaveManBody1 = waveManPainter(frame1)
+# ╔═╡ a93f41a9-2589-48c0-91ef-4a42109f20c2
+waveManSilhouettePainter()(frame1)
 
-# ╔═╡ 12f71588-fde4-49ba-9a82-535c1e074ee3
-shapeOfWaveManBody2 = waveManPainter(frame2)
+# ╔═╡ 9149333b-3f51-4ab1-9a21-fa784048c4c4
+waveManSilhouettePainter()(frame1).waveMan
 
-# ╔═╡ 9882f7e3-8972-4b8f-84de-1827bf8fe48b
-plot(shapeOfWaveManBody1, size=(600, 500), xlims=(-0.1, 1.2), ylims=(-0.1, 1.2), label=false, linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Frame1", titlefontsize=10)
+# ╔═╡ 9709f125-11cd-40ea-87e3-f35ed6f7ef59
+plot(waveManSilhouettePainter()(frame1).waveMan, label=false, linecolor=:cornflowerblue, lw=2, showaxis=false)
 
-# ╔═╡ d3389063-5d6c-470c-b8a0-d85b494005f5
-plot(shapeOfWaveManBody2, size=(600, 500), xlims=(1.1, 6.2), ylims=(1.1, 7.2), label=false, linecolour=:cornflowerblue, lw=2, title=L"Body\ of\ WaveMan\ in\ Frame2", titlefontsize=10)
+# ╔═╡ eadd41b4-e398-453b-bdc2-f75b02ff625f
+plot(waveManSilhouettePainter()(frame2).waveMan, label=false, linecolor=:cornflowerblue, lw=2, showaxis=false)
+
+# ╔═╡ b771d539-95bb-4fe7-b69f-a88837237580
+waveManBody =
+		fromSegmentsToPainter(
+			makeWaveManSegments(
+				waveManCoordinates).waveManBodySegments)(frame1)
+
+# ╔═╡ a8a2ba5f-cc83-46aa-a2bb-bcda2d69c37d
+Shape(
+	waveManCoordinates.waveManBodyXs, 
+	waveManCoordinates.waveManBodyYs)
+
+# ╔═╡ d1f5e0d9-087a-492a-874c-11b2650e8fac
+plot(
+	Shape(
+		waveManCoordinates.waveManBodyXs, 
+		waveManCoordinates.waveManBodyYs), 
+	color=:cornflowerblue, opacity=0.4)
+
+# ╔═╡ 9a2810e6-390b-4ae2-8d3e-ea348f738ab8
+function fromVectorComponentsToFrameCoordMap(frame)::Function
+	# 2D-vector components to be mapped into the frame basis
+	function (xss::Vector, yss::Vector)
+		map((xs, ys) -> 
+			[originFrame(frame).x, originFrame(frame).y]  + 
+				xs .* [edge1Frame(frame).x, edge1Frame(frame).y]  + 
+			    ys .* [edge2Frame(frame).x, edge2Frame(frame).y], xss, yss)
+	end # function (xss, yss)
+end # function fromVectorsComponentsToFrameCoordMap
+
+# ╔═╡ b04f6d46-53de-4134-bd81-efa4624b9f06
+edge1Frame(frame1)
+
+# ╔═╡ dd0566a6-5fa7-4dc7-88e8-e6fe7a0cea7b
+waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs
+
+# ╔═╡ e2426d9a-f97c-4484-acdb-c957edc950bd
+fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)
+
+# ╔═╡ fd4d8b24-0c1f-4fd8-8829-a54f1ece9794
+fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)
+
+# ╔═╡ 07454f7f-5af6-43bf-aa5e-8906c7e58e6f
+plot(
+	map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)),
+	map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)), 
+	label=false)
+
+# ╔═╡ cab0c9ca-d5e1-4716-b70e-f56389af9558
+plot(
+	map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame2)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)),
+	map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame2)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)),
+	label=false)
+
+# ╔═╡ 00ead5c8-fb00-4a76-8956-86cb3bc15496
+plot(Shape(
+	map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs)),
+	map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame1)(
+			waveManCoordinates.waveManBodyXs, 
+			waveManCoordinates.waveManBodyYs))),
+	color=:cornflowerblue, opacity=0.4, label=false)
+
+# ╔═╡ 755be4e7-b1cd-44b1-8c6c-e496d208eb97
+md"
+---
+###### Painter $waveManShapePainter$
+"
+
+# ╔═╡ 6f1daf2d-8753-48b5-85fe-0d0b2d72ae4b
+function waveManShapePainter()
+	function (frame)
+		waveManBodyInFrameXs =
+			map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame)(
+					waveManCoordinates.waveManBodyXs, 
+					waveManCoordinates.waveManBodyYs))
+		waveManBodyInFrameYs =
+			map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame)(
+				waveManCoordinates.waveManBodyXs, 
+				waveManCoordinates.waveManBodyYs))
+		#------------------------------------------------------------------------
+		waveManMouthInFrameXs =
+			map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame)(
+					waveManCoordinates.waveManMouthXs, 
+					waveManCoordinates.waveManMouthYs))
+		waveManMouthInFrameYs =
+			map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame)(
+				waveManCoordinates.waveManMouthXs, 
+				waveManCoordinates.waveManMouthYs))
+		#------------------------------------------------------------------------
+		waveManNoseInFrameXs =
+			map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame)(
+					waveManCoordinates.waveManNoseXs, 
+					waveManCoordinates.waveManNoseYs))
+		waveManNoseInFrameYs =
+			map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame)(
+				waveManCoordinates.waveManNoseXs, 
+				waveManCoordinates.waveManNoseYs))
+		#------------------------------------------------------------------------
+		waveManLeftEyeInFrameXs =
+			map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame)(
+					waveManCoordinates.waveManLeftEyeXs, 
+					waveManCoordinates.waveManLeftEyeYs))
+		waveManLeftEyeInFrameYs =
+			map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame)(
+				waveManCoordinates.waveManLeftEyeXs, 
+				waveManCoordinates.waveManLeftEyeYs))
+		#------------------------------------------------------------------------
+		waveManRightEyeInFrameXs =
+			map(vector -> vector[1], fromVectorComponentsToFrameCoordMap(frame)(
+					waveManCoordinates.waveManRightEyeXs, 
+					waveManCoordinates.waveManRightEyeYs))
+		waveManRightEyeInFrameYs =
+			map(vector -> vector[2], fromVectorComponentsToFrameCoordMap(frame)(
+				waveManCoordinates.waveManRightEyeXs, 
+				waveManCoordinates.waveManRightEyeYs))
+		#------------------------------------------------------------------------
+		[Shape(waveManBodyInFrameXs, waveManBodyInFrameYs), Shape(waveManMouthInFrameXs, waveManMouthInFrameYs), Shape(waveManNoseInFrameXs, waveManNoseInFrameYs),
+		Shape(waveManLeftEyeInFrameXs, waveManLeftEyeInFrameYs), Shape(waveManRightEyeInFrameXs, waveManRightEyeInFrameYs)]
+	end  # function
+end # function waveManShapePainter
+
+# ╔═╡ 5dcd93b7-5d24-47c5-b62e-476d0d4ac97e
+plot(waveManShapePainter()(frame1), color=:cornflowerblue, opacity=0.4, label=false)
+
+# ╔═╡ 86d3c1e9-2ed0-46e6-a601-d7495886a3ab
+plot(waveManShapePainter()(frame2), color=:cornflowerblue, opacity=0.4, label=false)
 
 # ╔═╡ bae80b14-3e77-4114-8b04-76a34776926f
 md"
@@ -716,10 +1097,27 @@ md"
 ##### 3.5 Transforming and Combining Painters
 "
 
+# ╔═╡ 2c1dbfb6-2366-4d81-84d9-7aec3572cd67
+md"
+---
+##### 4. Summary
+
+For our two painters $waveManSilhouettePainter, waveManShapePainter$ we followed this sequence of design steps:
+
+- *construct* a *painter* that paints a *figure of interest (FIGOI)* in the *unit frame* by a *recursive functional* script in the *picture language* 
+
+- embed this *(FIGOI)* in a *frame of interest (FROI)*
+
+- plot the *FROI* with $Plot.jl$ or another *plot library*
+
+The *last* step has to be *delayed* as much as possible.
+
+"
+
 # ╔═╡ b11f4238-6d8b-4ef4-9b2e-274af4d83409
 md"
 ---
-##### References
+##### 5. References
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2025/06/03
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/06/03
@@ -2196,6 +2594,8 @@ version = "1.4.1+2"
 # ╟─2b25dd82-6c60-4082-861d-a608de4315dc
 # ╠═8072600c-8148-443f-9648-091e3a388a90
 # ╟─1f4786b4-d11a-49fe-ab72-1d83055c0e33
+# ╠═e6730566-d799-4e6c-ab0d-4d9a91a960f7
+# ╠═655a5024-53f8-4b89-a2cb-4b2321931243
 # ╟─8e1e84aa-d1ee-49e3-83da-ad23a2cfddd4
 # ╠═52d4a383-885f-473f-9939-52989b8b9c0d
 # ╟─1b5e20c0-c83e-400f-9925-31054cdf7dd4
@@ -2203,15 +2603,28 @@ version = "1.4.1+2"
 # ╠═b1fb0a44-e12c-4670-b666-b8bf9f9ec4e7
 # ╟─cc1e91ae-4390-4a4f-89b5-0ddd800ef35b
 # ╠═f969dbd4-dbf6-4a09-bc2b-3a2d90c9d981
+# ╠═5b226945-1442-4d34-8a0d-05d51e1465d8
+# ╠═2f9e94d2-4c63-4cc6-b8cd-105685e74a0a
 # ╠═5492a690-ce5f-43a3-9aee-5f4b92c0909d
+# ╠═a78c070d-7745-4488-895a-dbc70aa3c9c9
+# ╠═f26ccbfb-c657-400c-9426-d7f3b1f7448f
 # ╟─4d6ce9f8-c266-4b06-9637-54dc8f2b985b
 # ╠═2c73a3ae-98c0-4759-b1ce-98c8da98d7c7
+# ╠═a43a659f-2338-4a6a-a055-988a4a22cbac
 # ╠═259e8a18-5c1f-4dbd-be01-a10194bf18c1
+# ╠═1f9ba27e-0ced-4f71-8f35-c3c2aa4b5aaf
 # ╠═1d427fe1-21a3-4151-be29-54ef7d531c1e
+# ╠═582a778b-47f4-4963-9125-3e9dd419312a
+# ╟─1f117119-228b-43de-a743-4818add6cd3f
 # ╟─3b4a452e-4896-4a2f-9d94-1d12dea0e8d4
 # ╠═c3686863-a0ea-4c0f-868b-a3d913258039
 # ╠═529727b7-e6ea-4d8f-82be-a995bed3a72f
 # ╠═ca86f7c6-dbd4-4d20-8543-062fa07b6b63
+# ╠═aa59c336-00fe-4d42-a851-2131d5fe9e94
+# ╠═34db0743-60b0-4aa5-ae96-c19e557513a1
+# ╠═f881e434-0961-484d-a90e-cc10c4b3c710
+# ╠═5acd24ae-ded2-421f-b7b3-bfcdafca42fa
+# ╠═351d3ef3-82ff-4aba-9fc2-9917c2b6572a
 # ╟─390ba005-e578-436c-8675-493953883368
 # ╠═593200c8-8a4a-4e66-a4aa-6e54df2b0eb1
 # ╟─9d18dc06-47cc-49bd-a0d4-3be1a2f729c3
@@ -2250,6 +2663,8 @@ version = "1.4.1+2"
 # ╠═5f2fa967-3798-4afd-8c4a-f96919c3b4d8
 # ╟─39fca6a6-4081-427d-9ae5-4f9084c3fd73
 # ╠═cf8835df-8f66-401f-97f8-d519a3112693
+# ╠═17ae3fd2-a96b-43d5-970e-8cddfd9c90e5
+# ╟─50351a14-de0b-4be7-97ee-736ddb401d45
 # ╟─85cb061e-4074-4ec4-bc81-6f8ceffe6c6f
 # ╟─e3af35a2-0d4e-441e-9d28-9609b8537485
 # ╠═49dd66f1-d30c-4946-85f6-4986231841a6
@@ -2257,6 +2672,8 @@ version = "1.4.1+2"
 # ╠═91127892-395f-4f66-ad94-99ad6a89a997
 # ╠═19fdaecd-8614-4761-bbd7-164b808d3fdb
 # ╟─11f4b71f-716d-41b4-b384-81cd206b170b
+# ╠═8c42f876-9623-4974-9fec-8ae728bc5f78
+# ╠═d327d008-cf25-456a-9893-eea733bc83c0
 # ╠═d62d8161-de05-42cd-ab5f-ef03842166cd
 # ╠═c404616e-aa80-4a1c-8426-4d1e7917749c
 # ╠═5d0071d4-7d45-41a3-85b1-4db95ccf6336
@@ -2269,19 +2686,27 @@ version = "1.4.1+2"
 # ╠═1134f274-92d4-4dd4-9740-a22c88b75752
 # ╟─248cf3e6-9b96-4c0a-9fd4-b5985044c329
 # ╠═6b1fc47b-2206-4a3d-98fd-964808630d18
-# ╠═2040afd0-3af6-4837-ac28-184fc25645a3
-# ╠═cf758e0a-714b-4b9a-8cab-cd26dba55d9f
+# ╠═6d7788cf-c3e4-4832-8e22-a52ccbb010ba
+# ╠═3b40e793-93d1-4ca8-ab78-788449f613e2
+# ╠═d3c8cc22-f34f-46af-8d4f-10a07b9f499c
+# ╠═774e52f3-fc50-4350-8b75-8f92ae3f2dd0
 # ╠═4c6f262f-909e-48a1-a566-4319c240d492
 # ╠═20a7d01b-afaf-4500-966e-446819d5b6f1
+# ╠═53184b92-eefd-4c14-8b59-671f7fee0074
 # ╠═374eaa45-1e6b-4d19-9ce9-3b3e4510c56c
 # ╠═77e84104-debb-435e-9184-7b79e6f730f4
+# ╠═1c50caf6-14b2-49e1-8eca-79986462092e
 # ╠═fa48c228-10ce-4681-927d-2a4cb3af199b
+# ╠═4b1c5204-cf96-44fe-8d01-0559de944028
+# ╠═416144cd-1d87-452e-aa38-3d64516b80bf
+# ╠═bc903351-bc95-41e3-8763-965d62cfd6b4
+# ╠═25136ed2-540b-43d5-9087-adfb10bd5401
 # ╠═19af462d-9c54-4ed1-b999-3eebc6e8e3e3
 # ╠═da30b5f0-6144-4503-866c-b42ed704b249
 # ╠═0458f5e5-0e00-4f17-8aac-fa7de3b7b958
 # ╠═4b382506-cc1e-4895-ac0a-9c82fd8df848
 # ╠═e12b2116-d310-4475-8898-cf8eadbb7b62
-# ╠═40192caf-352c-4b26-9cee-5298f9b5644e
+# ╠═b083310b-4de3-4b3d-967c-0af4ea0b06d5
 # ╠═7d54ba1f-e86f-4cb8-b415-36bbc674fdbb
 # ╠═921c1f16-a5e7-459c-aa85-1af2c7447f31
 # ╟─985b867e-ea4f-4212-99c3-fb59293bc330
@@ -2294,11 +2719,27 @@ version = "1.4.1+2"
 # ╠═f2158a99-7b82-4023-879b-a829d03cbd4a
 # ╟─3bea9896-fbf9-4933-abb4-babdf8988b01
 # ╠═9de2a15b-81f4-4211-95bf-884b0612f8a6
-# ╠═35bd376a-f0a1-4fce-93c7-8b641fbd36d5
-# ╠═12f71588-fde4-49ba-9a82-535c1e074ee3
-# ╠═9882f7e3-8972-4b8f-84de-1827bf8fe48b
-# ╠═d3389063-5d6c-470c-b8a0-d85b494005f5
+# ╠═a93f41a9-2589-48c0-91ef-4a42109f20c2
+# ╠═9149333b-3f51-4ab1-9a21-fa784048c4c4
+# ╠═9709f125-11cd-40ea-87e3-f35ed6f7ef59
+# ╠═eadd41b4-e398-453b-bdc2-f75b02ff625f
+# ╠═b771d539-95bb-4fe7-b69f-a88837237580
+# ╠═a8a2ba5f-cc83-46aa-a2bb-bcda2d69c37d
+# ╠═d1f5e0d9-087a-492a-874c-11b2650e8fac
+# ╠═9a2810e6-390b-4ae2-8d3e-ea348f738ab8
+# ╠═b04f6d46-53de-4134-bd81-efa4624b9f06
+# ╠═dd0566a6-5fa7-4dc7-88e8-e6fe7a0cea7b
+# ╠═e2426d9a-f97c-4484-acdb-c957edc950bd
+# ╠═fd4d8b24-0c1f-4fd8-8829-a54f1ece9794
+# ╠═07454f7f-5af6-43bf-aa5e-8906c7e58e6f
+# ╠═cab0c9ca-d5e1-4716-b70e-f56389af9558
+# ╠═00ead5c8-fb00-4a76-8956-86cb3bc15496
+# ╟─755be4e7-b1cd-44b1-8c6c-e496d208eb97
+# ╠═6f1daf2d-8753-48b5-85fe-0d0b2d72ae4b
+# ╠═5dcd93b7-5d24-47c5-b62e-476d0d4ac97e
+# ╠═86d3c1e9-2ed0-46e6-a601-d7495886a3ab
 # ╟─bae80b14-3e77-4114-8b04-76a34776926f
+# ╟─2c1dbfb6-2366-4d81-84d9-7aec3572cd67
 # ╟─b11f4238-6d8b-4ef4-9b2e-274af4d83409
 # ╟─59138adc-440a-41d3-a297-01abdc1db532
 # ╟─00000000-0000-0000-0000-000000000001
