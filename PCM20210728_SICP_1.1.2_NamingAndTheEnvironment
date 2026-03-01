@@ -8,7 +8,8 @@ using InteractiveUtils
 begin
 	using Pluto
 	using Plots	
-	using LaTeXStrings, Latexify
+	using LaTeXStrings
+	using Latexify
 	using GraphRecipes
 	#-----------------------------------------------------------------
 	println("pkgversion(Pluto)         = ", pkgversion(Pluto))

@@ -111,22 +111,22 @@ $code\;\; \text{\# ==> }\ expected\ value --> :(\;\;\;\text{ (if expectation is 
 # ╔═╡ e549b0c7-0dd4-4bae-ad21-b06cda1daebd
 md"
 ---
-###### Informal *Coding* and *Evaluation* Rules
+###### *Goal* Hierarchy for *Coding* and *Evaluation* 
 
 Here we deal with the *coding* of *simple arithmetic expressions* in *functional Julia*. *Coding* has to be *syntactically* and *semantically* correct. 
 
-Here we provide *informal* syntax rules denoted by $\rightarrow$. These are *informal* because there are *no* official rules published. 
+Here we provide *goal-subgoal* refining rules denoted by $\rightarrow$. The *syntactic* coding rules can be read like *commands*: IF the *goal* is to *code a simple arithmetic expression* THEN replace that goal by the subgoal *code a combination*.
 
-When *coding* is complete it has to be *evaluated*. This can be done by the *human* coder or by *machine*. The *value* of a *arithmetic expression* is a number. The *semantic* rules are denoted by $\Rightarrow$. 
+When *coding* is complete it has to be *evaluated*. The *value* of a *arithmetic expression* is a number. Evaluation can be done by the same rules or a shortcut. The *shortcut* is denoted by $\Rightarrow$. 
 
-- The *syntactic* coding rules can be read like *commands*: IF the goal is to *code a simple arithmetic expression* THEN replace that goal by the subgoal *code a combination*.
-- The *semantic* evaluation rules can be read as *state changes*: IF the goal is to *evaluate a simple arithmetic expression* THEN replace that *goal* by the *result* which is a *numeral*.
+The *semantic* evaluation rules can be read as *state changes*: IF the goal is to *evaluate a simple arithmetic expression* THEN replace that *goal* by the *result* which is a *numeral*.
 
-$<simple\ numeric\ expression>\ \rightarrow\ <combination>$
+###### *Goal Hierarchy*; *Coding* and *Evaluation* of *Simple Arithmetic Expressions*
+$<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
 $<combination>\ \rightarrow\ <operand>$
 $<operand>\ \rightarrow\ <numeral>$
 $---$
-$<simple\ numeric\ expression>\ \Rightarrow\ <numeral>$
+$<simple\ arithmetic\ expression>\ \Rightarrow\ <numeral>$
 $<numeral>\ \Rightarrow 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
 "
 
@@ -168,13 +168,17 @@ and a repitition operator meaning *zero or more* reptitions:
 
 $\{...\}^*$
 
+"
+
+# ╔═╡ a5f8a224-bd26-4ed4-92f6-64a72dfb3665
+md"
 ---
-###### Informal *Coding* and *Evaluation* Rules
+###### *Goal Hierarchy*; *Coding* and *Evaluation* of *Arithmetic Expressions*
 
 We have augmented the rules above with new rules containing *operators* $+, -, *, /$.
 
 $<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
-$<combination>\ \rightarrow\ <operand> \{<operation> <operand>\}^*$
+$<combination>\ \rightarrow\ <operand> \{<operator> <operand>\}^*$
 $<oprnd>\{<oprator> <oprnd>\}^*\ \rightarrow\ <numeral>\{<oprator> <numeral>\}^*$
 $<operator\ \rightarrow\ +|-|*|/|...\;\;$
 $<numeral\ <operator\ <numeral>\ \rightarrow\ <numeral>$
@@ -580,9 +584,9 @@ isprimitivetype(Function)
 typeof(+)
 
 # ╔═╡ c680cf4f-15ec-4f40-aa9b-68ca83447efb
-md"""
-"A *singleton type* in Julia is a type that has exactly *one* instance. Julia assigns each function its own unique singleton type. This type represents the function itself, rather its arguments or behavior" (ChatGPT, 2024/12/06)
-"""
+md"
+*A singleton type in Julia is a type that has exactly one instance. Julia assigns each function its own unique singleton type. This type represents the function itself, rather its arguments or behavior* (ChatGPT, 2024/12/06)
+"
 
 # ╔═╡ c97ebd78-ff4f-46f1-b2d4-bb2a87f268f9
 typeof(==)
@@ -2232,6 +2236,7 @@ version = "1.13.0+0"
 # ╠═0d95e7f8-a75f-4a09-9134-f4833f7ea561
 # ╠═a947f3c3-8e9b-402f-84fc-91c0fbd5df22
 # ╟─94935d7a-1348-4992-be9c-40a2929d913b
+# ╟─a5f8a224-bd26-4ed4-92f6-64a72dfb3665
 # ╠═a9073190-a3bb-4405-9f83-5bbbcbaef93a
 # ╠═b7f4d396-5584-459e-99e4-ccc4b4c33695
 # ╠═e674a954-14c0-4bb8-b8a5-5f2f5fc30c12
