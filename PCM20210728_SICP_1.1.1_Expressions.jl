@@ -22,7 +22,7 @@ md"
 ====================================================================================
 #### SICP: [1.1.1_Expressions](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/02/27***
+##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/01***
 
 ====================================================================================
 "
@@ -31,11 +31,11 @@ md"
 # ╔═╡ 53196c5e-41a1-4e37-9405-5e2ee4d8c58e
 md"
 ##### 0. Introduction
-*One easy way to get started at programming is to examine some typical interactions with* ... a Julia/Pluto compiler/notebook system. *Imagine that you are sitting at a computer terminal. You type an expression, and the* Julia/Pluto system *responds by displaying the result of its evaluating that expression.* (SICP, 1996; modifications by us)
+*One easy way to get started at programming is to examine some typical interactions with* ... a Julia/Pluto compiler/notebook system. *You type an expression, and the* Julia/Pluto system *responds by displaying the result of its evaluating that expression.* (SICP, 1996; modifications by us)
 
-First (in 3.), we try to keep the Julia code close to the *functional* style of SICP. Code is written by the original authors in [*MIT Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme). This is a dialect of [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)). Then (in 4.) we introduce *idiomatic* Julia elements to demonstrate its elegance and expressiveness.
+First (in 3.), we try to keep the *Julia* code close to the *functional* style of SICP. SICP-code is written in [*MIT Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme). This is a dialect of [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)). We expect that in a *1st pass* newcomers to programming study this code carefully and work through the exercises published in SICP. 
 
-The Julia newcomer should work *first* the sections numbered 3. Section 4 is reserved for a *second* pass for more advanced students.
+Then (in 4.) we introduce *idiomatic* Julia elements to demonstrate its elegance and expressiveness. We offer this as a *2nd pass* for experienced software developers coming either from other languages or from the *1st pass*.
 
 If you have any doubts about the *syntax* and *semantics* of Julia constructs, you can consult the [Julia documentation](https://docs.julialang.org/en/v1/) or an AI-agent (e.g. [*ChatGPT*](https://chatgpt.com/)).
 
@@ -52,7 +52,7 @@ md"
 - [*numeral*](- https://en.wikipedia.org/wiki/Numeral_system), *Number*
 - [*literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming))
 - [*types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
-- *dynamic*, *static* types
+- *dynamic*, *static* typing, *multiple dispatch*
 - *combination*, *compound expression*
 - *function call*, [*operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
 - *prefix*, *infix* and *postfix* notation
@@ -84,13 +84,13 @@ md"
 md"
 ---
 ###### 3.1 *Coding* and *Evaluation* of Simple *Arithmetic* Expressions (*Julia/Pluto* as a Pocket Calculator)
-(1st pass)
+(1st pass - for programming newcomers - )
 
 We start with *numerals* the most basic arithmetic expressions. In Julia they are *dynamic* typed. What is a *type* ? [*Types*](https://en.wikipedia.org/wiki/Type_system) are *sets of elements* of a *kind* declared by the programmer or by the system. 
 
 *Dynamic* types are *not* declared *in the code* but appear *in the evaluation process* (e.g. *with* or *without* decimal point when diagnosed as a arithmetic type). In contrast to that *static* types are *explicitly* declared in the code by the coder *before* the computation process starts. 
 
-Languages with *dynamic* typing are e.g. Scheme, Javascript and Smalltalk, wheras *static* types appear in Java, C++, etc. *Julia* code can be written in *both* styles. In Julia explicitly declarations of types are only ncessary when several alternative methods implement the same function.
+Languages with *dynamic* typing are e.g. Scheme, Javascript and Smalltalk, wheras *static* types appear in Java, C++, etc. *Julia* code can be written in *both* styles. In Julia *static* type declarations are only ncessary when several *alternative methods* implement the *same function*. This is the *key* feature of the language known as *multiple dispatch*.
 
 "
 
@@ -241,6 +241,7 @@ md"
 md"
 ---
 ##### 4. *Idiomatic* Julia
+(2nd pass - for experienced developers - )
 "
 
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
@@ -519,9 +520,9 @@ function makeMyTypeTreeReal()
 		1 0 0;
 		1 0 0]
 	#------------------------------------------------------------------------------
-	names = [" Real ", " Int64 ", "Float64"]
-	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype")
-	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, 
+	names = [L" Real ", L" Int64 ", L"Float64"]
+	edgelabels = Dict{Tuple, String}((2, 1) => L"supertype", (3, 1) => L"supertype")
+	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.13, fontsize=12, 
 	#------------------------------------------------------------------------------
 	title=L"Fig. 1.1.1.2\ Excerpt\ of\ type\ tree:\ Real", titlefontsize=14, size=(800, 400))
 end # function makeMyTypeTreeReal()
@@ -600,9 +601,9 @@ function makeMyTypeTreeFunction()
 		1 0 0 0;
 	    1 0 0 0]
 	#-------------------------------------------------------------------------------
-	names = ["Function", "  +  ", "  -  ", "==="]
-	edgelabels = Dict{Tuple, String}((2, 1) => "supertype", (3, 1) => "supertype", (4, 1) => "supertype")
-	graphplot(g, x=[1.5, -0.0, +1.5, 3.0], y = [0.7, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.15, fontsize=8, 
+	names = [L"Function", L"  +  ", L"  -  ", L"==="]
+	edgelabels = Dict{Tuple, String}((2, 1) => L"supertype", (3, 1) => L"supertype", (4, 1) => L"supertype")
+	graphplot(g, x=[1.5, -0.0, +1.5, 3.0], y = [0.7, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.13, fontsize=12, 
 	#-------------------------------------------------------------------------------
 	title=L"Fig. 1.1.1.3\ Excerpt\ of\ type\ tree:\ Function", titlefontsize=14, size=(800, 300))
 end # function makeMyTypeTreeFunction
