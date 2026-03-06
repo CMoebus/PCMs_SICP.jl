@@ -22,7 +22,7 @@ md"
 ====================================================================================
 #### SICP: [1.1.1_Expressions](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/01***
+##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/06***
 
 ====================================================================================
 "
@@ -33,11 +33,11 @@ md"
 ##### 0. Introduction
 *One easy way to get started at programming is to examine some typical interactions with* ... a Julia/Pluto compiler/notebook system. *You type an expression, and the* Julia/Pluto system *responds by displaying the result of its evaluating that expression.* (SICP, 1996; modifications by us)
 
-First (in 3.), we try to keep the *Julia* code close to the *functional* style of SICP. SICP-code is written in [*MIT Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme). This is a dialect of [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)). We expect that in a *1st pass* newcomers to programming study this code carefully and work through the exercises published in SICP. 
+First (in 3.), we try to keep the *Julia* code close to the *functional* style of SICP. The original SICP-code is written in [*MIT Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme). This is a dialect of [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)). We expect that in a *1st pass* newcomers to programming study this code carefully and work through the exercises published in SICP. 
 
 Then (in 4.) we introduce *idiomatic* Julia elements to demonstrate its elegance and expressiveness. We offer this as a *2nd pass* for experienced software developers coming either from other languages or from the *1st pass*.
 
-If you have any doubts about the *syntax* and *semantics* of Julia constructs, you can consult the [Julia documentation](https://docs.julialang.org/en/v1/) or an AI-agent (e.g. [*ChatGPT*](https://chatgpt.com/)).
+If you have any doubts about the *syntax* and *semantics* of Julia constructs, you can consult the [Julia documentation](https://docs.julialang.org/en/v1/) or an AI-agent (e.g. [*ChatGPT*](https://chatgpt.com/)). In doubts about the *semantic* meaning it is helpful to consult the original SICP sources. There are two versions (one in [html](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html) and another as [pdf](https://web.mit.edu/6.001/6.037/sicp.pdf)).
 
 "
 
@@ -119,9 +119,9 @@ Here we provide *goal-subgoal* refining rules denoted by $\rightarrow$. The *syn
 
 When *coding* is complete it has to be *evaluated*. The *value* of a *arithmetic expression* is a number. Evaluation can be done by the same rules or a shortcut. The *shortcut* is denoted by $\Rightarrow$. 
 
-The *semantic* evaluation rules can be read as *state changes*: IF the goal is to *evaluate a simple arithmetic expression* THEN replace that *goal* by the *result* which is a *numeral*.
+The *semantic* evaluation rules can be read as *goal-subgoaling*: IF the *goal* is to '*evaluate a simple arithmetic expression*' THEN replace that *goal* either by a chain of goals with the last *subgoal* '*evaluate a numeral*' or by a shortcut with the same effect.
 
-###### *Goal Hierarchy*; *Coding* and *Evaluation* of *Simple Arithmetic Expressions*
+###### *Goal Hierarchy*: *Coding* and *Evaluation* of *Simple Arithmetic Expressions*
 $<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
 $<combination>\ \rightarrow\ <operand>$
 $<operand>\ \rightarrow\ <numeral>$
@@ -164,7 +164,7 @@ Here we deal with *simple arithmetic expressions* in *functional Julia*. *Code* 
 
 $<oprnd> = <operand>; <oprator> = <operator>$
 
-and a repitition operator meaning *zero or more* reptitions:
+and a [*repitition*](https://en.wikipedia.org/wiki/Kleene_star) operator meaning *zero or more* reptitions:
 
 $\{...\}^*$
 
@@ -181,7 +181,7 @@ $<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
 $<combination>\ \rightarrow\ <operand> \{<operator> <operand>\}^*$
 $<oprnd>\{<oprator> <oprnd>\}^*\ \rightarrow\ <numeral>\{<oprator> <numeral>\}^*$
 $<operator\ \rightarrow\ +|-|*|/|...\;\;$
-$<numeral\ <operator\ <numeral>\ \rightarrow\ <numeral>$
+$<numeral>\ \Rightarrow 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
 $---$
 $<simple\ arithmetic\ expression>\ \Rightarrow\ <numeral>$
 $<numeral>\ \Rightarrow\ 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
@@ -241,6 +241,34 @@ md"
 # ╔═╡ 84e23ff5-6186-4ca0-be42-6385b3ef580d
 3 * (2 * 4 + (3 + 5)) + (10 - 7) + 6             # ==> 57 --> :)
 
+# ╔═╡ 145a7c91-5274-40e9-93d9-6c5be29de7b7
+md"
+---
+###### 3.5 Infix *Boolean* Expressions  
+$Number == Number \rightarrow BooleanValue$
+$Operator == Operator \rightarrow Error$
+$Number === Number \rightarrow BooleanValue$
+$Operator === Operator \rightarrow Error$
+$---$
+$BooleanValue \Rightarrow true\ |\ false$
+
+"
+
+# ╔═╡ 15078845-70de-446b-93d2-519d936610c7
+2 == 2.0                                               # test of equality
+
+# ╔═╡ 3bfa6425-6343-4948-b8a2-ac5e267facda
+2 === 2.0                                              # test of equality
+
+# ╔═╡ d6c18b59-d2a3-4c8a-9a49-ddd6e9cd6acf
+typeof(+)
+
+# ╔═╡ 28829789-b7a1-493e-859b-3df719a62ef1
+typeof(div)
+
+# ╔═╡ 850c7371-2097-4189-a434-365fe06468fd
+typeof(+) == typeof(div)
+
 # ╔═╡ 6b8bf4de-d03b-4397-9876-a682b2dde331
 md"
 ---
@@ -253,12 +281,12 @@ md"
 ###### 4.1 *Compound Prefix* Expressions (= *Combinations*) are *Function Calls*
 *Flat (= non-nested)* and *nested* expressions have several names. They are called *compound prefix* expressions or *combinations*. They have the *syntax* and *semantics* of *function calls*. 
 
-These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While *SICP* (= *MIT Scheme*) accepts only *prefix* expressions, *postfix* notation is used in some pocket calculators. 
+These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While original *SICP* (= *MIT Scheme*) accepts only *prefix* expressions, Julia understands both *pre-* and *infix* notation. *Postfix* notation is used in some pocket calculators. 
 
 Julia accepts *infix* notation (above) as learnt in school. This makes coding easy for non-CS domain experts. Parentheses are used to control the evaluation process.
 
 Furthermore Julia understands *prefix* notation similar to *Scheme*.
-*Combinations* written in *prefix* notation make it clear that they are *function calls* with the *operator* in the position of a *function* symbol.
+*Combinations* written in *prefix* notation make it clear that they are *function calls* with *operators* in the same position as *function* symbols.
 
 $<operator>() \Rightarrow Error$
 $+(<operand>) \Rightarrow <operand>$
@@ -526,9 +554,9 @@ function makeMyTypeTreeReal()
 	#------------------------------------------------------------------------------
 	names = [L" Real ", L" Int64 ", L"Float64"]
 	edgelabels = Dict{Tuple, String}((2, 1) => L"supertype", (3, 1) => L"supertype")
-	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.13, fontsize=12, 
+	graphplot(g, x=[1.0, -0.0, +2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.10, fontsize=14, 
 	#------------------------------------------------------------------------------
-	title=L"Fig. 1.1.1.2\ Excerpt\ of\ type\ tree:\ Real", titlefontsize=14, size=(800, 400))
+	title=L"Fig. 1.1.1.2\ Excerpt\ of\ type\ tree:\ Real", titlefontsize=16, size=(800, 400))
 end # function makeMyTypeTreeReal()
 
 # ╔═╡ f3d35d58-5889-44b8-be7c-4ca3c838bf86
@@ -762,13 +790,15 @@ md"
 ---
 ##### 6. References
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
 
 - **Bauer, F.L. & Wössner, H.**; *Algorithmic Language and Program Development*, Heidelberg: Springer, 1981
 
 - **JuliHub**; [*Julia doc*](https://docs.julialang.org/en/v1/); last visit 2026/02/26
+
+- **Wikipedia**; [*Kleene Star*](https://en.wikipedia.org/wiki/Kleene_star); last visit 2026/03/06
 
 - **Wikipedia**; [*Literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming)); last visit 2026/02/26
 
@@ -2254,6 +2284,12 @@ version = "1.13.0+0"
 # ╠═b77ac410-a5b9-4432-a1c8-5462d4a36d84
 # ╠═59aaa875-399f-49c7-9296-dc987e846edf
 # ╠═84e23ff5-6186-4ca0-be42-6385b3ef580d
+# ╟─145a7c91-5274-40e9-93d9-6c5be29de7b7
+# ╠═15078845-70de-446b-93d2-519d936610c7
+# ╠═3bfa6425-6343-4948-b8a2-ac5e267facda
+# ╠═d6c18b59-d2a3-4c8a-9a49-ddd6e9cd6acf
+# ╠═28829789-b7a1-493e-859b-3df719a62ef1
+# ╠═850c7371-2097-4189-a434-365fe06468fd
 # ╟─6b8bf4de-d03b-4397-9876-a682b2dde331
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╟─015dbbd5-a3b0-407a-9ff9-b5a0bee3713a
@@ -2289,7 +2325,7 @@ version = "1.13.0+0"
 # ╠═16a261cb-b368-4296-9452-490a0247b593
 # ╠═838f513c-fbaa-4233-a766-79f592df74d8
 # ╟─901c4920-b1d8-48dc-a100-d7ae25fa51cb
-# ╠═f3d35d58-5889-44b8-be7c-4ca3c838bf86
+# ╟─f3d35d58-5889-44b8-be7c-4ca3c838bf86
 # ╠═34265915-b300-4291-a327-4b2f512950fc
 # ╠═7e379802-13ac-4f26-97ad-644aa42b0b82
 # ╠═ba6e6b36-3e29-47cc-b89d-81044f1e21be
