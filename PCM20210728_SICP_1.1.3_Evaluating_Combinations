@@ -25,7 +25,7 @@ md"
 
 ###### file: PCM20210728\_SICP\_1.1.3\_Evaluating\_Combinations
 
-###### Julia/Pluto.jl-code (1.11.5/0.20.3) by PCM *** 2026/03/01 ****
+###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/07 ****
  
 ===================================================================================
 "
@@ -74,8 +74,10 @@ To answer the question what SICP understands under a *combinaton* we go back to 
 $<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
 $<combination>\ \rightarrow\ <operand> \{<operator> <operand>\}^*$
 $<oprnd>\{<oprator> <oprnd>\}^*\ \rightarrow\ <numeral>\{<oprator> <numeral>\}^*$
+$<numeral>\{<oprator> <numeral>\}^* \rightarrow <numeral>$
+$<operand>\ \rightarrow\ <numeral>$
 $<operator\ \rightarrow\ +|-|*|/|...\;\;$
-$<numeral\ <operator\ <numeral>\ \rightarrow\ <numeral>$
+$<numeral>\ \Rightarrow 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
 $---$
 $<simple\ arithmetic\ expression>\ \Rightarrow\ <numeral>$
 $<numeral>\ \Rightarrow\ 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
@@ -102,10 +104,10 @@ More precisely the evaluation order has to obeye a *partial order* which can be 
 "
 
 # ╔═╡ e2443252-7c22-4385-87a4-caf4eec72d60
-(2 + (4 * 6)) * (3 + 5 + 7) 
+(2 + (4 * 6)) * (3 + 5 + 7)             # infix arithmetic expression
 
 # ╔═╡ 77ce3530-44aa-45e6-805e-9adad7fd5ff3
-(2 + 4 * 6) * (3 + 5 + 7) 
+(2 + 4 * 6) * (3 + 5 + 7)               # infix arithmetic expression
 
 # ╔═╡ 86c99cbd-9e4c-4d92-aab3-4e9c2df21dbe
 md"
@@ -362,9 +364,9 @@ md"
 ---
 ##### 6. References
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
 
 - **Bauer, F.L. & Wössner, H.**; Algorithmic Language and Program Development; Heidelberg: Springer, 1982
 "
