@@ -22,7 +22,7 @@ md"
 ====================================================================================
 #### SICP: [1.1.1_Expressions](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/06***
+##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/07***
 
 ====================================================================================
 "
@@ -54,6 +54,7 @@ md"
 - [*types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
 - *dynamic*, *static* typing, *multiple dispatch*
 - *combination*, *compound expression*
+- *chunking*
 - *function call*, [*operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
 - *prefix*, *infix* and *postfix* notation
 - [*Polish notation*](https://en.wikipedia.org/wiki/Polish_notation)
@@ -121,9 +122,13 @@ When *coding* is complete it has to be *evaluated*. The *value* of a *arithmetic
 
 The *semantic* evaluation rules can be read as *goal-subgoaling*: IF the *goal* is to '*evaluate a simple arithmetic expression*' THEN replace that *goal* either by a chain of goals with the last *subgoal* '*evaluate a numeral*' or by a shortcut with the same effect.
 
+"
+
+# ╔═╡ 87a0fd06-c709-4fb9-ab79-75ebb014b6fd
+md"
+---
 ###### *Goal Hierarchy*: *Coding* and *Evaluation* of *Simple Arithmetic Expressions*
-$<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
-$<combination>\ \rightarrow\ <operand>$
+$<simple\ arithmetic\ expression>\ \rightarrow\  <operand>$
 $<operand>\ \rightarrow\ <numeral>$
 $---$
 $<simple\ arithmetic\ expression>\ \Rightarrow\ <numeral>$
@@ -162,9 +167,10 @@ md"
 
 Here we deal with *simple arithmetic expressions* in *functional Julia*. *Code* contains *operators* and *parentheses*. There are some abbreviations:
 
-$<oprnd> = <operand>; <oprator> = <operator>$
+$<oprnd> := <operand>$
+$<oprator> := <operator>$
 
-and a [*repitition*](https://en.wikipedia.org/wiki/Kleene_star) operator meaning *zero or more* reptitions:
+and a *repitition* operator [(*Kleene* star)](https://en.wikipedia.org/wiki/Kleene_star) meaning *zero or more* reptitions:
 
 $\{...\}^*$
 
@@ -176,10 +182,13 @@ md"
 ###### *Goal Hierarchy*; *Coding* and *Evaluation* of *Arithmetic Expressions*
 
 We have augmented the rules above with new rules containing *operators* $+, -, *, /$.
+The *complexity* of the *goal hierachy* to be learnt is astonishing. With growing expertise *chunking* takes place. *Chunking* means the replacement of rule *chains* by *compositions*. This was first implemented in [*Allen Newell*](https://en.wikipedia.org/wiki/Allen_Newell)'s [*SOAR*](https://en.wikipedia.org/wiki/Soar_(cognitive_architecture))
 
 $<simple\ arithmetic\ expression>\ \rightarrow\ <combination>$
 $<combination>\ \rightarrow\ <operand> \{<operator> <operand>\}^*$
 $<oprnd>\{<oprator> <oprnd>\}^*\ \rightarrow\ <numeral>\{<oprator> <numeral>\}^*$
+$<numeral>\{<oprator> <numeral>\}^* \rightarrow <numeral>$
+$<operand>\ \rightarrow\ <numeral>$
 $<operator\ \rightarrow\ +|-|*|/|...\;\;$
 $<numeral>\ \Rightarrow 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
 $---$
@@ -798,6 +807,8 @@ md"
 
 - **JuliHub**; [*Julia doc*](https://docs.julialang.org/en/v1/); last visit 2026/02/26
 
+- **Wikipedia**; [*Allen Newell*](https://en.wikipedia.org/wiki/Allen_Newell); last visit 2026/03/07
+
 - **Wikipedia**; [*Kleene Star*](https://en.wikipedia.org/wiki/Kleene_star); last visit 2026/03/06
 
 - **Wikipedia**; [*Literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming)); last visit 2026/02/26
@@ -805,6 +816,8 @@ md"
 - **Wikipedia**; [*MIT/GNU-Scheme*](https://en.wikipedia.org/wiki/MIT/GNU_Scheme); last visit 2026/02/26
 
 - **Wikipedia**; [*Scheme*](https://en.wikipedia.org/wiki/Scheme_(programming_language)); last visit 2026/02/26
+
+- **Wikipedia**; [*SOAR*](https://en.wikipedia.org/wiki/Soar_(cognitive_architecture))
 
 - **Wikipedia**; [*Type System*](https://en.wikipedia.org/wiki/Type_system); last visit 2026/02/26
 
@@ -2257,6 +2270,7 @@ version = "1.13.0+0"
 # ╟─09690a94-3733-4e75-b1c9-e72826a571bc
 # ╟─0d1e90da-83fd-494e-9a02-25c2be36d1ce
 # ╟─e549b0c7-0dd4-4bae-ad21-b06cda1daebd
+# ╟─87a0fd06-c709-4fb9-ab79-75ebb014b6fd
 # ╠═198ce2f2-988c-4387-a73d-60f5d785c3bc
 # ╠═dc5f6985-d4ae-4336-9f66-185bfed79a05
 # ╠═9fdcb71c-da9f-4b20-b606-a1ce7e3d8456
