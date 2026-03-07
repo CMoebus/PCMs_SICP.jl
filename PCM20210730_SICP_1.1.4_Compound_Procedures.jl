@@ -24,14 +24,14 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/02 ***
+ ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/07 ***
 ===================================================================================
 "
 
 # ╔═╡ 506915e1-15ef-43b6-aaf4-c3074e6c08ba
 md"
 ##### 0. Introduction
-*We have identified in Lisp some of the elements that must appear in any powerful programming language:*
+*We have identified in Lisp* (Scheme) *some of the elements that must appear in any powerful programming language:*
 
 - *Numbers and arithmetic operations are primitive data and procedures.*
 
@@ -39,9 +39,9 @@ md"
 
 - *Definitions that associate names with values provide a limited means of abstraction.* 
 
-*Now we will learn about procedure definitions, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.* (SICP, ch.1.1.4)
+*Now we will learn about procedure* (, method, and function) *definitions, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.* (*SICP, ch.1.1.4*, 'enhencements' by us)
 
-SICP talks about *procedures*. This concept has an *imperative* touch. *Imperative* is a concept if it works with *commands* and *side effects. We avoid that designator in favour of *function*. *Functions* are like mathematical functions and work with *expressions* and are *side-effect-free*.
+SICP talks about *procedures*. This concept has an *imperative* touch. *Imperative* is a concept if it works with *commands* and *side effects*. We avoid that identifier in favour of *function*. *Functions* are like mathematical functions and work with *expressions* and are *side-effect-free*.
 "
 
 # ╔═╡ 9b9a9365-f17d-4e98-b6d2-360d417781b6
@@ -70,11 +70,20 @@ md"
 md"
 ##### 3. SICP-Scheme-like *functional* Julia: Compound Procedures
 *Compound procedures* are *functions* with a *body* consisting of one or more *expressions*.
+
+###### 3.1 *Goal Hierarchy*: Definition and Coding a *Simple Function*
+
+$<simple\ function\ definition> \rightarrow <head> = <body>$
+$<head> \rightarrow <name>(<parameter>^*)$
+$<body> \rightarrow <expression>^*$
+$---$
+$<simple\ function\ definition> \Rightarrow <name>(<parameter>^*) = <expression>^*.$
 "
 
 # ╔═╡ 73339eae-4754-49b1-938a-5ceae1c0f6a3
 md"
-###### 3.1 *Definition* and *Application* of *Function* $mySquare$
+---
+###### 3.2 Example: *Definition* and *Application* of Function $mySquare$
 
 We choose the function *name* $mySquare$ instead of $square$ because we want to avoid a name clash with a *potential* built-in function $square$.
 
@@ -84,22 +93,20 @@ We choose the function *name* $mySquare$ instead of $square$ because we want to 
 md"
 ###### 1st *untyped, generic method* of function $mySquare$
 
-A *generic* function is an *untyped* function. This means that *input* and *output* are *not* constrained by *static* types (e.g.: Int64, Float64). Before the *binding* of arguments to parameters arguments possess the default *generic* type $Any$. At *binding time* the generic type $Any$ is *constrained* *dynamically* to the type of the argument.
+A *generic* function is an *untyped* function. This means that *input* and *output* are *not* constrained by *static* types (e.g.: Int64, Float64). Before the *binding* with arguments *parameters* possess the default *generic* type $Any$. At *binding time* the *generic* type $Any$ is *constrained* dynamically to the actual type of the argument.
 
 "
 
 # ╔═╡ ece77425-0b83-4a9a-b2ef-757bfaa60891
 md"
-             To square something, multiply it by itself* (SICP, 1996, ch. 1.1.4)  
+---
+###### Example: *Function* $x^2$
+           *To square something, multiply it by itself* (SICP, 1996, ch. 1.1.4)  
                   |       |        |
                   |   +---+        |
                   |   |            |
                   v   v            v
              mySquare(x)    =    x * x
-
-       <name>(<parameter>*) = <expression>*
-               <head>       =   <body>
-             <simple function definition>
 
 "
 
@@ -109,15 +116,13 @@ mySquare(x) = x * x                          # ==> definition of function mySqua
 # ╔═╡ 7e97208a-d1b0-435e-8756-f0b468b1c795
 md"
 ---
-###### 3.2 *Definition* and *Application* of *Generic* Function $sumOfSquares$
+###### 3.3 Function *Hierarchy*: *Definition* and *Application* of *Generic* Function $sumOfSquares$
 
 $sumOfSquares : \mathbb R \times \mathbb R \rightarrow \mathbb R$
 
-$sumOfSquares: (x, y) \mapsto sumOfSquares(x, y)$
+$sumOfSquares: (x, y) \mapsto square(x) + square(y)$
 
-$sumOfSquares(x, y) := x^2 + y^2$
-
-$\;$
+$square: x \mapsto x^2$
 
 "
 
@@ -143,11 +148,11 @@ md"
 
 $<function\ definition> \rightarrow <simple> | <explicit> | <anonymous>$
 
-$<simple> ::= <head> = <body>$
-$<head> ::= <name> (<param>*)$ 
-$<body> :: <expression>*$
-$<explicit> :: function <name>(<param>*) <body> end$
-$<anonymous> ::= (<param>*) \rightarrow <body> | function(<param>*) <body> end$ 
+$<simple> \rightarrow = <head> = <body>$
+$<head> \rightarrow <name> (<param>^*)$ 
+$<body> \rightarrow <expression>^*$
+$<explicit> \rightarrow function <head> <body> end$
+$<anonymous> \rightarrow  (<param>^*) \rightarrow <body> | function(<param>^*) <body> end$ 
 
 The symbol $*$ is [Kleene's repitition operator](https://en.wikipedia.org/wiki/Kleene_star).
 "
@@ -171,7 +176,7 @@ $mySquare(x) := x * x$
 "
 
 # ╔═╡ 9410ff1c-daf0-48de-be8a-f31c5a76dbed
-mySquare(x::Real)::Real = x * x        # specialized definition function 'mySquare'
+mySquare(x::Real)::Real = x * x         # specialized definition function 'mySquare'
 
 # ╔═╡ 51f99623-1572-4c05-b9d9-1cd4393c31e0
 typeof(Function)
@@ -200,10 +205,7 @@ $\;$
 "oh, " * "no !"               # operator $*$ is defined for strings !
 
 # ╔═╡ 77f4ee9b-4239-4eea-b7b4-d16183ab6e93
-mySquare(x::String) = error("not defined for strings !")
-
-# ╔═╡ 36bd0654-e06b-4b5a-a369-e70122f562bf
-mySquare                                     # 3 (!) methods, 1 function
+mySquare(x::String) = error("not defined for strings !") # suppression for strings
 
 # ╔═╡ 8db7e80c-a877-44ff-aa15-48841c035aeb
 mySquare(21)                                 # ==> 441 --> :)
@@ -241,7 +243,7 @@ mySquare("oh no!")
 # ╔═╡ 7ff29624-964a-435c-a909-550484a527c6
 md"
 ---
-###### 4.3 *Multiple Dispatch*
+###### 4.3 [*Multiple Dispatch*](https://docs.julialang.org/en/v1/#man-what-makes-julia)
 *Multiple dispatch* of function calls is possible when there are several *methods* with differently *typed parameters* of the *same* function *symbol*. 
 
 In a function *call* first *more narrow* methods are tried then the *next less narrow* methods, etc. What is more or less narrow is defined by the relevant type hierarchy. This is called *muliple dispatch* of function calls.
@@ -251,16 +253,32 @@ In a function *call* first *more narrow* methods are tried then the *next less n
 md"
 ---
 ###### *Methods* as targets for *multiple dispatch*
+The Julia *function* $mySquare$ has three *methods*:
+- one for input type $String$. This is *not* what we wanted. So we implemented an *error* message.
+- one for type $Real$. This is ok because subtypes are $Int, Float$. This is also for e.g. *rational* numbers $p//q$ and *irrational* numbers like $π$
+- one *generic* for type $Any$. It accepts only what the *body* can accept
 "
 
 # ╔═╡ 13b98b93-a478-4e4a-b4a2-423d6af45369
 methods(mySquare)
+
+# ╔═╡ 0c1ddb55-2658-4587-ad89-a8d3fa431a1c
+subtypes(Real)
+
+# ╔═╡ f27b27f5-d33c-4804-b92f-dcaecc2df702
+typejoin(Float64, Int64)
 
 # ╔═╡ 3454c059-533a-4f06-b72e-7deb61c0aedf
 typejoin(Real, String)                    # ==> Any
 
 # ╔═╡ 58c6ef37-5ca5-4e89-b96f-dc2fea19447c
 typejoin(Int64, Float64, String)          # ==> Any
+
+# ╔═╡ a16b5538-e257-4a7f-95cb-dfc01d685796
+mySquare(3//4), typeof(3//4)              # Rational numbers
+
+# ╔═╡ 52770aa8-8679-4240-af3a-51adfe5fe48b
+mySquare(π), typeof(π)                    # Irrational numbers
 
 # ╔═╡ ccdbeff9-c398-417b-b933-61662f406ad0
 function makeMyTypeTreeAny(; fontsize=12)
@@ -325,10 +343,17 @@ f2(5)
 
 # ╔═╡ 3766c9b6-0ff5-4b0d-bc85-2c9bfe0a1d50
 # 2nd alternative anonymous function definition of f with anonymous function '->'
-f3 = a -> sumOfSquares(+(a,1), 2a)    
+f3 = (a) -> sumOfSquares(+(a,1), 2a)    
 
 # ╔═╡ 84bb8887-9df3-4ff0-ab50-eb144cd2f118
 f3(5)
+
+# ╔═╡ d777f9f2-b9f9-40eb-85fb-b0aba7193cd3
+# 3rd alternative anonymous function definition of f with anonymous function '->'
+f4 = a -> sumOfSquares(+(a,1), 2a)  
+
+# ╔═╡ 0e4d0cf1-5549-44ac-9e82-fcdd877e4956
+f4(5)
 
 # ╔═╡ 8a67cb77-a84f-4750-9099-56b5ef8ae038
 sumOfSquares(3.0, 4.0)
@@ -345,14 +370,14 @@ md"
 "
 
 # ╔═╡ d0fac6ee-0507-4a55-907c-a86136e48e65
-f4(a::Real)::Real =
+f5(a::Real)::Real =
 	sumOfSquares(a + 1::Real, 2a::Real)::Real
 
 # ╔═╡ f29a4f6f-d090-4be8-9d0f-14369c35b6b3
-f4(5)
+f5(5)
 
 # ╔═╡ 863f12ad-c33c-4888-ba69-2c69f55edd07
-f4(5.0)
+f5(5.0)
 
 # ╔═╡ 1752aa11-635b-4179-86fa-736305434312
 md"
@@ -367,9 +392,10 @@ This is called *muliple dispatch* of function calls.
 md"
 ---
 ##### 6. References
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
+
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
 
 - **Wikipedia**; [*Kleene's repitition operator*](https://en.wikipedia.org/wiki/Kleene_star); last visit 2026/03/02
 
@@ -1801,7 +1827,6 @@ version = "1.13.0+0"
 # ╟─d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
 # ╟─ece77425-0b83-4a9a-b2ef-757bfaa60891
 # ╠═150ad79c-42b4-4981-8711-1ef426725ca0
-# ╠═36bd0654-e06b-4b5a-a369-e70122f562bf
 # ╠═8db7e80c-a877-44ff-aa15-48841c035aeb
 # ╠═95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
 # ╠═731aa7ca-d4af-4be8-8a40-2eec5522ad99
@@ -1818,6 +1843,8 @@ version = "1.13.0+0"
 # ╠═538f4130-f6e1-43c2-8020-f7f2488e2442
 # ╠═3766c9b6-0ff5-4b0d-bc85-2c9bfe0a1d50
 # ╠═84bb8887-9df3-4ff0-ab50-eb144cd2f118
+# ╠═d777f9f2-b9f9-40eb-85fb-b0aba7193cd3
+# ╠═0e4d0cf1-5549-44ac-9e82-fcdd877e4956
 # ╟─7c8b7c1d-1e23-49c6-be97-32c9f2e38041
 # ╠═9410ff1c-daf0-48de-be8a-f31c5a76dbed
 # ╠═2ef23512-6a23-4d2d-86fa-db9c1743c529
@@ -1833,8 +1860,12 @@ version = "1.13.0+0"
 # ╟─7ff29624-964a-435c-a909-550484a527c6
 # ╟─d78a705e-bf07-4af9-919a-a2b2de73cf6c
 # ╠═13b98b93-a478-4e4a-b4a2-423d6af45369
+# ╠═0c1ddb55-2658-4587-ad89-a8d3fa431a1c
+# ╠═f27b27f5-d33c-4804-b92f-dcaecc2df702
 # ╠═3454c059-533a-4f06-b72e-7deb61c0aedf
 # ╠═58c6ef37-5ca5-4e89-b96f-dc2fea19447c
+# ╠═a16b5538-e257-4a7f-95cb-dfc01d685796
+# ╠═52770aa8-8679-4240-af3a-51adfe5fe48b
 # ╟─ccdbeff9-c398-417b-b933-61662f406ad0
 # ╠═4bb8fae0-d70b-47a0-a551-851d478275a2
 # ╟─21650888-8948-4fe6-8b08-08472a84ad32
