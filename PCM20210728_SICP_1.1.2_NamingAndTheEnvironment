@@ -22,7 +22,7 @@ md"
 ===============================================================================
 #### SICP: 1.1.2 Naming and the Environment
 ##### file: PCM20210728\_SICP\_1.1.2\_NamingAndTheEnvironment
-##### Julia/Pluto.jl-code (1.11.2/0.20.0) by PCM *** 2026/03/02 ***
+##### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/07 ***
 
 ===============================================================================
 "
@@ -64,10 +64,12 @@ md"
 ---
 ###### 3.1 *Definition* of Constant and *Binding*
 
-*Binding* means *creation* of a singular *name* (= *symbol*) and *binding* (pointer) to a *value*. This binding is *constant* and cannot be changed. Otherwise we have a *mutation*. *Pluto* discourages mutations.
+*Binding* means the *creation* of a singular *name* (= *symbol*) and *binding* (pointer) to a *value*. This binding is *constant* and cannot be changed. Otherwise we have a *mutation*. *Pluto* discourages mutations.
 
-$<constant> \Rightarrow <symbol>$
-$<symbol> \Rightarrow <value>$
+$<constant> \rightarrow <symbol>$
+$<symbol> \dashrightarrow <value>$
+
+where $\dashrightarrow$ means a *binding* of a *value* to a *symbol*
 
 Fig. 1.2.1 Binding of a *constant* to a *value*
 
@@ -122,17 +124,17 @@ begin
 	scatter((1.0, 1.0), 
 			markersize=100, 
 			xlims=(-2, +4), ylims=(-4, +6), 
-			size=(600,400), color=:cornflowerblue, alpha=0.5, label=false, 
+			size=(600,450), color=:cornflowerblue, alpha=0.5, label=false, 
 			#--------------------------------------------------------------
 			title=L"Fig. 1.1.2.1 Visualization\ of\ Concept\ Circle",
 			titlefontsize=14)
 	#----------------------------------------------------------------------
 	scatter!((1.0, 1.0), markersize=3, label=L"center")
-	plot!([1.0, 2.7], color=:black, label=L"circumference:2\pi r")
+	plot!([1, 1.75], [1, 2.5], color=:black, label=L"radius\ r")
 	#----------------------------------------------------------------------
-	annotate!(1.6, 1.6, L"r")
-	annotate!(1, 0.2, L"area:r^2\pi", 12)
-	annotate!(2.75, 0.9, L"2\pi r", 12)
+	annotate!(1.5, 1.5, L"r")
+	annotate!(1, 0.2, L"area:r^2π", 12)
+	annotate!(1.0, -2.0, L"circumference: 2\pi r", 12)
 end # begin
 
 # ╔═╡ a20cfd0f-1aba-4e50-8da4-4841a2cc2171
@@ -145,7 +147,7 @@ radius = 10                       # definition of constant radius
 π * radius^2                      # arithmetic expression
 
 # ╔═╡ ba83c5f4-76d1-4d5c-ae4a-5da359b283a1
-area = π * radius^2               # definition of constant area
+area = radius^2 * π               # definition of constant area
 
 # ╔═╡ f209c046-91f9-46d2-b177-3f8e7833d616
 area                              # evaluation of constant area
@@ -296,6 +298,7 @@ makeMyTypeTreeReal()
 md"
 ---
 ##### 5. Summary
+*It should be clear that the possibility of associating values with symbols and later retrieving them means that the interpreter must maintain some sort of memory that keeps track of the name-object pairs. This memory is called the environment (more precisely the global environment, since we will see later that a computation may involve a number of different environments.* (SICP, 1996, 2016)
 "
 
 # ╔═╡ cbf42d36-89d7-44b1-849a-65667a05ef00
@@ -303,9 +306,9 @@ md"
 ---
 ##### 6. References
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
-- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+- **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
 
 - **Wikipedia**; [*Circle*](https://en.wikipedia.org/wiki/Circle); last visit 2024/12/06
 
