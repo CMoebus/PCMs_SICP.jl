@@ -69,16 +69,18 @@ md"
 # ╔═╡ 4e1efa4a-cb44-4913-a35f-0a779ee0ee2a
 md"
 ##### 3. SICP-Scheme-like *functional* Julia: Compound Procedures
+(1st pass)
+
 *Compound procedures* are *functions* with a *body* consisting of one or more *expressions*.
 
 ###### 3.1 *Goal Hierarchy*: Definition and Coding a *Simple Function*
 
-$<simple\ function\ definition> \rightarrow <head> = <body>$
-$<head> \rightarrow <name>(<parameter>^*)$
+$<simple\ function\ definition> \rightarrow <head> \mathbb = <body>$
+$<head> \rightarrow <name> \mathbb (<parameter>^* \mathbb )$
 $<body> \rightarrow <expression>^*$
 $---$
-$<simple\ function\ definition> \Rightarrow <name>(<parameter>^*) = <expression>^*.$
-"
+$<simple\ function\ definition> \Rightarrow <name> \mathbb (<parameter>^* \mathbb)\ \mathbb = <expression>^*.$
+" 
 
 # ╔═╡ 73339eae-4754-49b1-938a-5ceae1c0f6a3
 md"
@@ -141,6 +143,8 @@ $f(a) := sumOfSquares(a+1, 2a)$
 md"
 ---
 ##### 4. Idiomatic *functional* Julia ...
+(2nd pass)
+
 ###### ... with, *prefix* operator, *keyword* $function$, *anonymous* functions with operator $->$, *multiple dispatch*
 
 ---
@@ -419,8 +423,6 @@ md"
 
 # ╔═╡ 923f3c7d-9b17-4458-9ee3-8dd0e36f8452
 md" 
----
-##### end of ch. 1.1.4
 ===================================================================================
 
 This is a **draft** under the  [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. Comments, suggestions for improvement and bug reports are welcome: **claus.moebus(@)uol.de**
