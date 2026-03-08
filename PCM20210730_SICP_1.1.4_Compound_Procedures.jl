@@ -24,7 +24,7 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/07 ***
+ ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/08 ***
 ===================================================================================
 "
 
@@ -41,7 +41,7 @@ md"
 
 *Now we will learn about procedure* (, method, and function) *definitions, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.* (*SICP, ch.1.1.4*, 'enhencements' by us)
 
-SICP talks about *procedures*. This concept has an *imperative* touch. *Imperative* is a concept if it works with *commands* and *side effects*. We avoid that identifier in favour of *function*. *Functions* are like mathematical functions and work with *expressions* and are *side-effect-free*.
+SICP talks about *procedures*. This concept has an *imperative* touch. *Imperative* is a concept if it works with *commands* and *side effects*. We avoid the identifier *procedure* in favour of *function*. *Functions* are similar to mathematical functions but they are *effective* and *generate* values by evaluating *expressions*. So they are *side-effect-free*.
 "
 
 # ╔═╡ 9b9a9365-f17d-4e98-b6d2-360d417781b6
@@ -129,7 +129,7 @@ $square: x \mapsto x^2$
 # ╔═╡ b6fda0b6-2ea2-4f2f-961b-65936c050852
 md"
 ---
-###### 3.3 *Definition* and *Application* of *Generic* Function $f_1$
+###### 3.4 Function *Hierarchy*: *Definition* and *Application* of *Generic* Function $f_1$
 
 $f : \mathbb R \times \mathbb R \rightarrow \mathbb R$
 $f : a \mapsto f(a)$
@@ -141,7 +141,7 @@ $f(a) := sumOfSquares(a+1, 2a)$
 md"
 ---
 ##### 4. Idiomatic *functional* Julia ...
-###### ... with *prefix* operator, *keyword* $function$, *anonymous* functions with operator $->$
+###### ... with, *prefix* operator, *keyword* $function$, *anonymous* functions with operator $->$, *multiple dispatch*
 
 ---
 ###### *Goal Hierarchy* for Writing Function Definitions
@@ -152,7 +152,7 @@ $<simple> \rightarrow = <head> = <body>$
 $<head> \rightarrow <name> (<param>^*)$ 
 $<body> \rightarrow <expression>^*$
 $<explicit> \rightarrow function <head> <body> end$
-$<anonymous> \rightarrow  (<param>^*) \rightarrow <body> | function(<param>^*) <body> end$ 
+$<anonymous> \rightarrow  (<param>^*) \rightarrow <body> | function(<param>^*) <body> end.$ 
 
 The symbol $*$ is [Kleene's repitition operator](https://en.wikipedia.org/wiki/Kleene_star).
 "
@@ -256,7 +256,7 @@ md"
 The Julia *function* $mySquare$ has three *methods*:
 - one for input type $String$. This is *not* what we wanted. So we implemented an *error* message.
 - one for type $Real$. This is ok because subtypes are $Int, Float$. This is also for e.g. *rational* numbers $p//q$ and *irrational* numbers like $π$
-- one *generic* for type $Any$. It accepts only what the *body* can accept
+- one *generic* for type $Any$. It accepts only what the *operators* in the *body* can accept. E.g. $mySquare$ can accept *complex* numbers, because $Complex$ is *not* a subtype of $Real$ or $String$. This will be dealt later.
 "
 
 # ╔═╡ 13b98b93-a478-4e4a-b4a2-423d6af45369
@@ -280,32 +280,46 @@ mySquare(3//4), typeof(3//4)              # Rational numbers
 # ╔═╡ 52770aa8-8679-4240-af3a-51adfe5fe48b
 mySquare(π), typeof(π)                    # Irrational numbers
 
+# ╔═╡ a7dce298-b776-41a1-84a9-065b43b79790
+Complex <: Union{Real, String}            # Complex is not subtype of Real, String
+
+# ╔═╡ 9fc7a5cb-2cca-4ef5-84a9-585c87f54fdd
+mySquare((2 + 3im))                       # Complex numbers
+
+# ╔═╡ e034b2e4-1064-4761-aab3-203b2b2340ed
+(2 + 3im) * (2 + 3im)                     # Complex numbers
+
+# ╔═╡ a4bbb9b8-4e41-42ec-88b6-6648b622b1d8
+typejoin(Real, String, Complex)           # supertype is Any
+
 # ╔═╡ ccdbeff9-c398-417b-b933-61662f406ad0
 function makeMyTypeTreeAny(; fontsize=12)
 	g = [
-		0 0 0 0 0 0;          # Any
-		1 0 0 0 0 0;          # Real       -> Any
-		0 1 0 0 0 0;          # Int64      -> Real
-		0 1 0 0 0 0;          # Float64    -> Real
-	    0 1 0 0 0 0;          # Irrational -> Real
-	    1 0 0 0 0 0]          # String     -> Any
-	names = [L"  Any  ", L"  Real  ", L"  Int64  ", L" Float64 ", L" Irrational ", L" String "]
-	edgelabels = Dict{Tuple, String}((2, 1) => L"supertype", (3, 2) => L"supertype", (4, 2) => L"supertype", (5, 2) => L"supertype", (6, 1) => L"supertype")
-	graphplot(g, x=[5.0, 4.0, 2.0, 4.0, 6.0, 8.0], y = [3, 1.5, 0, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.4, fontsize=fontsize, size=(800, 400), title=L"Fig. 1.1.4.1\ Excerpt\ of\ Type\ Tree: Any", titlefontsize=fontsize+4)
+		0 0 0 0 0 0 0;          # Any
+		1 0 0 0 0 0 0;          # Real       -> Any
+		0 1 0 0 0 0 0;          # Int64      -> Real
+		0 1 0 0 0 0 0;          # Float64    -> Real
+	    0 1 0 0 0 0 0;          # Irrational -> Real
+	    1 0 0 0 0 0 0;          # String     -> Any
+		1 0 0 0 0 0 0]          # Complex    --> Any
+	names = [L"  Any  ", L"  Real  ", L"  Int64  ", L" Float64 ", L" Irrational ", L" String ", L" Complex "]
+	edgelabels = Dict{Tuple, String}((2, 1) => L"supertype", (3, 2) => L"suptype", (4, 2) => L"suptype", (5, 2) => L"suptype", (6, 1) => L"suptype", (7, 1) => L"suptype")
+	graphplot(g, x=[6.0, 4.0, 2.0, 4.0, 6.0, 8.0, 10.0], y = [3, 1.5, 0, 0, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.4, fontsize=fontsize, size=(960, 400), title=L"Fig. 1.1.4.1\ Excerpt\ of\ Type\ Tree: Any", titlefontsize=fontsize+4)
 end # makeMyTypeTreeAny()
 
 # ╔═╡ 4bb8fae0-d70b-47a0-a551-851d478275a2
 makeMyTypeTreeAny()
 
 # ╔═╡ 21650888-8948-4fe6-8b08-08472a84ad32
-function makeMyTypeTreeSquare(; fontsize=14)
+function makeMyTypeTreeSquare(; fontsize=15)
 	g = [
-		0 0 0;
-		1 0 0;
-		1 0 0]
-	names = [L"mySquare(x)", L"mySquare(x::Real)", L"mySquare(x::String)"]
-	edgelabels = Dict{Tuple, String}((2, 1) => L"less\ narrow\ argument's\ type", (3, 1) => L"less\ narrow\ argument's\ type")
-	graphplot(g, x=[1.0, 0.0, 2.0], y = [0.7, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.074, fontsize=fontsize, title=L"Fig. 1.1.4.2\ Dispatch\ of\ Methods\ of\ Function: mySquare(.)", titlefontsize=fontsize+4, size=(1000, 400))
+		0 0 0 0;
+		1 0 0 0;
+		1 0 0 0;
+	    1 0 0 0]
+	names = [L"mySquare(x)", L"mySquare(x::Real)", L"mySquare(x::String)", L"mySquare(x::Complex)"]
+	edgelabels = Dict{Tuple, String}((2, 1) => L"less\ narrow\ type", (3, 1) => L"less\ narrow\ type", (4, 1) => L"less\ narrow\ type")
+	graphplot(g, x=[2.0, 0.0, 2.0, 4.0], y = [1.5, 0, 0, 0], edgelabel=edgelabels, nodeshape=:rect, nodecolor=:aqua, names=names, lw=2, nodesize=0.17, fontsize=fontsize, title=L"Fig. 1.1.4.2\ Dispatch\ of\ Methods\ of\ Function: mySquare(.)", titlefontsize=fontsize+4, size=(960, 400))
 end # function makeMyTypeTreeSquare()
 
 # ╔═╡ 93bf2d55-ca89-436c-802e-8e3f26e7d65c
@@ -384,7 +398,7 @@ md"
 ---
 ##### 5. Summary
 First we defined *generic* functions. These make up the *first method* of that *function's symbol*. Then we *specialized* the *generic* function by *typing* the function's *parameters*. This assures the correct *dispatch* of function calls. In a function call first *more narrow* methods are tried then the *next less narrow* methods, etc.
-This is called *muliple dispatch* of function calls.
+This is called [*multiple dispatch*](https://en.wikipedia.org/wiki/Multiple_dispatch) of function calls. It is a *central* feature of Julia.
 "
 
 # ╔═╡ 20f492e1-1b1b-4852-8e40-37d4bd96c2a3
@@ -398,6 +412,8 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
 
 - **Wikipedia**; [*Kleene's repitition operator*](https://en.wikipedia.org/wiki/Kleene_star); last visit 2026/03/02
+
+- **Wikipedia**; [*Multiple dispatch*](https://en.wikipedia.org/wiki/Multiple_dispatch); last visit 2026/03/08
 
 "
 
@@ -1866,10 +1882,14 @@ version = "1.13.0+0"
 # ╠═58c6ef37-5ca5-4e89-b96f-dc2fea19447c
 # ╠═a16b5538-e257-4a7f-95cb-dfc01d685796
 # ╠═52770aa8-8679-4240-af3a-51adfe5fe48b
+# ╠═a7dce298-b776-41a1-84a9-065b43b79790
+# ╠═9fc7a5cb-2cca-4ef5-84a9-585c87f54fdd
+# ╠═e034b2e4-1064-4761-aab3-203b2b2340ed
+# ╠═a4bbb9b8-4e41-42ec-88b6-6648b622b1d8
 # ╟─ccdbeff9-c398-417b-b933-61662f406ad0
 # ╠═4bb8fae0-d70b-47a0-a551-851d478275a2
 # ╟─21650888-8948-4fe6-8b08-08472a84ad32
-# ╟─93bf2d55-ca89-436c-802e-8e3f26e7d65c
+# ╠═93bf2d55-ca89-436c-802e-8e3f26e7d65c
 # ╟─c44ce267-d9d7-46ea-a6f2-54170cda5409
 # ╠═abd380fc-5018-462c-8641-3fc269e0d2cb
 # ╠═8a67cb77-a84f-4750-9099-56b5ef8ae038
