@@ -22,7 +22,7 @@ md"
 ===================================================================================
 #### SICP: 1.1.5 [The Substitution Model for Procedure Application](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html)
 ##### file: PCM20241210\_SICP\_1.1.5\_TheSubstitutionModelForProcedureApplication
-##### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/03 ****
+##### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/08 ****
 
 ===================================================================================
 "
@@ -31,19 +31,19 @@ md"
 md"
 ---
 ##### 0. Introduction
-In ch. 1.1.5 SICP presents a first *approximate* model of an *interpreter*, which can be used as a *mental* model of or for the software developer. This model is called the *substitutional* model for procedure application. *Single* steps computing the value of a function call consist of *textual substitutions*. This *mental model* is of course only a rough approximation of the real working interpreter. 
+SICP presents in ch. 1.1.5 a first *approximate* model of an *interpreter*, which can be used as a descriptive or normative *mental* model of a software developer evaluating code scripts. This model is called the *substitutional* model for procedure application. *Single* steps computing the value of a function call consist of *textual substitutions*. This *mental model* is of course only a rough *approximation* of the real working interpreter. 
 
 The *substitutional model* offers two alternative evaluation strategies: *applicative* (*eager* evaluation, *call-by-value*) vs. *normal* order (*lazy* evaluation, *call-by-name*). Under the first strategy *all* arguments in the function call are evaluated *before* they are bound to the parameters of the function. Under the second strategy the evaluation of arguments is *deferred* as long as possible. They are evaluated only when needed. This behavior is really *lazy*.
 
-                              <mental model interpreter>
-                                           ^
+                             <mental model interpreter>
                                            |
-                          <textual substitution interpreter>
-                                           ^
+                                           v
+                           <textual substitution interpreter>
                                            |
+                                           v
                          +-----------------+-----------------+
-                         ^                                   ^
                          |                                   |
+                         v                                   v
           <applicative order interpreter>          <normal order interpreter>
 
                                        
@@ -129,11 +129,11 @@ md"
 
 - *Binding* of *evaluated argument* to *formal parameter*
 
-$a \mapsto 5$
+$a \dashrightarrow 5$
 
 - *Expansion* of function *body* by substituting *parameters* by *bindings*
 
-$a \mapsto 5; sumOfSquares(a + 1, a * 2) \mapsto sumOfSquares(5 + 1, 5 * 2)$
+$a \dashrightarrow 5; sumOfSquares(a + 1, a * 2) \mapsto sumOfSquares(5 + 1, 5 * 2)$
 
 - *Evaluation* of arguments
 
@@ -141,11 +141,11 @@ $sumOfSquares(5 + 1, 5 * 2) \mapsto sumOfSquares(6, 10)$
 
 - *Binding* of *evaluated argument* to *formal parameters*
 
-$x, y \mapsto 6, 10$
+$(x, y) \dashrightarrow (6, 10)$
 
 - *Expansion* of function *body* by substituting *parameters* by *bindings*
 
-$x, y \mapsto 6, 10; sumOfSquares(x, y) \mapsto square(6) + square(10)$
+$(x, y) \dashrightarrow (6, 10); sumOfSquares(x, y) \mapsto square(6) + square(10)$
 
 - *Expansion* of function *body* by substituting *parameters* by *bindings*
 
@@ -157,7 +157,7 @@ $6 * 6 + 10 * 10 \mapsto 36 + 100$
 
 - *Reduction* by *evaluation* of primitive expressions
 
-$36 + 100 \mapsto 136$
+$36 + 100 \mapsto 136.$
 
 "
 
@@ -186,7 +186,7 @@ $6 * 6 + 10 * 10 \mapsto 36 + 100$
 
 - *Reduction* by *Evaluation* of *primitive* expressions
 
-$36 + 100 \mapsto 136$
+$36 + 100 \mapsto 136.$
 
 "
 
@@ -308,7 +308,7 @@ md"
 ---
 ##### 5. Summary
 
-Here we defined informal rules as a *mental model* of or for the interpreter. There are two different evaluation *strategies*: *applicative* and *normal order* evaluation. Most times both strategies compute the same result. Only if the evaluation of some arguments don't terminate then both strategies may diverge: applicative order does not terminate wheras normal order does eventually.
+Here we defined informal *descriptive* or *normative* rules as a *mental model* of a human or machine interpreter. There are two different evaluation *strategies*: *applicative* and *normal order* evaluation. Most times both strategies compute the same result. Only if the evaluation of some arguments does not terminate then both strategies may diverge: *applicative* order does not terminate wheras *normal* order does eventually.
 "
 
 # ╔═╡ 1d6258a3-dc05-40e2-94bf-604a33e3fb7a
