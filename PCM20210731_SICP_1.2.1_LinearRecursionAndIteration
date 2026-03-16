@@ -26,7 +26,7 @@ md"
 
 ##### file: PCM20210731\_SICP\_1.2.1\_LinearRecursionAndIteration
 
-##### Julia/Pluto.jl-code (1.12.5/0.20.24) by PCM *** 2026/03/15 ***
+##### Julia/Pluto.jl-code (1.12.5/0.20.24) by PCM *** 2026/03/16 ***
 ===================================================================================
 "
 
@@ -148,7 +148,7 @@ plotONotations()
 
 # ╔═╡ 373dfb03-b7fa-4ba5-b908-1b8788d41daa
 md"
-**Fig. 1.2.1.1**: Graphs of *big-Measures* (cf. Fig.2.3, Skiena, 2012, p.35))
+**Fig. 1.2.1.1**: Graphs of *big-Measures* (cf.: Fig. 3.2, Cormen et al., 2022, 4/e, ch.03, p.54; Fig.2.3, Skiena, 2012, p.35))
 " 
 
 # ╔═╡ 0b349f69-61ff-4c54-b8cb-2618213d44c8
@@ -480,6 +480,8 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+
+- **Cormen, Th.H., Leiserson, Ch.E., Rivest, R.L., & Stein, C.**; *Introduction to Algorithms*, Cambridge, Massachussetts: MIT Press, 2022, 4/e 
 
 - **Skiena, S.S.**; *The Algorithm Design Manual*, Cham, Switzerland: Springer, 2012, 3/e
 
