@@ -24,14 +24,14 @@ md"
 
  ###### file: PCM20210730\_SICP\_1.1.4\_Compound\_Procedures.jl
 
- ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/08 ***
+ ###### Julia/Pluto.jl-code (1.12.5/0.20.3) by PCM *** 2026/03/16 ***
 ===================================================================================
 "
 
 # ╔═╡ 506915e1-15ef-43b6-aaf4-c3074e6c08ba
 md"
 ##### 0. Introduction
-*We have identified in Lisp* (Scheme) *some of the elements that must appear in any powerful programming language:*
+*We have identified ... some of the elements that must appear in any powerful programming language:*
 
 - *Numbers and arithmetic operations are primitive data and procedures.*
 
@@ -39,25 +39,30 @@ md"
 
 - *Definitions that associate names with values provide a limited means of abstraction.* 
 
-*Now we will learn about procedure* (, method, and function) *definitions, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.* (*SICP, ch.1.1.4*, 'enhencements' by us)
+*Now we will learn about procedure definitions, a much more powerful abstraction technique by which a compound operation can be given a name and then referred to as a unit.* (*SICP, ch.1.1.4*)
 
-SICP talks about *procedures*. This concept has an *imperative* touch. *Imperative* is a concept if it works with *commands* and *side effects*. We avoid the identifier *procedure* in favour of *function*. *Functions* are similar to mathematical functions but they are *effective* and *generate* values by evaluating *expressions*. So they are *side-effect-free*.
+The disctinction between *functions*, *procedures*, and *methods*:
+
+- *SICP* distinguishes *functions* from *procedures*. Functions are a *mathematical* concept and they are *descriptive* (what should be). In contrast procedures are *effective* (how to do). They *implement* functions by combining *expressions* and *statements* or *commands*. *Evaluation* of expressions is *side-effect-free* whereas *executon* of commands or statements produces *side-effects* in the form of *state-changes*.
+
+- *Julia* makes a similar distinction but the name *procedure* is replaced by *method*. So a *function* is implemented by one or more *type-specific* *methods*. When in Julia a function is *called* the correct *method* is selected by [*multiple dispatch*](https://docs.julialang.org/en/v1/manual/methods/#Methods). This is the most important *characteristic* of *Julia*.
+
 "
 
 # ╔═╡ 9b9a9365-f17d-4e98-b6d2-360d417781b6
 md"
 ---
 ##### 1. Topics
-- *generic* function
+- *generic (= polymorphic)* functions
 - *dynamic* vs *static* types
-- *methods* of *function*
+- [*methods* of *functions*](https://docs.julialang.org/en/v1/manual/methods/#Methods)
 - *infix* operator, *iuxtaposition* of operands
 - *definition* of function with *keyword* $function$
 - *definition* of function with *anonymous* function with operator $\textit{->}$
 - *String* as *argument*
 - *typifying* of arguments
-- *dispatch* of function calls
-- *multiple dispatch*
+- [*dispatch* of function calls](https://docs.julialang.org/en/v1/manual/methods/#Methods)
+- [*multiple dispatch*](https://docs.julialang.org/en/v1/manual/methods/#Methods)
 "
 
 # ╔═╡ f6741d7a-4cbe-442a-b508-73085eed5ecf
@@ -68,18 +73,18 @@ md"
 
 # ╔═╡ 4e1efa4a-cb44-4913-a35f-0a779ee0ee2a
 md"
-##### 3. SICP-Scheme-like *functional* Julia: Compound Procedures
+##### 3. SICP-Scheme-like *functional* Julia: Compound Procedures (*Methods*)
 (1st pass)
 
-*Compound procedures* are *functions* with a *body* consisting of one or more *expressions*.
+*Compound SICP procedures* are *Julian methods* with a *body* consisting of one or more *expressions*.
 
-###### 3.1 *Goal Hierarchy*: Definition and Coding a *Simple Function*
+###### 3.1 *Goal Hierarchy*: Definition and Coding a *Simple Method* Implementing a *Function*
 
-$<simple\ function\ definition> \rightarrow <head> \mathbb = <body>$
+$<simple\ method\ definition> \rightarrow <head> \mathbb = <body>$
 $<head> \rightarrow <name> \mathbb (<parameter>^* \mathbb )$
 $<body> \rightarrow <expression>^*$
 $---$
-$<simple\ function\ definition> \Rightarrow <name> \mathbb (<parameter>^* \mathbb)\ \mathbb = <expression>^*.$
+$<simple\ method\ definition> \Rightarrow <name> \mathbb (<parameter>^* \mathbb)\ \mathbb = <expression>^*.$
 " 
 
 # ╔═╡ 73339eae-4754-49b1-938a-5ceae1c0f6a3
@@ -88,14 +93,6 @@ md"
 ###### 3.2 Example: *Definition* and *Application* of Function $mySquare$
 
 We choose the function *name* $mySquare$ instead of $square$ because we want to avoid a name clash with a *potential* built-in function $square$.
-
-"
-
-# ╔═╡ d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
-md"
-###### 1st *untyped, generic method* of function $mySquare$
-
-A *generic* function is an *untyped* function. This means that *input* and *output* are *not* constrained by *static* types (e.g.: Int64, Float64). Before the *binding* with arguments *parameters* possess the default *generic* type $Any$. At *binding time* the *generic* type $Any$ is *constrained* dynamically to the actual type of the argument.
 
 "
 
@@ -112,30 +109,40 @@ md"
 
 "
 
+# ╔═╡ d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
+md"
+###### 1st *Untyped, Generic (= Polymorphic) Method* $mySquare$ of *Function* $mySquare$
+
+A *generic* function is an *untyped* function. This means that *input* and *output* are *not* constrained by *static* type declarations (e.g.: $'::Int64'$, $'::Float64'$). 
+
+Before the *binding* with arguments *parameters* possess the default *generic* type $Any$. At *binding time* the *generic* type $Any$ is *constrained* dynamically to the *actual* type of the argument.
+
+"
+
 # ╔═╡ 150ad79c-42b4-4981-8711-1ef426725ca0
 mySquare(x) = x * x                          # ==> definition of function mySquare   
 
 # ╔═╡ 7e97208a-d1b0-435e-8756-f0b468b1c795
 md"
 ---
-###### 3.3 Function *Hierarchy*: *Definition* and *Application* of *Generic* Function $sumOfSquares$
+###### 3.3 Function *Hierarchy*: *Definition* and *Application* of Generic *Method* $sumOfSquares$ of *Function* $sumOfSquares$
 
 $sumOfSquares : \mathbb R \times \mathbb R \rightarrow \mathbb R$
 
-$sumOfSquares: (x, y) \mapsto square(x) + square(y)$
+$sumOfSquares: (x, y) \mapsto mySquare(x) + mySquare(y)$
 
-$square: x \mapsto x^2$
+$mySquare: x \mapsto x^2$
 
 "
 
 # ╔═╡ b6fda0b6-2ea2-4f2f-961b-65936c050852
 md"
 ---
-###### 3.4 Function *Hierarchy*: *Definition* and *Application* of *Generic* Function $f_1$
+###### 3.4 Function *Hierarchy*: *Definition* and *Application* of Generic *Method*  $f_1$ of *Function* $f_1$
 
-$f : \mathbb R \times \mathbb R \rightarrow \mathbb R$
-$f : a \mapsto f(a)$
-$f(a) := sumOfSquares(a+1, 2a)$
+$f_1 : \mathbb R \times \mathbb R \rightarrow \mathbb R$
+$f_1 : a \mapsto f(a)$
+$f_1(a) := sumOfSquares(a+1, 2a)$
 
 "
 
@@ -147,10 +154,23 @@ md"
 
 ###### ... with, *prefix* operator, *keyword* $function$, *anonymous* functions with operator $->$, *multiple dispatch*
 
----
-###### *Goal Hierarchy* for Writing Function Definitions
+###### *Performance* Critical Code Should be Inside a *Method* or *Function*
 
-$<function\ definition> \rightarrow <simple> | <explicit> | <anonymous>$
+*Any code that is performance critical should be inside a function. Code inside functions tends to run much faster than top level code, due to how Julia's compiler works.* ([JuliaDoc](https://docs.julialang.org/en/v1/manual/performance-tips/#Performance-critical-code-should-be-inside-a-function); last vist 2026/03/16)
+
+*The use of functions is not only important for performance: functions are more reusable and testable, and clarify what steps are being done and what their inputs and outputs are, Write functions, not just scripts is also a recommendation of Julia's Styleguide.* ([JuliaDoc](https://docs.julialang.org/en/v1/manual/performance-tips/#Performance-critical-code-should-be-inside-a-function); last vist 2026/03/16)
+
+*The functions should take arguments, instead of operating directly on global variables,...* ([JuliaDoc](https://docs.julialang.org/en/v1/manual/performance-tips/#Performance-critical-code-should-be-inside-a-function); last vist 2026/03/16)
+
+"
+
+# ╔═╡ 188905e4-4d48-4d58-9f15-ced0060367f5
+md"
+---
+---
+###### *Goal Hierarchy* for Writing *Method* Definitions Implementing a *Function*
+
+$<method\ definition> \rightarrow <simple> | <explicit> | <anonymous>$
 
 $<simple> \rightarrow = <head> = <body>$
 $<head> \rightarrow <name> (<param>^*)$ 
@@ -164,26 +184,68 @@ The symbol $*$ is [Kleene's repitition operator](https://en.wikipedia.org/wiki/K
 # ╔═╡ 780b9896-21d5-4acd-a878-86a3670ccaaf
 md"
 ---
-###### 4.1 Alternative Definitions with *Anonymous* Functions
+###### 4.1 Alternative *Definition* and *Application* of Generic *Method* $f_2$ of *Function* $f_2$
+"
+
+# ╔═╡ 62f774db-293f-4807-9ba5-bd788fd47dc2
+md"
+---
+###### 4.2 Alternative *Definition* and *Application* of Generic *Method* $f_3$ of *Function* $f_3$
+"
+
+# ╔═╡ 0fec12eb-3206-44fd-9c5a-ba032d4eb0a3
+md"
+---
+###### 4.3 Alternative *Definition* and *Application* of Generic *Method* $f_4$ of *Function* $f_4$
 "
 
 # ╔═╡ 7c8b7c1d-1e23-49c6-be97-32c9f2e38041
 md"
 ---
-###### 4.2 More *typed* Methods for Function $mySquare$
+###### 4.4 More *typed* Methods for Function $mySquare$
 ###### 2nd *typed* method of function $mySquare$
 
 $mySquare : \mathbb R \rightarrow \mathbb R$
 $mySquare : x \mapsto x * x$
-$mySquare(x) := x * x$
+$mySquare(x::\mathbb R)::\mathbb R := x * x$
 
 "
 
 # ╔═╡ 9410ff1c-daf0-48de-be8a-f31c5a76dbed
 mySquare(x::Real)::Real = x * x         # specialized definition function 'mySquare'
 
-# ╔═╡ 51f99623-1572-4c05-b9d9-1cd4393c31e0
-typeof(Function)
+# ╔═╡ 8db7e80c-a877-44ff-aa15-48841c035aeb
+mySquare(21)                                 # ==> 441 --> :)
+
+# ╔═╡ 95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
+mySquare(2 + 5)                              # ==> 49 --> :)
+
+# ╔═╡ 731aa7ca-d4af-4be8-8a40-2eec5522ad99
+mySquare(mySquare(3))                        # ==> 81 --> :)
+
+# ╔═╡ d263c3dd-f20b-4de2-b42b-ea88475d63ac
+mySquare(mySquare(3.))                       # ==> 81.0 --> :)
+
+# ╔═╡ 7254bd30-87b7-48e9-99f8-56159dc78ad4
+sumOfSquares(x, y) = mySquare(x) + mySquare(y)
+
+# ╔═╡ 2ef23512-6a23-4d2d-86fa-db9c1743c529
+mySquare                                      # evaluation ==> 2 (!) methods --> :)
+
+# ╔═╡ 32e6b39b-28a1-4936-a629-38f681c7c9cd
+methods(mySquare)
+
+# ╔═╡ bc018df0-02ea-4011-ad6e-2176e4a1b232
+mySquare(21)                                  # mySquare : Integer --> Integer
+
+# ╔═╡ 965efc63-8dac-4397-8052-312bccd4e736
+mySquare(21.0)                                # mySquare : Float --> Float
+
+# ╔═╡ 85e27170-e830-4054-8716-86f6b8e16aad
+mySquare("Oh, no! ")                          # mySquare : String --> String
+
+# ╔═╡ c97d34e3-3ace-48a2-8044-24758947fdc1
+typeof(mySquare)  <: Function                               # ==> true --> :)
 
 # ╔═╡ f9b0181b-c988-4d93-85e9-1a7bc41ecee4
 md"""
@@ -206,43 +268,13 @@ $\;$
 """
 
 # ╔═╡ 7693444c-efe8-4698-b979-787b03bb8d29
-"oh, " * "no !"               # operator $*$ is defined for strings !
+"oh, " * "no !"                # operator $*$ is overloaded and defined for strings !
 
 # ╔═╡ 77f4ee9b-4239-4eea-b7b4-d16183ab6e93
-mySquare(x::String) = error("not defined for strings !") # suppression for strings
-
-# ╔═╡ 8db7e80c-a877-44ff-aa15-48841c035aeb
-mySquare(21)                                 # ==> 441 --> :)
-
-# ╔═╡ 95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
-mySquare(2 + 5)                              # ==> 49 --> :)
-
-# ╔═╡ 731aa7ca-d4af-4be8-8a40-2eec5522ad99
-mySquare(mySquare(3))                        # ==> 81 --> :)
-
-# ╔═╡ d263c3dd-f20b-4de2-b42b-ea88475d63ac
-mySquare(mySquare(3.))                       # ==> 81.0 --> :)
-
-# ╔═╡ 7254bd30-87b7-48e9-99f8-56159dc78ad4
-sumOfSquares(x, y) = mySquare(x) + mySquare(y)
-
-# ╔═╡ 2ef23512-6a23-4d2d-86fa-db9c1743c529
-mySquare                                      # evaluation ==> 3 methods --> :)
-
-# ╔═╡ bc018df0-02ea-4011-ad6e-2176e4a1b232
-mySquare(21)                                  # mySquare : Integer --> Integer
-
-# ╔═╡ 965efc63-8dac-4397-8052-312bccd4e736
-mySquare(21.0)                                # mySquare : Float --> Float
-
-# ╔═╡ 4462e7ca-18f7-4f9d-8198-0196dac76c7d
-typeof(mySquare)
-
-# ╔═╡ c97d34e3-3ace-48a2-8044-24758947fdc1
-typeof(mySquare)  <: Function                               # ==> true --> :)
+mySquare2(x::String) = error("not defined for strings !") # suppression for strings
 
 # ╔═╡ 5db537e9-5232-43c3-8fcc-363d0b6e9811
-mySquare("oh no!")
+mySquare2("oh no!")
 
 # ╔═╡ 7ff29624-964a-435c-a909-550484a527c6
 md"
@@ -253,14 +285,18 @@ md"
 In a function *call* first *more narrow* methods are tried then the *next less narrow* methods, etc. What is more or less narrow is defined by the relevant type hierarchy. This is called *muliple dispatch* of function calls.
 "
 
+# ╔═╡ 7c0ab09f-5da6-4fd8-a78e-3c4748617bc7
+mySquare(π)                                     # calling method with type '::Real'
+
 # ╔═╡ d78a705e-bf07-4af9-919a-a2b2de73cf6c
 md"
 ---
-###### *Methods* as targets for *multiple dispatch*
-The Julia *function* $mySquare$ has three *methods*:
-- one for input type $String$. This is *not* what we wanted. So we implemented an *error* message.
+###### *Methods* as Targets for *Multiple Dispatch*
+The Julia *function* $mySquare$ has two *methods*:
 - one for type $Real$. This is ok because subtypes are $Int, Float$. This is also for e.g. *rational* numbers $p//q$ and *irrational* numbers like $π$
-- one *generic* for type $Any$. It accepts only what the *operators* in the *body* can accept. E.g. $mySquare$ can accept *complex* numbers, because $Complex$ is *not* a subtype of $Real$ or $String$. This will be dealt later.
+- one *generic* for type $Any$. It accepts only what the *operators* in the *body* can accept. E.g. $mySquare$ can accept: 
+- *strings*, because the underlying operator $*$ is overloaded for *strings*. They get concatenated.
+- *complex* numbers, because $Complex$ is *not* a subtype of $Real$ or $String$. This will be dealt later.
 "
 
 # ╔═╡ 13b98b93-a478-4e4a-b4a2-423d6af45369
@@ -342,16 +378,16 @@ sumOfSquares(x::Real, y::Real)::Real = mySquare(x) + mySquare(y)
 sumOfSquares(3, 4), sumOfSquares(3., 4), sumOfSquares(3., 4.) # different input types
 
 # ╔═╡ 706e727c-f29b-4cdb-ae08-cddd5725cdae
-f(a) = sumOfSquares(a + 1 , 2a)
-#                           ^^
-#                           ||
-#                           ++---------------- direct juxtaposition instead of 2*a
+f1(a) = sumOfSquares(a + 1 , 2a)
+#                            ^^
+#                            ||
+#                            ++---------------- direct juxtaposition instead of 2*a
 
 # ╔═╡ 2b7d0b48-70de-40fd-bf43-660e70f2416e
-f(5) # (5 + 1)^2 + (2 * 5)^2 = 6^2 + 10^2 = 36 + 100 = 136
+f1(5) # (5 + 1)^2 + (2 * 5)^2 = 6^2 + 10^2 = 36 + 100 = 136
 
 # ╔═╡ 358250f0-94b7-48a8-acde-1c1f2734c967
-# 1st anonymous function definition of f with 'function' and 'end'
+# 1st anonymous method definition of with 'function' and 'end'
 f2 = function(a)
 	sumOfSquares(+(a,1), 2a)                  # prefix '+' and iuxtapositioned '2a'
 end  # function
@@ -414,6 +450,10 @@ md"
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, html-version](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2025/01/09), Cambridge, Mass.: MIT Press, (2/e), 1996; last visit 2026/02/26
 
 - **Abelson, H., Sussman, G.J. & Sussman, J.**; [*Structure and Interpretation of Computer Programs*, pdf-version](https://web.mit.edu/6.001/6.037/sicp.pdf), Cambridge, Mass.: MIT Press, (2/e), 2016; last visit 2026/02/26
+
+- **JuliaDoc**; [*Multiple Dispatch*](https://docs.julialang.org/en/v1/manual/methods/#Methods); last visit 2026/03/14
+
+- **JuliaDoc**; [*Performance critical code should be inside a function*](https://docs.julialang.org/en/v1/manual/performance-tips/#Performance-critical-code-should-be-inside-a-function)
 
 - **Wikipedia**; [*Kleene's repitition operator*](https://en.wikipedia.org/wiki/Kleene_star); last visit 2026/03/02
 
@@ -688,7 +728,7 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.5"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libva_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
 git-tree-sha1 = "01ba9d15e9eae375dc1eb9589df76b3572acd3f2"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "8.0.1+0"
@@ -1657,6 +1697,12 @@ git-tree-sha1 = "7ed9347888fac59a618302ee38216dd0379c480d"
 uuid = "ea2f1a96-1ddc-540d-b46f-429655e07cfa"
 version = "0.9.12+0"
 
+[[deps.Xorg_libpciaccess_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "4909eb8f1cbf6bd4b1c30dd18b2ead9019ef2fad"
+uuid = "a65dc6b1-eb27-53a1-bb3e-dea574b5389e"
+version = "0.18.1+0"
+
 [[deps.Xorg_libxcb_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXau_jll", "Xorg_libXdmcp_jll"]
 git-tree-sha1 = "bfcaf7ec088eaba362093393fe11aa141fa15422"
@@ -1769,6 +1815,12 @@ git-tree-sha1 = "9bf7903af251d2050b467f76bdbe57ce541f7f4f"
 uuid = "1183f4f0-6f2a-5f1a-908b-139f9cdfea6f"
 version = "0.2.2+0"
 
+[[deps.libdrm_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libpciaccess_jll"]
+git-tree-sha1 = "63aac0bcb0b582e11bad965cef4a689905456c03"
+uuid = "8e53e030-5e6c-5a89-a30b-be5b7263a166"
+version = "2.4.125+1"
+
 [[deps.libevdev_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "56d643b57b188d30cccc25e331d416d3d358e557"
@@ -1792,6 +1844,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
 git-tree-sha1 = "e015f211ebb898c8180887012b938f3851e719ac"
 uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
 version = "1.6.55+0"
+
+[[deps.libva_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll", "Xorg_libXext_jll", "Xorg_libXfixes_jll", "libdrm_jll"]
+git-tree-sha1 = "7dbf96baae3310fe2fa0df0ccbb3c6288d5816c9"
+uuid = "9a156e7d-b971-5f62-b2c9-67348b8fb97c"
+version = "2.23.0+0"
 
 [[deps.libvorbis_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll"]
@@ -1842,8 +1900,8 @@ version = "1.13.0+0"
 # ╠═3d323fd6-b7a2-427d-a058-6dfe9ab04289
 # ╟─4e1efa4a-cb44-4913-a35f-0a779ee0ee2a
 # ╟─73339eae-4754-49b1-938a-5ceae1c0f6a3
-# ╟─d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
 # ╟─ece77425-0b83-4a9a-b2ef-757bfaa60891
+# ╟─d39b8c94-18a2-4ddd-ae82-1e05bfcc5c85
 # ╠═150ad79c-42b4-4981-8711-1ef426725ca0
 # ╠═8db7e80c-a877-44ff-aa15-48841c035aeb
 # ╠═95f00b9b-646c-4ac5-b6fd-16f84a89d7b9
@@ -1856,26 +1914,30 @@ version = "1.13.0+0"
 # ╠═706e727c-f29b-4cdb-ae08-cddd5725cdae
 # ╠═2b7d0b48-70de-40fd-bf43-660e70f2416e
 # ╟─1cf1668b-220e-4813-af3b-fef0f938e29b
+# ╟─188905e4-4d48-4d58-9f15-ced0060367f5
 # ╟─780b9896-21d5-4acd-a878-86a3670ccaaf
 # ╠═358250f0-94b7-48a8-acde-1c1f2734c967
 # ╠═538f4130-f6e1-43c2-8020-f7f2488e2442
+# ╟─62f774db-293f-4807-9ba5-bd788fd47dc2
 # ╠═3766c9b6-0ff5-4b0d-bc85-2c9bfe0a1d50
 # ╠═84bb8887-9df3-4ff0-ab50-eb144cd2f118
+# ╟─0fec12eb-3206-44fd-9c5a-ba032d4eb0a3
 # ╠═d777f9f2-b9f9-40eb-85fb-b0aba7193cd3
 # ╠═0e4d0cf1-5549-44ac-9e82-fcdd877e4956
 # ╟─7c8b7c1d-1e23-49c6-be97-32c9f2e38041
 # ╠═9410ff1c-daf0-48de-be8a-f31c5a76dbed
 # ╠═2ef23512-6a23-4d2d-86fa-db9c1743c529
+# ╠═32e6b39b-28a1-4936-a629-38f681c7c9cd
 # ╠═bc018df0-02ea-4011-ad6e-2176e4a1b232
 # ╠═965efc63-8dac-4397-8052-312bccd4e736
-# ╠═4462e7ca-18f7-4f9d-8198-0196dac76c7d
-# ╠═51f99623-1572-4c05-b9d9-1cd4393c31e0
+# ╠═85e27170-e830-4054-8716-86f6b8e16aad
 # ╠═c97d34e3-3ace-48a2-8044-24758947fdc1
 # ╟─f9b0181b-c988-4d93-85e9-1a7bc41ecee4
 # ╠═7693444c-efe8-4698-b979-787b03bb8d29
 # ╠═77f4ee9b-4239-4eea-b7b4-d16183ab6e93
 # ╠═5db537e9-5232-43c3-8fcc-363d0b6e9811
 # ╟─7ff29624-964a-435c-a909-550484a527c6
+# ╠═7c0ab09f-5da6-4fd8-a78e-3c4748617bc7
 # ╟─d78a705e-bf07-4af9-919a-a2b2de73cf6c
 # ╠═13b98b93-a478-4e4a-b4a2-423d6af45369
 # ╠═0c1ddb55-2658-4587-ad89-a8d3fa431a1c
