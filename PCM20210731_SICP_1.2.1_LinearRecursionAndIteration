@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.21
+# v0.20.24
 
 using Markdown
 using InteractiveUtils
@@ -26,7 +26,7 @@ md"
 
 ##### file: PCM20210731\_SICP\_1.2.1\_LinearRecursionAndIteration
 
-##### Julia/Pluto.jl-code (1.12.5/0.20.24) by PCM *** 2026/03/16 ***
+##### Julia/Pluto.jl-code (1.12.5/0.20.24) by PCM *** 2026/03/18 ***
 ===================================================================================
 "
 
@@ -457,9 +457,9 @@ md"
 The content of this chapter can be summarized in Fig. 1.2.1.2:
 
 $\begin{array}{c|c|c|c|c|}
-\text{}       & time       & space       & time       & space      \\
+\text{} & time       & space       & time       & space      \\
 \text{}       & complexity & complexity  & complexity & complexity \\
-\text{}       & TCO        & TCO         & no\ TCO    & no\ TCO    \\
+\text{ factorial} & TCO        & TCO         & no\ TCO    & no\ TCO    \\
 \text{ code } & e.g.Scheme & e.g. Scheme & e.g. Julia & e.g. Julia \\
 \hline 
 \text{ linear recursive } & O(n) & O(n) & O(n) & O(n) \\
@@ -468,7 +468,7 @@ $\begin{array}{c|c|c|c|c|}
 \hline 
 \end{array}$
 
-**Fig. 1.2.1.3**: Relation between *Code, Tail-Call-Optimization(TCO)*, and *Complexity*
+**Fig. 1.2.1.2**: Relation between *Code, Tail-Call-Optimization(TCO)*, and *Complexity*
 
 "
 
@@ -1965,7 +1965,7 @@ version = "1.13.0+0"
 # ╟─b7a1a820-167e-4509-9132-16d1e373a599
 # ╟─f5869f82-5163-4ca9-8344-fbb5af822a0a
 # ╟─a88db91d-9ec7-4038-ae79-8ee225a17cb3
-# ╠═8a294ca3-5824-4fd7-b79d-805aa8e0c130
+# ╟─8a294ca3-5824-4fd7-b79d-805aa8e0c130
 # ╟─373dfb03-b7fa-4ba5-b908-1b8788d41daa
 # ╟─0b349f69-61ff-4c54-b8cb-2618213d44c8
 # ╠═76c277f3-f31f-4f6b-aae1-94fbbda60be4
