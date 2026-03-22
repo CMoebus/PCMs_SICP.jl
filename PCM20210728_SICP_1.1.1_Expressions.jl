@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.21
+# v0.20.24
 
 using Markdown
 using InteractiveUtils
@@ -22,7 +22,7 @@ md"
 ====================================================================================
 #### SICP: [1.1.1_Expressions](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-10.html#%_sec_1.1.1)
 ##### file: PCM20210728\_SICP\_1.1.1\_Expressions.jl
-##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/07***
+##### Julia/Pluto.jl: 1.12.5/0.20.4 by PCM *** 2026/03/22***
 
 ====================================================================================
 "
@@ -53,6 +53,7 @@ md"
 - [*literal*](https://en.wikipedia.org/wiki/Literal_(computer_programming))
 - [*types*](https://en.wikipedia.org/wiki/Data_type): $Int64, Float64, Real$
 - *dynamic*, *static* typing, *multiple dispatch*
+- *quote*, $\mathbf{:()}$
 - *combination*, *compound expression*
 - *chunking*
 - *function call*, [*operator*](https://en.wikipedia.org/wiki/Operator_(computer_programming)): $+, - *, /, div, ÷, ==, ===$
@@ -199,8 +200,8 @@ $<numeral>\ \Rightarrow\ 486\ |\ 486.\ |\ 486f0\ |\ 486E-2\ |\ ...$
 # ╔═╡ a9073190-a3bb-4405-9f83-5bbbcbaef93a
 137 + 349                                        # ==> 486 --> :)
 
-# ╔═╡ b7f4d396-5584-459e-99e4-ccc4b4c33695
-1000 - 334                                       # ==> 666 --> :)
+# ╔═╡ 8d436a8c-ae22-432a-b29b-9e2c2c3210e0
+typeof(137 + 349)
 
 # ╔═╡ e674a954-14c0-4bb8-b8a5-5f2f5fc30c12
 10 / 5                                           # ==> 2.9 --> :)
@@ -253,7 +254,7 @@ md"
 # ╔═╡ 145a7c91-5274-40e9-93d9-6c5be29de7b7
 md"
 ---
-###### 3.5 Infix *Boolean* Expressions  
+###### 3.4 Infix *Boolean* Expressions  
 $Number == Number \rightarrow BooleanValue$
 $Operator == Operator \rightarrow Error$
 $Number === Number \rightarrow BooleanValue$
@@ -285,9 +286,35 @@ md"
 (2nd pass - for experienced developers - )
 "
 
+# ╔═╡ cb185f7d-b172-4831-b9b7-6abb9b6791ab
+md"
+---
+###### 4.1 $quote$ and $typeof$ *Expressions*
+With long form $quote(...)end$ or short form $\mathbf{:(...)}$ we can *suppress* evaluation. This is an advanced tool for building *domain specific languages* (*DSLs*).
+"
+
+# ╔═╡ ea5eb61a-c340-4a28-8c89-c7218f31e36f
+:(137 + 349)                                     # ==> :(137 + 349) --> :)
+
+# ╔═╡ 2acc2387-6791-4387-a0cd-1c3731c0b303
+typeof(:(137 + 349))                             # ==> Expr --> :)
+#      ^^         ^
+#      ||         | 
+#      ++---------+------------------------------# ==> quote --> :)
+
+# ╔═╡ b7f4d396-5584-459e-99e4-ccc4b4c33695
+1000 - 334                                       # ==> 666 --> :)
+
+# ╔═╡ 43be92d3-c914-4784-a003-e10f3b0b26af
+typeof(quote(1000 - 334) end)                    # ==> Expr --> :)
+#        ^                ^
+#        |                | 
+#        +----------------+----------------------# ==> quote --> :)
+
 # ╔═╡ 579560f8-5e67-4ba1-bccd-8c9aa05b2530
 md"
-###### 4.1 *Compound Prefix* Expressions (= *Combinations*) are *Function Calls*
+---
+###### 4.2 *Compound Prefix* Expressions (= *Combinations*) are *Function Calls*
 *Flat (= non-nested)* and *nested* expressions have several names. They are called *compound prefix* expressions or *combinations*. They have the *syntax* and *semantics* of *function calls*. 
 
 These can be written in *linear* form with parentheses in different ways, such as in *prefix*, *infix* and *postfix* notation. While original *SICP* (= *MIT Scheme*) accepts only *prefix* expressions, Julia understands both *pre-* and *infix* notation. *Postfix* notation is used in some pocket calculators. 
@@ -307,7 +334,7 @@ $<opertor>(<opernd>, <opernd>^*) \equiv <opernd>\{<opertor><opernd>\}^*$
 # ╔═╡ 015dbbd5-a3b0-407a-9ff9-b5a0bee3713a
 md"
 ---
-###### 4.2 *Flat Arithmetic* Expressions in *Prefix* Notation
+###### 4.3 *Flat Arithmetic* Expressions in *Prefix* Notation
 "
 
 # ╔═╡ e7125587-8e19-4201-9faf-e5fcc6d9f0bd
@@ -457,7 +484,7 @@ md"
 # ╔═╡ 07d566e1-77a2-45b1-be22-5521d1f65d2e
 md"
 ---
-###### 4.3 *Nested* Combination with *Prefix* Operators as a *nonlinear* Data Flow (*Kantorovic*) tree
+###### 4.4 *Nested* Combination with *Prefix* Operators as a *nonlinear* Data Flow (*Kantorovic*) tree
 (Bauer & Wössner, 1981, p.21)
 The *Kantorovic* *tree* posesses *two* types of *nodes*: *leafs* and *roots*. *Leafs* are *<operands>* (like: 2, 4, ...) and *roots* are *<operators>* (like: $*, +, ...$). Edges are between *leafs* and *roots* (like: 5 -- +) or between *roots* (like: + -- +).
 "
@@ -539,7 +566,7 @@ $((3,((2,4)*,(3, 5)+)+)*,((10,7)-,6)+)+$
 # ╔═╡ 36ceefbb-a164-49cf-a499-19c6c336be23
 md"
 ---
-###### 4.4 *Numeric* type *hierarchy*, *builtin* functions $typejoin, subtypes,...$
+###### 4.5 *Numeric* type *hierarchy*, *builtin* functions $typejoin, subtypes,...$
 "
 
 # ╔═╡ 751b2fc4-298b-479f-9974-67578d4c5f24
@@ -586,7 +613,7 @@ typemin(Float64), typemax(Float64)
 # ╔═╡ db568d2c-ac58-425d-acbe-553a072d941d
 md"
 ---
-###### 4.5 Prefix *Boolean* Expressions  
+###### 4.6 Prefix *Boolean* Expressions  
 $==(Number, Number) \rightarrow BooleanValue$
 $==(Operator, Operator) \rightarrow BooleanValue$
 $===(Number, Number) \rightarrow BooleanValue$
@@ -611,7 +638,7 @@ $BooleanValue \Rightarrow true\ |\ false$
 # ╔═╡ 1b51d453-6197-46ea-8aaa-545bbbcbf332
 md"
 ---
-###### 4.6 *Type* Tree of some *functions*
+###### 4.7 *Type* Tree of some *functions*
 "
 
 # ╔═╡ 45269af2-373c-4178-a527-b0d0064f5a06
@@ -655,7 +682,7 @@ makeMyTypeTreeFunction()
 # ╔═╡ a270e918-1d26-4d66-92bd-54faeb0b4005
 md"
 ---
-###### 4.7 *Infix* Operators and Arithmetic Expressions
+###### 4.8 *Infix* Operators and Arithmetic Expressions
 "
 
 # ╔═╡ 9e498769-9f09-4a0b-9cb9-e01b03706f20
@@ -771,7 +798,7 @@ md"
 # ╔═╡ d955da7c-2570-4808-8e6b-cb8564c2f0cd
 md"
 ---
-###### 4.8 Automatic *Type Conversion*
+###### 4.9 Automatic *Type Conversion*
 $/(Float64, Int64) \Rightarrow Float64$
 "
 
@@ -1090,7 +1117,7 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.5"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libva_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
 git-tree-sha1 = "01ba9d15e9eae375dc1eb9589df76b3572acd3f2"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "8.0.1+0"
@@ -2083,6 +2110,12 @@ git-tree-sha1 = "7ed9347888fac59a618302ee38216dd0379c480d"
 uuid = "ea2f1a96-1ddc-540d-b46f-429655e07cfa"
 version = "0.9.12+0"
 
+[[deps.Xorg_libpciaccess_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "4909eb8f1cbf6bd4b1c30dd18b2ead9019ef2fad"
+uuid = "a65dc6b1-eb27-53a1-bb3e-dea574b5389e"
+version = "0.18.1+0"
+
 [[deps.Xorg_libxcb_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXau_jll", "Xorg_libXdmcp_jll"]
 git-tree-sha1 = "bfcaf7ec088eaba362093393fe11aa141fa15422"
@@ -2195,6 +2228,12 @@ git-tree-sha1 = "9bf7903af251d2050b467f76bdbe57ce541f7f4f"
 uuid = "1183f4f0-6f2a-5f1a-908b-139f9cdfea6f"
 version = "0.2.2+0"
 
+[[deps.libdrm_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libpciaccess_jll"]
+git-tree-sha1 = "63aac0bcb0b582e11bad965cef4a689905456c03"
+uuid = "8e53e030-5e6c-5a89-a30b-be5b7263a166"
+version = "2.4.125+1"
+
 [[deps.libevdev_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "56d643b57b188d30cccc25e331d416d3d358e557"
@@ -2218,6 +2257,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
 git-tree-sha1 = "6ab498eaf50e0495f89e7a5b582816e2efb95f64"
 uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
 version = "1.6.54+0"
+
+[[deps.libva_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll", "Xorg_libXext_jll", "Xorg_libXfixes_jll", "libdrm_jll"]
+git-tree-sha1 = "7dbf96baae3310fe2fa0df0ccbb3c6288d5816c9"
+uuid = "9a156e7d-b971-5f62-b2c9-67348b8fb97c"
+version = "2.23.0+0"
 
 [[deps.libvorbis_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll"]
@@ -2282,7 +2327,7 @@ version = "1.13.0+0"
 # ╟─94935d7a-1348-4992-be9c-40a2929d913b
 # ╟─a5f8a224-bd26-4ed4-92f6-64a72dfb3665
 # ╠═a9073190-a3bb-4405-9f83-5bbbcbaef93a
-# ╠═b7f4d396-5584-459e-99e4-ccc4b4c33695
+# ╠═8d436a8c-ae22-432a-b29b-9e2c2c3210e0
 # ╠═e674a954-14c0-4bb8-b8a5-5f2f5fc30c12
 # ╠═97f9d9f4-c443-4930-bb97-18db14973857
 # ╠═7fb84817-502e-4d7f-bf6e-6d38dc89f239
@@ -2305,6 +2350,11 @@ version = "1.13.0+0"
 # ╠═28829789-b7a1-493e-859b-3df719a62ef1
 # ╠═850c7371-2097-4189-a434-365fe06468fd
 # ╟─6b8bf4de-d03b-4397-9876-a682b2dde331
+# ╟─cb185f7d-b172-4831-b9b7-6abb9b6791ab
+# ╠═ea5eb61a-c340-4a28-8c89-c7218f31e36f
+# ╠═2acc2387-6791-4387-a0cd-1c3731c0b303
+# ╠═b7f4d396-5584-459e-99e4-ccc4b4c33695
+# ╠═43be92d3-c914-4784-a003-e10f3b0b26af
 # ╟─579560f8-5e67-4ba1-bccd-8c9aa05b2530
 # ╟─015dbbd5-a3b0-407a-9ff9-b5a0bee3713a
 # ╠═e7125587-8e19-4201-9faf-e5fcc6d9f0bd
