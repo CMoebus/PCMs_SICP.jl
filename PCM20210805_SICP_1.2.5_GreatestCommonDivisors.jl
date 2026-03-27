@@ -299,7 +299,7 @@ md"
 
 By use of [*Lamé*'s theorem](https://en.wikipedia.org/wiki/Lam%C3%A9%27s_theorem) (c.f. SICP, 1996, 2016) we can determine an *upper limit* for the number of steps $k = \#steps(gcd(a, b))\ for\ $a > b = n$:
 
-$n \ge fib(k) \approx \frac{\phi^k}{\sqrt 5}$
+$n \ge fib(k) \approx \frac{\phi^k}{\sqrt 5}\;\;\;\text{ with } \phi = \frac{1+\sqrt 5}{2}$
 
 $n \sqrt 5 \ge \phi^k$
 
@@ -323,15 +323,42 @@ The *upper* limit according Lamé's theorem is:
 
 $\frac{\log(n\sqrt 5)}{\log \phi} =\frac{\log(13\sqrt 5)}{\log \left((1+\sqrt 5)/2\right)} \ge 6$
 
-$= \frac{\log 29.068888}{\log 2.118033988} = \frac{3.36966831}{0.4812118} \ge 6$
+$= \frac{\log 29.068888}{\log 2.118033988} = \frac{3.369668313678587}{0.48121182505960347} \ge 6$
 
-$7.00246 \ge 6.$
+$7.002463651555561 \ge 6.$
 
 "
 
 
 # ╔═╡ f5fbb73e-7f2f-4d9a-810e-8b9d1f236207
-mySICP_GCD2(21, 13)
+mySICP_GCD2(21, 13)                                # k steps = 6 steps
+
+# ╔═╡ 3932eaf3-cd87-4f9c-a933-0a60ba23dafe
+function lame(n)
+	ϕ = (1.0 + sqrt(5))/2.0
+	log(n * sqrt(5)) / log(ϕ)
+end # function lame
+
+# ╔═╡ 436ccb3d-a420-4e96-af21-3e3cfcad2a09
+lame(13)                                           # lame(13) ≈ 7 ≥ k = 6 --> :)
+
+# ╔═╡ 44d65e41-5181-49c3-ab76-496a1dd5486f
+mySICP_GCD2(206, 40)                               # k steps = 4 steps
+
+# ╔═╡ 4d8b4ba3-2e81-4fea-98f6-36b2bc119167
+lame(40)                                           # lame(40) ≈ 9 ≥ k = 4 --> :) 
+
+# ╔═╡ b5f93ad6-560c-430e-92ad-95f08d5a2d51
+mySICP_GCD2(269, 271)                              # k steps = 4 steps
+
+# ╔═╡ ac30e2f1-ff42-40ef-958c-b2a96e453fec
+lame(269)                                          # lame(269) ≈ 13 ≥ k = 4 --> :)
+
+# ╔═╡ a4ff03f1-6da4-42a6-8add-620591cf247e
+mySICP_GCD2(7907, 7919)                            # k steps = 5 steps
+
+# ╔═╡ 912ac36c-904e-49e2-8699-72572cf7bdfb
+lame(7907)                                         # lame(7907) ≈ 20 ≥ k = 5 --> :)
 
 # ╔═╡ fcb61a42-36eb-4b1a-8e8d-79f57e536864
 md"
@@ -2078,6 +2105,14 @@ version = "1.13.0+0"
 # ╟─46897383-0c6c-4c18-b1d7-5e1c6a63dbe0
 # ╟─10766977-40bd-4d71-856e-fa22f4b97b44
 # ╠═f5fbb73e-7f2f-4d9a-810e-8b9d1f236207
+# ╠═3932eaf3-cd87-4f9c-a933-0a60ba23dafe
+# ╠═436ccb3d-a420-4e96-af21-3e3cfcad2a09
+# ╠═44d65e41-5181-49c3-ab76-496a1dd5486f
+# ╠═4d8b4ba3-2e81-4fea-98f6-36b2bc119167
+# ╠═b5f93ad6-560c-430e-92ad-95f08d5a2d51
+# ╠═ac30e2f1-ff42-40ef-958c-b2a96e453fec
+# ╠═a4ff03f1-6da4-42a6-8add-620591cf247e
+# ╠═912ac36c-904e-49e2-8699-72572cf7bdfb
 # ╟─fcb61a42-36eb-4b1a-8e8d-79f57e536864
 # ╠═26285995-870f-467c-ab00-e09fdb5e67db
 # ╠═e45b60ce-0c6e-4c61-8065-4f64ac8eeb7c
