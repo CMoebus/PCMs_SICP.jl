@@ -24,7 +24,7 @@ md"
 
 ##### file: PCM20210805\_SICP\_1.2.5\_GreatestCommonDivisors
 
-##### Julia/Pluto.jl (1.12.5/0.20.4) code by PCM *** 2026/03/26 ***
+##### Julia/Pluto.jl (1.12.5/0.20.4) code by PCM *** 2026/03/27 ***
 ===================================================================================
 "
 
@@ -43,13 +43,12 @@ md"
 md"
 ---
 ##### 1. Topics
-- *Renaming* of functions
-- *functions* $mod, rem, remainder$
-- *Lamé's theorem*
-- *big*-$O$ of $gcd(n, m)$
+- *functions* $mod, rem$
+- complexities $\Omega \log(n), \Theta \log(n)$ of $gcd(n, m)$
 - case analysis $if ... else ... end$
 - *output* $println$
 - string *interpolation* with $
+- *Lamé's theorem*
 "
 
 # ╔═╡ 86fe0183-5901-4199-a33e-ad7919fbbadb
@@ -322,13 +321,9 @@ $k = \#steps(gcd(21, 13) = 6.$
 
 The *upper* limit according Lamé's theorem is:
 
-$\frac{\log(13\sqrt 5)}{\log \phi} \ge 6$
+$\frac{\log(n\sqrt 5)}{\log \phi} =\frac{\log(13\sqrt 5)}{\log \left((1+\sqrt 5)/2\right)} \ge 6$
 
-$\frac{\log 29.068888}{\log (1+\sqrt 5)/2} \ge 6$
-
-$\frac{3.36966831}{\log 2.118033988} \ge 6$
-
-$\frac{3.36966831}{0.4812118} \ge 6$
+$= \frac{\log 29.068888}{\log 2.118033988} = \frac{3.36966831}{0.4812118} \ge 6$
 
 $7.00246 \ge 6.$
 
