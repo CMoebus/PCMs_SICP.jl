@@ -418,28 +418,38 @@ $\boxed{P(nature\ |\ test) = P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z
 
 # ╔═╡ 6bf2767d-5822-478e-83d5-6e196435aadd
 md"
-This is compatible with the following contingency cross table:
+This is compatible with the following 
+
+###### *Confusion matrix*:
 
 $\begin{array}{l|cc|c}
-Test \text{ \\ } Nature  & prime & composite & sum   \\
+Test \text{ \\ } Nature  & prime   & composite & sum     \\
 \hline
-FermatTest = prime       &   A   &    B      & A + B \\
-FermatTest = composite   &   0   &    C      & 0 + C \\
+FermatTest = prime       &   TP    &    FP     & TP + FP \\
+FermatTest = composite   & FN = 0  &    TN     &   TN    \\
 \hline
-sum                      & A + 0 &  B + C    &   N   \\
+sum                      &   TP    &  FP + TN  &   N     \\
 \end{array}$
 
-- *Causal* direction
+###### *Causal* direction
 
-$P(FTest=prime|Nature=prime) = \frac{A}{A+0} = 1\;;\text{ perfect sensivity}$
-$P(FTest=prime|Nature=composite) = \frac{B}{B+C} < 1\;;\text{ no perfect specivity}$
+$P(FTest=prime|Nature=prime) = \frac{TP}{TP+0} = 1\;;\text{ perfect sensivity, recall}$
+$P(FTest=composite|Nature=prime) = \frac{0}{TP+0} = 0\;;\text{ perfect sensivity}$
+$P(FTest=prime|Nature=composite) = \frac{FP}{FP+TN} < 1\;;\text{ Carmichael numbers }$
+$P(FTest=composite|Nature=composite) = \frac{TN}{FP+TN} < 1$
 
-- *Diagnostic* direction
+###### *Diagnostic* direction
 
-$P(Nature=prime|FTest=prime) = \frac{A}{A+B} < 1$
-$P(Nature=composite|FTest=composite) = \frac{C}{B+C} = 1$
+$P(Nature=prime|FTest=prime) = \frac{TP}{TP+FP} < 1\;;\text{ precision }$
+$P(Nature=composite|FTest=prime) = \frac{TP}{TP+FP} < 1\;;\text{ precision, Carmichael }$
+$P(Nature=prime|FTest=composite) = \frac{0}{TN} = 0$
+$P(Nature=composite|FTest=composite) = \frac{TN}{TN} = 1.$
 
-$\text{ with } B > 0\;;\text{ due to the existence of Carmichael numbers}$
+with:
+- TP = frequency of *true positives*
+- FP = frequency of *false positives*
+- TN = frequency of *true negatives*
+- FN = frequency of *false negatives*
 "
 
 # ╔═╡ 84499038-4ed6-46fc-a6d1-70a5964c3f3e
