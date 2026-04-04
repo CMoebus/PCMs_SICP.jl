@@ -1320,7 +1320,7 @@ millerRabin(52633, 20), millerRabin(62745, 20), millerRabin(63973, 20), millerRa
 # ╔═╡ 7817cdb2-6181-43e4-8ac6-023f6ed9480a
 md"
 ---
-###### 4.4 Library Function $isprime(.)$
+###### 4.5 Library Function $isprime(.)$
 "
 
 # ╔═╡ 0a47ac1a-c7d2-4d5b-8a22-3b02759e7923
@@ -1394,6 +1394,45 @@ md"
 
 # ╔═╡ de2a5678-6322-496b-aa68-3465984cd06b
 isprime(52633),isprime(62745),isprime(63973),isprime(75361)# ==>(false,...)--> :)
+
+# ╔═╡ 0b12d734-da18-4378-910b-f6c8559ab760
+md"
+---
+###### 4.6 Probabilistic Considerations
+
+- The *prime distribution* function is $\pi(n)$:
+
+$\pi(n) = \sum_{i=1}^n \mathbf{1} \left(isprime(n)\right) \approx n \cdot \frac{1}{\ln n}$
+$\text{ example: }\pi(10) = 4,$
+
+and
+- the *prime density* function is $\pi'(n)$:
+
+$\pi'(n) \approx \frac{d}{dn}\left(\frac{n}{\ln n} \right)\approx \frac{1}{\ln n}.$
+
+$\text{ example: }\pi(10^9) = 50.847.534 \text{ (CRLS, 2022, ch. 31.8, p.943) }$
+$\pi(10^9) \approx n \cdot \frac{1}{\ln n} = 48.254.942$
+
+The deviation is 
+
+$\frac{|50847534-48254942|}{50847534} = 0.051$
+
+"
+
+# ╔═╡ 0326ea84-be7c-46c6-8bbb-bfb980b4c1c3
+π(n) = sum(isprime(i) for i in 1:n)
+
+# ╔═╡ 95a66772-3a33-41f9-b483-f1016f0bcfa6
+π(10^1), π(10^2), π(10^3), π(10^4), π(10^9)
+
+# ╔═╡ 2bde3064-cb59-426d-8183-2bc58669d876
+πApprox(n) = n/log(n)
+
+# ╔═╡ d6f48c33-f1ae-4b48-85fe-aa9821b3e79d
+πApprox(10^9)
+
+# ╔═╡ 84e338d3-3653-4bb7-adf7-e82814749ee1
+(abs(50847534 - πApprox(10^9))/50847534) * 100.0
 
 # ╔═╡ 6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
 md"
@@ -3164,6 +3203,12 @@ version = "1.13.0+0"
 # ╠═97780427-158d-4440-aaeb-fe96b6fcde6c
 # ╟─bdaaa5eb-c1ac-41af-9044-0762a5d2a42c
 # ╠═de2a5678-6322-496b-aa68-3465984cd06b
+# ╟─0b12d734-da18-4378-910b-f6c8559ab760
+# ╠═0326ea84-be7c-46c6-8bbb-bfb980b4c1c3
+# ╠═95a66772-3a33-41f9-b483-f1016f0bcfa6
+# ╠═2bde3064-cb59-426d-8183-2bc58669d876
+# ╠═d6f48c33-f1ae-4b48-85fe-aa9821b3e79d
+# ╠═84e338d3-3653-4bb7-adf7-e82814749ee1
 # ╟─6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
 # ╟─5889eede-0150-476a-a0d1-7298b616172f
 # ╟─5ddec9aa-8c2c-447f-b97c-a91b39be792b
