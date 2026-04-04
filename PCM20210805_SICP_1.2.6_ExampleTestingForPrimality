@@ -26,7 +26,7 @@ md"
 
 ##### file: PCM20210805\_SICP\_1.2.6\_ExampleTestingForPrimality
 
-##### Julia/Pluto.jl-code (1.12.5/0.20.4) by PCM *** 2026/04/02 ***
+##### Julia/Pluto.jl-code (1.12.5/0.20.4) by PCM *** 2026/04/04 ***
 ==================================================================================
 "
 
@@ -63,16 +63,11 @@ md"
 ##### 3. SICP-Scheme-like *functional* Julia
 (1st pass)
 
-###### 3.1 *Generic* (*Polymorphic*) Function $isprime$: Searching for *Divisors* (= *Factors*)
+###### 3.1 *Generic* (*Polymorphic*) Function $isPrime$: Searching for *Divisors* (= *Factors*)
 *One way to test if a number is prime is to find the number's divisors. The following program finds the smallest integral divisor (greater than $1$) of a given number $n$. It does this in a straightforward way, by testing $n$ for divisibility by successive integers starting with* $2$.(SICP, 1996, 2016)
 
-"
+Cormen et al. refer to this strategy as *trial division* ( CLRS, 2022, p.943f)) with complexity $\Theta(\sqrt n)$.
 
-# ╔═╡ fc96aecc-a50e-4b17-aeda-1294bdf2ec0b
-md"
----
-###### Requirement: Generic (Polymorphic) Function $square$
-The polymorphic degree of $square$ is dependable on the polymorphic degree of $*$. 
 "
 
 # ╔═╡ d123c9b7-7473-40b3-981c-03a4c88e2126
@@ -137,7 +132,7 @@ md"
 
 # ╔═╡ e78e17f2-c9fa-4f5b-aefc-8c3e580f117f
 function findDivisor(n, testDivisor)
-	testDivisor^2 > n ? n :                     # stop condition
+	testDivisor^2 > n ? n :                     # SICP stop condition
 	isDivisor(testDivisor, n) ? testDivisor :
 		findDivisor(n, testDivisor + 1)         # tail recursive call
 end # function findDivisor
@@ -151,7 +146,7 @@ end # function smallestDivisor
 smallestDivisor(1)                              # ==> 1 --> :)
 
 # ╔═╡ b6b50de5-8279-46be-90ad-29f7e2ac1c60
-smallestDivisor(4)                              # ==> 2 --> :)
+smallestDivisor(4), smallestDivisor(3), smallestDivisor(6) # ==> (2, 3, 2) --> :)    
 
 # ╔═╡ f1aa9700-1c4a-4a7d-8563-595984bd4a19
 smallestDivisor(7)                              # ==> 7 --> :), because 7 is prime
@@ -173,28 +168,34 @@ md"
 
 The [first 25 primes](https://en.wikipedia.org/wiki/Prime_number) are: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
 
-*The end test for $findDivisor$ is based on the fact that if $n$ is not prime it must have a divisor less than or equal to $\sqrt n$. This means that the algorithm need only test divisors between $1$ and $\sqrt n$. Consequently, the number of steps required to identify $n$ as prime will have order of growth $\Theta \sqrt n$.*(SICP)
+*The end test for $findDivisor$ is based on the fact that if $n$ is not prime it must have a divisor less than or equal to $\sqrt n$. This means that the algorithm need only test divisors between $1$ and $\sqrt n$. Consequently, the number of steps required to identify $n$ as prime will have order of growth $\Theta \sqrt n$.* (SICP)
+
+*Thus, trial division works well only if n is very small or happens to have a small
+prime factor. When it works, trial division has the advantage that it not only 
+determines whether n is prime or composite, it also determines one of n’s prime factors if n is composite.* (CRLS, 2022, 31.8, p.944)
 
 "
 
-# ╔═╡ 768cc486-5e6e-4ce1-bf2c-a35151a4793f
+# ╔═╡ 2693d856-2025-45ae-b2f4-997547fed477
 function isPrime(n)
 	n <= 1    ? false :
     n <= 3    ? true  :
-    iseven(n) ? false : n == smallestDivisor(n)
+    iseven(n) ? (false, smallestDivisor(n)) :   # ==> (false, prime factor)
+	n == smallestDivisor(n) ? true : 
+		(false, smallestDivisor(n))             # ==> (false, prime factor)
 end # function isPrime
 
 # ╔═╡ dac9cfc1-6b2d-4458-82a6-cf9e2c79fcc1
-isPrime(1)                             # ==> false --> :)
+isPrime(1)                            # ==> false --> :)
 
 # ╔═╡ b5b5a466-e78e-49c0-8ee9-765644596e27
-isPrime(2), isPrime(3), isPrime(5)     # ==> (true, true, true) --> :); primes
+isPrime(2), isPrime(3), isPrime(5)    # ==> (true, true, true) --> :); primes
 
 # ╔═╡ a344aaaa-af28-4345-8e96-a6b735fb6023
-isPrime(4)                             # ==> false --> :)
+isPrime(4)                            # ==> (false, 2) --> :)
 
 # ╔═╡ eb89783e-e948-42d8-b7d5-857a719da9b4
-isPrime(5), isPrime(7)                 # ==> (true, true) --> :); 5, 7 are prime
+isPrime(7), isPrime(11)                # ==> (true, true) --> :); 5, 11 are primes
 
 # ╔═╡ 2a3be054-6361-4b44-9ceb-465547ce3803
 isPrime(97)                            # ==> true --> :); 97 is prime
@@ -208,7 +209,10 @@ md"
 isPrime(99989), isPrime(99991)         # ==> (true, true) --> :)
 
 # ╔═╡ 9bc0eb42-79b0-4d7b-b472-07abae671439
-isPrime(99993)                         # ==> false --> :); because 3 * 33331 = 99993
+isPrime(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 33518b69-6a05-47a7-8dbf-e581f0817a83
+99993 % 3                              # ==> 0 --> :)
 
 # ╔═╡ 57187f78-2aeb-4284-90da-b529a298eb91
 isPrime(100003), isPrime(100019)       # ==> (true, true) --> :)
@@ -217,11 +221,6 @@ isPrime(100003), isPrime(100019)       # ==> (true, true) --> :)
 md"
 ###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
 A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isPrime$ is searching divisors *exhausively*, so its perfect but *not* effective. $isPrime$ *cannot* be fooled by the first 16 Carmichael numbers.
-
-*...there are $20.138.200$ Carmichael numbers between $1$ and $10^{21}$*. [(*Wikipedia*)](https://en.wikipedia.org/wiki/Carmichael_number)
-
-The first *seven* Carmichael numbers *were all found by the Czech mathematician Václav Šimerka in 1885*:
-$561, 1105, 1729, 2465, 2821, 6601, 8911$ ([*Wikipedia*](https://en.wikipedia.org/wiki/Carmichael_number))
 
 "
 
@@ -232,7 +231,11 @@ md"
 "
 
 # ╔═╡ fa620300-3307-4bda-97de-1c49fbf58d61
-isPrime(561), isPrime(1105), isPrime(1729), isPrime(2465)  # ==> (false, ...) --> :)
+isPrime(561), isPrime(1105), isPrime(1729), isPrime(2465)  
+# ==> ((false, 3), (false, 5), (false, 7), (false, 6)) --> :)
+
+# ╔═╡ 2df7061f-ef1d-4d3d-961f-643198354c2d
+561 % 3, 1105 % 5, 1729 % 7, 2465 % 5                    # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 1c6fbf70-c098-44cc-ac84-28acc220da7d
 md"
@@ -241,7 +244,11 @@ md"
 "
 
 # ╔═╡ af7c8d34-5bf3-4e5a-851e-4b7d13b5f6b4
-isPrime(2821), isPrime(6601), isPrime(8911), isPrime(10585) # ==> (false, ...) --> :)
+isPrime(2821), isPrime(6601), isPrime(8911), isPrime(10585) 
+# ==> ((false, 7), (false, 7), false, 7), (false, 5)) --> :)
+
+# ╔═╡ 5187922a-fd8b-447a-9124-4015cbf10554
+2821 % 7, 6601 % 7, 8911 % 7, 10585 % 5                  # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ d6bc8877-7093-4c3c-a256-ab1409183866
 md"
@@ -250,7 +257,11 @@ md"
 "
 
 # ╔═╡ 3e9d4b35-0e9d-4a23-874c-82ed4edee8fb
-isPrime(15841),isPrime(29341),isPrime(41041),isPrime(46657) # ==> (false, ...) --> :)
+isPrime(15841),isPrime(29341),isPrime(41041),isPrime(46657) 
+# ==> ((false, 7), (false, 13), false, 7), (false, 13)) --> :)
+
+# ╔═╡ aa3dd5e9-4a4e-4ab2-bf92-ef41b525ffd6
+15841 % 7, 29341 % 13, 41041 % 7, 46657 % 13             # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 7d4832ca-cd8c-49af-aa3e-df0104dc677c
 md"
@@ -259,7 +270,11 @@ md"
 "
 
 # ╔═╡ ac8e5704-a619-4545-95c3-313f4e8d6585
-isPrime(52633),isPrime(62745),isPrime(63973),isPrime(75361) # ==> (false, ...) --> :)
+isPrime(52633),isPrime(62745),isPrime(63973),isPrime(75361) 
+# ==> ((false, 7), (false, 3), false, 7), (false, 11)) --> :)
+
+# ╔═╡ dee1c4c1-3c0f-4701-b985-b37218e89c00
+52633 % 7, 62745 % 3, 63973 % 7, 75361 % 11              # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ e698ce81-6cd0-4a9a-931a-5994bf91dc39
 md"
@@ -275,17 +290,19 @@ function isPrime2(n)
 	#-------------------------------------------
 	isDivisor(a, b)   = remainder(b, a) == 0
 	#-------------------------------------------
-	smallestDivisor() = findDivisor(2)
+	smallestDivisor(n) = findDivisor(n, 2)
 	#-----------------------------------------------------------------------------
-	function findDivisor(testDivisor)  
+	function findDivisor(n, testDivisor)  
 		testDivisor^2 > n ? n : 
 		isDivisor(testDivisor, n) ? testDivisor : 
-			findDivisor(testDivisor + 1)
+			findDivisor(n, testDivisor + 1)
 	end # function findDivisor
 	#-----------------------------------------------------------------------------
 	n <= 1    ? false :
     n <= 3    ? true  :
-    iseven(n) ? false : n == smallestDivisor() 
+    iseven(n) ? (false, smallestDivisor(n)) :   # ==> (false, prime factor)
+	n == smallestDivisor(n) ? true : 
+		(false, smallestDivisor(n))             # ==> (false, prime factor)
 end # function isPrime2
 
 # ╔═╡ 66613d2a-6a5b-4e93-bc7a-9524adce94bf
@@ -295,7 +312,7 @@ isPrime2(1)                            # ==> false --> :)
 isPrime2(2), isPrime2(3), isPrime2(5)  # ==> (true, true, true) --> :); primes
 
 # ╔═╡ 124a041d-b559-4358-a79d-2a95082921e8
-isPrime2(4)                            # ==> false --> :)
+isPrime2(4)                            # ==> (false, 2) --> :)
 
 # ╔═╡ 9ba48d44-b4f4-47ff-b2f5-eabd401974d3
 isPrime2(5), isPrime2(7)               # ==> (true, true) --> :); 5, 7 are prime
@@ -312,7 +329,10 @@ md"
 isPrime2(99989), isPrime2(99991)       # ==> (true, true) --> :)
 
 # ╔═╡ 74b7a041-c90f-49f1-9534-0287155cb4a0
-isPrime2(99993)                        # ==> false --> :); because 3 * 33331 = 99993
+isPrime2(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 86c64f03-05ad-4aae-8b64-ebec7af6da7b
+99993 % 3                              # ==> 0 --> :)
 
 # ╔═╡ e8108d0f-cd1e-49d0-90c5-b52faf704609
 isPrime2(100003), isPrime2(100019)     # ==> (true, true) --> :)
@@ -331,7 +351,11 @@ md"
 "
 
 # ╔═╡ c2713cd1-9fad-4649-8971-166b9523e215
-isPrime2(561),isPrime2(1105),isPrime2(1729),isPrime2(2465)  # ==> (false, ...) --> :)
+isPrime2(561),isPrime2(1105),isPrime2(1729),isPrime2(2465)  
+# ==> ((false, 3), (false, 5), (false, 7), (false, 6)) --> :)
+
+# ╔═╡ b009d9f6-1b4d-4355-b088-22e8e0d81011
+561 % 3, 1105 % 5, 1729 % 7, 2465 % 5                    # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 97d32356-2930-4d80-bbcc-13fd625cb0ac
 md"
@@ -340,7 +364,11 @@ md"
 "
 
 # ╔═╡ 11934955-85c4-43a3-8e80-8f81c4259f10
-isPrime2(2821),isPrime2(6601),isPrime2(8911),isPrime2(10585) # ==> (false,...) --> :)
+isPrime2(2821),isPrime2(6601),isPrime2(8911),isPrime2(10585) 
+# ==> ((false, 7), (false, 7), false, 7), (false, 5)) --> :)
+
+# ╔═╡ fa0bec5a-a61e-4471-b52b-ebdbc985a4d2
+2821 % 7, 6601 % 7, 8911 % 7, 10585 % 5                  # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 5c75161a-c1c1-495b-bd52-d235a7aeff99
 md"
@@ -363,7 +391,7 @@ isPrime2(52633),isPrime2(62745),isPrime2(63973),isPrime2(75361)# ==>(false,...)-
 # ╔═╡ 374eccff-3888-4760-9ce7-09b388beaed0
 md"
 ---
-###### 3.3 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem) (SICP version)
+###### 3.3 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
 
 *If $p$ is a prime number and $a$ is any positive integer less than $p$, then $a$ raised to the $p$th power is congruent to $a$ modulo $p$* (SICP, 1996; [2016, p.67](https://web.mit.edu/6.001/6.037/sicp.pdf)):
 
@@ -379,6 +407,39 @@ $a^n \equiv a\ (\bmod n) \text{ is an abbreviation for: } a^n\ (\bmod n) = a\ (\
 
 *Two numbers are said to be congruent modulo n if they both have the same remainder when divided by n. The remainder of a number a when divided by n is also referred to as the 'remainder of a modulo n', or simply as 'a modulo n'.* (SICP)
 
+We can summarize *Fermat's Little Theorem* (CLRS, 2022, ch. 31.8, p.944):
+
+$\boxed{P(test\ |\ nature) = P\left(\forall a | a \in \mathbb Z^+_n: a^{n-1} = 1\ (mod\  n)\;|\;isprime(n)\right) = 1\ }$
+
+and the *inverse diagnostic* rule
+
+$\boxed{P(nature\ |\ test) = P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z^+_n: a^{n-1} = 1\ (mod\  n)\right) < 1\ }.$
+"
+
+# ╔═╡ 6bf2767d-5822-478e-83d5-6e196435aadd
+md"
+This is compatible with the following contingency cross table:
+
+$\begin{array}{l|cc|c}
+Test \text{ \\ } Nature  & prime & composite & sum   \\
+\hline
+FermatTest = prime       &   A   &    B      & A + B \\
+FermatTest = composite   &   0   &    C      & 0 + C \\
+\hline
+sum                      & A + 0 &  B + C    &   N   \\
+\end{array}$
+
+- *Causal* direction
+
+$P(FTest=prime|Nature=prime) = \frac{A}{A+0} = 1\;;\text{ perfect sensivity}$
+$P(FTest=prime|Nature=composite) = \frac{B}{B+C} < 1\;;\text{ no perfect specivity}$
+
+- *Diagnostic* direction
+
+$P(Nature=prime|FTest=prime) = \frac{A}{A+B} < 1$
+$P(Nature=composite|FTest=composite) = \frac{C}{B+C} = 1$
+
+$\text{ with } B > 0\;;\text{ due to the existence of Carmichael numbers}$
 "
 
 # ╔═╡ 84499038-4ed6-46fc-a6d1-70a5964c3f3e
@@ -400,7 +461,7 @@ b * a^{(b-1)} \bmod n,  & \text{ if } (b > 0) \land isodd(b)  \\
 
 # ╔═╡ 99f32ce2-e7c5-4a0a-b466-d7ecf5ef6af4
 md"
-... with *self-defined* type $FloatOrInteger.$
+... with *self-defined* type $FloatOrInteger.$ The same function is implemented in *Julia* under the name $powermod(base, exp, n).$
 "
 
 # ╔═╡ 8bbdd3d4-9a2b-478d-8ba4-7ca3a10aa86e
@@ -421,7 +482,7 @@ $2^3\ \equiv 2\ (\bmod 3) = 2 \text{ is same as: }  2^3\ (\bmod 3) \equiv 2\ (\b
 "
 
 # ╔═╡ 5ee7549a-dff7-4809-b63c-ebf572ad10eb
-expmod(2, 3, 3)
+expmod(2, 3, 3), powermod(2, 3, 3)
 
 # ╔═╡ 65c473e2-c57a-4045-bd41-1f0ee046ef0f
 md"
@@ -430,7 +491,7 @@ $2^5\ \equiv 2\ (\bmod 5) \text{ is same as: } 2^5\ (\bmod 5) \equiv 2\ (\bmod 5
 "
 
 # ╔═╡ 770100ce-9cd8-4892-a3c0-d15c97192b5b
-expmod(2, 5, 5)
+expmod(2, 5, 5), powermod(2, 5, 5)
 
 # ╔═╡ d83d7003-094c-4e99-8762-d642156581d0
 md"
@@ -439,7 +500,19 @@ $3^5\ \equiv 3\ (\bmod 5) \text{ is same as: } 3^5\ (\bmod 5) \equiv 3\ (\bmod 5
 "
 
 # ╔═╡ 247589bd-70b9-4677-bf8f-472aa4d57804
-expmod(3, 5, 5)
+expmod(3, 5, 5), powermod(3, 5, 5)
+
+# ╔═╡ a0ec8199-618f-49bf-a1f1-6f7cf1ecc462
+md"
+---
+(CRLS, 2022, ch.31.6, p. 934f)
+
+$expmod(7, 560, 561) = 1$
+
+"
+
+# ╔═╡ 319f8014-90a6-437d-9f56-0ef04ecbeab1
+expmod(7, 560, 561), powermod(7, 560, 561)
 
 # ╔═╡ cebc2513-0f94-41df-ab52-9bfe6815bb8d
 md"
@@ -525,14 +598,14 @@ fermatTest1(52633), fermatTest1(62745), fermatTest1(63973), fermatTest1(75361)
 md"
 ---
 ###### 3.3.3 Recursive *Fermat Test* with *Replications*: $fastPrime1$ 
-*The following (tail-recursive) procedure runs the test a given number of times, as specified by a parameter $trials$. Its value is true if the test succeeds every time, and false otherwise.* (SICP, 1996; 2016, p.68)
+*The following (tail-recursive) procedure runs the test a given number of times, as specified by a parameter $ntrials$. Its value is true if the test succeeds every time, and false otherwise.* (SICP, 1996; 2016, p.68)
 
 "
 
 # ╔═╡ 8a3e42bf-6c51-4201-b894-a96bc3b8c6b6
-function fastPrime1(n::Signed, trials::Signed)::Bool
-	trials == 0 ? true :
-	fermatTest1(n) ? fastPrime1(n, trials-1) : false
+function fastPrime1(n::Signed, ntrials::Signed)::Bool
+	ntrials == 0 ? true :
+	fermatTest1(n) ? fastPrime1(n, ntrials-1) : false
 end # fastPrime1
 
 # ╔═╡ 61664469-1784-47d5-9f1c-8d0fc034b97e
@@ -617,7 +690,13 @@ We can include the condition $gcd(p, a) = 1$ as a precondition in *Fermat*'s tes
 
 Now we can write the *short* version of *Fermat's Little Theorem* as:
 
-$\boxed{\text{If } isprime(p) \text{ then } \forall a \in \{a|(gcd(p, a) = 1) \land (1 < a < p) \}: a^{p-1}\  (\bmod p) = 1}$
+$\boxed{P(test\ |\ nature) = 1}$
+$\boxed{= P\left(\forall a | a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\;|\;isprime(n)\right) = 1\ }$
+
+and the *inverse diagnostic* rule
+
+$\boxed{P(nature\ |\ test) < 1\ }$
+$\boxed{= P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\right) < 1\ }.$
 
 "
 
@@ -707,9 +786,9 @@ md"
 "
 
 # ╔═╡ 5b9a1a53-2081-4778-aab6-a60fcfbef3b6
-function fastPrime2(n::Signed, trials::Signed)::Bool
-	trials == 0 ? true :
-	fermatTest2(n) ? fastPrime2(n, trials-1) : false
+function fastPrime2(n::Signed, ntrials::Signed)::Bool
+	ntrials == 0 ? true :
+	fermatTest2(n) ? fastPrime2(n, ntrials-1) : false
 end # fastPrime2
 
 # ╔═╡ f12b812f-0434-41e0-8e77-86abf79384e1
@@ -1046,6 +1125,9 @@ md"
 # ╔═╡ 130c08ad-33fa-4c86-900f-9865e5495158
 fastPrime3(561, 10), fastPrime3(1105, 10), fastPrime3(1729, 10), fastPrime3(2465, 10)  # ==> (false, false, false, false) --> :)
 
+# ╔═╡ c2cdcfbe-ebd9-486d-8b8a-f3968a7c12c3
+fastPrime3(561, 20), fastPrime3(1105, 20), fastPrime3(1729, 20), fastPrime3(2465, 20)  # ==> (false, false, false, false) --> :)
+
 # ╔═╡ a3960750-3d51-4a04-9947-6e928e0ef1d6
 md"
 ---
@@ -1081,6 +1163,149 @@ fastPrime3(52633, 10), fastPrime3(62745, 10), fastPrime3(63973, 10), fastPrime3(
 
 # ╔═╡ c2d6ac86-03b5-42e4-b968-35be2f7c4b42
 fastPrime3(52633, 20), fastPrime3(62745, 20), fastPrime3(63973, 20), fastPrime3(75361, 20)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ ed5171d1-7c87-4f41-ab01-0652fd745249
+md"
+---
+###### 4.4 Miller-Rabin
+(CLRS, 2022, ch. 31.8, p.946)
+
+*One variant of the Fermat test that cannot be fooled is called the Miller-Rabin test (Miller 1976; Rabin 1980). This starts from an alternate form of Fermat's Little Theorem, which states that if n is a prime number and a is any positive integer less than n, then a raised to the (n - 1)st power is congruent to 1 modulo n.* (SICP, exercise 1.28)
+
+*To test the primality of a number n by the Miller-Rabin test, we pick a random number a<n and raise a to the (n - 1)st power modulo n using the expmod procedure. However, whenever we perform the squaring step in expmod, we check to see if we have discovered a ``nontrivial square root of 1 modulo n,'' that is, a number not equal to 1 or n - 1 whose square is equal to 1 modulo n.* (SICP, exercise 1.28)
+
+Instead of the recommended $expmod$ method we use Julia's library function $powermod$. Our code is a implementation of the pseudocode of CRLS (2022, ch. 31.8, p.946).
+"
+
+# ╔═╡ 02350d15-b2c7-42ff-8465-fbb691914367
+for i in 1:10
+	println("i = $i")
+	if i % 5 == 0
+		true && break
+	end # if
+end # for i
+
+# ╔═╡ e878c3e1-21b9-47cd-ae57-6814dbeae2d0
+function witness(j, a, n)          # witness for compositeness
+	#-------------------------------------------------------------------------
+	xi = -1
+	# decompose n - 1 = 2^t * u with isodd(u)
+	u = n - 1
+	t = 0
+	while u % 2 == 0               #  while iseven(u)
+		u ÷= 2
+		t += 1
+	end # while
+	nMin1 = n - 1
+	twotu = 2^t*u
+	# println("j = $j, n = $n, t = $t, u = $u, n-1 = $nMin1, = 2^t*u = $twotu")
+	# isodd(u) now
+	#-------------------------------------------------------------------------
+	# a^u mod n
+	x0 = powermod(a, u, n)   # CRLS, row 2
+	# println("a = $a, u = $u, n = $n, x0 = $x0")
+	for i in 1:t
+		xi = mod(x0^2, n) 
+		# println("xi = $xi")
+		# # println("----------------------------------------------------")
+		if xi == 1 && x0 ≠ 1 && x0 ≠ n - 1
+			true && break          # found a nontrivial square root of 1
+			                       # found a composite
+		end # if
+		x0 = xi
+	end # for i
+	if xi ≠ 1
+		true                       # composite, definitely
+	else
+		false                      # prime or pseudoprime
+	end # if
+end # function witness
+
+# ╔═╡ a3383b40-1779-4a23-aa56-96bd7de3564f
+function millerRabin(n, ntrials)   # n > 2 is odd
+	#-----------------------------------------------------------------------------
+	j = 0
+	witnessVal = false             # hypothesis: iscomposite(n) == false
+	while !(j > ntrials) && witnessVal == false
+		j += 1
+		a = rand(2:n-2)
+		witnessVal = witness(j, a, n)
+		# println("witnessVal = $witnessVal")
+	end # while
+	#-----------------------------------------------------------------------------
+	if witnessVal                  # if true  then definitely is composite
+		false                      # if false then definitely is composite
+	else
+		true                       # almost surely prime or pseudoprime
+	end # if
+end # function millerRabin
+
+# ╔═╡ 8adabfd4-909f-41f6-afb4-5d5b4a03c254
+millerRabin(5, 10)    # ==> (true, ...) --> :)
+
+# ╔═╡ 95ad439e-7f76-4d3c-92e7-96c229c686c3
+millerRabin(4, 10), millerRabin(6, 100), millerRabin(9, 1000) # ==> (false, ...) --> :)
+
+# ╔═╡ 99550191-f999-4554-814c-1369bd23b6e1
+millerRabin(7, 10), millerRabin(11, 10), millerRabin(97, 10)  # ==> (true, ...) --> :)
+
+# ╔═╡ 86642ccd-f3bd-4fab-b4ae-2b7434bf7126
+millerRabin(99989,10),millerRabin(99991,10),millerRabin(100003,10)# ==>(true,...)--> :)
+
+# ╔═╡ 38fe5a14-401e-4bb6-8e53-8452d297869f
+millerRabin(99993, 10)                            # ==> false --> :); 99993 = 3*33331
+
+# ╔═╡ 1188ee3b-42e5-4d4b-91ec-c43a1a2d3b72
+md"
+---
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+A *Carmichael number* will *usually* fool *Fermat primality tests*. $millerRabin$ *cannot* be fooled by *all* first 16 Carmichael numbers. They are detected as *nonprime* with $20$ trials.
+"
+
+# ╔═╡ 3848e59e-b396-4f19-a0a4-abd51c5e2303
+md"
+---
+###### *1st - 4th* Carmichael Number
+"
+
+# ╔═╡ d9f91252-624e-4399-9335-493e3e605e90
+millerRabin(561, 10), millerRabin(1105, 10), millerRabin(1729, 10), millerRabin(2465, 10)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 2ad2febc-b7b6-4060-bcd6-d6ad55a4612f
+md"
+---
+###### *5th - 8th* Carmichael Number
+"
+
+# ╔═╡ ca062719-a7fa-4f3c-bdf6-13cf0ce09f99
+millerRabin(2821, 10), millerRabin(6601, 10), millerRabin(8911, 10), millerRabin(10585, 10)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 3fa56dfb-e667-4fb4-b03c-1016c6917c88
+millerRabin(2821, 20), millerRabin(6601, 20), millerRabin(8911, 20), fastPrime3(10585, 20)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 6d27b15e-8d67-4dfe-bf35-5bcfb19c5482
+md"
+---
+###### *9th - 12th* Carmichael Number
+"
+
+# ╔═╡ 9b7e3e17-daee-41de-b44e-ffe27008f873
+millerRabin(15841, 10), millerRabin(29341, 10), millerRabin(41041, 10), millerRabin(46657, 10)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ d736218c-b4ec-4c02-82bb-628c147df9d4
+millerRabin(15841, 20), millerRabin(29341, 20), millerRabin(41041, 20), millerRabin(46657, 20)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 7ffabcb9-c90b-4048-a9c8-98037c2072ba
+md"
+---
+###### *13th - 16th* Carmichael Number
+"
+
+# ╔═╡ 60301a59-c4ad-4cbe-af06-3d04bb7a849b
+millerRabin(52633, 10), millerRabin(62745, 10), millerRabin(63973, 10), millerRabin(75361, 10)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 5aacb54e-df1c-453a-8df2-4b68086e4083
+millerRabin(52633, 20), millerRabin(62745, 20), millerRabin(63973, 20), millerRabin(75361, 20)  # ==> (false, false, false, false) --> :)
 
 # ╔═╡ 7817cdb2-6181-43e4-8ac6-023f6ed9480a
 md"
@@ -1166,20 +1391,23 @@ md"
 ##### 5. Summary
 We presented *exhaustive* and *nonexhaustive, probabilistic* search methods for identifying *primenes* of natural numbers. The results are assembled in the following table. For production purposes the *library* function $isprime(.)$ is recommended.
 
-$\begin{array}{l|cccr}
-\text{function} & \text{search} & \text{code}    & \text{Carmichael} & text{trials}\\
+$\begin{array}{l|cccr|c}
+\text{function} & \text{trial division} & \text{replication} & \text{Carmichael} & \text{trials} & \text{complexity} \\
 \hline
-isPrime           & exhaustive    & tail-recursive & not\ fooled       & >   1 \\
-isPrime2          & exhaustive    & tail-recursive & not\ fooled       & >   1 \\
-isPrime3          & exhaustive    & iterative      & not\ fooled       & >   1 \\
-isPrime4          & exhaustive    & iterative      & not\ fooled       & >   1 \\
+isPrime     & exhaustive    & tail-recurs. & not\ fooled     & >   1 & \Theta(\sqrt n) \\
+isPrime2    & exhaustive    & tail-recurs. & not\ fooled     & >   1 & \Theta(\sqrt n) \\
+isPrime3    & exhaustive    & iterative    & not\ fooled     & >   1 & \Theta(\sqrt n) \\
+isPrime4    & exhaustive    & iterative    & not\ fooled     & >   1 & \Theta(\sqrt n) \\
 \hline
-fermatTest1       & probabilistic & tail-recursive & fooled            & =   1 \\
-fastPrime1        & probabilistic & tail-recursive & fooled            & = 100 \\
-fermatTest2       & probabilistic & tail-recursive & fooled\ (p≈.68)   & =   1 \\
-fastPrime2        & probabilistic & tail-recursive & not\ fooled       & =  10 \\
-fastPrime3        & probabilistic & iterative      & not\ fooled       & =  10 \\
-isprime (library) & probabilistic & iterative      & not\ fooled       & =   1 \\
+fermatTest1 & probabilistic & tail-recurs. & fooled          & =   1 & \Theta((\log n)^3) \\ 
+fastPrime1  & probabilistic & tail-recurs. & fooled          & = 100 & \Theta(k(\log n)^3) \\
+fermatTest2 & probabilistic & tail-recurs. & fooled\ (p≈.81) & =   1 & \Theta((\log n)^3) \\
+fastPrime2  & probabilistic & tail-recurs. & not\ fooled     & =  10 & \Theta(k(\log n)^3) \\
+fastPrime3  & probabilistic & iterative    & fooled\ (p≈.06) & =  10 & \Theta(k(\log n)^3) \\
+fastPrime3  & probabilistic & iterative    & not\ fooled     & =  20 & \Theta(k(\log n)^3) \\
+millerRabin & probabilistic & recursive    & fooled\ (p≈.06) & =  10 & \Theta(k(\log n)^3) \\
+millerRabin & probabilistic & recursive    & not\ fooled     & =  20 & \Theta(k(\log n)^3) \\
+isprime     & probabilistic & iterative    & not\ fooled     & =   1 & \Theta(\log n)^3 \\
 \hline
 \end{array}$
 
@@ -2671,7 +2899,6 @@ version = "1.13.0+0"
 # ╟─b64b7617-c882-44b3-9400-863138f3678e
 # ╠═b58f3d47-bc97-4b54-ad3e-19b775e6849c
 # ╟─35a00708-a1ff-4b0c-a4eb-50452e394e06
-# ╟─fc96aecc-a50e-4b17-aeda-1294bdf2ec0b
 # ╟─d123c9b7-7473-40b3-981c-03a4c88e2126
 # ╠═001f90e2-99c7-485c-a140-04142a5c8f6a
 # ╠═ce2760c6-de30-4588-9dda-1dd3f1690ec4
@@ -2695,7 +2922,7 @@ version = "1.13.0+0"
 # ╠═b8e74e16-deed-4903-aaea-d68e3e9d6024
 # ╠═46cc1617-f160-4041-bd79-193d311afb61
 # ╟─db02e8a1-4131-4c0f-9975-6223dafd1631
-# ╠═768cc486-5e6e-4ce1-bf2c-a35151a4793f
+# ╠═2693d856-2025-45ae-b2f4-997547fed477
 # ╠═dac9cfc1-6b2d-4458-82a6-cf9e2c79fcc1
 # ╠═b5b5a466-e78e-49c0-8ee9-765644596e27
 # ╠═a344aaaa-af28-4345-8e96-a6b735fb6023
@@ -2704,16 +2931,21 @@ version = "1.13.0+0"
 # ╟─6bd55608-02f5-4b95-8ad9-597abdf106b6
 # ╠═4d06eb30-b117-4b02-b04c-6c459a73bcd8
 # ╠═9bc0eb42-79b0-4d7b-b472-07abae671439
+# ╠═33518b69-6a05-47a7-8dbf-e581f0817a83
 # ╠═57187f78-2aeb-4284-90da-b529a298eb91
 # ╟─8d69e081-99d6-404a-805a-5d12821c5f5a
 # ╟─6a7a2391-9cbc-44ef-83f8-5252c1454ac2
 # ╠═fa620300-3307-4bda-97de-1c49fbf58d61
+# ╠═2df7061f-ef1d-4d3d-961f-643198354c2d
 # ╟─1c6fbf70-c098-44cc-ac84-28acc220da7d
 # ╠═af7c8d34-5bf3-4e5a-851e-4b7d13b5f6b4
+# ╠═5187922a-fd8b-447a-9124-4015cbf10554
 # ╟─d6bc8877-7093-4c3c-a256-ab1409183866
 # ╠═3e9d4b35-0e9d-4a23-874c-82ed4edee8fb
+# ╠═aa3dd5e9-4a4e-4ab2-bf92-ef41b525ffd6
 # ╟─7d4832ca-cd8c-49af-aa3e-df0104dc677c
 # ╠═ac8e5704-a619-4545-95c3-313f4e8d6585
+# ╠═dee1c4c1-3c0f-4701-b985-b37218e89c00
 # ╟─e698ce81-6cd0-4a9a-931a-5994bf91dc39
 # ╠═9979c1e4-349b-4e0a-87a0-39de45ecdf4c
 # ╠═66613d2a-6a5b-4e93-bc7a-9524adce94bf
@@ -2724,17 +2956,21 @@ version = "1.13.0+0"
 # ╟─516a2707-d950-4ce8-8ff3-750941fa7101
 # ╠═51db44db-6faf-40ca-abe5-e5101340c4ff
 # ╠═74b7a041-c90f-49f1-9534-0287155cb4a0
+# ╠═86c64f03-05ad-4aae-8b64-ebec7af6da7b
 # ╠═e8108d0f-cd1e-49d0-90c5-b52faf704609
 # ╟─4cb5f5b4-c0a5-4bac-93e8-1b5069e3863a
 # ╟─343b4135-8c3b-476f-a01e-1aa160f621d3
 # ╠═c2713cd1-9fad-4649-8971-166b9523e215
+# ╠═b009d9f6-1b4d-4355-b088-22e8e0d81011
 # ╟─97d32356-2930-4d80-bbcc-13fd625cb0ac
 # ╠═11934955-85c4-43a3-8e80-8f81c4259f10
+# ╠═fa0bec5a-a61e-4471-b52b-ebdbc985a4d2
 # ╟─5c75161a-c1c1-495b-bd52-d235a7aeff99
 # ╠═3a1b61d2-6c7f-4c12-92b8-96c41e73b262
 # ╟─f63e0782-7149-4004-8add-3bdacf8f639d
 # ╠═9e5ac0c9-c2d8-4635-9111-e686134026fd
 # ╟─374eccff-3888-4760-9ce7-09b388beaed0
+# ╟─6bf2767d-5822-478e-83d5-6e196435aadd
 # ╟─84499038-4ed6-46fc-a6d1-70a5964c3f3e
 # ╟─99f32ce2-e7c5-4a0a-b466-d7ecf5ef6af4
 # ╠═8bbdd3d4-9a2b-478d-8ba4-7ca3a10aa86e
@@ -2745,6 +2981,8 @@ version = "1.13.0+0"
 # ╠═770100ce-9cd8-4892-a3c0-d15c97192b5b
 # ╟─d83d7003-094c-4e99-8762-d642156581d0
 # ╠═247589bd-70b9-4677-bf8f-472aa4d57804
+# ╟─a0ec8199-618f-49bf-a1f1-6f7cf1ecc462
+# ╠═319f8014-90a6-437d-9f56-0ef04ecbeab1
 # ╟─cebc2513-0f94-41df-ab52-9bfe6815bb8d
 # ╠═e57b3eb9-a394-4253-8f23-76ff51bc1998
 # ╠═7079c8a5-af5b-4083-b494-aaaf0ed1336a
@@ -2866,6 +3104,7 @@ version = "1.13.0+0"
 # ╟─abc8c6d9-7e26-4983-87ad-225317673ebc
 # ╟─ae15d78d-8ef7-4725-9023-f3b0e60342c1
 # ╠═130c08ad-33fa-4c86-900f-9865e5495158
+# ╠═c2cdcfbe-ebd9-486d-8b8a-f3968a7c12c3
 # ╟─a3960750-3d51-4a04-9947-6e928e0ef1d6
 # ╠═c73694d1-fa48-49dd-a043-5966c7fec7c9
 # ╠═2a36969e-7d6c-4890-9216-eee0cdbd6e62
@@ -2875,6 +3114,27 @@ version = "1.13.0+0"
 # ╟─acf7b484-d02e-423b-b005-d10ff2c3ffc2
 # ╠═2deda15e-9235-4228-b1e4-7c46adb37dea
 # ╠═c2d6ac86-03b5-42e4-b968-35be2f7c4b42
+# ╟─ed5171d1-7c87-4f41-ab01-0652fd745249
+# ╠═02350d15-b2c7-42ff-8465-fbb691914367
+# ╠═a3383b40-1779-4a23-aa56-96bd7de3564f
+# ╠═e878c3e1-21b9-47cd-ae57-6814dbeae2d0
+# ╠═8adabfd4-909f-41f6-afb4-5d5b4a03c254
+# ╠═95ad439e-7f76-4d3c-92e7-96c229c686c3
+# ╠═99550191-f999-4554-814c-1369bd23b6e1
+# ╠═86642ccd-f3bd-4fab-b4ae-2b7434bf7126
+# ╠═38fe5a14-401e-4bb6-8e53-8452d297869f
+# ╟─1188ee3b-42e5-4d4b-91ec-c43a1a2d3b72
+# ╟─3848e59e-b396-4f19-a0a4-abd51c5e2303
+# ╠═d9f91252-624e-4399-9335-493e3e605e90
+# ╟─2ad2febc-b7b6-4060-bcd6-d6ad55a4612f
+# ╠═ca062719-a7fa-4f3c-bdf6-13cf0ce09f99
+# ╠═3fa56dfb-e667-4fb4-b03c-1016c6917c88
+# ╟─6d27b15e-8d67-4dfe-bf35-5bcfb19c5482
+# ╠═9b7e3e17-daee-41de-b44e-ffe27008f873
+# ╠═d736218c-b4ec-4c02-82bb-628c147df9d4
+# ╟─7ffabcb9-c90b-4048-a9c8-98037c2072ba
+# ╠═60301a59-c4ad-4cbe-af06-3d04bb7a849b
+# ╠═5aacb54e-df1c-453a-8df2-4b68086e4083
 # ╟─7817cdb2-6181-43e4-8ac6-023f6ed9480a
 # ╠═0a47ac1a-c7d2-4d5b-8a22-3b02759e7923
 # ╠═63ae48b7-becf-4398-b7d5-a0c28b0d93fa
