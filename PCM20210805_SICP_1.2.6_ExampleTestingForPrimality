@@ -6,17 +6,21 @@ using InteractiveUtils
 
 # ╔═╡ b58f3d47-bc97-4b54-ad3e-19b775e6849c
 begin 
+	#-------------------------------------------------------------------------
 	using Pluto
 	using Plots	
 	using LaTeXStrings
 	using GraphRecipes
 	using Primes
-	#-----------------------------------------------------------------
-	println("pkgversion(Pluto)         = ", pkgversion(Pluto))
-	println("pkgversion(Plots)         = ", pkgversion(Plots))
-	println("pkgversion(LaTeXStrings)  = ", pkgversion(LaTeXStrings))
-	println("pkgversion(GraphRecipes)  = ", pkgversion(GraphRecipes))
-	println("pkgversion(Primes)        = ", pkgversion(Primes))
+	using SpecialFunctions
+	#-------------------------------------------------------------------------
+	println("pkgversion(Pluto)            = ", pkgversion(Pluto))
+	println("pkgversion(Plots)            = ", pkgversion(Plots))
+	println("pkgversion(LaTeXStrings)     = ", pkgversion(LaTeXStrings))
+	println("pkgversion(GraphRecipes)     = ", pkgversion(GraphRecipes))
+	println("pkgversion(Primes)           = ", pkgversion(Primes))
+	println("pkgversion(SpecialFunctions) = ", pkgversion(SpecialFunctions))
+	#-------------------------------------------------------------------------
 end # begin
 
 # ╔═╡ fcaf83d0-f611-11eb-1bc9-31384cf290cb
@@ -26,7 +30,7 @@ md"
 
 ##### file: PCM20210805\_SICP\_1.2.6\_ExampleTestingForPrimality
 
-##### Julia/Pluto.jl-code (1.12.5/0.20.4) by PCM *** 2026/04/04 ***
+##### Julia/Pluto.jl-code (1.12.6/0.20.4) by PCM *** 2026/04/20 ***
 ==================================================================================
 "
 
@@ -43,11 +47,20 @@ md"
 - *exponentiation* with ^
 - *case* analysis by $if$ <condition> <epression> $elseif$ <condition> <epression> $else$ <epression> $end$
 - function-wide *scope*
+- @*time* - macro
 - *jumps* by $break$
 - *Fermat*'s Little Theorem
+- *prime, pseudoprime, Carmichael number, composite*
 - *coprimes*
 - *powermod(.,.,.)*
 - *package* $Primes$
+- *macro* $@time$
+- *Bayes Theorem*
+- *prior*, *posterior* probabilities, *likelihoods*
+- *TPR* (= True Positive Rate). *sensitivity, *recall*
+- *TNR* (= True Negative Rate), *specifity*
+- *PPV* (= Positive Predictive Value), *precision*
+- *NPV* (= Negative Predictiv Value)
 
 "
 
@@ -63,10 +76,11 @@ md"
 ##### 3. SICP-Scheme-like *functional* Julia
 (1st pass)
 
+---
 ###### 3.1 *Generic* (*Polymorphic*) Function $isPrime$: Searching for *Divisors* (= *Factors*)
-*One way to test if a number is prime is to find the number's divisors. The following program finds the smallest integral divisor (greater than $1$) of a given number $n$. It does this in a straightforward way, by testing $n$ for divisibility by successive integers starting with* $2$.(SICP, 1996, 2016)
+*One way to test if a number is prime is to find the number's divisors. The following program finds the smallest integral divisor (greater than $1$) of a given number $n$. It does this in a straightforward way, by testing $n$ for divisibility by successive integers starting with* $2$...*Consequently, the number of steps required to identify n as prime will have order of growth* $\Theta(\sqrt n)$.(SICP, 1996, 2016)
 
-Cormen et al. refer to this strategy as *trial division* ( CLRS, 2022, p.943f)) with complexity $\Theta(\sqrt n)$.
+Cormen et al. refer to this strategy as *trial division* ( CLRS, 2022, p.943f).
 
 "
 
@@ -75,11 +89,11 @@ md"
 ---
 ###### Requirement: Generic (Polymorphic) Function [*rem*](https://docs.julialang.org/en/v1/base/math/#Base.rem-Tuple%7BAny,%20Any,%20RoundingMode%7D) 
 
-*Compute the remainder of x after integer division by y, with the quotient rounded according to the rounding mode r. In other words, the quantity* ([JuliDoc](https://docs.julialang.org/en/v1/base/math/#Base.rem-Tuple%7BAny,%20Any,%20RoundingMode%7D))
+*Compute the remainder of x after integer division by y, with the quotient rounded according to the rounding mode r. In other words, the quantity* ([JuliaDoc](https://docs.julialang.org/en/v1/base/math/#Base.rem-Tuple%7BAny,%20Any,%20RoundingMode%7D))
 
 $rem(x,y) := x - y * round(x / y, r),$
 
-*if  $r == RoundToZero$ (default), then the result is exact, and in the interval $[0,∣y∣)$ if $x$ is positive, or $(−∣y∣,0]$ otherwise. See also RoundToZero.* ([JuliDoc](https://docs.julialang.org/en/v1/base/math/#Base.rem-Tuple%7BAny,%20Any,%20RoundingMode%7D))
+*if  $r == RoundToZero$ (default), then the result is exact, and in the interval $[0,∣y∣)$ if $x$ is positive, or $(−∣y∣,0]$ otherwise. See also RoundToZero.* ([JuliaDoc](https://docs.julialang.org/en/v1/base/math/#Base.rem-Tuple%7BAny,%20Any,%20RoundingMode%7D))
 
 "
 
@@ -132,9 +146,13 @@ md"
 
 # ╔═╡ e78e17f2-c9fa-4f5b-aefc-8c3e580f117f
 function findDivisor(n, testDivisor)
+	#-----------------------------------------------------------------------------
 	testDivisor^2 > n ? n :                     # SICP stop condition
 	isDivisor(testDivisor, n) ? testDivisor :
-		findDivisor(n, testDivisor + 1)         # tail recursive call
+		iseven(testDivisor) ? 
+			findDivisor(n, testDivisor + 1) :   # tail recursive call
+			findDivisor(n, testDivisor + 2)     # tail recursive call
+	#-----------------------------------------------------------------------------
 end # function findDivisor
 
 # ╔═╡ afcd5e13-b61a-491a-bf4f-47ea59fe112d
@@ -177,50 +195,83 @@ determines whether n is prime or composite, it also determines one of n’s prim
 "
 
 # ╔═╡ 2693d856-2025-45ae-b2f4-997547fed477
-function isPrime(n)
-	n <= 1    ? false :
-    n <= 3    ? true  :
-    iseven(n) ? (false, smallestDivisor(n)) :   # ==> (false, prime factor)
-	n == smallestDivisor(n) ? true : 
-		(false, smallestDivisor(n))             # ==> (false, prime factor)
+function isPrime(p)
+	#-----------------------------------------------------------------------------
+	p <= 1    ? false :
+    p <= 3    ? true  :
+	let smallestDivisorNumber = smallestDivisor(p)
+		iseven(p) ? (false, smallestDivisorNumber) :      # ==> (false, factor)
+		p == smallestDivisorNumber ? true :               # ==> prime
+		(false, smallestDivisorNumber)                    # ==> (false, factor)
+	end # let
+	#-----------------------------------------------------------------------------
 end # function isPrime
 
 # ╔═╡ dac9cfc1-6b2d-4458-82a6-cf9e2c79fcc1
-isPrime(1)                            # ==> false --> :)
+isPrime(1)                                   # ==> false --> :)
 
 # ╔═╡ b5b5a466-e78e-49c0-8ee9-765644596e27
-isPrime(2), isPrime(3), isPrime(5)    # ==> (true, true, true) --> :); primes
+isPrime(2), isPrime(3), isPrime(5)           # ==> (true, true, true) --> :); primes
 
 # ╔═╡ a344aaaa-af28-4345-8e96-a6b735fb6023
-isPrime(4)                            # ==> (false, 2) --> :)
+isPrime(4)                                   # ==> (false, 2) --> :)
 
 # ╔═╡ eb89783e-e948-42d8-b7d5-857a719da9b4
-isPrime(7), isPrime(11)                # ==> (true, true) --> :); 5, 11 are primes
+isPrime(7), isPrime(11), isPrime(13), isPrime(17) # ==> (true,true,true,true) --> :)
+
+# ╔═╡ 854b95b5-38e4-40bd-9908-baf9c2743e68
+isPrime(19), isPrime(23), isPrime(29), isPrime(31) # ==> (true,true,true,true) --> :)
 
 # ╔═╡ 2a3be054-6361-4b44-9ceb-465547ce3803
-isPrime(97)                            # ==> true --> :); 97 is prime
+isPrime(97)                                  # ==> true --> :); 97 is prime
 
 # ╔═╡ 6bd55608-02f5-4b95-8ad9-597abdf106b6
 md"
-###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+---
+###### Some more Candidates 
 "
 
 # ╔═╡ 4d06eb30-b117-4b02-b04c-6c459a73bcd8
-isPrime(99989), isPrime(99991)         # ==> (true, true) --> :)
+isPrime(99989), isPrime(99991)               # ==> (true, true) --> :)
 
 # ╔═╡ 9bc0eb42-79b0-4d7b-b472-07abae671439
-isPrime(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
+isPrime(99993)                     # ==> (false, 3) --> :); because 3 * 33331 = 99993
 
 # ╔═╡ 33518b69-6a05-47a7-8dbf-e581f0817a83
-99993 % 3                              # ==> 0 --> :)
+99993 % 3                                    # ==> 0 --> :)
 
 # ╔═╡ 57187f78-2aeb-4284-90da-b529a298eb91
-isPrime(100003), isPrime(100019)       # ==> (true, true) --> :)
+isPrime(100003), isPrime(100019)             # ==> (true, true) --> :)
+
+# ╔═╡ c3312efd-a296-4e3e-8698-347837683611
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are *not* Carmichael Numbers 
+"
+
+# ╔═╡ 62fa68a1-8401-4e10-870f-5fd6183c003c
+isPrime(341)                             # ==> test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ 410fcaa0-0d47-4a49-92c3-f9a68c7e919e
+isPrime(645)                             # ==> test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 13477d73-c891-4b06-9df3-fe67d8ee03d5
+isPrime(703)                             # ==> test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ e50d50c0-e0ec-4d25-b888-b770b6d622fd
+isPrime(781)                             # ==> test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 38c9cfd5-2801-470e-a881-4d9ebd434c86
+isPrime(793)                             # ==> test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ a6d0056d-6047-40ea-bcd6-bbe46dbbe824
+isPrime(891)                             # ==> test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 8d69e081-99d6-404a-805a-5d12821c5f5a
 md"
-###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
-A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isPrime$ is searching divisors *exhausively*, so its perfect but *not* effective. $isPrime$ *cannot* be fooled by the first 16 Carmichael numbers.
+---
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) 
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isPrime$ is searching divisors *exhausively*, so its perfect but *not* efficient. So $isPrime$ *cannot* be fooled by the first 16 Carmichael numbers.
 
 "
 
@@ -232,7 +283,7 @@ md"
 
 # ╔═╡ fa620300-3307-4bda-97de-1c49fbf58d61
 isPrime(561), isPrime(1105), isPrime(1729), isPrime(2465)  
-# ==> ((false, 3), (false, 5), (false, 7), (false, 6)) --> :)
+# ==> ((false, 3), (false, 5), (false, 7), (false, 5)) --> :)
 
 # ╔═╡ 2df7061f-ef1d-4d3d-961f-643198354c2d
 561 % 3, 1105 % 5, 1729 % 7, 2465 % 5                    # ==> (0, 0, 0, 0) --> :)
@@ -276,6 +327,33 @@ isPrime(52633),isPrime(62745),isPrime(63973),isPrime(75361)
 # ╔═╡ dee1c4c1-3c0f-4701-b985-b37218e89c00
 52633 % 7, 62745 % 3, 63973 % 7, 75361 % 11              # ==> (0, 0, 0, 0) --> :)
 
+# ╔═╡ 8aee5060-92ce-4ee2-b16a-91ad75b4cfb4
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ 1f366242-6699-4772-b882-dc61a61a8fbc
+lCn20260412 = 5394826801
+
+# ╔═╡ 4ea4b7d2-8406-4a73-99bf-6d721331eee4
+isPrime(lCn20260412)                               # ==> (false, 7) --> :)
+
+# ╔═╡ b785f7ae-2521-471f-b943-677bebcd0bcd
+@time isPrime(lCn20260412)                         # ==> 0.000002 seconds
+
+
+# ╔═╡ c41f6702-f06c-4a4a-85f9-e60aa4d05a86
+lCn20260412 ÷ isPrime(lCn20260412)[2]        # ==> 770689543 --> :) is the 1st factor
+
+# ╔═╡ baaadf2c-9835-4d75-834e-5c8157df150e
+factor(lCn20260412)                                # factorization
+
+# ╔═╡ e4093686-6992-4da8-adba-8ffcbb178913
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73      # ==> 5394826801 --> :)
+
 # ╔═╡ e698ce81-6cd0-4a9a-931a-5994bf91dc39
 md"
 ---
@@ -284,64 +362,97 @@ with *local* function definitions
 "
 
 # ╔═╡ 9979c1e4-349b-4e0a-87a0-39de45ecdf4c
-function isPrime2(n) 
-	#-------------------------------------------
-	remainder = %          # idiomatic Julia '%'
-	#-------------------------------------------
-	isDivisor(a, b)   = remainder(b, a) == 0
-	#-------------------------------------------
-	smallestDivisor(n) = findDivisor(n, 2)
+function isPrime2(p)   
 	#-----------------------------------------------------------------------------
-	function findDivisor(n, testDivisor)  
-		testDivisor^2 > n ? n : 
-		isDivisor(testDivisor, n) ? testDivisor : 
-			findDivisor(n, testDivisor + 1)
+	remainder = %                                         # idiomatic Julia '%'
+	#-----------------------------------------------------------------------------
+	isDivisor(a, b)    = remainder(b, a) == 0
+	#-----------------------------------------------------------------------------
+	smallestDivisor(p) = findDivisor(p, 2)
+	#-----------------------------------------------------------------------------
+	function findDivisor(p, testDivisor)
+		testDivisor^2 > p ? p :                           # SICP stop condition
+		isDivisor(testDivisor, p) ? testDivisor :
+			iseven(testDivisor) ? 
+				findDivisor(p, testDivisor + 1) :         # tail recursive call
+				findDivisor(p, testDivisor + 2)           # tail recursive call
 	end # function findDivisor
 	#-----------------------------------------------------------------------------
-	n <= 1    ? false :
-    n <= 3    ? true  :
-    iseven(n) ? (false, smallestDivisor(n)) :   # ==> (false, prime factor)
-	n == smallestDivisor(n) ? true : 
-		(false, smallestDivisor(n))             # ==> (false, prime factor)
+	p <= 1    ? false :
+    p <= 3    ? true  :
+	let smallestDivisorNumber = smallestDivisor(p)
+		iseven(p) ? (false, smallestDivisorNumber) :      # ==> (false, factor)
+		p == smallestDivisorNumber ? true :               # ==> prime
+		(false, smallestDivisorNumber)                    # ==> (false, factor)
+	end # let
+	#-----------------------------------------------------------------------------
 end # function isPrime2
 
 # ╔═╡ 66613d2a-6a5b-4e93-bc7a-9524adce94bf
-isPrime2(1)                            # ==> false --> :)
+isPrime2(1)                             # ==> false --> :)
 
 # ╔═╡ 9790f7d2-509f-461a-b638-3dfeb761c061
-isPrime2(2), isPrime2(3), isPrime2(5)  # ==> (true, true, true) --> :); primes
+isPrime2(2), isPrime2(3), isPrime2(5)   # ==> (true, true, true) --> :); primes
 
 # ╔═╡ 124a041d-b559-4358-a79d-2a95082921e8
-isPrime2(4)                            # ==> (false, 2) --> :)
+isPrime2(4)                             # ==> (false, 2) --> :)
 
-# ╔═╡ 9ba48d44-b4f4-47ff-b2f5-eabd401974d3
-isPrime2(5), isPrime2(7)               # ==> (true, true) --> :); 5, 7 are prime
+# ╔═╡ 50752937-a022-47e2-8e63-2c4d501bbdc3
+isPrime2(7),isPrime2(11),isPrime2(13),isPrime2(17) # ==> (true,true,true,true) --> :)
+
+# ╔═╡ dafa30cf-3897-42c2-a59e-de23b1535de4
+isPrime2(19),isPrime2(23),isPrime2(29),isPrime2(31) # ==>(true,true,true,true)--> :)
 
 # ╔═╡ 182d2960-b92a-4edc-b9e4-450204eb6fc2
-isPrime2(97)                           # ==> true --> :); 97 is prime
+isPrime2(97)                            # ==> true --> :); 97 is prime
 
-# ╔═╡ 516a2707-d950-4ce8-8ff3-750941fa7101
+# ╔═╡ a583d5fe-fc61-443f-80c7-9d8a090e6b0b
 md"
-###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+---
+###### Some more Candidates 
 "
 
 # ╔═╡ 51db44db-6faf-40ca-abe5-e5101340c4ff
-isPrime2(99989), isPrime2(99991)       # ==> (true, true) --> :)
+isPrime2(99989), isPrime2(99991)        # ==> (true, true) --> :)
 
 # ╔═╡ 74b7a041-c90f-49f1-9534-0287155cb4a0
 isPrime2(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
 
 # ╔═╡ 86c64f03-05ad-4aae-8b64-ebec7af6da7b
-99993 % 3                              # ==> 0 --> :)
+99993 % 3                               # ==> 0 --> :)
 
 # ╔═╡ e8108d0f-cd1e-49d0-90c5-b52faf704609
-isPrime2(100003), isPrime2(100019)     # ==> (true, true) --> :)
+isPrime2(100003), isPrime2(100019)      # ==> (true, true) --> :)
+
+# ╔═╡ 92364e52-d8e5-47c8-acb1-6beb07159a26
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ a783731d-f282-431d-8f1a-f8601a6cdc69
+isPrime2(341)                           # ==> test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ 370b6cf6-ffde-45a6-a1af-db5c1d89c364
+isPrime2(645)                           # ==> test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ f3c5d909-43e0-4920-a56e-651c33f0601d
+isPrime2(703)                           # ==> test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ cd027bc7-62ec-4b2e-b9a0-c23aea90fdcb
+isPrime2(781)                           # ==> test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 57bdf181-bb33-45d1-9b79-2a6963f7aa88
+isPrime2(793)                           # ==> test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ f5b86ab1-d937-405c-9a48-06d6d6a511f3
+isPrime2(891)                           # ==> test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 4cb5f5b4-c0a5-4bac-93e8-1b5069e3863a
 md"
 ---
-###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
-A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isPrime2$ is searching divisors *exhausively*, so its perfect but *not* effective. $isPrime2$ *cannot* be fooled by the first 16 Carmichael numbers.
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number)
+A *Carmichael number* will *usually* pass *Fermat primality test* even though it is *not* actually prime. But this test $isPrime2$ is searching divisors *exhausively*, so its perfect but *not* efficient. So $isPrime2$ *cannot* be fooled by the first 16 Carmichael numbers.
 "
 
 # ╔═╡ 343b4135-8c3b-476f-a01e-1aa160f621d3
@@ -352,7 +463,7 @@ md"
 
 # ╔═╡ c2713cd1-9fad-4649-8971-166b9523e215
 isPrime2(561),isPrime2(1105),isPrime2(1729),isPrime2(2465)  
-# ==> ((false, 3), (false, 5), (false, 7), (false, 6)) --> :)
+# ==> ((false, 3), (false, 5), (false, 7), (false, 5)) --> :)
 
 # ╔═╡ b009d9f6-1b4d-4355-b088-22e8e0d81011
 561 % 3, 1105 % 5, 1729 % 7, 2465 % 5                    # ==> (0, 0, 0, 0) --> :)
@@ -377,7 +488,11 @@ md"
 "
 
 # ╔═╡ 3a1b61d2-6c7f-4c12-92b8-96c41e73b262
-isPrime2(15841),isPrime2(29341),isPrime2(41041),isPrime2(46657)# ==>(false,...)--> :)
+isPrime2(15841),isPrime2(29341),isPrime2(41041),isPrime2(46657)
+# ==> ((false, 7), (false, 13), false, 7), (false, 13)) --> :)
+
+# ╔═╡ 7f3a4ad2-5595-4142-9141-aa02eb05f5c6
+15841 % 7, 29341 % 13, 41041 % 7, 46657 % 13             # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ f63e0782-7149-4004-8add-3bdacf8f639d
 md"
@@ -386,70 +501,60 @@ md"
 "
 
 # ╔═╡ 9e5ac0c9-c2d8-4635-9111-e686134026fd
-isPrime2(52633),isPrime2(62745),isPrime2(63973),isPrime2(75361)# ==>(false,...)--> :)
+isPrime2(52633),isPrime2(62745),isPrime2(63973),isPrime2(75361)
+# ==> ((false, 7), (false, 3), false, 7), (false, 11)) --> :)
 
-# ╔═╡ 374eccff-3888-4760-9ce7-09b388beaed0
+# ╔═╡ 7506993a-7a33-4b8b-b03f-775c0f8b1e1f
+52633 % 7, 62745 % 3, 63973 % 7, 75361 % 11              # ==> (0, 0, 0, 0) --> :)
+
+# ╔═╡ 0380c8dd-eb82-4cc0-9f30-3cb04ec5ff04
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ e807070f-028c-4916-b30f-dea41e934cc4
+isPrime2(lCn20260412)                         # ==> (false, 7) --> :)
+
+# ╔═╡ dbc30f3d-3f0c-4d6c-9cfd-d60c268c419d
+@time isPrime2(lCn20260412)                   # ==> 0.000002 seconds
+
+# ╔═╡ e25b04c1-5afe-405d-bcbc-c2e521a23079
+lCn20260412 ÷ isPrime2(lCn20260412)[2]        # ==> 770689543 --> :) the 1st factor
+
+# ╔═╡ b1dfeb3b-d2fb-4466-8381-a6d6ce3ce175
+factor(lCn20260412)                           # factorization
+
+# ╔═╡ af6f8a62-1f89-4f37-950d-8b790d9642db
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73      # ==> 5394826801 --> :)
+
+# ╔═╡ 3dee27c7-48a0-4c84-82d9-3e606ac14cf6
 md"
 ---
 ###### 3.3 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
 
+###### 3.3.1 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem) (*long* version)
+
 *If $p$ is a prime number and $a$ is any positive integer less than $p$, then $a$ raised to the $p$th power is congruent to $a$ modulo $p$* (SICP, 1996; [2016, p.67](https://web.mit.edu/6.001/6.037/sicp.pdf)):
 
-$\boxed{\text{If } isprime(p) \text{ then } \forall a \in \{a|1 < a < p\}: a^p \equiv a\ (\bmod p)}.$
+$\boxed{\text{If } prime(p) \text{ then } \forall a \in [1 < a < p]: a^p \equiv a\ (\bmod p)}$
 
-Another form can be obtained by dividing both sides of the equivalence by $a$:
+Another (*short*) form can be obtained by dividing both sides of the equivalence by $a$ if $a$ is *not* divisible by $p$; that is, if $a$ is [*coprime*](https://en.wikipedia.org/wiki/Coprime_integers) to $p$:
 
-$\boxed{\text{If } isprime(p) \text{ then } \forall a \in \{a|1 < a < p\}: a^{p-1} \equiv 1\ (\bmod p)}.$
+$\boxed{\text{If } prime(p) \text{ then } \forall a \in [1 < a < p] \land gcd(a,p)=1: a^{p-1} \equiv 1\ (\bmod p)}$
 
-where $\{a|1 < a < p\} \in \mathbb N$ is called *basis* and where:
+where $a \in [1 < a < p] \subset \mathbb N$ is called *basis* and where:
 
-$a^n \equiv a\ (\bmod n) \text{ is an abbreviation for: } a^n\ (\bmod n) = a\ (\bmod n).$
+$a^p \equiv a\ (\bmod p) \text{ is an abbreviation for: } a^p\ (\bmod p) = a\ (\bmod p).$
 
-*Two numbers are said to be congruent modulo n if they both have the same remainder when divided by n. The remainder of a number a when divided by n is also referred to as the 'remainder of a modulo n', or simply as 'a modulo n'.* (SICP)
+*Two numbers are said to be congruent modulo $p$ if they both have the same remainder when divided by $p$. The remainder of a number a when divided by $p$ is also referred to as the 'remainder of a modulo p', or simply as 'a modulo p'.* (SICP)
 
-We can summarize *Fermat's Little Theorem* (CLRS, 2022, ch. 31.8, p.944):
+We can summarize *Fermat's Little Theorem* with $|FermatTest \times GroundTruth| = 4$  *conditional* probabilities between the two random variables $GroundTruth = \{prime, composite\}$ and $FermatTest = \{true\  (=prime), false\ (=composite)\}$:
 
-$\boxed{P(test\ |\ nature) = P\left(\forall a | a \in \mathbb Z^+_n: a^{n-1} = 1\ (mod\  n)\;|\;isprime(n)\right) = 1\ }$
+$\boxed{\mathbb P\left(FermatTest\ |\ GroundTruth \right).}$
 
-and the *inverse diagnostic* rule
-
-$\boxed{P(nature\ |\ test) = P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z^+_n: a^{n-1} = 1\ (mod\  n)\right) < 1\ }.$
-"
-
-# ╔═╡ 6bf2767d-5822-478e-83d5-6e196435aadd
-md"
-This is compatible with the following 
-
-###### *Confusion matrix*:
-
-$\begin{array}{l|cc|c}
-Test \text{ \\ } Nature  & prime   & composite & sum     \\
-\hline
-FermatTest = prime       &   TP    &    FP     & TP + FP \\
-FermatTest = composite   & FN = 0  &    TN     &   TN    \\
-\hline
-sum                      &   TP    &  FP + TN  &   N     \\
-\end{array}$
-
-###### *Causal* direction
-
-$P(FTest=prime|Nature=prime) = \frac{TP}{TP+0} = 1\;;\text{ perfect sensivity, recall}$
-$P(FTest=composite|Nature=prime) = \frac{0}{TP+0} = 0\;;\text{ perfect sensivity}$
-$P(FTest=prime|Nature=composite) = \frac{FP}{FP+TN} < 1\;;\text{ Carmichael numbers }$
-$P(FTest=composite|Nature=composite) = \frac{TN}{FP+TN} < 1$
-
-###### *Diagnostic* direction
-
-$P(Nature=prime|FTest=prime) = \frac{TP}{TP+FP} < 1\;;\text{ precision }$
-$P(Nature=composite|FTest=prime) = \frac{TP}{TP+FP} < 1\;;\text{ precision, Carmichael }$
-$P(Nature=prime|FTest=composite) = \frac{0}{TN} = 0$
-$P(Nature=composite|FTest=composite) = \frac{TN}{TN} = 1.$
-
-with:
-- TP = frequency of *true positives*
-- FP = frequency of *false positives*
-- TN = frequency of *true negatives*
-- FN = frequency of *false negatives*
 "
 
 # ╔═╡ 84499038-4ed6-46fc-a6d1-70a5964c3f3e
@@ -483,6 +588,7 @@ function expmod(base::Signed, exp::FloatOrSigned, n::Signed)
 	exp == 0    ? 1 :
 	iseven(exp) ? expmod(base, exp / 2, n)^2 % n :
 		   base * expmod(base, exp - 1, n) % n
+	#---------------------------------------------------------
 end # function expmod
 
 # ╔═╡ bff175b8-7637-40ae-84a5-3047a5c71d30
@@ -528,7 +634,7 @@ expmod(7, 560, 561), powermod(7, 560, 561)
 md"
 ---
 ###### 3.3.2 *Fermat Test* Function $fermatTest$
-*The Fermat test is performed by choosing at random a number a between 1 and n - 1 inclusive and checking whether the remainder modulo n of the nth power of a is equal to a. (SICP, 1996; 2016, p.68) 
+*The Fermat test is performed by choosing at random a number a between 1 and n - 1 inclusive and checking whether the remainder modulo n of the nth power of a is equal to a.* (SICP, 1996; 2016, p.68) 
 "
 
 # ╔═╡ e57b3eb9-a394-4253-8f23-76ff51bc1998
@@ -536,13 +642,15 @@ histogram([rand(1:10) for i in 1:1E4], bins=1:11, size=(800, 250))
 
 # ╔═╡ 7079c8a5-af5b-4083-b494-aaaf0ed1336a
 # idiomatic Julia-code with 'rand'
-function fermatTest1(n::Signed)::Bool 
+function fermatTest1(p::Signed)
 	#-----------------------------------------------------------------------------
-	tryIt(a) = expmod(a, n, n) == mod(a, n)     # long form as in theorem
+	# long form as in theorem
+	tryIt(a) = expmod(a, p, p) == mod(a, p)
 	#-----------------------------------------------------------------------------
-	n <= 1    ? false :
-    n <= 3    ? true  :
-    iseven(n) ? false : tryIt(rand(1:n-1))      # 1 < rand < (n-1)
+	p <= 1    ? false :
+    p <= 3    ? true  :
+    iseven(p) ? false : tryIt(rand(1:p-1))      # 1 < rand < (p-1)
+	#-----------------------------------------------------------------------------
 end # fermat_test1
 
 # ╔═╡ ad498f1a-1dd5-4429-899a-0bab0ea734d0
@@ -557,10 +665,54 @@ fermatTest1(4), fermatTest1(6), fermatTest1(9)  # ==> (false, false, false) --> 
 # ╔═╡ 6d344ac0-c073-45ae-8d74-532ae7001a92
 fermatTest1(97)                                 # ==> true --> :)
 
+# ╔═╡ 085f0593-3946-49f0-943c-0fd19ed6c1c8
+md"
+---
+###### Some more Candidates 
+"
+
+# ╔═╡ 668bd297-1142-4d55-aab1-6b3b0956a109
+fermatTest1(99989), fermatTest1(99991)          # ==> (true, true) --> :)
+
+# ╔═╡ d3fee73b-0499-4ea9-9e48-2a893da791d2
+fermatTest1(99993)                # ==> (false, 3) --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 23beac8e-da09-434b-8a84-7b4297d19248
+99993 % 3                                       # ==> 0 --> :)
+
+# ╔═╡ e5d4cd1f-0287-4c54-828a-44afc68c2258
+fermatTest1(100003), fermatTest1(100019)        # ==> (true, true) --> :)
+
+# ╔═╡ 6cdb8a9b-8da2-4241-9c84-0486f42b6cfd
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+
+The test $fermatTest1$ *can be* fooled by *pseudo*primes and *will be* fooled by Carmichael numbers.
+"
+
+# ╔═╡ e92f9ccd-4e93-4ed1-babf-f56618b5c6db
+fermatTest1(341)                        # ==> test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ 71b9aca5-46c6-4fed-be1b-7a699ef2fa33
+fermatTest1(645)                        # ==> test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 46ea2dff-bee5-4107-9744-d421b4ddffdd
+fermatTest1(703)                        # ==> test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 12bdb5d0-112b-4e17-96af-088a74035ca8
+fermatTest1(781)                        # ==> test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 578f075e-79ac-4587-8e6f-1987c38509ff
+fermatTest1(793)                        # ==> test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 63f387b9-c95a-4df1-9f07-52df5c95af0f
+fermatTest1(891)                        # ==> test not fooled: 3 * 330 = 891 --> :)
+
 # ╔═╡ f6bf4f1a-c764-4d8f-b039-de7bab2e6672
 md"
 ---
-###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number) (= [Fermat *pseudo*primes](https://en.wikipedia.org/wiki/Fermat_pseudoprime))
+###### [Carmichael numbers](https://en.wikipedia.org/wiki/Carmichael_number)
 A *Carmichael number* will *usually* fool *Fermat primality test*. Even $fermatTest1$ is fooled for the first 16 Carmichael numbers.
 "
 
@@ -604,6 +756,26 @@ md"
 fermatTest1(52633), fermatTest1(62745), fermatTest1(63973), fermatTest1(75361)
 # ==> (true, true, true, true) --> :(  fermatTest1 is fooled !
 
+# ╔═╡ 1b641f7e-3a15-414e-83bc-ab6c6d924a25
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ a2076855-30a3-46c5-9e70-7c50936a5a7d
+fermatTest1(lCn20260412)                         # ==> false --> :)
+
+# ╔═╡ bfd5c9ea-97b9-4c2f-802e-2936217336a3
+@time fermatTest1(lCn20260412)                   # ==> 0.000004 seconds
+
+# ╔═╡ 55db5ca6-e9bd-4ea6-8fba-2b83530db830
+factor(lCn20260412)                              # factorization
+
+# ╔═╡ 23d7c452-e914-4b91-85d9-c6223d52ae4d
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73    # ==> 5394826801 --> :)
+
 # ╔═╡ c9403479-b7e2-4391-a058-541501434de0
 md"
 ---
@@ -630,11 +802,47 @@ fastPrime1(4, 10), fastPrime1(6, 100), fastPrime1(9, 1000) # ==> (false, ...) --
 # ╔═╡ 13d75f8a-edc4-4042-8473-7eb24764b404
 fastPrime1(7, 10), fastPrime1(11, 10), fastPrime1(97, 10)  # ==> (true, ...) --> :)  
 
-# ╔═╡ 4ca1868f-c694-47fe-be38-6f1899c8e902
-fastPrime1(99989,10),fastPrime1(99991,10),fastPrime1(100003,10)# ==>(true,...)--> :) 
+# ╔═╡ a2adb615-bf51-43b8-813f-3413eab1a751
+md"
+---
+###### Some more Candidates 
+"
 
-# ╔═╡ 2275dc7a-43d9-47aa-a5ab-e1b53a8c7df2
-fastPrime1(99993, 10)                            # ==> false --> :); 99993 = 3*33331
+# ╔═╡ f73af81d-86e7-41d6-a443-af4f43d6ca42
+fastPrime1(99989, 10), fastPrime1(99991, 10)          # ==> (true, true) --> :)
+
+# ╔═╡ b3cc4a14-7f37-469d-8831-c4e4fc0230ab
+fastPrime1(99993, 10)                  # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 2a6c107a-0235-4acc-ad5f-8f36b78121fb
+99993 % 3                                             # ==> 0 --> :)
+
+# ╔═╡ 926d0083-ae4d-4d3e-a0f6-736784089347
+fastPrime1(100003, 10), fastPrime1(100019, 10)        # ==> (true, true) --> :)
+
+# ╔═╡ 37387e3f-c0a1-4e47-80f0-44a916fee96a
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 9baaba22-faf3-4414-bd89-96a0bffe2f89
+fastPrime1(341, 10)                # ==> fermat test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ f149bb40-9af5-44bd-bfe5-08b4ac5aaffd
+fastPrime1(645, 10)                # ==> fermat test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ acca7371-18d7-435e-889a-8e0ccc955101
+fastPrime1(703, 10)                # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ a3107bd3-7e94-41d9-9bfe-ef96fdb1d826
+fastPrime1(781, 10)                # ==> fermat test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 80b99bc5-403c-48fb-986a-ea0c7299ac55
+fastPrime1(793, 10)                # ==> fermat test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 23f3d1d2-dc8e-4468-b35b-522f615b9a2f
+fastPrime1(891, 10)                # ==> fermat test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 5758c0ea-40db-42ec-ac3d-97d552a74fda
 md"
@@ -679,10 +887,30 @@ md"
 # ╔═╡ 43e48ffa-ff3a-446e-b055-cd65c0ca9c87
 fastPrime1(52633, 100), fastPrime1(62745, 100), fastPrime1(63973, 100), fastPrime1(75361, 100) # ==> (true, true, true, true) --> :(  fastPrime1 is fooled !
 
+# ╔═╡ 8a8a08ea-98e8-4ba9-84b2-6bc89016f631
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ 9567d974-695f-40b5-8626-79678b038abc
+fastPrime1(lCn20260412, 10)                         # ==> false --> :)
+
+# ╔═╡ 7140f4fd-110c-46ee-b637-86a3398ffbfe
+@time fastPrime1(lCn20260412, 10)                   # ==> 0.000005 seconds
+
+# ╔═╡ a3500b7a-c2b7-4e72-aae9-3b679221c2b0
+factor(lCn20260412)                                 # factorization
+
+# ╔═╡ 4abe2818-a393-41c8-84e5-459d9d31a317
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73       # ==> 5394826801 --> :)
+
 # ╔═╡ f3e9ad78-79f2-4aeb-8113-c8f50d05e68e
 md"
 ---
-###### 3.4 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem) (short version, e.g. Cormen et al., 2022, p.932)
+###### 3.4 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
 
 If *basis* $a$ and *test candidate* $p$ are *coprime* then $gcd(a, p)==1$. In this case we can divide both sides of the equivalence 
 
@@ -690,23 +918,29 @@ $a^p\ (\bmod p) \equiv a\ (\bmod p)$
 
 by $a\ (\bmod p)$. Now, we get:
 
-$a^{p-1}\ (\bmod p) \equiv a^{1-1}\ (\bmod p) = a^0\ (\bmod p) = 1\ (\bmod p) = 1.$
+$a^{p-1}\ (\bmod p) \equiv a^{1-1}\ (\bmod p) = a^0\ (\bmod p) = 1\ (\bmod p).$
 
 So:
 
-$a^{p-1}\ (\bmod p) = 1.$
+$a^{p-1} \ (\bmod p) \equiv 1 \ (\bmod p)$
 
-We can include the condition $gcd(p, a) = 1$ as a precondition in *Fermat*'s test. If we *know* that $isprime(p)$ is *true* this check is redundant. In other cases we can use it as a *quick-check*. If $gcd(p, a) > 1$ then we know that $isprime(p)$ is *false* and $p$ is *composite*. Otherwise we are *uncertain* whether $p$ is *prime* or *pseudoprime* (=*Carmichael*) and we have to go on with testing.
+or short
+
+$a^{p-1} \equiv 1 \ (\bmod p).$
+
+We can include the condition $gcd(p, a) = 1$ as a precondition in *Fermat*'s test. If we *know* that $isprime(p)$ is *true* this check is redundant. In other cases we can use it as a *quick-check*. If $gcd(p, a) > 1$ then we know that $isprime(p)$ is *false* and $p$ is *composite*.
 
 Now we can write the *short* version of *Fermat's Little Theorem* as:
 
-$\boxed{P(test\ |\ nature) = 1}$
-$\boxed{= P\left(\forall a | a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\;|\;isprime(n)\right) = 1\ }$
+$\boxed{P(FermatTest=isprime\ |\ GroundTruth=isprime) = 1}$
+$\boxed{= P\left(\forall a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\;|\;isprime(n)\right) = 1\ }$
 
 and the *inverse diagnostic* rule
 
-$\boxed{P(nature\ |\ test) < 1\ }$
-$\boxed{= P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\right) < 1\ }.$
+$\boxed{P(GroundTruth=isprime\ |\ FermatTest=isprime) < 1\ }$
+$\boxed{= P\left(isprime(n) \;|\; \forall a \in \mathbb Z^+_n: (gcd(p, a) = 1) \land (a^{n-1} = 1\ (mod\  n))\right) < 1\ },$
+
+where: $\mathbb Z^+_n ={1,2,...,n}.$
 
 "
 
@@ -714,7 +948,7 @@ $\boxed{= P\left(isprime(n) \;|\; \forall a | a \in \mathbb Z^+_n: (gcd(p, a) = 
 md"
 ---
 ###### 3.4.1 *Fermat Test* Function $fermatTest2$
-*The Fermat test is performed by choosing at random a number a between 1 and n - 1 inclusive and checking whether the remainder modulo n of the nth power of a is equal to a. (SICP, 1996; 2016, p.68) 
+*The Fermat test is performed by choosing at random a number a between 1 and n - 1 inclusive and checking whether the remainder modulo n of the nth power of a is equal to a.* (SICP, 1996; 2016, p.68) 
 "
 
 # ╔═╡ 88f02453-317c-4162-bb18-764715015a0b
@@ -726,6 +960,7 @@ function fermatTest2(n::Signed)::Bool
 	n <= 1    ? false :
     n <= 3    ? true  :
     iseven(n) ? false : tryIt(rand(1:n-1))
+	#--------------------------------------------------------------------
 end # fermatTest2
 
 # ╔═╡ 640bd295-5df7-438c-bd70-b6e8dd6824da
@@ -739,6 +974,48 @@ fermatTest2(4), fermatTest2(6), fermatTest2(9)  # ==> (false, false, false) --> 
 
 # ╔═╡ cc349f60-d9bb-450a-9873-677f06eb5196
 fermatTest2(97)                                 # ==> true --> :)
+
+# ╔═╡ d6aaf12d-d652-49b6-9100-7682ce0d4905
+md"
+---
+###### Some more Candidates 
+"
+
+# ╔═╡ eb48d116-d685-4f3c-b3ae-63a02e619268
+fermatTest2(99989), fermatTest2(99991)          # ==> (true, true) --> :)
+
+# ╔═╡ 5dac500c-c35e-4574-8b43-12ac01857cf9
+fermatTest2(99993)                  # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ a385895a-d192-4c9c-9d69-357f67c01060
+99993 % 3                                             # ==> 0 --> :)
+
+# ╔═╡ 7791e9cd-d31d-4d4f-b844-a0bf09fd71a1
+fermatTest2(100003), fermatTest2(100019)        # ==> (true, true) --> :)
+
+# ╔═╡ 612b4388-3f75-4dc5-a02f-f6b423fe7c73
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 9c87c505-4385-448e-9eb2-280409a401fb
+fermatTest2(341)                  # ==> fermat test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ a4bf1444-f550-4af1-8140-96a5d51947fb
+fermatTest2(645)                  # ==> fermat test not fooled: 3 * 215 = 645 --> :) 
+
+# ╔═╡ 8f2f878d-13e5-4b1c-a024-988dd487d5e0
+fermatTest2(703)                  # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 7adbe3dd-e148-44d6-9ad6-ed9b30ddd4a5
+fermatTest2(781)                  # ==> fermat test not fooled: 11 * 71 = 781 --> :) 
+
+# ╔═╡ 266c31ea-3564-404f-9650-144534e154ea
+fermatTest2(793)                  # ==> fermat test not fooled: 13 * 61 = 793 --> :) 
+
+# ╔═╡ 9a74932d-68cb-4516-afc1-9ddda32e46d2
+fermatTest2(891)                  # ==> fermat test not fooled: 3 * 330 = 891 --> :) 
 
 # ╔═╡ 3e80309a-16a4-4444-8a63-d5c70f7751e8
 md"
@@ -787,6 +1064,26 @@ md"
 fermatTest2(52633), fermatTest2(62745), fermatTest2(63973), fermatTest2(75361)
 # ==> (true, true, true, true) --> :(  fermatTest1 is fooled !
 
+# ╔═╡ 5a13d7b6-d26e-493f-81ea-93cc80720cad
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ 2975f152-a29d-436d-9961-b7b952681bbd
+fermatTest2(lCn20260412)                            # ==> false --> :)
+
+# ╔═╡ 2d4fa668-67dc-465f-8b5e-4f6269440bb4
+@time fermatTest2(lCn20260412)                      # ==> 0.000005 seconds
+
+# ╔═╡ d97cfa72-88b4-441e-9e5e-81beabdcf51b
+factor(lCn20260412)                                 # factorization
+
+# ╔═╡ 382e4c51-5553-47d7-b129-359d3eb261c0
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73       # ==> 5394826801 --> :)
+
 # ╔═╡ 2b1c1412-3b85-4540-a0da-1dc17163c21f
 md"
 ---
@@ -797,8 +1094,10 @@ md"
 
 # ╔═╡ 5b9a1a53-2081-4778-aab6-a60fcfbef3b6
 function fastPrime2(n::Signed, ntrials::Signed)::Bool
+	#--------------------------------------------------------------------
 	ntrials == 0 ? true :
 	fermatTest2(n) ? fastPrime2(n, ntrials-1) : false
+	#--------------------------------------------------------------------
 end # fastPrime2
 
 # ╔═╡ f12b812f-0434-41e0-8e77-86abf79384e1
@@ -813,11 +1112,47 @@ fastPrime2(4, 10), fastPrime2(6, 100), fastPrime2(9, 1000) # ==> (false, ...) --
 # ╔═╡ 1fa5adfc-591f-4f60-b5a3-2b49a4602d7d
 fastPrime2(7, 10), fastPrime2(11, 10), fastPrime2(97, 10)  # ==> (true, ...) --> :)
 
-# ╔═╡ 09dc9d17-ec20-4d52-84e5-6673c5cbb022
-fastPrime2(99989,10),fastPrime2(99991,10),fastPrime2(100003,10)# ==>(true,...)--> :)
+# ╔═╡ 575d192e-b797-465d-bfb5-afd81b4c5f36
+md"
+---
+###### Some more Candidates 
+"
 
-# ╔═╡ 6f1a3a0b-205b-4a01-9fae-033661507de2
-fastPrime2(99993, 10)                            # ==> false --> :); 99993 = 3*33331
+# ╔═╡ b50f818f-d783-4a7c-9fab-a2a8299fecea
+fastPrime2(99989, 10), fastPrime2(99991, 10)          # ==> (true, true) --> :)
+
+# ╔═╡ 5aef4068-2856-4603-adb2-34b0f53e6f43
+fastPrime2(99993, 10)                  # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 73b9020c-d14e-4ac8-a2f5-91e9f9c229cd
+99993 % 3                                             # ==> 0 --> :)
+
+# ╔═╡ 4d5e166a-f70c-4b77-b18b-b0c0ca50cc08
+fastPrime2(100003, 10), fastPrime2(100019, 10)        # ==> (true, true) --> :)
+
+# ╔═╡ 8df60735-52e0-472f-a48a-34b06ac98208
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 39308ec6-623d-4cc7-84e2-34e447392d92
+fastPrime2(341, 10)               # ==> fermat test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ f049e186-add7-45ee-ade4-3781bfe24f50
+fastPrime2(645, 10)               # ==> fermat test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 1e85f41a-6298-4701-a423-9f8e82fbe399
+fastPrime2(703, 10)               # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ a8b4685b-1e55-4fe6-b199-16d5827cc1e4
+fastPrime2(781, 10)               # ==> fermat test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 2f213ab1-a1b7-45bc-94df-24a19fbaefd9
+fastPrime2(793, 10)               # ==> fermat test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 1ac4d593-1645-4b7e-a826-528c0bde8c84
+fastPrime2(891, 10)               # ==> fermat test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 26e1c1ce-0b5c-4d4c-8da5-61da6c76f3b3
 md"
@@ -844,6 +1179,9 @@ md"
 # ╔═╡ e45309b8-9cf4-4c93-9c9d-73b09a6c4a84
 fastPrime2(2821, 10), fastPrime2(6601, 10), fastPrime2(8911, 10), fastPrime2(10585, 10)  # ==> (false, false, false, false) --> :)
 
+# ╔═╡ d4df315e-a632-40bb-912d-88ad57045e2c
+fastPrime2(2821, 20), fastPrime2(6601, 20), fastPrime2(8911, 20), fastPrime2(10585, 20)  # ==> (false, false, false, false) --> :)
+
 # ╔═╡ a63dbc65-c6c5-46ee-861f-0ca87cf1510c
 md"
 ---
@@ -853,6 +1191,9 @@ md"
 # ╔═╡ 748a19c0-7b68-4963-97cd-0500eff454ab
 fastPrime2(15841, 10), fastPrime2(29341, 10), fastPrime2(41041, 10), fastPrime2(46657, 10)  # ==> (false, false, false, false) --> :)
 
+# ╔═╡ 99d634a7-62ac-4b11-8510-529a48e616e6
+fastPrime2(15841, 20), fastPrime2(29341, 20), fastPrime2(41041, 20), fastPrime2(46657, 20)  # ==> (false, false, false, false) --> :)
+
 # ╔═╡ 1a6a194d-07ec-4c9c-87e1-624f79189c63
 md"
 ---
@@ -861,6 +1202,29 @@ md"
 
 # ╔═╡ 5cce71fb-9277-4e52-a3ef-3c07f09bdbbf
 fastPrime2(52633, 10), fastPrime2(62745, 10), fastPrime2(63973, 10), fastPrime2(75361, 10)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 3ed03ad5-6807-4247-a5b1-271db0b5325f
+fastPrime2(52633, 20), fastPrime2(62745, 20), fastPrime2(63973, 20), fastPrime2(75361, 20)  # ==> (false, false, false, false) --> :)
+
+# ╔═╡ 6d3c54aa-8ddd-4cfe-a3aa-adccd052ceeb
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ a71a645c-8926-43d4-8d9a-f49c7835b974
+fastPrime2(lCn20260412, 10)                            # ==> false --> :)
+
+# ╔═╡ b865cb4a-ce8f-4d6d-8225-5286a21d6d0e
+@time fastPrime2(lCn20260412, 10)                      # ==> 0.000005 seconds
+
+# ╔═╡ 64fe964a-3cb6-45c3-a279-d8f12087716f
+factor(lCn20260412)                                    # factorization
+
+# ╔═╡ 0d26a042-71fa-483e-b76f-ac14b22390d1
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73          # ==> 5394826801 --> :)
 
 # ╔═╡ 295d258d-3633-4c3f-acf4-f277679e4d2a
 md"
@@ -881,22 +1245,28 @@ with localized definitions and function-wide scope of $n$
 
 # ╔═╡ 36ccf5f4-2106-4055-a255-457fe6e88185
 # 'n' in local functions suppressed 
-function isPrime3(n::Signed)::Bool
-	#-----------------------------------------------------------
-	isDivisor(a, b) = rem(b, a) == 0 
-	#-----------------------------------------------------------
-	smallestDivisor()::Signed = findDivisor(2)::Signed
-	#-----------------------------------------------------------
-	function findDivisor(testDivisor::Signed)::Signed  
-	  while !((testDivisor^2 > n) || isDivisor(testDivisor, n))
-			testDivisor += 1
-	  end # while
-	  testDivisor^2 > n ? n : testDivisor
+function isPrime3(n) 
+	#-----------------------------------------------------------------------------
+	remainder = %          # idiomatic Julia '%'
+	#-----------------------------------------------------------------------------
+	isDivisor(a, b)   = remainder(b, a) == 0
+	#-----------------------------------------------------------------------------
+	smallestDivisor() = findDivisor(n, 2)
+	#-----------------------------------------------------------------------------
+	function findDivisor(n, testDivisor)  
+		testDivisor^2 > n ? n : 
+		isDivisor(testDivisor, n) ? testDivisor : 
+			findDivisor(n, testDivisor + 1)
 	end # function findDivisor
-	#-----------------------------------------------------------	
+	#-----------------------------------------------------------------------------
 	n <= 1    ? false :
     n <= 3    ? true  :
-    iseven(n) ? false : n == smallestDivisor()::Signed
+	let smallestDivisorNumber = smallestDivisor()
+		iseven(n) ? (false, smallestDivisorNumber) :      # ==> (false, factor)
+		n == smallestDivisorNumber ? true :               # ==> prime
+		(false, smallestDivisorNumber)                    # ==> (false, factor)
+	end # let
+	#-----------------------------------------------------------------------------
 end # function isPrime3
 
 # ╔═╡ d89933c8-339d-4cc6-9fcf-3b6e0e06ca1e
@@ -914,19 +1284,47 @@ isPrime3(5), isPrime3(7)               # ==> (true, true) --> :); 5, 7 are prime
 # ╔═╡ bcb782ec-e917-45cb-98ae-72bfe7dc2ef2
 isPrime3(97)                           # ==> true --> :); 97 is prime
 
-# ╔═╡ 8c7f29ea-efbe-4c77-9b18-b7aa418f2d87
+# ╔═╡ c9eeec42-685f-418d-9506-721f7a9ed56e
 md"
-###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+---
+###### Some more Candidates 
 "
 
-# ╔═╡ 692dc034-acad-4ceb-a0f4-94fdfe1d4bd1
+# ╔═╡ 22d70e3c-444e-4392-a750-da54a40defd4
 isPrime3(99989), isPrime3(99991)       # ==> (true, true) --> :)
 
-# ╔═╡ bac3126d-6795-4adf-a952-aecefc85431c
-isPrime3(99993)                        # ==> false --> :); because 3 * 33331 = 99993
+# ╔═╡ 182b4e66-72f1-4a78-a21d-ce99f657bea6
+isPrime3(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
 
-# ╔═╡ 3d2befc7-8d5c-48ff-abef-76255773eb23
+# ╔═╡ ec818ecf-4e75-4ffc-9a6f-2798c3c81702
+99993 % 3                              # ==> 0 --> :)
+
+# ╔═╡ 62493746-ed86-487b-a1e8-70911021a0d5
 isPrime3(100003), isPrime3(100019)     # ==> (true, true) --> :)
+
+# ╔═╡ 0c7e679e-2ca2-4d2f-8ab0-f8997f816d16
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 4ef4ba41-1ca5-4560-aa35-02c899c35208
+isPrime3(341)                     # ==> fermat test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ fb7180d5-b887-447d-8115-7cb0ef5ab8dd
+isPrime3(645)                     # ==> fermat test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ d7a2be33-4d5f-4e79-a0f2-6e0295a5a40e
+isPrime3(703)                     # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 1470e907-b86b-4332-a472-29666264873c
+isPrime3(781)                     # ==> fermat test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ ed1cb874-b9da-4c59-b8eb-9b639df85763
+isPrime3(793)                     # ==> fermat test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 693f138c-c5e1-4fa1-90d3-3448cfaac324
+isPrime3(891)                     # ==> fermat test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 2cc49441-ba71-40a7-8818-f248a728eaae
 md"
@@ -942,7 +1340,8 @@ md"
 "
 
 # ╔═╡ a09c6e60-0424-4def-9e0d-98d503f38740
-isPrime3(561),isPrime3(1105),isPrime3(1729),isPrime3(2465)  # ==> (false, ...) --> :)
+isPrime3(561),isPrime3(1105),isPrime3(1729),isPrime3(2465) 
+# ==> ((false, 3), (false, 5), (false, 7), (false, 5)) --> :)
 
 # ╔═╡ 7d1fb02e-e794-492c-ad89-6086af48f16a
 md"
@@ -951,7 +1350,8 @@ md"
 "
 
 # ╔═╡ 11f5553a-f147-4e7b-9094-9158318eb73e
-isPrime3(2821),isPrime3(6601),isPrime3(8911),isPrime3(10585) # ==> (false,...) --> :)
+isPrime3(2821),isPrime3(6601),isPrime3(8911),isPrime3(10585) 
+# ==> ((false, 7), (false, 7), (false, 7), (false, 5)) --> :)
 
 # ╔═╡ eea001a3-c66a-4fd1-b459-069b09d661a7
 md"
@@ -960,7 +1360,8 @@ md"
 "
 
 # ╔═╡ 098880c3-db08-4056-a5eb-cfff22121034
-isPrime3(15841),isPrime3(29341),isPrime3(41041),isPrime3(46657)# ==>(false,...)--> :)
+isPrime3(15841),isPrime3(29341),isPrime3(41041),isPrime3(46657)
+# ==> ((false, 7), (false, 13), (false, 7), (false, 13)) --> :)
 
 # ╔═╡ 377051b7-8219-4775-9f2e-46d394fce3a1
 md"
@@ -969,7 +1370,28 @@ md"
 "
 
 # ╔═╡ b0e005c1-c468-45dd-b648-1b271f44cf34
-isPrime3(52633),isPrime3(62745),isPrime3(63973),isPrime3(75361)# ==>(false,...)--> :)
+isPrime3(52633),isPrime3(62745),isPrime3(63973),isPrime3(75361)
+# ==> ((false, 7), (false, 3), (false, 7), (false, 11)) --> :)
+
+# ╔═╡ c36f4d52-3b35-4006-ab0c-467b82edab74
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ b2daf4d4-b0c7-45fb-89f3-1800da1b185c
+isPrime3(lCn20260412)                                  # ==> (false, 7) --> :)
+
+# ╔═╡ 908ddd15-59e6-4f42-8622-5a11a85839c8
+@time isPrime3(lCn20260412)                            # ==> 0.000010 seconds
+
+# ╔═╡ d9dd76fb-6ccd-4422-ac68-37418f01009e
+factor(lCn20260412)                                    # factorization
+
+# ╔═╡ ab3c2823-22db-48f8-9054-fb3f002dba36
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73          # ==> 5394826801 --> :)
 
 # ╔═╡ ee5289aa-835d-4346-9294-b3c38f9dcd1c
 md"
@@ -996,10 +1418,10 @@ end # let
 
 # ╔═╡ 2beafb91-5227-45eb-bb09-138128713268
 # function-wide scope of 'n';  suppressed in local functions
-function isPrime4(n::Signed)::Bool
-	#------------------------------------------------------
+function isPrime4(n::Signed)
+	#-----------------------------------------------------------------------------
 	isDivisor(a::Signed, b::Signed)::Bool = rem(b, a) == 0 
-	#------------------------------------------------------
+	#-----------------------------------------------------------------------------
 	function smallestDivisor()::Signed
 		testDivisor = 2
 		for i = 2:round(Int,√n)
@@ -1008,10 +1430,15 @@ function isPrime4(n::Signed)::Bool
 		end # for
 		isDivisor(testDivisor, n) ? testDivisor : n
 	end # function smallestDivisor
-	#------------------------------------------------------
+	#-----------------------------------------------------------------------------
 	n <= 1    ? false :
     n <= 3    ? true  :
-    iseven(n) ? false : n == smallestDivisor() 
+	let smallestDivisorNumber = smallestDivisor()
+		iseven(n) ? (false, smallestDivisorNumber) :      # ==> (false, factor)
+		n == smallestDivisorNumber ? true :               # ==> prime
+		(false, smallestDivisorNumber)                    # ==> (false, factor)
+	end # let
+	#-----------------------------------------------------------------------------
 end # function isPrime4
 
 # ╔═╡ 137659d5-fc65-44a4-8c81-2a6ce581d039
@@ -1021,7 +1448,7 @@ isPrime4(1)                            # ==> false --> :)
 isPrime4(2), isPrime4(3), isPrime4(5)  # ==> (true, true, true) --> :); primes
 
 # ╔═╡ da7d7a47-91c0-4869-9131-9a14d58112dc
-isPrime4(4)                            # ==> false --> :)
+isPrime4(4)                            # ==> (false, 2) --> :)
 
 # ╔═╡ d983c8b3-9dd7-496a-a545-20fc0385f402
 isPrime4(5), isPrime4(7)               # ==> (true, true) --> :); 5, 7 are prime
@@ -1029,19 +1456,47 @@ isPrime4(5), isPrime4(7)               # ==> (true, true) --> :); 5, 7 are prime
 # ╔═╡ 92ea12cd-a793-4282-9038-2c5dd0d271e4
 isPrime4(97)                           # ==> true --> :); 97 is prime
 
-# ╔═╡ c42fda32-28a1-4c00-b00d-0976e2b108a1
+# ╔═╡ d9a7d1f7-ad99-4f1f-8ce4-890a845b2393
 md"
-###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+---
+###### Some more Candidates 
 "
 
-# ╔═╡ 99c0005f-6bbb-4501-aa64-ccfce7f33ebb
+# ╔═╡ 11273c1f-5fb9-4bdd-afc7-117ff2fc2392
 isPrime4(99989), isPrime4(99991)       # ==> (true, true) --> :)
 
-# ╔═╡ fff5f94e-9404-42c1-b151-b226efa6f01b
-isPrime4(99993)                        # ==> false --> :); because 3 * 33331 = 99993
+# ╔═╡ 2cbcb3f6-a88a-467c-a247-4a60de40eb6a
+isPrime4(99993)                   # ==> (false, 3) --> :); because 3 * 33331 = 99993
 
-# ╔═╡ 39990bee-1e20-4304-b2fa-ed010d6cc463
+# ╔═╡ 2dfc436e-8db4-46b4-a838-05b67ebfca84
+99993 % 3                              # ==> 0 --> :)
+
+# ╔═╡ f8446038-1578-40fc-b9b6-a3f4dbcaef1c
 isPrime4(100003), isPrime4(100019)     # ==> (true, true) --> :)
+
+# ╔═╡ cc5f1a8a-6695-4933-82f4-61aa297d1c7f
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 0211dc8d-db38-4c87-b973-1cf0e72281ab
+isPrime4(341)                     # ==> fermat test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ 195381a0-1436-4aca-a585-7118f17c168f
+isPrime4(645)                     # ==> fermat test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 9925d8da-2e7b-44de-b391-c255cf046920
+isPrime4(703)                     # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 9020c9f0-da46-43d5-81e5-786b1bd8ec55
+isPrime4(781)                     # ==> fermat test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 542eda83-9fa9-461f-b9a5-62792d124897
+isPrime4(793)                     # ==> fermat test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ ed270d8d-2c55-44df-ac6b-303eed52034a
+isPrime4(891)                     # ==> fermat test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 61d83c83-d35d-42e3-bab0-fedb2b25939a
 md"
@@ -1057,7 +1512,11 @@ md"
 "
 
 # ╔═╡ 9d9b5310-55c9-477b-8dac-885cfaa20160
-isPrime4(561),isPrime4(1105),isPrime4(1729),isPrime4(2465)  # ==> (false, ...) --> :)
+isPrime4(561),isPrime4(1105),isPrime4(1729),isPrime4(2465)  
+# ==> ((false, 3), (false, 5), (false, 7), (false, 5)) --> :)
+
+# ╔═╡ 5010c614-135f-4cc4-89c0-b197bf2bc667
+561 % 3, 1105 % 5, 1729 % 7, 2465 % 5              # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 1b3fc127-1373-4da8-a229-295db0cf9ed9
 md"
@@ -1066,7 +1525,11 @@ md"
 "
 
 # ╔═╡ 3de4a9da-9bd7-4027-91f7-d557b3d2248c
-isPrime4(2821),isPrime4(6601),isPrime4(8911),isPrime4(10585) # ==> (false,...) --> :)
+isPrime4(2821),isPrime4(6601),isPrime4(8911),isPrime4(10585) 
+# ==> ((false, 7), (false, 7), (false, 7), (false, 5)) --> :)
+
+# ╔═╡ 64d74d00-76f6-4b8d-b0b0-bb8c86cda9f2
+2821 % 7, 6601 % 7, 8911 % 7, 10585 % 5              # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 352f910c-b4e2-4002-b0b4-391284b4a0c0
 md"
@@ -1075,7 +1538,11 @@ md"
 "
 
 # ╔═╡ 92b138e6-c445-403d-a594-d698afafd95d
-isPrime4(15841),isPrime4(29341),isPrime4(41041),isPrime4(46657)# ==>(false,...)--> :)
+isPrime4(15841),isPrime4(29341),isPrime4(41041),isPrime4(46657)
+# ==> ((false, 7), (false, 13), (false, 7), (false, 13)) --> :)
+
+# ╔═╡ bc5fd032-081b-4a98-a1ff-e1135bd1a03a
+15841 % 7, 29341 % 13, 41041 % 7, 46657 % 13         # ==> (0, 0, 0, 0) --> :)
 
 # ╔═╡ 6eed69c7-b26c-4d00-b3a7-71762196b1fd
 md"
@@ -1084,7 +1551,31 @@ md"
 "
 
 # ╔═╡ f2e24bcc-cdbb-4f7d-bae2-78ac01742e7d
-isPrime4(52633),isPrime4(62745),isPrime4(63973),isPrime4(75361)# ==>(false,...)--> :)
+isPrime4(52633),isPrime4(62745),isPrime4(63973),isPrime4(75361)
+# ==> ((false, 7), (false, 3), (false, 7), (false, 11)) --> :)
+
+# ╔═╡ 0b732ca0-a6d0-4fd6-bf8c-2acc41465063
+52633 % 7, 62745 % 3, 63973 % 7, 75361 % 11         # ==> (0, 0, 0, 0) --> :)
+
+# ╔═╡ 7257e672-fe20-44d5-ae38-4ed8d6cb38bb
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ 6db5d2c5-9663-4dd8-aa97-262ac26f72bd
+isPrime4(lCn20260412)                                  # ==> (false, 7) --> :)
+
+# ╔═╡ e74bf0e1-1e5b-417f-b03b-d4fb5453830c
+@time isPrime4(lCn20260412)                            # ==> 0.000010 seconds
+
+# ╔═╡ aef44860-b41c-40d5-bbb7-81d99e61b0a7
+factor(lCn20260412)                                    # factorization
+
+# ╔═╡ 49971aa3-e542-4998-aa56-164408804c38
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73          # ==> 5394826801 --> :)
 
 # ╔═╡ b06561f2-546b-44a7-a4a3-43056d1019e4
 md"
@@ -1093,12 +1584,13 @@ md"
 "
 
 # ╔═╡ b1601460-c2d3-492a-85cc-c3cd08a37546
-function fastPrime3(n::Integer, times::Integer)::Bool
-	#-------------------------------------------------
-	while (times != 0) && fermatTest2(n)
-		times -= 1
+function fastPrime3(n::Integer, ntrials::Integer)::Bool
+	#-----------------------------------------------------------------------------
+	while (ntrials != 0) && fermatTest2(n)
+		ntrials -= 1
 	end
-	times > 0 ? false : true
+	ntrials > 0 ? false : true
+	#-----------------------------------------------------------------------------
 end # function fastPrime3
 
 # ╔═╡ a62db319-51ec-435b-ab6c-6af2e668a244
@@ -1113,11 +1605,47 @@ fastPrime3(4, 10), fastPrime3(6, 100), fastPrime3(9, 1000) # ==> (false, ...) --
 # ╔═╡ 2e52cccf-d79f-4d8e-a7d5-317d6212e184
 fastPrime3(7, 10), fastPrime3(11, 10), fastPrime3(97, 10)  # ==> (true, ...) --> :)
 
-# ╔═╡ 7248f22e-b210-420d-b20f-9a8d4ca48e95
-fastPrime3(99989,10),fastPrime3(99991,10),fastPrime3(100003,10)# ==>(true,...)--> :)
+# ╔═╡ 6a3df586-ef88-418f-a598-dfaf08e45224
+md"
+---
+###### Some more Candidates 
+"
 
-# ╔═╡ 6a9dca77-d335-453d-a256-61203ce39c5a
-fastPrime3(99993, 10)                            # ==> false --> :); 99993 = 3*33331
+# ╔═╡ 0d9161c6-ed02-4eb7-a5aa-56f2e9af747f
+fastPrime3(99989, 10), fastPrime3(99991, 10)          # ==> (true, true) --> :)
+
+# ╔═╡ b5e9e2fe-6005-40c7-bf5e-7670e1c42732
+fastPrime3(99993, 10)                  # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 61bd95e2-d827-41e8-a319-ab473f585d56
+99993 % 3                                             # ==> 0 --> :)
+
+# ╔═╡ d09f865f-04d1-4957-8312-aabdf07e0862
+fastPrime3(100003, 10), fastPrime3(100019, 10)        # ==> (true, true) --> :)
+
+# ╔═╡ 349cd2c7-942b-4622-9059-2a84334fced9
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 3dec9eef-dc37-43c4-b33e-70c93073b439
+fastPrime3(341, 10)               # ==> fermat test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ b58e5150-7e51-49c6-a2b6-f83330d8f073
+fastPrime3(645, 10)               # ==> fermat test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 6dd9afee-47c2-45ed-a2ff-8222684eaa39
+fastPrime3(703, 10)               # ==> fermat test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 9d15e3f6-a02f-430b-a95f-7e601fd38fe0
+fastPrime3(781, 10)               # ==> fermat test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ cf04fb4d-73eb-4c97-b08c-79b2fb965855
+fastPrime3(793, 10)               # ==> fermat test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 5597f412-0c7a-49d9-9379-1e517ab756e8
+fastPrime3(891, 10)               # ==> fermat test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ abc8c6d9-7e26-4983-87ad-225317673ebc
 md"
@@ -1174,6 +1702,26 @@ fastPrime3(52633, 10), fastPrime3(62745, 10), fastPrime3(63973, 10), fastPrime3(
 # ╔═╡ c2d6ac86-03b5-42e4-b968-35be2f7c4b42
 fastPrime3(52633, 20), fastPrime3(62745, 20), fastPrime3(63973, 20), fastPrime3(75361, 20)  # ==> (false, false, false, false) --> :)
 
+# ╔═╡ 965488a6-a074-4d1f-8e4f-7f1181e701eb
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ 0fe93727-f093-48ea-818f-87784d93895a
+fastPrime3(lCn20260412, 10)                                  # ==> (false, 7) --> :)
+
+# ╔═╡ 7604129a-959d-4ec5-846e-45a740cc356a
+@time fastPrime3(lCn20260412, 10)                            # ==> 0.000010 seconds
+
+# ╔═╡ 32cab23b-a24b-4aac-b291-dd5af36ab716
+factor(lCn20260412)                                    # factorization
+
+# ╔═╡ 26b7d839-aea6-42c7-9e20-563d8565f68f
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73          # ==> 5394826801 --> :)
+
 # ╔═╡ ed5171d1-7c87-4f41-ab01-0652fd745249
 md"
 ---
@@ -1197,23 +1745,26 @@ end # for i
 
 # ╔═╡ e878c3e1-21b9-47cd-ae57-6814dbeae2d0
 function witness(j, a, n)          # witness for compositeness
-	#-------------------------------------------------------------------------
+	#-----------------------------------------------------------------------------
 	xi = -1
 	# decompose n - 1 = 2^t * u with isodd(u)
 	u = n - 1
 	t = 0
+	#-----------------------------------------------------------------------------
 	while u % 2 == 0               #  while iseven(u)
 		u ÷= 2
 		t += 1
 	end # while
+	#-----------------------------------------------------------------------------
 	nMin1 = n - 1
 	twotu = 2^t*u
 	# println("j = $j, n = $n, t = $t, u = $u, n-1 = $nMin1, = 2^t*u = $twotu")
 	# isodd(u) now
-	#-------------------------------------------------------------------------
+	#-----------------------------------------------------------------------------
 	# a^u mod n
 	x0 = powermod(a, u, n)   # CRLS, row 2
 	# println("a = $a, u = $u, n = $n, x0 = $x0")
+	#-----------------------------------------------------------------------------
 	for i in 1:t
 		xi = mod(x0^2, n) 
 		# println("xi = $xi")
@@ -1224,11 +1775,13 @@ function witness(j, a, n)          # witness for compositeness
 		end # if
 		x0 = xi
 	end # for i
+	#-----------------------------------------------------------------------------
 	if xi ≠ 1
 		true                       # composite, definitely
 	else
 		false                      # prime or pseudoprime
 	end # if
+	#-----------------------------------------------------------------------------
 end # function witness
 
 # ╔═╡ a3383b40-1779-4a23-aa56-96bd7de3564f
@@ -1248,6 +1801,7 @@ function millerRabin(n, ntrials)   # n > 2 is odd
 	else
 		true                       # almost surely prime or pseudoprime
 	end # if
+	#-----------------------------------------------------------------------------
 end # function millerRabin
 
 # ╔═╡ 8adabfd4-909f-41f6-afb4-5d5b4a03c254
@@ -1259,11 +1813,47 @@ millerRabin(4, 10), millerRabin(6, 100), millerRabin(9, 1000) # ==> (false, ...)
 # ╔═╡ 99550191-f999-4554-814c-1369bd23b6e1
 millerRabin(7, 10), millerRabin(11, 10), millerRabin(97, 10)  # ==> (true, ...) --> :)
 
-# ╔═╡ 86642ccd-f3bd-4fab-b4ae-2b7434bf7126
-millerRabin(99989,10),millerRabin(99991,10),millerRabin(100003,10)# ==>(true,...)--> :)
+# ╔═╡ 433ccb81-b408-49fa-a774-b4297d7a1b49
+md"
+---
+###### Some more Candidates 
+"
 
-# ╔═╡ 38fe5a14-401e-4bb6-8e53-8452d297869f
-millerRabin(99993, 10)                            # ==> false --> :); 99993 = 3*33331
+# ╔═╡ 9636da38-29de-4114-bd12-23e39226444a
+millerRabin(99989, 10), millerRabin(99991, 10)          # ==> (true, true) --> :)
+
+# ╔═╡ 118ffed6-03ab-47de-b1d6-96058b6f2ee5
+millerRabin(99993, 10)                  # ==> false --> :); because 3 * 33331 = 99993
+
+# ╔═╡ 2b482711-c7c8-4414-9eb2-6998efec7e0b
+99993 % 3                                             # ==> 0 --> :)
+
+# ╔═╡ b8c23fba-c32a-4e77-89ce-d0803573304c
+millerRabin(100003, 10), millerRabin(100019, 10)        # ==> (true, true) --> :)
+
+# ╔═╡ 99bb8445-050b-40bd-8a78-cca8086cc146
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ 811414c8-29bd-4e3a-8c1f-8073a9aba575
+millerRabin(341, 10)          # ==> millerRabin test not fooled: 341 = 11 * 31 --> :)
+
+# ╔═╡ ed29fd60-a4b8-4a61-9cf2-4d5812cafcc7
+millerRabin(645, 10)          # ==> millerRabin test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ ff9c9e8a-3460-465a-a834-7ae70c82ee95
+millerRabin(703, 10)          # ==> millerRabin test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 51bbd688-0c3b-4fb5-bb3f-629f451e9429
+millerRabin(781, 10)          # ==> millerRabin test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 8cdc3f73-f132-4e58-8206-67a408299785
+millerRabin(793, 10)          # ==> millerRabin test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 444758f1-f1a1-4546-8d1c-557bd7355797
+millerRabin(891, 10)          # ==> millerRabin test not fooled: 3 * 330 = 891 --> :)
 
 # ╔═╡ 1188ee3b-42e5-4d4b-91ec-c43a1a2d3b72
 md"
@@ -1317,10 +1907,30 @@ millerRabin(52633, 10), millerRabin(62745, 10), millerRabin(63973, 10), millerRa
 # ╔═╡ 5aacb54e-df1c-453a-8df2-4b68086e4083
 millerRabin(52633, 20), millerRabin(62745, 20), millerRabin(63973, 20), millerRabin(75361, 20)  # ==> (false, false, false, false) --> :)
 
+# ╔═╡ c88381f3-bce0-4edf-9242-400af9825429
+md"
+---
+###### Large *known* Carmichael Number (date 2026/04/12)
+
+$lCn20260412 = 5394826801$
+"
+
+# ╔═╡ c4bb5876-fa2c-4fb1-951c-3f94a31eb05e
+millerRabin(lCn20260412, 10)                                  # ==> false --> :)
+
+# ╔═╡ e56ffd9a-d1f0-4157-beed-066d022a35fb
+@time millerRabin(lCn20260412, 10)                            # ==> 0.000010 seconds
+
+# ╔═╡ 8f46d2d6-985c-48ee-8e59-89a24e1c084f
+factor(lCn20260412)                                    # factorization
+
+# ╔═╡ a50836b5-c5fe-4471-bb11-25b62e72af26
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 *73          # ==> 5394826801 --> :)
+
 # ╔═╡ 7817cdb2-6181-43e4-8ac6-023f6ed9480a
 md"
 ---
-###### 4.5 Library Function $isprime(.)$
+###### 4.5 Library Functions $isprime(.), factor(.)$
 "
 
 # ╔═╡ 0a47ac1a-c7d2-4d5b-8a22-3b02759e7923
@@ -1338,19 +1948,71 @@ isprime(5), isprime(7)                # ==> (true, true) --> :); 5, 7 are prime
 # ╔═╡ 04bf8c9d-b2ed-42ee-a791-023caa61d74f
 isprime(97)                           # ==> true --> :); 97 is prime
 
-# ╔═╡ 440bfbb6-64a8-4199-b902-d83bfeaaa255
+# ╔═╡ bd90ef7f-2ead-4e5a-9491-e026492bd2fa
 md"
-###### Sample from the [First 100,008 Primes](https://primes.utm.edu/lists/small/100000.txt)
+---
+###### Some more Candidates 
 "
 
-# ╔═╡ 8628d923-6377-41c6-9793-1c74df51c25a
-isprime(99989), isprime(99991)        # ==> (true, true) --> :)
+# ╔═╡ b51e0714-13e3-4736-9641-a39f69e6a86d
+isprime(99989), isprime(99991)         # ==> (true, true) --> :)
 
-# ╔═╡ d3adc2d9-8ecc-42f5-a7e0-d2a6622590b8
-isprime(99993)                        # ==> false --> :); because 3 * 33331 = 99993
+# ╔═╡ f1b5d4ac-8d12-4b73-b92f-55966c8b05a0
+isprime(99993)                    # ==> (false, 3) --> :); because 3 * 33331 = 99993
 
-# ╔═╡ ce5d879c-727e-451b-9bc6-9b0fcd52db77
-isprime(100003), isprime(100019)      # ==> (true, true) --> :)
+# ╔═╡ 2331e38c-1ffb-45d3-ac69-82a72980ac4a
+factor(99993)                     # ==> (false, 3) --> :); because 3 * 33331 = 99993
+
+# ╔═╡ f56b7126-7bf5-4d89-ac3a-00beb0be2777
+99993 % 3                              # ==> 0 --> :)
+
+# ╔═╡ 86691359-43f9-45b8-a215-8de26aa063fe
+isprime(100003), isprime(100019)       # ==> (true, true) --> :)
+
+# ╔═╡ 12c1e439-d487-4553-8c4c-bb3abbdf581a
+md"
+---
+###### Base-2 [*Pseudoprimes*](https://en.wikipedia.org/wiki/Fermat_pseudoprime) $≤ 1000$ that are not Carmichael Numbers 
+"
+
+# ╔═╡ f35030b6-5748-4ed1-b601-5b2ef20f988a
+isprime(341)                   # ==> isprime test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ 55cec595-3af8-45a0-b1c3-d43613013e56
+factor(341)                    # ==> isprime test not fooled: 11 * 31 = 341 --> :)
+
+# ╔═╡ 63be7278-95ac-45a0-b0df-b7dd9e30b703
+isprime(645)                   # ==> isprime test not fooled: 3 * 215 = 645 --> :)
+
+# ╔═╡ 656fe351-2ef0-451c-9ea1-e00ba476e089
+factor(645)                    # ==> isprime test not fooled: 3 * 5 * 43 = 645 --> :)
+
+# ╔═╡ 5e46ad22-15c2-41f2-9d54-a3a39cd6347a
+isprime(703)                   # ==> isprime test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 3c655465-bef3-4415-bf4e-e874f63933ee
+factor(703)                    # ==> isprime test not fooled: 19 * 37 = 703 --> :)
+
+# ╔═╡ 3630d85c-b0c2-4fad-a483-4f531985c548
+isprime(781)                   # ==> isprime test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 58aa2250-2f82-4e58-8151-2f125ca1b431
+factor(781)                    # ==> isprime test not fooled: 11 * 71 = 781 --> :)
+
+# ╔═╡ 1fee0407-ce20-4921-89fd-df00400603f3
+isprime(793)                   # ==> isprime test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ cf212358-d45e-462d-8403-bf226384239a
+factor(793)                    # ==> isprime test not fooled: 13 * 61 = 793 --> :)
+
+# ╔═╡ 65288b94-e1c7-4b6e-b622-c00fcac3f0f9
+isprime(891)                   # ==> isprime test not fooled: 3 * 330 = 891 --> :)
+
+# ╔═╡ bfe3646d-53c3-44ec-a041-cbb76b9c926a
+factor(891)           # ==> isprime test not fooled: 3 * 3 * 3 * 3 * 11 = 891 --> :)
+
+# ╔═╡ 9565e664-2ad7-4212-aca3-5a22ed2db871
+891 == (3 * 3 * 3 * 3 * 11)            # ==> true --> :)
 
 # ╔═╡ 4d94bfa8-8940-4ebc-8231-704bc2878901
 md"
@@ -1395,50 +2057,700 @@ md"
 # ╔═╡ de2a5678-6322-496b-aa68-3465984cd06b
 isprime(52633),isprime(62745),isprime(63973),isprime(75361)# ==>(false,...)--> :)
 
-# ╔═╡ 0b12d734-da18-4378-910b-f6c8559ab760
+# ╔═╡ 3272ff2b-ff89-4d85-801e-b6f91bdc1236
 md"
 ---
-###### 4.6 Probabilistic Considerations
+###### Large *known* Carmichael Number (date 2026/04/12)
 
-- The *prime distribution* function is $\pi(n)$:
+$lCn20260412 = 5394826801$
+"
 
-$\pi(n) = \sum_{i=1}^n \mathbf{1} \left(isprime(n)\right) \approx n \cdot \frac{1}{\ln n}$
-$\text{ example: }\pi(10) = 4,$
+# ╔═╡ ef32a173-c49e-4109-b5de-b91be1734212
+isprime(lCn20260412)                                  # ==> (false, 7) --> :)
 
-and
-- the *prime density* function is $\pi'(n)$:
+# ╔═╡ 36ebf1fa-d116-47ee-a50b-8fb80386d8d9
+@time isprime(lCn20260412)                            # ==> 0.000010 seconds
 
-$\pi'(n) \approx \frac{d}{dn}\left(\frac{n}{\ln n} \right)\approx \frac{1}{\ln n}.$
+# ╔═╡ 4d244ed8-6acb-4881-8e5a-685229a97c6f
+factor(lCn20260412)                                    # factorization
 
-$\text{ example: }\pi(10^9) = 50.847.534 \text{ (CRLS, 2022, ch. 31.8, p.943) }$
-$\pi(10^9) \approx n \cdot \frac{1}{\ln n} = 48.254.942$
+# ╔═╡ 20102603-7aab-497b-89bc-7de3438b94df
+lCn20260412 == 7 * 13 * 17 * 23 * 31 * 67 * 73         # ==> 5394826801 --> :)
 
-The deviation is 
+# ╔═╡ 4e3ba368-487d-4e3a-932e-6e3d90ab3d61
+md"
+---
+##### 4.6 [Binary Classification](https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers) in the Domain of Primes
 
-$\frac{|50847534-48254942|}{50847534} = 0.051$
+###### 4.6.1 Conditional Probabilities in *Causal* Direction $\mathbb P\{FermatTest\ |\ GroundTruth\}$ (e.g. *Recall*)
+
+In a *standard* binary classifier are *four* conditional probabilities in *causal* direction. In a *Bayesian* context they are all called *likelihoods*. Two bear special names. The *first* is called *TPR (= True Positive Rate)*, *recall* in computer science and *sensivity* in medicine. The *fourth* is called *TNR (=True Negative Rate)* or *specificity* in medicine. 
+
+$(C1)\ TPR := \mathbb P(FermatTest=true\ |\ GroundTruth=prime)\;;\text{(= recall, sensivity)}$
+
+$(C2)\ \mathbb P(FermatTest=false\ |\ GroundTruth=prime)$
+
+$(C1) + (C2) = 1$
+
+$(C3)\ \mathbb P(FermatTest=true\ |\ GroundTruth=composite)$
+
+$(C4)\ TNR := \mathbb P(FermatTest=false\ |\ GroundTruth=composite)\;;\text{(= specificity)}$
+
+$(C3) + (C4) = 1$
+
+Most interesting for us are (C1) and (C3):
+
+- (C1) *TPR* (= *recall*, *sensivity*) of Fermat's test $\mathbb P(FermatTest=true\ |\ GroundTruth=prime)$ is *perfect*. So its value is $=1$.
+
+$\boxed{(C1)\ \mathbb P(FTest=true|GT=prime) = 1\ }$
+
+- Unfortunately probability (C3)
+
+$\boxed{(C3)\ \mathbb P(FTest=true\ |\ GTruth=composite) ≥ 0}$
+
+is only *zero* for *composites* which *don't lie* so are *not* *Carmichael* numbers *nor* *pseudo*primes. So we have to partition the set of *composites* into the three classes *Carmichaels*, *pseudoprimes* and *composites* which are left.
+
+For *Carmichael* numbers this probability (C3.1) is $1$ because they *fool* the *Fermat test* *permanently*:
+
+$\boxed{(C3.1)\ \mathbb P(FTest=true|GT=comp_{ca}) = 1\ }$
+
+There are *composites* (*pseudo*primes) which are *not* Carmichael numbers. They *fool* the Fermat test *ocassionally* for certain bases $a$. *Number-theoretic* considerations argue that the conditional probability (C3.2) is $≤ 1/2$.
+
+$\boxed{(C3.2)\ 0 ≤ \mathbb P(FTest=true|GT=comp_{pp}) ≤ 1/2\ }$
+
+The rest class is for *composites* which are neither *Carmichaels* nor *pseudoprimes*. They *cannot* fool Fermat's test, so the probability (C3.3) is:
+
+$\boxed{(C3.3)\ \mathbb P(FTest=true|GT=comp_{npp}) = 0\ }$
 
 "
 
+# ╔═╡ e5aa29c9-eb05-43df-a037-205cfd04dc32
+md"
+- (C4) *TNR* (= *specifity*) = $\mathbb P(FermatTest=false|comp)$ is *complementary* to (C3) so that
+
+$(C3) + (C4) = (C3) + TNR = 1$
+
+The three conditional probabilities (C4.1)-(C4.3) *of not fooling* Fermat's test are complementary to the probabilities (C3.1)-(C3.3) above:
+
+$\boxed{1 - (C3.3) = (C4.3)\ \mathbb P(FTest=false|GT=comp_{npp}) = 1\ }$
+
+$\boxed{1 - (C3.1) = (C4.1)\ \mathbb P(FTest=false|GT=comp_{ca}) = 0\ }$
+
+$\boxed{1 - (C3.2) = (C4.2)\ 1/2 <\mathbb P(FTest=false|GT=comp_{pp}) ≤ 1\ }$
+
+These considerations demonstrate that we do *not* have a *standard* binary classification problem with a $2 \times 2$ but with a $2 \times 4$-contingency table. This special table has *two* rows for $FTest=\{prime, false\}$ and *four* columns for $GTruth=\{prime, comp_{ca}, comp_{pp}, comp_{npp}\}$.
+"
+
+# ╔═╡ 374eccff-3888-4760-9ce7-09b388beaed0
+md"
+---
+###### 4.6.2 Conditional Probabilities in *Diagnostic* Direction $\mathbb P\{GroundTruth\ |\ FermatTest\}$ (e.g. *Precision*)
+
+In a *standard*, binary classification there are also *four* conditional probabilities in *diagnostic* direction. In a *Bayesian* context they are all called *posteriors* with [*PPV (Positive Predictive Value)*](https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values) and [*NPV (Negative Predictive Value)*](https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values): 
+
+$(D1)\ PPV := \mathbb P(GroundTruth=prime\ |\ FermatTest=true)\;;\text{ precision}$
+
+$(D2)\ \mathbb P(GroundTruth=composite\ |\ FermatTest=true)$
+
+$(D1) + (D2) = 1$
+
+$(D3)\ \mathbb P(GroundTruth=prime\ |\ FermatTest=false)$
+
+$(D4)\ NPV := \mathbb P(GroundTruth=composite\ |\ FermatTest=false)$
+
+$(D3) + (D4) = 1$
+
+For us the most important are (D1) $PPV$ (=*precision*) and (D2) $1-PPV$.
+
+- (D1) *PPV* (= *precision*) is between $1/2$ and $1$ depending on the range of numbers tested (here: $2 ≤ p ≤ 10^9$) and only *one* number of test *applications*. By repeating the test with *random* bases $a$ we can detect at least *pseudo*primes with a high probability.
+
+$\boxed{(D1)\ 1/2 < PPV = \mathbb P(GT=prime|FT=true) \le 1\ }$
+
+$\boxed{(D2)\ 0 < \mathbb P(GT=comp|FT=true) \le 1/2}$
+
+The meaning of these conditional probabilities is that if the *FermatTest* rings *alarm* the probability that it has detected a *prime* is *higher* than for detecting a *composite*. This is a rather weak result. So a simple but crude method to overcome this deficiency is to *repeat* the test with *different random* bases $a$.
+
+- The $NPV$ (= *Negative Predictive Value*) is perfect:
+
+$\boxed{(D4)\ NPV = \mathbb P(GT=comp|FT=false) = 1}.$
+
+- its complement $(D3)\ 1-NPV$ is also consequent:
+
+$\boxed{(D3)\ \mathbb P(GT=prime|FT=false) = 0}.$
+
+"
+
+# ╔═╡ 4e5d8be5-0a19-45ac-bb6a-65986b726d29
+md"
+---
+###### 4.6.3 Joint Frequency Distribution (*JFD*) of *GroundTruth* and *FermatTest*
+The cell entries are explained below.
+
+###### 4.6.3.1 *Symbolic* Table
+$\begin{array}{l|c|c|c|c|c}
+  GTruth &   prime    & compos,    &  compos,      & pure         & sum            \\
+         &            & Carmichael &  pseudo-      & composite    &                \\
+FTest    &            &  michael   &  prime        &              &                \\
+\hline
+FTest    & TP         & FN_{ca}    & FN_{pp}       & FN_{pc}      & N_{FT=true}    \\
+= true   &            &            &               &              &                \\
+\hline
+FTest    & FP         & TN_{ca}    & TN_{pp}       & TN_{pc}      &N_{FT=false}    \\
+= false  &            &            &               &              &                \\
+\hline
+sum      & N_{prime}  & N_{ca}     & N_{pp}        & N_{pc}       & N              \\
+\end{array}$
+"
+
+# ╔═╡ b088346b-ddfe-4589-834a-06ee10009be7
+md"
+---
+###### 4.6.3.2 *Numeric* Table for $n \le 10^9$
+The cell entries are explained below. **Bold** numbers are *empirically valid*, others are *rough estimates*. 
+
+$\begin{array}{l|c|c|c|c|c}
+  GTruth &   prime    & compos,    &  compos,      & pure         & sum            \\
+         &            & Car-       &  pseudo-      & composite    &                \\
+FTest    &            &  michael   &  prime        &              &                \\
+\hline
+FTest    & TP=        & FN_{ca} =  & FN_{pp} =     & FN_{pc} =    & N_{FT=true} =  \\
+= true   &\mathbf{50,847,534}&\mathbf{646}&9\cdot10^6&\mathbf 0   &  6\cdot10^7    \\
+(= prime)&≈5.1\cdot10^7& ≈6\cdot10^2&              &              &                \\
+\hline
+FTest    & FP =       & TN_{ca} =  & TN_{pp} =     & TN_{pc} =    &N_{FT=false} =  \\
+= false  & \mathbf 0  & \mathbf 0  & 4.4\cdot10^8  & 5\cdot10^8   & 9.4\cdot10^8   \\
+(= compo)&            &            &               &              &               \\ 
+\hline
+sum      & N_{prime}= & N_{ca} =   & N_{pp} =      & N_{pc} =     & N_{total} =    \\
+         &\mathbf{50,847,534}&\mathbf{646}&4.5\cdot10^8&5\cdot10^8& 10^9           \\
+         &≈5.1\cdot10^7& ≈6\cdot10^2&              &              &                \\
+\end{array}$
+"
+
+# ╔═╡ 8f1aefd6-0a4a-4d13-909d-e39c1e77de49
+md"
+---
+###### 4.6.4 Explanantions for *JFD* Cell Entries
+
+###### 4.6.4.1 *Frequency* of Primes $\pi(p)=N_{prime}(p)$ and the [*Prime Number Theorem*](https://en.wikipedia.org/wiki/Prime_number_theorem)
+(column 1 in table above)
+
+The *prime frequency distribution* function $\pi(p)$ and its *approximation* $\frac{p}{\ln p}$ (*Prime Number Theorem*) are:
+
+$\pi(p) = \sum_{i=1}^p \mathbf{1} \left(isprime(p)\right) \approx \frac{p}{\ln p}$
+
+with the *indicator* function $\mathbf 1.$
+
+As a small example for $p=10$ we have 4 primes $\pi(10) = 4$ which $2, 3, 5, 7$. For our example $n = 10^9$ we have:
+
+$\pi(10^9) = \mathbf{50,847,534}  \approx p \cdot \frac{1}{\ln p} = \mathbf{48,254,942} \text{ (CRLS, 2022, ch. 31.8, p.943) }$
+
+The relative deviation *error* of $\pi(10^9)$ is 
+
+$\frac{|50847534-48254942|}{50847534} = 0.051\;\text{ or } 5.1\%.$
+
+Because *all* primes can be detected by the *FermatTest* 
+
+$TP = N_{prime}(p) = \mathbf{50,847,534}$ and 
+
+$FP = N_{prime}(p) - TP = \mathbf 0.$
+
+"
+
+# ╔═╡ 3f8be902-3429-4648-b712-0cb734645f13
+const nTotal = 10^9              # n_total = 10^9
+
+# ╔═╡ 19d4f8fa-6f0c-4b67-9124-f8e745f62245
+const nPrimes = 50847534         # total primes below n = 10^9
+
+# ╔═╡ e1603c5d-5591-4196-b1d1-72b872e2d322
+const tp = nPrimes               # true primes
+
+# ╔═╡ 6a2c06eb-1171-4719-a4e8-49c1e3e23178
+const fp = nPrimes - tp          # false primes
+
+# ╔═╡ 4fe505d7-5a16-47fd-8f67-957ef81205be
+md"
+---
+###### 4.6.4.2 *Frequency* of Carmichael Numbers $C(p)=N_{ca}(p)$ and their *Approximation* $p^{0.31}$
+(column 2 of table above)
+
+The [number of *Carmichaels*](https://en.wikipedia.org/wiki/Carmichael_number) below $n = 10^9$ is 
+
+$C(10^9) = N_{ca} = \mathbf{646}$
+
+All Carmichaels lie and fool the *Fermat test* permanently. So 
+
+$FN_{ca} = \mathbf{646}$ and 
+
+$TN_{ca} = 0.$
+
+"
+
+# ╔═╡ 85b7c2cd-a8ac-43a5-b603-95a41dfa95e4
+const n_ca = 646                 # total number of carmichaels below n = 10°9
+
+# ╔═╡ 1d5cb565-b242-493f-9dc6-c7e1a9341985
+const fn_ca = 646                # false negatives
+
+# ╔═╡ 8e47edc8-1ede-4cbe-99d6-c948485d0466
+const tn_ca = n_ca - fn_ca       # true negatives
+
+# ╔═╡ 168f98cf-9e09-43db-a574-7d0b333beaeb
+md"
+---
+###### 4.6.4.3 *Frequency* of (Fermat-)Pseudoprimes $N_{pp}(p)$ 
+(column 3 of table above)
+
+Nearly for *each* composite $p$ there is a base $a$ which *fools* the Fermat test. This is 
+
+$N_{pp} = 4.5 \cdot 10^8$
+
+$N_{npp} = N_{total} - N_{primes} - N_{ca} - N_{pp}$
+
+$N_{npp} = 10^9 - 4.8\cdot10^7 - 6.5 \cdot 10^2 - 4.5 \cdot 10^8 = 5\cdot 10^8$
+
+*FN_{pp}* and *TN_{pp}* are rough estimates, too:
+
+$FN_{pp} = \frac{1}{50}N_{pp}$
+
+$TN_{pp} = N_{pp} - FN_{pp}$
+
+"
+
+# ╔═╡ ba8616e8-b99c-4e35-b5e5-5c3114d6a5cc
+const n_pp = 4.5 * 10^8
+
+# ╔═╡ d8c5bb6b-fecb-43de-be06-dd524a7c8995
+const n_npp = nTotal - nPrimes - n_ca - n_pp       # a rough estimate
+
+# ╔═╡ 76c0c7a3-5ba2-4b82-8d88-f43544cdbd98
+const fn_pp = n_pp / 50                            # a rough estimate
+
+# ╔═╡ 2aeb3d3a-1a17-4094-8fd8-2e27f2748dcc
+const tn_pp = n_pp - fn_pp                         # a rough estimate
+
+# ╔═╡ ba2c3338-da85-40a4-b958-8be45a391cf8
+md"
+---
+###### 4.6.4.4 *Frequency* of *Pure Composites* $N_{npp}(p) = N_{total} - N_{primes} -N_{ca} - N_{pp}$
+(column 4 of table above)
+
+- *(Fermat-)Pseudoprime* is a *composite* $p$ for *some* base $a \ge 2 \text{ and } gcd(a, p) = 1$ for which $a^{p-1} \equiv 1 (mod\ p)$.
+
+- *Composite* (but *not* *(Fermat-)Pseudoprime*) is a *composite* $p$ for *some* base $a \ge 2  \text{ and } gcd(a, p) = 1$ for which $a^{p-1} \not\equiv 1 (mod\ p)$.
+
+- *Pure Composite* is a *composite* $p$ for *all* bases $\{a \ge 2 \land gcd(a, p) = 1\}$  for which $a^{p-1} \not \equiv 1 (mod\ p)$.
+
+where: $gcd(a, p) = 1$ means that $a, p$ are [*coprime*](https://en.wikipedia.org/wiki/Coprime_integers).
+
+Here are some examples for *composites* which are *not* pseudoprimes:
+
+- *n = 4* is *composite* and *not pseudoprime* because $n = 2 \cdot 2$ and because for single *coprime* basis $a = 3$:
+$a^{p-1} \neq 1\ (mod\ p) = 3^3 = 27 \equiv 3 \neq 1\ (mod\ 4)$
+
+- *n = 6* is *composite* and *not pseudoprime* because $n = 2 \cdot 3$ and because  for single *coprime* basis $a = 5$:
+$a^{p-1} \neq 1\ (mod\ p) = 5^5 = 3125 \equiv 5  \neq 1\ (mod\ 6)$
+
+- *n = 8* is *composite* and *not pseudoprime* because $n = 2 \cdot 4$ and because for *coprime* bases $a = 3, 5, 7$:
+$a= 3:a^{p-1} \neq 1\ (mod\ p) = 3^7 = 2187 ≡ 3 \neq 1\ (mod\ 8)$
+$a= 5:a^{p-1} \neq 1\ (mod\ p) = 5^7 = 78125 ≡ 5 \neq 1\ (mod\ 8)$
+$a= 7:a^{p-1} \neq 1\ (mod\ p) = 7^7 = 823543 ≡ 7 \neq 1\ (mod\ 8)$
+
+These *few* examples demonstrate that there are *many* *pure* composites. But generally $N_{npp}(p)$ is *unknown* for $p \le 10^9.$
+
+"
+
+# ╔═╡ 88bbc29f-f422-4d70-8bfd-3da6ab0b11b9
+const fn_npp = 0
+
+# ╔═╡ 57d56625-0973-49f4-b8a7-d12b6368f084
+const tn_npp = n_npp - fn_npp                     # 4.8 * 10^5
+
+# ╔═╡ 113cfb51-5db8-4354-bc05-2ca74ca1610e
+482549.42 ≈ 4.8254942 * 10^5
+
+# ╔═╡ 2ce52946-16f4-4bb6-a545-6ca0944223cb
+md"
+---
+###### 4.6.5 *Numerical* Values of *Likelihoods* $TPR...TNR$ (*causal* direction)
+
+$(C1)\ TPR = \mathbb P(FT=true | GT=prime) = \frac{tp}{N_{primes}} = 1$
+$(C3.1)\ \mathbb P(P(FT=true | GT=comp_{ca}) = \frac{fn_{ca}}{N_{ca}} = 1$
+" 
+
+# ╔═╡ e0abaac7-2b60-4ec0-a34e-c515f848544a
+const tpr = tp/nPrimes                    # (C1) TPR = P(FT=true | GT = prime) = 1
+
+# ╔═╡ eba2334f-41cb-47d3-b779-5392cdc0a9fa
+const p_FTtrue_GTcomp_ca = fn_ca/n_ca     # (C3.1) P(FT=true | GT = comp_ca) = 1
+
+# ╔═╡ ee431940-8d5e-41f7-81c4-eb8bb35d4e1d
+const p_FTtrue_GTcomp_pp = fn_pp/n_pp     # (C3.2) P(FT=true | GT = comp_pp) \le 1/2
+
+# ╔═╡ f39c126d-af0a-4c8d-b3c2-ffc2f599aebb
+const p_FTtrue_GTcomp_npp = fn_npp/n_npp  # (C3.3) P(FT=true | GT = comp_npp) = 0
+
+# ╔═╡ c646d15f-2869-48ff-bc38-25a0cffdcf4c
+const p_FTtrue_GTcomp =                   # (C3) P(FT=false|GT=comp) ≈ 1
+	(tn_ca + tn_pp + tn_npp)/(n_ca + n_pp + n_npp) 
+
+# ╔═╡ ca112b43-22ec-409a-b791-b28a037d0a2f
+const fpr = fp/nPrimes                    # (C2) 1 - TPR = P(FT=false|GT = prime) = 1
+
+# ╔═╡ 0d2c9efa-1949-45af-8161-152685aa1073
+tp + fp == nPrimes                        # check
+
+# ╔═╡ 68000073-654f-4a99-bb3d-44ea33102c8e
+tn_ca/n_ca                                # (C4.1) P(FT=false | GT = comp_ca) = 0
+
+# ╔═╡ 50a50c44-3bd2-44db-934e-6bc715a7f5f6
+tn_pp/n_pp                                # (C4.2) P(FT=false | GT = comp_pp) = .99
+
+# ╔═╡ e6360ad1-b0ec-4041-91f7-caf8b5d0489d
+tn_npp/n_npp                              # (C4.3) P(FT=false | GT = comp_npp) = 1
+
+# ╔═╡ 76505eb2-825d-48b4-909c-bb57a533a4df
+md"
+---
+###### 4.6.3 Derivation of *Posterior* Probabilities
+
+There are *two* alternatives in the derivation of *posteriors*. The *first* method is of plugging in the probabilities of the JPD into the formula for *PPV* and *NPV* to get the *posterior* probabilities. The *second* method is using [*Bayes Theorem*](https://en.wikipedia.org/wiki/Bayes%27_theorem). For this approach we need *priors* and *likelihoods* to derive the *posteriors*. here we prefer the first method.
+
+"
+
+# ╔═╡ e569b6d9-dbae-4530-b748-61b7a0ef98c5
+md"
+###### *PPV (= Positive Predictive Value)* and *NPV (= Negative Predictive Value)*
+Both PPV and NPV are in a *Bayesian* sense *posterior* probabilites. They confirm that the FermatTest applied *only once* is a rather uncertain measurement device even though its *validity* is suspected *higher than* $0.51$.
+
+Also we use here *complement* values which we call *PEV* (Positive *Error* Value) and *NEV* (Negative *Error* Value):
+
+$PPV = \frac{TP}{TP+FN_{ca}+ \ll FN_{pp}+FN_{co}} ≈ 0.85$
+$PEV = 1 - PPV$
+
+$NPV = \frac{TN_{ca}+TN_{pp}+TN_{co}}{TN_{ca}+TN_{pp}+TN_{co}+FP} = 1.00$
+$NEV = 1 - NPV$
+
+When we apply the *FTest* *several* times with different assumed *independently* selected *random* bases $a$ the overall *error* probability gets multiplicatively *smaller* and as a consequence the $PPV$ complementary *greater*:
+
+$PEV(nTrials) = (1-PPV)^{nTrials}$
+$PPV(nTrials) = 1 - PEV(nTrials)$
+"
+
+# ╔═╡ 7d27a702-1d94-47cc-93f6-a0b6af4a3ee0
+ppv(tp, fn_ca, fn_pp, fn_npp) = 
+	tp/(tp + fn_ca + fn_pp + fn_npp)
+
+# ╔═╡ 7fb21993-20b5-46ae-9259-6fcbe4fee6d8
+ppv(tp, fn_ca, fn_pp, fn_npp)                  # ==> PPV = 0.84 --> :)
+
+# ╔═╡ 97483911-cd38-488b-83a3-1e1d2e7f0787
+npv(fp, tn_ca, tn_pp, tn_npp) = 
+	(tn_ca + tn_pp + tn_npp)/(fp + tn_ca + tn_pp + tn_npp)
+
+# ╔═╡ 0d55bd89-2604-4600-9270-da3c5a15de08
+npv(fp, tn_ca, tn_pp, tn_npp)                   # ==> NPV = 1.00 --> :)
+
+# ╔═╡ e5c42d96-697c-4c52-a83e-21435298f9d3
+pev(tp, fn_ca, fn_pp, fn_npp; nTrials=1) = 
+	(1 - ppv(tp, fn_ca, fn_pp, fn_npp))^nTrials # positive error value for nTrials
+
+# ╔═╡ 9b5fd434-01b6-43ed-8306-1303ad382063
+pev(tp, fn_ca, fn_pp, fn_npp; nTrials=1)        # ==> PEV = 1- PPV = 0.16 --> :)
+
+# ╔═╡ 4504e86c-8d6f-40f3-add7-49ebd0a8de08
+function ppvVal(tp, fn_ca, fn_pp, fn_npp; nTrials=1)
+	nTrials == 1 ?
+		ppv(tp, fn_ca, fn_pp, fn_npp) :         # positive predictive value
+		1 - pev(tp, fn_ca, fn_pp, fn_npp; nTrials=nTrials)
+end # function ppvVal
+
+# ╔═╡ 69eff141-4ffc-4690-8688-ef50ba769241
+const npvVal = npv(fp, tn_ca, tn_pp, tn_npp)    # negative predictive value
+
+# ╔═╡ 7ee0a21d-7b7a-4597-9dd5-0b299bba826d
+pev(tp, fn_ca, fn_pp, fn_npp; nTrials=1)        # positive error value for 1 trial
+
+# ╔═╡ cc4ee667-98f9-45a5-b39a-fb02ce1a429b
+ppvVal(tp, fn_ca, fn_pp, fn_npp, nTrials=1) + pev(tp, fn_ca, fn_pp, fn_npp, nTrials=1)                                      # ==> 1.0 --> :) check
+
+# ╔═╡ 13767188-f0f6-4908-a4f4-1a8b4cae504f
+nev = 1 -  npvVal
+
+# ╔═╡ 3d8d5ed1-b1ff-4a95-92e4-7f9c1b0d60f2
+for i in 1:10
+	ppv = ppvVal(tp, fn_ca, fn_pp, fn_npp, nTrials=i)
+	pevVal = pev(tp, fn_ca, fn_pp, fn_npp; nTrials=i)
+	println("nTrials = $i, ppv = $ppv, pev = $pevVal")
+end # for
+
+# ╔═╡ 56a19e81-1f38-4b4d-9e03-db068a23ce95
+md"
+Under the *independence* assumption we need only $5$ trials so that the error rate is below $0.0001$.
+"
+
+# ╔═╡ 0b12d734-da18-4378-910b-f6c8559ab760
+md"
+---
+###### 4.6.4 Frequency, Probability, and Density Distributions and their Approximations
+
+Here we provide arguments for the cell entries of the JFD (table above).
+
+###### 4.6.4.1 *Frequency* of Primes $N_{prime}$ and their *Probability* 
+(sum of column 1 in table above)
+- The *prime frequency distribution* function is $\pi(p)$:
+
+$\pi(p) = \sum_{i=1}^p \mathbf{1} \left(isprime(p)\right) \approx p \cdot \frac{1}{\ln p}$
+
+with the *indicator* function $\mathbf 1.$
+
+$\text{ example: }\pi(10) = 4\;\;\text{ which are: } 2, 3, 5, 7.$
+
+$\text{ example: }\pi(10^9) = 50.847.534 \text{ (CRLS, 2022, ch. 31.8, p.943) }$
+$\pi(10^9) \approx p \cdot \frac{1}{\ln p} = 48.254.942$
+
+The relative *error* deviation is 
+
+$\frac{|50847534-48254942|}{50847534} = 0.051\;\text{ or } 5.1\%$
+
+and
+- the *prime density* function $\pi'(p)$ is by using the *quotient*-rule *approximately*:
+
+$\pi'(p) \approx \left(\frac{p}{\ln p} \right)' = \frac{1 \cdot \ln p - \frac{1}{p} \cdot p}{(\ln p)^2} = \frac{\ln p - 1}{(\ln p)^2} = \frac{1}{\ln p}-\frac{1}{(\ln p)^2} \approx \frac{1}{\ln p}.$
+
+$\text{ example: } \pi'(10) = \frac{4}{10} = 0.4 \approx \frac{1}{\ln 10} = 0.43429448190325176$
+$\text{ example: } \pi'(10^9) = 0.050847534 \approx \frac{1}{\ln 10^9} = 0.04825494243369465.$
+
+The probability that a random number $2 \le p \le 10^9$ is *prime* is approximately 
+
+$P(isprime(p) | 2 ≤ p ≤ 10^9) \approx 0.05$
+
+and
+
+$P(nonprime(p) | 2 ≤ p ≤ 10^9) \approx 1.00 - 0.05 = 0.95$
+
+"
+
+# ╔═╡ 2b307f37-8bb9-440e-8ff1-8b6346eae1dc
+md"
+---
+###### 4.6.4.2 *Frequency* $N_{ca}$ of [*Carmichael* Numbers](https://en.wikipedia.org/wiki/Carmichael_number) and their *Probability* 
+(sum of column 2 in table above)
+
+Here we have a *rough* estimator of the *upper bound* of the number of *Carmichaels*:
+
+$\#\{Carmichaels\} = C(p) \sim p^{1/3}$ and 
+
+$C(10^9) \approx 10^{9^{1/3}} = 10^3$
+
+The *exact* number of Carmichaels is 
+
+$N_{ca} = 646.$
+"
+
+# ╔═╡ 745e56a8-609d-4238-8aec-500777aef766
+md"
+---
+###### 4.6.4.3 *Frequency* $N_{pp}$ of [*Pseudo*primes](https://en.wikipedia.org/wiki/Pseudoprime) and their *Probability* 
+(sum of column 3 in table above)
+
+Here we have a *rough* estimator of the *upper bound* of the number of *pseudo*primes independent of a special basis $a$:
+
+$\#\{pseudoprimes\ for\ basis\ a \le p\} \ll \frac{p}{\ln p}=\frac{10^9}{\ln 10^9} = 48.254.942 \approx 48.3\cdot 10^6$
+"
+
+# ╔═╡ 42ac5b43-5793-4beb-b3b9-7a71ad7d774a
+md"
+---
+###### 4.6.4.4 *Frequency* $N_{co}$ of *pure* Composites and their *Probability*
+(sum of column 4 in table above)
+
+Here we have a *rough* estimator of the *pure* composites:
+
+$N_{co} = \#\{\{2 \le p \le 10^9\} \setminus Carmichaels \setminus Pseudoprimes\}$
+
+$N_{co} \approx 10^9 - 646 - \ll 48\cdot 10^6 \gg 9\cdot 10^8$
+"
+
+# ╔═╡ c9c689e3-00d0-42eb-b50e-c64a708b8882
+md"
+---
+##### 4.7 Probabilistic Considerations
+
+###### 4.7.1 [*Prime-counting Function* π(n)](https://en.wikipedia.org/wiki/Prime-counting_function) and its *Approximations*
+"
+
 # ╔═╡ 0326ea84-be7c-46c6-8bbb-bfb980b4c1c3
-π(n) = sum(isprime(i) for i in 1:n)
+function π(n) 
+	freq = 0
+	for i in 1:n
+		freq += isprime(i) ? 1 : 0
+	end # for i
+	freq
+end # function π
 
 # ╔═╡ 95a66772-3a33-41f9-b483-f1016f0bcfa6
-π(10^1), π(10^2), π(10^3), π(10^4), π(10^9)
+π(10^1), π(10^2), π(10^3), π(10^4)     # ==> (4, 25, 168, 1229) --> :) #(primes)
+
+# ╔═╡ c5b2a982-4f07-4e82-9086-f4a899af1246
+# nPrimes10Exp9 = @time π(10^9)         # 166.160429 seconds (1 allocation: 16 bytes)
+
+# ╔═╡ 95610f6c-faa5-4f93-9a71-bfa87dd08193
+nPrimes10Exp9  = 50847534                         # ==> 50847534 --> :)
+
+# ╔═╡ ac60534f-1cfa-4f37-8e25-bf6f6d725a58
+probPrimes1Upto10Exp9 = nPrimes10Exp9 / 10^9      # ==> 0.050847534 --> :)
+
+# ╔═╡ 2c37642a-c113-471c-b408-2ccc161aad70
+πApprox1(n) = 1.0 / log(n)                        # 1st approx. to density π'(n)
+
+# ╔═╡ 7a691963-e77c-46c4-8ff1-e9b8ea3ab141
+πApprox2(n) = (1.0 / log(n)) - (1.0 / (log(n))^2) # 2nd approx. to density π'(n)
+
+# ╔═╡ 80aa817a-e095-4e6e-abfd-9d3e14eed89c
+md"
+The function $expinti(x::Real)$ computes the *exponential integral* function
+
+$Ei(x) = \int_{infty}^x \frac{e^t}{t}dt$
+
+"
+
+# ╔═╡ 6f19ef6d-ec3c-4107-9db9-56d02eb01836
+li_offset(n) = expinti(log(n))                    # *exponential integral* function
+
+# ╔═╡ 7fffc500-feb7-4be0-b109-91bfa230f085
+md"
+The function $li(n)$ is the *logarithmic integral* and an approximation to $π(n)$
+
+$π(n) ≈ li(n) = \int_2^n \frac{1}{\ln t}dt$
+
+"
+
+# ╔═╡ ade08f18-58b5-491a-9dad-02993d88f15d
+li(n) = li_offset(n) - li_offset(2)
+
+# ╔═╡ 9956df3c-0236-432d-9735-541e59bb0023
+πApprox3(n) = li(n) / n                            # 3rd approx. to density π'(n)
+
+# ╔═╡ e5599443-d812-4279-a4a2-58ab02c8f966
+πApprox1(10), πApprox2(10), πApprox3(10)   
+# ==> (0.434294, 0.434294, 0.512044) --> :)
+
+# ╔═╡ 4d39744f-7f20-4699-b3aa-a6fd3baf6d0d
+πApprox1(10^9), πApprox2(10^9), πApprox3(10^9)     # approxs to density π'(10^9)
+# ==> (0.0482549, 0.0459264, 0.0508492) --> :)
+
+# ╔═╡ e6420757-2486-4e7a-acca-3cc013747370
+let limit     = 10^9
+	stepsize  = limit ÷ 10^5
+	πApprox3s = [πApprox3(i) for i in 2:stepsize:limit]
+	ns        = [i for i in 2:stepsize:limit]
+	plot(ns, πApprox3s, title=L"Approximation\ 3\ for\ Density\ \pi'(n)", titlefontsize=12, label=L"πApprox3(n) = li(n) / n")
+end # let
 
 # ╔═╡ 2bde3064-cb59-426d-8183-2bc58669d876
-πApprox(n) = n/log(n)
+nπApprox1(n) = n * πApprox1(n)                            
+
+# ╔═╡ 1f795df4-7fc5-4515-a8a9-d5793ad39bfb
+nπApprox2(n) = n * πApprox2(n)         
+
+# ╔═╡ 1645060e-59f2-4f81-8b41-ecf2e5432e70
+nπApprox3(n) = li(n)
+
+# ╔═╡ 472dd029-36a2-4aa5-aef1-92166ca39385
+nπApprox1(1000), nπApprox2(1000), nπApprox3(1000) 
+# ==> (144.765, 123.808, 176.564) --> :)
 
 # ╔═╡ d6f48c33-f1ae-4b48-85fe-aa9821b3e79d
-πApprox(10^9)
+nπApprox1(10^9), nπApprox2(10^9), nπApprox3(10^9) 
+# ==> (4.82549e7, 4.59264e7, 5.08492e7) --> :)
+
+# ╔═╡ 86b26b1a-e835-4456-b0ee-6fadbfb0f329
+nPrimes
+
+# ╔═╡ 67c6beb7-776c-48de-aa73-0356ff3360d6
+ abs(nπApprox3(10^9) - nPrimes)/nPrimes   # the 3rd approximation is nearly perfect
+
+# ╔═╡ 5c1c2d87-f30c-4c88-ab6d-0bed3f49f162
+md"
+---
+###### Error percentages
+"
+
+# ╔═╡ fa872d2c-01f3-4d5b-b4fc-468a3d49c8b2
+π(10)
+
+# ╔═╡ fca7dc09-abba-4ae8-91eb-81f8e3f7e37e
+(abs(π(10) - nπApprox1(10))/π(10)) * 100.0         # ==> 8.5736 percent
+
+# ╔═╡ 6b76e39c-fd58-41bd-afb4-d7e57507daab
+(abs(π(10) - nπApprox2(10))/π(10)) * 100.0         # ==> 38.5793 percent
+
+# ╔═╡ 04beebce-9437-41c1-a4c5-a3852a969ea5
+(abs(π(10) - nπApprox3(10))/π(10)) * 100.0         # ==> 28.0109 percent
+
+# ╔═╡ 0e2dd706-7c75-4f03-bfc0-7349e043c466
+md"
+---
+"
+
+# ╔═╡ 004d3d58-ca6f-4387-b351-862e0b014b26
+π(100)
+
+# ╔═╡ cb2b415d-7c8e-4b2e-90fc-236f9365d6af
+(abs(π(100) - nπApprox1(100))/π(100)) * 100.0      # ==> 13.1411 percent
+
+# ╔═╡ 99b3707b-f4d8-428f-9900-41fa1282db50
+(abs(π(100) - nπApprox2(100))/π(100)) * 100.0      # ==> 32.0023 percent
+
+# ╔═╡ 85ab9e71-f6df-4893-9455-584b50eda024
+(abs(π(100) - nπApprox3(100))/π(100)) * 100.0      # ==> 16.3239 percent
+
+# ╔═╡ 43d263b1-a2d7-4194-b3ec-691550e24fa3
+md"
+---
+"
+
+# ╔═╡ 80e781c5-0151-45c9-b97a-8437e606400b
+π(1000)
+
+# ╔═╡ 4dbeaf16-91aa-4e95-94e7-f7ac54f3f06d
+(abs(π(1000) - nπApprox1(1000))/π(1000)) * 100.0   # ==> 13.8305 percent
+
+# ╔═╡ ea1a41be-ab0c-417d-8b1f-503c3a8b10fd
+(abs(π(1000) - nπApprox2(1000))/π(1000)) * 100.0   # ==> 26.3048 percent
+
+# ╔═╡ cc64098e-0e68-4a06-8e82-3ee6634db780
+(abs(π(1000) - nπApprox3(1000))/π(1000)) * 100.0   # ==> 5.0988 percent
+
+# ╔═╡ 36e6d733-0c7b-479d-801f-6c5bd6bb26c5
+md"
+---
+"
+
+# ╔═╡ 5f74772a-ab67-47e7-9781-71a417a70d2f
+# nPrimes10Exp9 = π(10^9)     # ==> 50847534 --> :)
 
 # ╔═╡ 84e338d3-3653-4bb7-adf7-e82814749ee1
-(abs(50847534 - πApprox(10^9))/50847534) * 100.0
+(abs(nPrimes10Exp9 - nπApprox1(10^9))/nPrimes10Exp9) * 100.0   # ==> 5.0988 percent
+
+# ╔═╡ b569ac41-4bd3-466e-a4e5-9515fc637ffa
+(abs(nPrimes10Exp9 - nπApprox2(10^9))/nPrimes10Exp9) * 100.0   # ==> 9.6782 percent
+
+# ╔═╡ 3f22fabf-51d2-4625-a32f-1bb7ba544624
+(abs(nPrimes10Exp9 - nπApprox3(10^9))/nPrimes10Exp9) * 100.0   # ==> 0.0033 percent
+
+# ╔═╡ d609522b-f751-4bea-8efa-6ad79c95a498
+md"
+The *best* approximation to $π(n)$ is the *third* with $li(n)$. The *second* best is the *first* approximation with the simple density $1/ln n$. Paradoxically is that the exact derivative in the second approximation alternative is of *no* benefit.
+"
 
 # ╔═╡ 6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
 md"
 ---
 ##### 5. Summary
-We presented *exhaustive* and *nonexhaustive, probabilistic* search methods for identifying *primenes* of natural numbers. The results are assembled in the following table. For production purposes the *library* function $isprime(.)$ is recommended.
+We presented *exhaustive* and *nonexhaustive, probabilistic* search methods for identifying *primenes* of natural numbers. The *complexity* results are assembled in the following table. For production purposes the *library* function $isprime(.)$ is recommended.
 
 $\begin{array}{l|cccr|c}
 \text{function} & \text{trial division} & \text{replication} & \text{Carmichael} & \text{trials} & \text{complexity} \\
@@ -1460,6 +2772,11 @@ isprime     & probabilistic & iterative    & not\ fooled     & =   1 & \Theta(\l
 \hline
 \end{array}$
 
+
+Since the PPV (= *precision*) of the Fermat test is not perfect, we performed some *Bayesian* calculations. We calculated *PPV (Predicted Positive Value)* and *PEV (Predicted Error Value)* to determine the effect of repeating the Fermat test. The result was that, assuming independent repetitions, we needed only 5 trials to achieve an error rate below $0.0001$. The Bayesian calculations were performed using the *complete* JFD of $FTest \times GroundTruth$. To fill all cells with frequencies, we needed some rough estimates, as these values were not published in standard number theory sources such as [*Wolfram MathWorld*](https://mathworld.wolfram.com/). In any case, the relevant number of repetitions required for the Fermat test was fairly stable compared to the entries in the JFD.
+
+So, to obtain a valid prime number diagnosis, one can either attempt an exhaustive search with $isPrime$, perform multiple iterations using the $fermatTest$ or the $millerRabin$ test, or use Julia’s $Primes.isprime$ function.
+
 "
 
 # ╔═╡ 5889eede-0150-476a-a0d1-7298b616172f
@@ -1475,17 +2792,35 @@ md"
 
 - **t5k.org**; [*List of 100.008 Primes*](https://t5k.org/lists/small/100000.txt), last visit 2026/03/29
 
+- **Wikipedia**; [*Bayes Theorem*](https://en.wikipedia.org/wiki/Bayes%27_theorem); last visit 2026/04/07
+
 - **Wikipedia**; [*Carmichael Number*](https://en.wikipedia.org/wiki/Carmichael_number); last visit 2026/03/29
+
+- **Wikipedia**; [*Coprimes*](https://en.wikipedia.org/wiki/Coprime_integers); last visit 2026/04/12
+
+- **Wikipedia**; [*Evaluation of binary classifiers*](https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers); last visit 2026/04/11
 
 - **Wikipedia**; [*Fermat's little theorem*](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem); last visit 2026/03/29
 
 - **Wikipedia**; [*Miller-Rabin Primality Test*](https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test); last visit 2026/03/30
 
-- **Wikipedia**; [*Prime Number*](https://en.wikipedia.org/wiki/Prime_number); last vist 2026/03/29
+- **Wikipedia**; [*Negative Predictive Value*](https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values); last visit 2026/03/20
+
+- **Wikipedia**; [*Positive Predictive Value*](https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values); last visit 2026/03/20
 
 - **Wikipedia**; [*Pseudoprimes*](https://en.wikipedia.org/wiki/Pseudoprime); last visit 2026/03/29
 
+- **Wikipedia**; [*Precision*](https://en.wikipedia.org/wiki/Precision_and_recall); last visit 2026/04/09
+
+- **Wikipedia**; [*Prime Number*](https://en.wikipedia.org/wiki/Prime_number); last vist 2026/03/29
+
+- **Wikipedia**; [*Prime Number Theorem*](https://en.wikipedia.org/wiki/Prime_number_theorem); last visit 2026/04/16
+
+- **Wikipedia**; [*Recall*](https://en.wikipedia.org/wiki/Precision_and_recall); last visit 2026/04/09
+
 - **Wikipedia**; [*The First 100,008 Primes*](https://en.wikipedia.org/wiki/List_of_prime_numbers); last visit 2026/03/26
+
+- **Wolfram**; [*Wolfram MathWorld*](https://mathworld.wolfram.com/); last visit 2026/04/20
 
 "
 
@@ -1506,6 +2841,7 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
 GraphRecipes = "~0.5.16"
@@ -1513,15 +2849,16 @@ LaTeXStrings = "~1.4.0"
 Plots = "~1.41.6"
 Pluto = "~0.20.24"
 Primes = "~0.5.7"
+SpecialFunctions = "~2.7.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.5"
+julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "d01ee6e4644fedc68c7e72c8b45dc6a6e75c177a"
+project_hash = "4ea57059f8ae493887df56039f6e4f2f4e27ee1e"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -1619,12 +2956,10 @@ deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statist
 git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
 uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
 version = "0.10.0"
+weakdeps = ["SpecialFunctions"]
 
     [deps.ColorVectorSpace.extensions]
     SpecialFunctionsExt = "SpecialFunctions"
-
-    [deps.ColorVectorSpace.weakdeps]
-    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [[deps.Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
@@ -2257,6 +3592,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
 version = "3.5.4+0"
 
+[[deps.OpenSpecFun_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "1346c9208249809840c91b26703912dff463d335"
+uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+version = "0.5.6+0"
+
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "e2bb57a313a74b8104064b7efd01406c0a50d2ff"
@@ -2512,6 +3853,16 @@ version = "1.2.2"
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 version = "1.12.0"
+
+[[deps.SpecialFunctions]]
+deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
+git-tree-sha1 = "5acc6a41b3082920f79ca3c759acbcecf18a8d78"
+uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
+version = "2.7.1"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.SpecialFunctions.extensions]
+    SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
 
 [[deps.StableRNGs]]
 deps = ["Random"]
@@ -2976,12 +4327,20 @@ version = "1.13.0+0"
 # ╠═b5b5a466-e78e-49c0-8ee9-765644596e27
 # ╠═a344aaaa-af28-4345-8e96-a6b735fb6023
 # ╠═eb89783e-e948-42d8-b7d5-857a719da9b4
+# ╠═854b95b5-38e4-40bd-9908-baf9c2743e68
 # ╠═2a3be054-6361-4b44-9ceb-465547ce3803
 # ╟─6bd55608-02f5-4b95-8ad9-597abdf106b6
 # ╠═4d06eb30-b117-4b02-b04c-6c459a73bcd8
 # ╠═9bc0eb42-79b0-4d7b-b472-07abae671439
 # ╠═33518b69-6a05-47a7-8dbf-e581f0817a83
 # ╠═57187f78-2aeb-4284-90da-b529a298eb91
+# ╟─c3312efd-a296-4e3e-8698-347837683611
+# ╠═62fa68a1-8401-4e10-870f-5fd6183c003c
+# ╠═410fcaa0-0d47-4a49-92c3-f9a68c7e919e
+# ╠═13477d73-c891-4b06-9df3-fe67d8ee03d5
+# ╠═e50d50c0-e0ec-4d25-b888-b770b6d622fd
+# ╠═38c9cfd5-2801-470e-a881-4d9ebd434c86
+# ╠═a6d0056d-6047-40ea-bcd6-bbe46dbbe824
 # ╟─8d69e081-99d6-404a-805a-5d12821c5f5a
 # ╟─6a7a2391-9cbc-44ef-83f8-5252c1454ac2
 # ╠═fa620300-3307-4bda-97de-1c49fbf58d61
@@ -2995,18 +4354,33 @@ version = "1.13.0+0"
 # ╟─7d4832ca-cd8c-49af-aa3e-df0104dc677c
 # ╠═ac8e5704-a619-4545-95c3-313f4e8d6585
 # ╠═dee1c4c1-3c0f-4701-b985-b37218e89c00
+# ╟─8aee5060-92ce-4ee2-b16a-91ad75b4cfb4
+# ╠═1f366242-6699-4772-b882-dc61a61a8fbc
+# ╠═4ea4b7d2-8406-4a73-99bf-6d721331eee4
+# ╠═b785f7ae-2521-471f-b943-677bebcd0bcd
+# ╠═c41f6702-f06c-4a4a-85f9-e60aa4d05a86
+# ╠═baaadf2c-9835-4d75-834e-5c8157df150e
+# ╠═e4093686-6992-4da8-adba-8ffcbb178913
 # ╟─e698ce81-6cd0-4a9a-931a-5994bf91dc39
 # ╠═9979c1e4-349b-4e0a-87a0-39de45ecdf4c
 # ╠═66613d2a-6a5b-4e93-bc7a-9524adce94bf
 # ╠═9790f7d2-509f-461a-b638-3dfeb761c061
 # ╠═124a041d-b559-4358-a79d-2a95082921e8
-# ╠═9ba48d44-b4f4-47ff-b2f5-eabd401974d3
+# ╠═50752937-a022-47e2-8e63-2c4d501bbdc3
+# ╠═dafa30cf-3897-42c2-a59e-de23b1535de4
 # ╠═182d2960-b92a-4edc-b9e4-450204eb6fc2
-# ╟─516a2707-d950-4ce8-8ff3-750941fa7101
+# ╟─a583d5fe-fc61-443f-80c7-9d8a090e6b0b
 # ╠═51db44db-6faf-40ca-abe5-e5101340c4ff
 # ╠═74b7a041-c90f-49f1-9534-0287155cb4a0
 # ╠═86c64f03-05ad-4aae-8b64-ebec7af6da7b
 # ╠═e8108d0f-cd1e-49d0-90c5-b52faf704609
+# ╟─92364e52-d8e5-47c8-acb1-6beb07159a26
+# ╠═a783731d-f282-431d-8f1a-f8601a6cdc69
+# ╠═370b6cf6-ffde-45a6-a1af-db5c1d89c364
+# ╠═f3c5d909-43e0-4920-a56e-651c33f0601d
+# ╠═cd027bc7-62ec-4b2e-b9a0-c23aea90fdcb
+# ╠═57bdf181-bb33-45d1-9b79-2a6963f7aa88
+# ╠═f5b86ab1-d937-405c-9a48-06d6d6a511f3
 # ╟─4cb5f5b4-c0a5-4bac-93e8-1b5069e3863a
 # ╟─343b4135-8c3b-476f-a01e-1aa160f621d3
 # ╠═c2713cd1-9fad-4649-8971-166b9523e215
@@ -3016,10 +4390,17 @@ version = "1.13.0+0"
 # ╠═fa0bec5a-a61e-4471-b52b-ebdbc985a4d2
 # ╟─5c75161a-c1c1-495b-bd52-d235a7aeff99
 # ╠═3a1b61d2-6c7f-4c12-92b8-96c41e73b262
+# ╠═7f3a4ad2-5595-4142-9141-aa02eb05f5c6
 # ╟─f63e0782-7149-4004-8add-3bdacf8f639d
 # ╠═9e5ac0c9-c2d8-4635-9111-e686134026fd
-# ╟─374eccff-3888-4760-9ce7-09b388beaed0
-# ╟─6bf2767d-5822-478e-83d5-6e196435aadd
+# ╠═7506993a-7a33-4b8b-b03f-775c0f8b1e1f
+# ╟─0380c8dd-eb82-4cc0-9f30-3cb04ec5ff04
+# ╠═e807070f-028c-4916-b30f-dea41e934cc4
+# ╠═dbc30f3d-3f0c-4d6c-9cfd-d60c268c419d
+# ╠═e25b04c1-5afe-405d-bcbc-c2e521a23079
+# ╠═b1dfeb3b-d2fb-4466-8381-a6d6ce3ce175
+# ╠═af6f8a62-1f89-4f37-950d-8b790d9642db
+# ╟─3dee27c7-48a0-4c84-82d9-3e606ac14cf6
 # ╟─84499038-4ed6-46fc-a6d1-70a5964c3f3e
 # ╟─99f32ce2-e7c5-4a0a-b466-d7ecf5ef6af4
 # ╠═8bbdd3d4-9a2b-478d-8ba4-7ca3a10aa86e
@@ -3039,6 +4420,18 @@ version = "1.13.0+0"
 # ╠═cd1ed62c-086a-4d92-b625-dfce3362f1c6
 # ╠═f22888d3-26a2-4dc5-af18-4f9e5e05ba91
 # ╠═6d344ac0-c073-45ae-8d74-532ae7001a92
+# ╟─085f0593-3946-49f0-943c-0fd19ed6c1c8
+# ╠═668bd297-1142-4d55-aab1-6b3b0956a109
+# ╠═d3fee73b-0499-4ea9-9e48-2a893da791d2
+# ╠═23beac8e-da09-434b-8a84-7b4297d19248
+# ╠═e5d4cd1f-0287-4c54-828a-44afc68c2258
+# ╟─6cdb8a9b-8da2-4241-9c84-0486f42b6cfd
+# ╠═e92f9ccd-4e93-4ed1-babf-f56618b5c6db
+# ╠═71b9aca5-46c6-4fed-be1b-7a699ef2fa33
+# ╠═46ea2dff-bee5-4107-9744-d421b4ddffdd
+# ╠═12bdb5d0-112b-4e17-96af-088a74035ca8
+# ╠═578f075e-79ac-4587-8e6f-1987c38509ff
+# ╠═63f387b9-c95a-4df1-9f07-52df5c95af0f
 # ╟─f6bf4f1a-c764-4d8f-b039-de7bab2e6672
 # ╟─6d10b3ec-5384-400b-a639-9704925c2ae5
 # ╠═0ccdc830-15d7-4196-999d-f4a6b7479e28
@@ -3048,14 +4441,29 @@ version = "1.13.0+0"
 # ╠═32946f9a-244c-429c-ae38-aa5b2e3a3559
 # ╟─5a9c4f70-65ff-4f92-a930-4af35197ba05
 # ╠═237ecdb4-8adc-44ba-9cac-8ff81adba33b
+# ╟─1b641f7e-3a15-414e-83bc-ab6c6d924a25
+# ╠═a2076855-30a3-46c5-9e70-7c50936a5a7d
+# ╠═bfd5c9ea-97b9-4c2f-802e-2936217336a3
+# ╠═55db5ca6-e9bd-4ea6-8fba-2b83530db830
+# ╠═23d7c452-e914-4b91-85d9-c6223d52ae4d
 # ╟─c9403479-b7e2-4391-a058-541501434de0
 # ╠═8a3e42bf-6c51-4201-b894-a96bc3b8c6b6
 # ╠═61664469-1784-47d5-9f1c-8d0fc034b97e
 # ╠═cbdc8f90-774b-49ad-8736-033e4d98fbd3
 # ╠═b90b682f-e083-44b9-93e8-2d7f143c8386
 # ╠═13d75f8a-edc4-4042-8473-7eb24764b404
-# ╠═4ca1868f-c694-47fe-be38-6f1899c8e902
-# ╠═2275dc7a-43d9-47aa-a5ab-e1b53a8c7df2
+# ╟─a2adb615-bf51-43b8-813f-3413eab1a751
+# ╠═f73af81d-86e7-41d6-a443-af4f43d6ca42
+# ╠═b3cc4a14-7f37-469d-8831-c4e4fc0230ab
+# ╠═2a6c107a-0235-4acc-ad5f-8f36b78121fb
+# ╠═926d0083-ae4d-4d3e-a0f6-736784089347
+# ╟─37387e3f-c0a1-4e47-80f0-44a916fee96a
+# ╠═9baaba22-faf3-4414-bd89-96a0bffe2f89
+# ╠═f149bb40-9af5-44bd-bfe5-08b4ac5aaffd
+# ╠═acca7371-18d7-435e-889a-8e0ccc955101
+# ╠═a3107bd3-7e94-41d9-9bfe-ef96fdb1d826
+# ╠═80b99bc5-403c-48fb-986a-ea0c7299ac55
+# ╠═23f3d1d2-dc8e-4468-b35b-522f615b9a2f
 # ╟─5758c0ea-40db-42ec-ac3d-97d552a74fda
 # ╟─e1c14764-4871-4817-ac21-31c1cff743e6
 # ╠═0cd39a64-e6d7-414d-a756-a885b33716e1
@@ -3065,6 +4473,11 @@ version = "1.13.0+0"
 # ╠═6a60f134-1d9c-42a7-9a13-2b21cb7f2da3
 # ╟─88f3e8e5-f6e0-4f32-947b-b2596f835836
 # ╠═43e48ffa-ff3a-446e-b055-cd65c0ca9c87
+# ╟─8a8a08ea-98e8-4ba9-84b2-6bc89016f631
+# ╠═9567d974-695f-40b5-8626-79678b038abc
+# ╠═7140f4fd-110c-46ee-b637-86a3398ffbfe
+# ╠═a3500b7a-c2b7-4e72-aae9-3b679221c2b0
+# ╠═4abe2818-a393-41c8-84e5-459d9d31a317
 # ╟─f3e9ad78-79f2-4aeb-8113-c8f50d05e68e
 # ╟─c7ec632c-0371-476b-91a5-4267d4235eb1
 # ╠═88f02453-317c-4162-bb18-764715015a0b
@@ -3072,6 +4485,18 @@ version = "1.13.0+0"
 # ╠═8eb7e77f-cef2-4661-9483-680902f7ed2e
 # ╠═219d3b71-7cc7-4de3-ad8b-0e86690fed4e
 # ╠═cc349f60-d9bb-450a-9873-677f06eb5196
+# ╟─d6aaf12d-d652-49b6-9100-7682ce0d4905
+# ╠═eb48d116-d685-4f3c-b3ae-63a02e619268
+# ╠═5dac500c-c35e-4574-8b43-12ac01857cf9
+# ╠═a385895a-d192-4c9c-9d69-357f67c01060
+# ╠═7791e9cd-d31d-4d4f-b844-a0bf09fd71a1
+# ╟─612b4388-3f75-4dc5-a02f-f6b423fe7c73
+# ╠═9c87c505-4385-448e-9eb2-280409a401fb
+# ╠═a4bf1444-f550-4af1-8140-96a5d51947fb
+# ╠═8f2f878d-13e5-4b1c-a024-988dd487d5e0
+# ╠═7adbe3dd-e148-44d6-9ad6-ed9b30ddd4a5
+# ╠═266c31ea-3564-404f-9650-144534e154ea
+# ╠═9a74932d-68cb-4516-afc1-9ddda32e46d2
 # ╟─3e80309a-16a4-4444-8a63-d5c70f7751e8
 # ╟─2d5183ac-98d7-48d1-a47e-8f59cf19cc02
 # ╠═f4599215-bbd6-4dd1-9bd5-352ddc65d19d
@@ -3081,23 +4506,46 @@ version = "1.13.0+0"
 # ╠═c0a2e308-f0d8-4839-861c-4d24dc1eaeda
 # ╟─9ac494b3-9069-4c3f-944f-f593c3442038
 # ╠═2b2261c8-e4e2-473f-9fb8-48784c7b141f
+# ╟─5a13d7b6-d26e-493f-81ea-93cc80720cad
+# ╠═2975f152-a29d-436d-9961-b7b952681bbd
+# ╠═2d4fa668-67dc-465f-8b5e-4f6269440bb4
+# ╠═d97cfa72-88b4-441e-9e5e-81beabdcf51b
+# ╠═382e4c51-5553-47d7-b129-359d3eb261c0
 # ╟─2b1c1412-3b85-4540-a0da-1dc17163c21f
 # ╠═5b9a1a53-2081-4778-aab6-a60fcfbef3b6
 # ╠═f12b812f-0434-41e0-8e77-86abf79384e1
 # ╠═163b3441-d879-4d75-918c-aab4fecf2d05
 # ╠═f3e4c3dc-effb-4a29-952b-47609e17278a
 # ╠═1fa5adfc-591f-4f60-b5a3-2b49a4602d7d
-# ╠═09dc9d17-ec20-4d52-84e5-6673c5cbb022
-# ╠═6f1a3a0b-205b-4a01-9fae-033661507de2
+# ╟─575d192e-b797-465d-bfb5-afd81b4c5f36
+# ╠═b50f818f-d783-4a7c-9fab-a2a8299fecea
+# ╠═5aef4068-2856-4603-adb2-34b0f53e6f43
+# ╠═73b9020c-d14e-4ac8-a2f5-91e9f9c229cd
+# ╠═4d5e166a-f70c-4b77-b18b-b0c0ca50cc08
+# ╟─8df60735-52e0-472f-a48a-34b06ac98208
+# ╠═39308ec6-623d-4cc7-84e2-34e447392d92
+# ╠═f049e186-add7-45ee-ade4-3781bfe24f50
+# ╠═1e85f41a-6298-4701-a423-9f8e82fbe399
+# ╠═a8b4685b-1e55-4fe6-b199-16d5827cc1e4
+# ╠═2f213ab1-a1b7-45bc-94df-24a19fbaefd9
+# ╠═1ac4d593-1645-4b7e-a826-528c0bde8c84
 # ╟─26e1c1ce-0b5c-4d4c-8da5-61da6c76f3b3
 # ╟─ebef346a-6233-434f-850e-b39fd62c3e56
 # ╠═365f7c00-00f7-48aa-af32-94cef8c2d39b
 # ╟─ec9fb54e-5e46-4464-a790-600d87c29032
 # ╠═e45309b8-9cf4-4c93-9c9d-73b09a6c4a84
+# ╠═d4df315e-a632-40bb-912d-88ad57045e2c
 # ╟─a63dbc65-c6c5-46ee-861f-0ca87cf1510c
 # ╠═748a19c0-7b68-4963-97cd-0500eff454ab
+# ╠═99d634a7-62ac-4b11-8510-529a48e616e6
 # ╟─1a6a194d-07ec-4c9c-87e1-624f79189c63
 # ╠═5cce71fb-9277-4e52-a3ef-3c07f09bdbbf
+# ╠═3ed03ad5-6807-4247-a5b1-271db0b5325f
+# ╟─6d3c54aa-8ddd-4cfe-a3aa-adccd052ceeb
+# ╠═a71a645c-8926-43d4-8d9a-f49c7835b974
+# ╠═b865cb4a-ce8f-4d6d-8225-5286a21d6d0e
+# ╠═64fe964a-3cb6-45c3-a279-d8f12087716f
+# ╠═0d26a042-71fa-483e-b76f-ac14b22390d1
 # ╟─295d258d-3633-4c3f-acf4-f277679e4d2a
 # ╟─682dab37-9f5f-4f92-9795-c7d1c1d2179f
 # ╠═36ccf5f4-2106-4055-a255-457fe6e88185
@@ -3106,10 +4554,18 @@ version = "1.13.0+0"
 # ╠═f971e126-91e8-40c9-8228-7f0c48d2db4d
 # ╠═9ae46586-b3f0-4298-b0bd-ef8e5a8ef4e9
 # ╠═bcb782ec-e917-45cb-98ae-72bfe7dc2ef2
-# ╟─8c7f29ea-efbe-4c77-9b18-b7aa418f2d87
-# ╠═692dc034-acad-4ceb-a0f4-94fdfe1d4bd1
-# ╠═bac3126d-6795-4adf-a952-aecefc85431c
-# ╠═3d2befc7-8d5c-48ff-abef-76255773eb23
+# ╟─c9eeec42-685f-418d-9506-721f7a9ed56e
+# ╠═22d70e3c-444e-4392-a750-da54a40defd4
+# ╠═182b4e66-72f1-4a78-a21d-ce99f657bea6
+# ╠═ec818ecf-4e75-4ffc-9a6f-2798c3c81702
+# ╠═62493746-ed86-487b-a1e8-70911021a0d5
+# ╟─0c7e679e-2ca2-4d2f-8ab0-f8997f816d16
+# ╠═4ef4ba41-1ca5-4560-aa35-02c899c35208
+# ╠═fb7180d5-b887-447d-8115-7cb0ef5ab8dd
+# ╠═d7a2be33-4d5f-4e79-a0f2-6e0295a5a40e
+# ╠═1470e907-b86b-4332-a472-29666264873c
+# ╠═ed1cb874-b9da-4c59-b8eb-9b639df85763
+# ╠═693f138c-c5e1-4fa1-90d3-3448cfaac324
 # ╟─2cc49441-ba71-40a7-8818-f248a728eaae
 # ╟─ad9ccb82-8d0b-4315-a811-c71ed35327e6
 # ╠═a09c6e60-0424-4def-9e0d-98d503f38740
@@ -3119,6 +4575,11 @@ version = "1.13.0+0"
 # ╠═098880c3-db08-4056-a5eb-cfff22121034
 # ╟─377051b7-8219-4775-9f2e-46d394fce3a1
 # ╠═b0e005c1-c468-45dd-b648-1b271f44cf34
+# ╟─c36f4d52-3b35-4006-ab0c-467b82edab74
+# ╠═b2daf4d4-b0c7-45fb-89f3-1800da1b185c
+# ╠═908ddd15-59e6-4f42-8622-5a11a85839c8
+# ╠═d9dd76fb-6ccd-4422-ac68-37418f01009e
+# ╠═ab3c2823-22db-48f8-9054-fb3f002dba36
 # ╟─ee5289aa-835d-4346-9294-b3c38f9dcd1c
 # ╠═c665c4fe-4061-4da1-a324-a43c126db248
 # ╠═99ce7b3d-0f79-4495-a786-b42fa173e992
@@ -3129,27 +4590,54 @@ version = "1.13.0+0"
 # ╠═da7d7a47-91c0-4869-9131-9a14d58112dc
 # ╠═d983c8b3-9dd7-496a-a545-20fc0385f402
 # ╠═92ea12cd-a793-4282-9038-2c5dd0d271e4
-# ╟─c42fda32-28a1-4c00-b00d-0976e2b108a1
-# ╠═99c0005f-6bbb-4501-aa64-ccfce7f33ebb
-# ╠═fff5f94e-9404-42c1-b151-b226efa6f01b
-# ╠═39990bee-1e20-4304-b2fa-ed010d6cc463
+# ╟─d9a7d1f7-ad99-4f1f-8ce4-890a845b2393
+# ╠═11273c1f-5fb9-4bdd-afc7-117ff2fc2392
+# ╠═2cbcb3f6-a88a-467c-a247-4a60de40eb6a
+# ╠═2dfc436e-8db4-46b4-a838-05b67ebfca84
+# ╠═f8446038-1578-40fc-b9b6-a3f4dbcaef1c
+# ╟─cc5f1a8a-6695-4933-82f4-61aa297d1c7f
+# ╠═0211dc8d-db38-4c87-b973-1cf0e72281ab
+# ╠═195381a0-1436-4aca-a585-7118f17c168f
+# ╠═9925d8da-2e7b-44de-b391-c255cf046920
+# ╠═9020c9f0-da46-43d5-81e5-786b1bd8ec55
+# ╠═542eda83-9fa9-461f-b9a5-62792d124897
+# ╠═ed270d8d-2c55-44df-ac6b-303eed52034a
 # ╟─61d83c83-d35d-42e3-bab0-fedb2b25939a
 # ╟─8ab54466-18e4-4207-b33e-d5855ae2593c
 # ╠═9d9b5310-55c9-477b-8dac-885cfaa20160
+# ╠═5010c614-135f-4cc4-89c0-b197bf2bc667
 # ╟─1b3fc127-1373-4da8-a229-295db0cf9ed9
 # ╠═3de4a9da-9bd7-4027-91f7-d557b3d2248c
+# ╠═64d74d00-76f6-4b8d-b0b0-bb8c86cda9f2
 # ╟─352f910c-b4e2-4002-b0b4-391284b4a0c0
 # ╠═92b138e6-c445-403d-a594-d698afafd95d
+# ╠═bc5fd032-081b-4a98-a1ff-e1135bd1a03a
 # ╟─6eed69c7-b26c-4d00-b3a7-71762196b1fd
 # ╠═f2e24bcc-cdbb-4f7d-bae2-78ac01742e7d
+# ╠═0b732ca0-a6d0-4fd6-bf8c-2acc41465063
+# ╟─7257e672-fe20-44d5-ae38-4ed8d6cb38bb
+# ╠═6db5d2c5-9663-4dd8-aa97-262ac26f72bd
+# ╠═e74bf0e1-1e5b-417f-b03b-d4fb5453830c
+# ╠═aef44860-b41c-40d5-bbb7-81d99e61b0a7
+# ╠═49971aa3-e542-4998-aa56-164408804c38
 # ╟─b06561f2-546b-44a7-a4a3-43056d1019e4
 # ╠═b1601460-c2d3-492a-85cc-c3cd08a37546
 # ╠═a62db319-51ec-435b-ab6c-6af2e668a244
 # ╠═61c045a5-e7ff-4d51-bdf6-a4af2fbeb754
 # ╠═355b7311-8ed2-4a52-9def-13ac487cf17f
 # ╠═2e52cccf-d79f-4d8e-a7d5-317d6212e184
-# ╠═7248f22e-b210-420d-b20f-9a8d4ca48e95
-# ╠═6a9dca77-d335-453d-a256-61203ce39c5a
+# ╟─6a3df586-ef88-418f-a598-dfaf08e45224
+# ╠═0d9161c6-ed02-4eb7-a5aa-56f2e9af747f
+# ╠═b5e9e2fe-6005-40c7-bf5e-7670e1c42732
+# ╠═61bd95e2-d827-41e8-a319-ab473f585d56
+# ╠═d09f865f-04d1-4957-8312-aabdf07e0862
+# ╟─349cd2c7-942b-4622-9059-2a84334fced9
+# ╠═3dec9eef-dc37-43c4-b33e-70c93073b439
+# ╠═b58e5150-7e51-49c6-a2b6-f83330d8f073
+# ╠═6dd9afee-47c2-45ed-a2ff-8222684eaa39
+# ╠═9d15e3f6-a02f-430b-a95f-7e601fd38fe0
+# ╠═cf04fb4d-73eb-4c97-b08c-79b2fb965855
+# ╠═5597f412-0c7a-49d9-9379-1e517ab756e8
 # ╟─abc8c6d9-7e26-4983-87ad-225317673ebc
 # ╟─ae15d78d-8ef7-4725-9023-f3b0e60342c1
 # ╠═130c08ad-33fa-4c86-900f-9865e5495158
@@ -3163,6 +4651,11 @@ version = "1.13.0+0"
 # ╟─acf7b484-d02e-423b-b005-d10ff2c3ffc2
 # ╠═2deda15e-9235-4228-b1e4-7c46adb37dea
 # ╠═c2d6ac86-03b5-42e4-b968-35be2f7c4b42
+# ╟─965488a6-a074-4d1f-8e4f-7f1181e701eb
+# ╠═0fe93727-f093-48ea-818f-87784d93895a
+# ╠═7604129a-959d-4ec5-846e-45a740cc356a
+# ╠═32cab23b-a24b-4aac-b291-dd5af36ab716
+# ╠═26b7d839-aea6-42c7-9e20-563d8565f68f
 # ╟─ed5171d1-7c87-4f41-ab01-0652fd745249
 # ╠═02350d15-b2c7-42ff-8465-fbb691914367
 # ╠═a3383b40-1779-4a23-aa56-96bd7de3564f
@@ -3170,8 +4663,18 @@ version = "1.13.0+0"
 # ╠═8adabfd4-909f-41f6-afb4-5d5b4a03c254
 # ╠═95ad439e-7f76-4d3c-92e7-96c229c686c3
 # ╠═99550191-f999-4554-814c-1369bd23b6e1
-# ╠═86642ccd-f3bd-4fab-b4ae-2b7434bf7126
-# ╠═38fe5a14-401e-4bb6-8e53-8452d297869f
+# ╟─433ccb81-b408-49fa-a774-b4297d7a1b49
+# ╠═9636da38-29de-4114-bd12-23e39226444a
+# ╠═118ffed6-03ab-47de-b1d6-96058b6f2ee5
+# ╠═2b482711-c7c8-4414-9eb2-6998efec7e0b
+# ╠═b8c23fba-c32a-4e77-89ce-d0803573304c
+# ╟─99bb8445-050b-40bd-8a78-cca8086cc146
+# ╠═811414c8-29bd-4e3a-8c1f-8073a9aba575
+# ╠═ed29fd60-a4b8-4a61-9cf2-4d5812cafcc7
+# ╠═ff9c9e8a-3460-465a-a834-7ae70c82ee95
+# ╠═51bbd688-0c3b-4fb5-bb3f-629f451e9429
+# ╠═8cdc3f73-f132-4e58-8206-67a408299785
+# ╠═444758f1-f1a1-4546-8d1c-557bd7355797
 # ╟─1188ee3b-42e5-4d4b-91ec-c43a1a2d3b72
 # ╟─3848e59e-b396-4f19-a0a4-abd51c5e2303
 # ╠═d9f91252-624e-4399-9335-493e3e605e90
@@ -3184,16 +4687,37 @@ version = "1.13.0+0"
 # ╟─7ffabcb9-c90b-4048-a9c8-98037c2072ba
 # ╠═60301a59-c4ad-4cbe-af06-3d04bb7a849b
 # ╠═5aacb54e-df1c-453a-8df2-4b68086e4083
+# ╟─c88381f3-bce0-4edf-9242-400af9825429
+# ╠═c4bb5876-fa2c-4fb1-951c-3f94a31eb05e
+# ╠═e56ffd9a-d1f0-4157-beed-066d022a35fb
+# ╠═8f46d2d6-985c-48ee-8e59-89a24e1c084f
+# ╠═a50836b5-c5fe-4471-bb11-25b62e72af26
 # ╟─7817cdb2-6181-43e4-8ac6-023f6ed9480a
 # ╠═0a47ac1a-c7d2-4d5b-8a22-3b02759e7923
 # ╠═63ae48b7-becf-4398-b7d5-a0c28b0d93fa
 # ╠═0c7b628c-1542-4563-95de-3369cc8a0f64
 # ╠═fc64f3a9-d53a-4f61-ac86-8eb775d9331b
 # ╠═04bf8c9d-b2ed-42ee-a791-023caa61d74f
-# ╟─440bfbb6-64a8-4199-b902-d83bfeaaa255
-# ╠═8628d923-6377-41c6-9793-1c74df51c25a
-# ╠═d3adc2d9-8ecc-42f5-a7e0-d2a6622590b8
-# ╠═ce5d879c-727e-451b-9bc6-9b0fcd52db77
+# ╟─bd90ef7f-2ead-4e5a-9491-e026492bd2fa
+# ╠═b51e0714-13e3-4736-9641-a39f69e6a86d
+# ╠═f1b5d4ac-8d12-4b73-b92f-55966c8b05a0
+# ╠═2331e38c-1ffb-45d3-ac69-82a72980ac4a
+# ╠═f56b7126-7bf5-4d89-ac3a-00beb0be2777
+# ╠═86691359-43f9-45b8-a215-8de26aa063fe
+# ╟─12c1e439-d487-4553-8c4c-bb3abbdf581a
+# ╠═f35030b6-5748-4ed1-b601-5b2ef20f988a
+# ╠═55cec595-3af8-45a0-b1c3-d43613013e56
+# ╠═63be7278-95ac-45a0-b0df-b7dd9e30b703
+# ╠═656fe351-2ef0-451c-9ea1-e00ba476e089
+# ╠═5e46ad22-15c2-41f2-9d54-a3a39cd6347a
+# ╠═3c655465-bef3-4415-bf4e-e874f63933ee
+# ╠═3630d85c-b0c2-4fad-a483-4f531985c548
+# ╠═58aa2250-2f82-4e58-8151-2f125ca1b431
+# ╠═1fee0407-ce20-4921-89fd-df00400603f3
+# ╠═cf212358-d45e-462d-8403-bf226384239a
+# ╠═65288b94-e1c7-4b6e-b622-c00fcac3f0f9
+# ╠═bfe3646d-53c3-44ec-a041-cbb76b9c926a
+# ╠═9565e664-2ad7-4212-aca3-5a22ed2db871
 # ╟─4d94bfa8-8940-4ebc-8231-704bc2878901
 # ╟─19eb3317-e8ec-47e9-b56a-2e7e2fe9d670
 # ╠═684d278d-d3c8-417e-a5ac-2bbbea152f84
@@ -3203,12 +4727,108 @@ version = "1.13.0+0"
 # ╠═97780427-158d-4440-aaeb-fe96b6fcde6c
 # ╟─bdaaa5eb-c1ac-41af-9044-0762a5d2a42c
 # ╠═de2a5678-6322-496b-aa68-3465984cd06b
+# ╟─3272ff2b-ff89-4d85-801e-b6f91bdc1236
+# ╠═ef32a173-c49e-4109-b5de-b91be1734212
+# ╠═36ebf1fa-d116-47ee-a50b-8fb80386d8d9
+# ╠═4d244ed8-6acb-4881-8e5a-685229a97c6f
+# ╠═20102603-7aab-497b-89bc-7de3438b94df
+# ╟─4e3ba368-487d-4e3a-932e-6e3d90ab3d61
+# ╟─e5aa29c9-eb05-43df-a037-205cfd04dc32
+# ╟─374eccff-3888-4760-9ce7-09b388beaed0
+# ╟─4e5d8be5-0a19-45ac-bb6a-65986b726d29
+# ╟─b088346b-ddfe-4589-834a-06ee10009be7
+# ╟─8f1aefd6-0a4a-4d13-909d-e39c1e77de49
+# ╠═3f8be902-3429-4648-b712-0cb734645f13
+# ╠═19d4f8fa-6f0c-4b67-9124-f8e745f62245
+# ╠═e1603c5d-5591-4196-b1d1-72b872e2d322
+# ╠═6a2c06eb-1171-4719-a4e8-49c1e3e23178
+# ╟─4fe505d7-5a16-47fd-8f67-957ef81205be
+# ╠═85b7c2cd-a8ac-43a5-b603-95a41dfa95e4
+# ╠═1d5cb565-b242-493f-9dc6-c7e1a9341985
+# ╠═8e47edc8-1ede-4cbe-99d6-c948485d0466
+# ╟─168f98cf-9e09-43db-a574-7d0b333beaeb
+# ╠═ba8616e8-b99c-4e35-b5e5-5c3114d6a5cc
+# ╠═d8c5bb6b-fecb-43de-be06-dd524a7c8995
+# ╠═76c0c7a3-5ba2-4b82-8d88-f43544cdbd98
+# ╠═2aeb3d3a-1a17-4094-8fd8-2e27f2748dcc
+# ╟─ba2c3338-da85-40a4-b958-8be45a391cf8
+# ╠═88bbc29f-f422-4d70-8bfd-3da6ab0b11b9
+# ╠═57d56625-0973-49f4-b8a7-d12b6368f084
+# ╠═113cfb51-5db8-4354-bc05-2ca74ca1610e
+# ╟─2ce52946-16f4-4bb6-a545-6ca0944223cb
+# ╠═e0abaac7-2b60-4ec0-a34e-c515f848544a
+# ╠═eba2334f-41cb-47d3-b779-5392cdc0a9fa
+# ╠═ee431940-8d5e-41f7-81c4-eb8bb35d4e1d
+# ╠═f39c126d-af0a-4c8d-b3c2-ffc2f599aebb
+# ╠═c646d15f-2869-48ff-bc38-25a0cffdcf4c
+# ╠═ca112b43-22ec-409a-b791-b28a037d0a2f
+# ╠═0d2c9efa-1949-45af-8161-152685aa1073
+# ╠═68000073-654f-4a99-bb3d-44ea33102c8e
+# ╠═50a50c44-3bd2-44db-934e-6bc715a7f5f6
+# ╠═e6360ad1-b0ec-4041-91f7-caf8b5d0489d
+# ╟─76505eb2-825d-48b4-909c-bb57a533a4df
+# ╟─e569b6d9-dbae-4530-b748-61b7a0ef98c5
+# ╠═7d27a702-1d94-47cc-93f6-a0b6af4a3ee0
+# ╠═7fb21993-20b5-46ae-9259-6fcbe4fee6d8
+# ╠═97483911-cd38-488b-83a3-1e1d2e7f0787
+# ╠═0d55bd89-2604-4600-9270-da3c5a15de08
+# ╠═e5c42d96-697c-4c52-a83e-21435298f9d3
+# ╠═9b5fd434-01b6-43ed-8306-1303ad382063
+# ╠═4504e86c-8d6f-40f3-add7-49ebd0a8de08
+# ╠═69eff141-4ffc-4690-8688-ef50ba769241
+# ╠═7ee0a21d-7b7a-4597-9dd5-0b299bba826d
+# ╠═cc4ee667-98f9-45a5-b39a-fb02ce1a429b
+# ╠═13767188-f0f6-4908-a4f4-1a8b4cae504f
+# ╠═3d8d5ed1-b1ff-4a95-92e4-7f9c1b0d60f2
+# ╟─56a19e81-1f38-4b4d-9e03-db068a23ce95
 # ╟─0b12d734-da18-4378-910b-f6c8559ab760
+# ╟─2b307f37-8bb9-440e-8ff1-8b6346eae1dc
+# ╟─745e56a8-609d-4238-8aec-500777aef766
+# ╟─42ac5b43-5793-4beb-b3b9-7a71ad7d774a
+# ╟─c9c689e3-00d0-42eb-b50e-c64a708b8882
 # ╠═0326ea84-be7c-46c6-8bbb-bfb980b4c1c3
 # ╠═95a66772-3a33-41f9-b483-f1016f0bcfa6
+# ╠═c5b2a982-4f07-4e82-9086-f4a899af1246
+# ╠═95610f6c-faa5-4f93-9a71-bfa87dd08193
+# ╠═ac60534f-1cfa-4f37-8e25-bf6f6d725a58
+# ╠═2c37642a-c113-471c-b408-2ccc161aad70
+# ╠═7a691963-e77c-46c4-8ff1-e9b8ea3ab141
+# ╟─80aa817a-e095-4e6e-abfd-9d3e14eed89c
+# ╠═6f19ef6d-ec3c-4107-9db9-56d02eb01836
+# ╟─7fffc500-feb7-4be0-b109-91bfa230f085
+# ╠═ade08f18-58b5-491a-9dad-02993d88f15d
+# ╠═9956df3c-0236-432d-9735-541e59bb0023
+# ╠═e5599443-d812-4279-a4a2-58ab02c8f966
+# ╠═4d39744f-7f20-4699-b3aa-a6fd3baf6d0d
+# ╠═e6420757-2486-4e7a-acca-3cc013747370
 # ╠═2bde3064-cb59-426d-8183-2bc58669d876
+# ╠═1f795df4-7fc5-4515-a8a9-d5793ad39bfb
+# ╠═1645060e-59f2-4f81-8b41-ecf2e5432e70
+# ╠═472dd029-36a2-4aa5-aef1-92166ca39385
 # ╠═d6f48c33-f1ae-4b48-85fe-aa9821b3e79d
+# ╠═86b26b1a-e835-4456-b0ee-6fadbfb0f329
+# ╠═67c6beb7-776c-48de-aa73-0356ff3360d6
+# ╟─5c1c2d87-f30c-4c88-ab6d-0bed3f49f162
+# ╠═fa872d2c-01f3-4d5b-b4fc-468a3d49c8b2
+# ╠═fca7dc09-abba-4ae8-91eb-81f8e3f7e37e
+# ╠═6b76e39c-fd58-41bd-afb4-d7e57507daab
+# ╠═04beebce-9437-41c1-a4c5-a3852a969ea5
+# ╟─0e2dd706-7c75-4f03-bfc0-7349e043c466
+# ╠═004d3d58-ca6f-4387-b351-862e0b014b26
+# ╠═cb2b415d-7c8e-4b2e-90fc-236f9365d6af
+# ╠═99b3707b-f4d8-428f-9900-41fa1282db50
+# ╠═85ab9e71-f6df-4893-9455-584b50eda024
+# ╟─43d263b1-a2d7-4194-b3ec-691550e24fa3
+# ╠═80e781c5-0151-45c9-b97a-8437e606400b
+# ╠═4dbeaf16-91aa-4e95-94e7-f7ac54f3f06d
+# ╠═ea1a41be-ab0c-417d-8b1f-503c3a8b10fd
+# ╠═cc64098e-0e68-4a06-8e82-3ee6634db780
+# ╟─36e6d733-0c7b-479d-801f-6c5bd6bb26c5
+# ╠═5f74772a-ab67-47e7-9781-71a417a70d2f
 # ╠═84e338d3-3653-4bb7-adf7-e82814749ee1
+# ╠═b569ac41-4bd3-466e-a4e5-9515fc637ffa
+# ╠═3f22fabf-51d2-4625-a32f-1bb7ba544624
+# ╟─d609522b-f751-4bea-8efa-6ad79c95a498
 # ╟─6626ffdb-fdc0-492b-b7e8-dcf4a98afae7
 # ╟─5889eede-0150-476a-a0d1-7298b616172f
 # ╟─5ddec9aa-8c2c-447f-b97c-a91b39be792b
