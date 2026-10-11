@@ -18,7 +18,7 @@ md"
 ====================================================================================
 #### SICP: [3.1.1\_Local\_State\_Variables](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-19.html#%_chap_3)
 ##### file: PCM20230112\_SICP\_3.1.1\_LocalStateVariables.jl
-##### Julia/Pluto.jl-code (1.13.1/1.0.3) by PCM *** 2026/10/10 ***
+##### Julia/Pluto.jl-code (1.13.1/1.0.3) by PCM *** 2026/10/11 ***
 
 ====================================================================================
 
@@ -586,7 +586,8 @@ We can demonstrate that in some circumstances it is possible to skim off informa
 # ╔═╡ 4259e000-303f-441b-8418-dfd326cdc987
 md"
 ---
-###### [Cox' *Closure* Trick](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/)
+##### [Cox' *Closure* Trick](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/)
+
 ...*There is again a creative option with closures to make it even harder to access the properties, similar to the previous section. You initialize a type with functions as properties. Basically you combine functions (everything private) with types (everything public).* [Cox](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/)
 
 Where is the *closure* in Cox' code ? Strictly speaking, only $area()$ is the closure. $Rectangle(width, height)$ is an ordinary function that creates the *closure*.
@@ -929,7 +930,15 @@ md"
 ---
 #### 4. Summary
 
-In Section 3.1, we transcribed the Scheme code from SICP 3.1 into Julia. In Section 3.2, we rewrote the Julia code to make it more idiomatic. We then introduced [Cox’s code, known as the “Closure Trick”](https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/). This code placed particular emphasis on *encapsulation* and *privacy*. I then refactored Cox’s code into my *Two-struct-factory* using two $struct$s and a *method*. In this *factory*, we moved Cox’s method into the second structure as an *inner constructor*. This has several advantages, as a comparison of the two approaches by Claude demonstrates.
+In Section 3.1, we transcribed the Scheme code from SICP 3.1 into Julia. In Section 3.2, we rewrote the Julia code to make it more idiomatic. 
+
+There, in 3.2.3, we presented [Cox’s code, known as the “Closure Trick”] (https://www.functionalnoise.com/pages/2021-07-02-julia-encapsulation/). This code placed particular emphasis on *encapsulation* and *privacy*. I then refactored Cox’s code into my *Two-struct-factory* using only two *struct*s. 
+
+The first *struct* deals with the *private* and the second with the *public* stuff. In this *factory*, we moved Cox’s *method* into the second *struct* as an *inner constructor*. This has several advantages, as a comparison of the two approaches by Claude demonstrates. 
+
+Most importantly from my point of view is the fact, that the he *Two-Struct-Factory* generates objects with *methods included*. This seems to be more like traditional OO where objects 'can have methods'.
+
+In 3.2.4, the *Two-Struct-Factory* pattern was then applied to the *bank account problem* separating private and public accessable information.
 
 "
 
